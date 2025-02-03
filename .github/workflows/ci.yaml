@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+permissions:
+  contents: read
+
+jobs:
+  fmt:
+    name: Format
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Check Go modules
+        run: |
+          go mod tidy && git add go.* &&
+          git diff --cached --exit-code || (echo 'Please run "go mod tidy" to sync Go modules' && exit 1);
+      - name: Verify gofumpt
+        run: |
+          echo "refer to https://github.com/mvdan/gofumpt for detailed info" &&
+          GO111MODULE=on go install mvdan.cc/gofumpt@v0.4.0 &&
+          make fmt && git add pkg cmd &&
+          git diff --cached --exit-code || (echo 'Please run "make fmt" to verify fmt' && exit 1);
+
+  vet:
+    name: Vet
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Verify govet
+        run: |
+          make vet && git add pkg cmd &&
+          git diff --cached --exit-code || (echo 'Please run "make vet" to verify govet' && exit 1);
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: false
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          args: --timeout=10m
+  test:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v5
+      - name: Install dependencies
+        run: go mod tidy
+      - name: Run tests
+        run: make test # 使用我们自己的测试命令
+      - name: Check the number of changed lines
+        run: | # 比较基础提交和最新提交的差别，新增代码行数不超过 10 行则不需要检查
+          LINES_ADDED=$(git diff --numstat ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} pkg/ | awk '{ add += $1 } END { printf add }')
+          echo "lines added: $LINES_ADDED"
+          if [[ $LINES_ADDED -lt 10 ]]; then
+            echo "NEED_TO_CHECK=false" >> $GITHUB_ENV
+          else
+            echo "NEED_TO_CHECK=true" >> $GITHUB_ENV
+          fi
+      - name: Upload results to Codecov
+        if: ${{ (env.NEED_TO_CHECK == 'true') || (github.event_name != 'pull_request') }}
+        uses: codecov/codecov-action@v5
+        with:
+          flags: unittest
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: coverage.txt
+          fail_ci_if_error: true
+          verbose: true
+
+  license:
+    name: License
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check license header
+        run: |
+          make license && git add pkg cmd &&
+          git diff --cached --exit-code || (echo 'Please run "make license" to add license headers' && exit 1);

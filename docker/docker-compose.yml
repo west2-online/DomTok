@@ -1,0 +1,246 @@
+services:
+  domtok-redis:
+    container_name: domtok-redis
+    image: redis:bookworm # 选择使用 redis 官方的 bookworm tag
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - "6379:6379"
+    env_file:
+      - "./env/redis.env"
+    networks:
+      - domtok
+
+  domtok-mysql:
+    container_name: domtok-mysql
+    image: mysql:9.0.1 # 选择使用 mysql 官方的 9.0.1 版本
+    env_file:
+      - "./env/mysql.env"
+    ports:
+      - "3306:3306"
+    networks:
+      - domtok
+    volumes:
+      - ../config/sql:/docker-entrypoint-initdb.d
+      - ./data/mysql:/var/lib/mysql
+
+  domtok-etcd:
+    container_name: domtok-etcd
+    # image: bitnami/etcd:3.5-debian-12
+    image: quay.io/coreos/etcd:v3.5.5 # 计划使用 vmware 的 etcd3.5，但是似乎遇到了权限问题，data 挂载不上
+    restart: always
+    ports:
+      - 2379:2379
+      - 2380:2380
+    env_file:
+      - "./env/etcd.env"
+    volumes:
+      - ./script:/script
+      - ../config:/config
+      - ./data/etcd:/etcd-data
+    networks:
+      - domtok
+    entrypoint: [ "sh", "-c", "chmod +x /script/etcd-monitor.sh && /script/etcd-monitor.sh & exec etcd" ]
+
+#  etcd-keeper:
+#    hostname: domtok-etcdkeeper
+#    image: evildecay/etcdkeeper
+#    environment:
+#      - ETCD_HOSTS=http://etcd:2379
+#      - SW_STORAGE_ETCD_CLUSTER_NODES=etcd:2379
+#      - HOST=0.0.0.0
+#      - HOSTNAME=etcd-keeper
+#    links:
+#      - etcd
+#    ports:
+#      - 8099:8080
+#    depends_on:
+#      - etcd
+#    networks:
+#      - domtok
+#
+#  elasticsearch:
+#    image: elasticsearch:8.4.2
+#    container_name: domtok-elasticsearch
+#    environment:
+#      bootstrap.memory_lock: "true"
+#      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+#      discovery.type: single-node
+#      ingest.geoip.downloader.enabled: "false"
+#      TZ: Asia/Shanghai
+#      xpack.security.enabled: "false"
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl -sf http://elasticsearch:9200/_cluster/health || exit 1" ] # ⼼跳检测，成功之后不再执⾏后⾯的退出
+#      interval: 60s # ⼼跳检测间隔周期
+#      timeout: 10s
+#      retries: 3
+#      start_period: 60s # ⾸次检测延迟时间
+#    ulimits:
+#      memlock:
+#        soft: -1
+#        hard: -1
+#    volumes:
+#      - ../config/elasticsearch:/usr/share/elasticsearch/config
+#      - ./data/elasticsearch:/usr/share/elasticsearch/data
+#    ports:
+#      - "9200:9200"
+#    restart: always
+#    networks:
+#      - domtok
+#
+#  kibana:
+#    image: kibana:8.4.2
+#    container_name: domtok-kibana
+#    environment:
+#      - I18N_LOCALE=zh-CN
+#      - XPACK_GRAPH_ENABLED=true
+#      - TIMELION_ENABLED=true
+#      - XPACK_MONITORING_COLLECTION_ENABLED="true"
+#      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+#    depends_on:
+#      - elasticsearch
+#    ports:
+#      - "5601:5601"
+#    volumes:
+#      - ../config/kibana:/usr/share/kibana/config
+#      - ./data/kibana:/usr/share/kibana/data
+#    networks:
+#      - domtok
+#
+#  filebeat:
+#    image: elastic/filebeat:8.4.2
+#    container_name: domtok-filebeat
+#    user: root
+#    volumes:
+#      - ../config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml # 挂载配置文件
+#      - ./data/filebeat:/usr/share/filebeat/data  # 持久化注册表文件
+#      - ../log:/usr/share/filebeat/logs  # 挂载日志目录
+#    depends_on:
+#      elasticsearch:
+#        condition: service_healthy
+#    restart: on-failure
+#    networks:
+#      - domtok
+
+#
+#    jaeger:
+#      container_name: domtok-jaeger
+#      image: "jaegertracing/all-in-one:latest"
+#      restart: always
+#      ports:
+#        - 16686:16686
+#        - 6831:6831/udp
+#      volumes:
+#        - ./data/jaeger:/var/lib/jaeger
+#        - ../config/jaeger:/etc/jaeger
+#      networks:
+#        - domtok
+#
+#    prometheus:
+#      image: prom/prometheus
+#      container_name: domtok-prometheus
+#      hostname: prometheus
+#      restart: always
+#      volumes:
+#        - ../config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+#      ports:
+#        - 9090:9090
+#      networks:
+#        - domtok
+#
+#    grafana:
+#      image: grafana/grafana
+#      container_name: domtok-grafana
+#      restart: always
+#      ports:
+#        - 3000:3000
+#      volumes:
+#        - ../config/grafana:/etc/grafana
+#      networks:
+#        - domtok
+#
+#    alertmanager: #预警模块
+#      image: prom/alertmanager
+#      container_name: domtok-alertmanager
+#      restart: always
+#      ports:
+#        - 9093:9093
+#      networks:
+#        - domtok
+#
+#    node-exporter:
+#      image: quay.io/prometheus/node-exporter
+#      container_name: domtok-node-exporter
+#      restart: always
+#      ports:
+#        - 9100:9100
+#      networks:
+#        - domtok
+#
+#    cadvisor:
+#      image: google/cadvisor:latest
+#      container_name: domtok-cadvisor
+#      restart: always
+#      platform: linux/amd64
+#      volumes:
+#        - /:/rootfs:ro
+#        - /var/run:/var/run:rw
+#        - /sys:/sys:ro
+#        - /var/lib/docker/:/var/lib/docker:ro
+#      ports:
+#        - 8899:8080
+#      networks:
+#        - domtok
+#
+#    redis-exporter:
+#      image: oliver006/redis_exporter
+#      container_name: domtok-redis-exporter
+#      restart: always
+#      ports:
+#        - 9121:9121
+#      command:
+#        - "--redis.addr=redis://127.0.0.1:6379"
+#      networks:
+#        - domtok
+#
+#  mysql_xporter:
+#    image: prom/mysqld-exporter
+#    container_name: domtok-mysql-exporter
+#    restart: always
+#    ports:
+#      - 9104:9104
+#    environment:
+#      DATA_SOURCE_NAME: 'exporter:123456@(127.0.0.1:3306)'
+#    networks:
+#       - domtok
+#
+#  kafka:
+#    container_name: domtok-kafka
+#    image: bitnami/kafka:latest
+#    restart: always
+#    user: root
+#    ports:
+#      - "9092:9092"
+#      - "9093:9093"
+#    env_file:
+#      - ./env/kafka.env
+#    volumes:
+#      - ./data/kafka:/bitnami/kafka
+#    networks:
+#      - domtok
+#
+#  kafka-ui:
+#    container_name: domtok-kafka-ui
+#    image: provectuslabs/kafka-ui:latest
+#    restart: always
+#    ports:
+#      - "9091:8080"
+#    env_file:
+#      - ./env/kafka-ui.env
+#    networks:
+#      - domtok
+
+networks:
+  domtok:
+    driver: bridge
+    name: domtok

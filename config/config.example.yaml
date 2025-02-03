@@ -1,0 +1,66 @@
+server:
+  private-key: | # PKCS#8
+    -----BEGIN PRIVATE KEY-----
+    {insert your private key here}
+    -----END PRIVATE KEY-----
+  version: "1.0"
+  name: "DomTok"
+  log-level: "INFO" # OPTIONS: TRACE, DEBUG, INFO(default), NOTICE, WARN, ERROR, FATAL
+
+defaultUser:
+  account: ""
+  password: ""
+
+snowflake:
+  worker-id: 0
+  datancenter-id: 0
+
+mysql:
+  addr: 127.0.0.1:3306
+  database: DomTok
+  username: DomTok
+  password: DomTok
+  charset: utf8mb4
+
+oss:
+  endpoint: ""
+  accessKey-id: ""
+  accessKey-secret: ""
+  bucketname: ""
+  main-directory: DomTok
+
+elasticsearch:
+  addr: 127.0.0.1:9200
+  host: 127.0.0.1
+
+redis:
+  addr: DomTok-redis:6379
+  password: DomTok
+
+jaeger:
+  addr: 127.0.0.1:6831
+
+kafka:
+  address: 127.0.0.1:9092
+  network: tcp
+  user: DomTok
+  password: DomTok-password
+
+services:
+  template:
+    name: template
+    load-balance: false
+    addr:
+    - 127.0.0.1:10001
+
+  api:
+    name: api
+    load-balance: false
+    addr:
+    - 0.0.0.0:20001
+
+  user:
+    name: user
+    load-balance: false
+    addr:
+    - 0.0.0.0:20002
