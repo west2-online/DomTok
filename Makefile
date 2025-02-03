@@ -13,9 +13,9 @@
 # 检查 tmux 是否存在
 TMUX_EXISTS := $(shell command -v tmux)
 # 远程仓库
-REMOTE_REPOSITORY = registry.cn-hangzhou.aliyuncs.com/west2-online/fzuhelper-server
+REMOTE_REPOSITORY = registry.cn-hangzhou.aliyuncs.com/west2-online/DomTok
 # 项目 MODULE 名
-MODULE = github.com/west2-online/fzuhelper-server
+MODULE = github.com/west2-online/DomTok
 # 当前架构
 ARCH := $(shell uname -m)
 # 目录相关
@@ -68,6 +68,7 @@ env-down:
 	@ cd ./docker && docker compose down
 
 # 生成基于 Kitex 的业务代码，在新建业务时使用
+# TODO: 这么写是因为 kitex 这个 cli 太难用了，计划修改成 cwgo 的
 .PHONY: kitex-gen-%
 kitex-gen-%:
 	mkdir -p $(CMD)/$* && cd $(CMD)/$* && \
@@ -85,6 +86,7 @@ kitex-update-%:
 	kitex -module "${MODULE}" idl/$*.thrift
 
 # 生成基于 Hertz 的脚手架
+# TODO: 这个和 Kitex 的区别在于这个 update 实际上做了 gen 的工作，相关路径需要在 .hz 中修改
 .PHONY: hertz-gen-api
 hertz-gen-api:
 	hz update -idl ${IDL_PATH}/api.thrift
