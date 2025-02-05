@@ -8,7 +8,6 @@ struct BaseResp {
 struct UserInfo {
     1: i64 userId,
     2: string name,
-    3: string password,
 }
 
 struct Coupon {
@@ -111,4 +110,18 @@ struct BaseOrderGoods {
     3: required i64 StyleID; // 商品款式 ID
     4: required double PurchaseQuantity; // 购买数量
     5: i64 CouponID // 优惠券 ID
+}
+
+/*
+ * struct CreditCardInfo 信用卡信息
+ * @Param maskedCreditCardNumber 仅存储信用卡号掩码，如 **** **** **** 1234
+ * @Param creditCardExpirationYear 信用卡到期年
+ * @Param creditCardExpirationMonth 信用卡到期月
+ * @Param creditCardCvv 信用卡
+ */
+struct CreditCardInfo {
+    1: required string maskedCreditCardNumber
+    2: required i64 creditCardExpirationYear
+    3: required i64 creditCardExpirationMonth
+    4: required i64 creditCardCvv
 }

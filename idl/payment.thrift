@@ -12,7 +12,7 @@ include "model.thrift"
 struct PaymentRequest {
     1: required i64 orderID
     2: required i64 userID
-    4: required CreditCardInfo creditCard
+    4: required model.CreditCardInfo creditCard
     5: optional string description
 }
 
@@ -42,19 +42,6 @@ struct RefundResponse {
     3: required i64 status
 }
 
-/*
- * struct CreditCardInfo 信用卡信息
- * @Param maskedCreditCardNumber 仅存储信用卡号掩码，如 **** **** **** 1234
- * @Param creditCardExpirationYear 信用卡到期年
- * @Param creditCardExpirationMonth 信用卡到期月
- * @Param creditCardCvv 信用卡
- */
-struct CreditCardInfo {
-    1: required string maskedCreditCardNumber
-    2: required i64 creditCardExpirationYear
-    3: required i64 creditCardExpirationMonth
-    4: required i64 creditCardCvv
-}
 
 /*
  * service PaymentService 支付服务
