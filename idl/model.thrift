@@ -11,10 +11,33 @@ struct UserInfo {
     3: string password,
 }
 
+struct CategoryInfo {
+    1: required i64 categoryID;
+    2: required string name;
+}
+
 struct Coupon {
     1: required i64 couponID;
-    2: required i64 userID;
-    3: required i64 activityID;
+    2: required i64 creatorID;
+    3: required i64 deadlineForGet;
+    4: required string name;
+    5: required string typeInfo;
+    6: required double conditionCost;
+    7: optional double discountAmount;
+    8: optional double discount;
+    9: required i64 rangeType;
+    10: required i64 rangeId;
+    11: required i64 expireTime;
+    12: required string description;
+    13: required i64 createdAt;
+    14: optional i64 updatedAt;
+    15: optional i64 deletedAt;
+}
+
+struct UserCoupon {
+    1: required i64 couponID;
+    2: required i64 creatorID;
+    3: required i64 userID;
     4: required string name;
     5: required string typeInfo;
     6: required i64 conditionCost;
@@ -24,11 +47,8 @@ struct Coupon {
     10: required i64 rangeId;
     11: required i64 expireAt;
     12: required string description;
-    13: required i64 createdAt;
-    14: optional i64 updatedAt;
-    15: optional i64 deletedAt;
-    16: required i64 remainUserUseCount;
-    17: required i64 expireTime
+    13: required i64 remainUserUseCount;
+    14: required i64 createdAt;
 }
 
 struct AttrValue {
@@ -55,22 +75,21 @@ struct SkuImage {
 struct Spu {
     1: required i64 spuID;
     2: required string name;
-    3: required i64 userID;
+    3: required i64 creatorID;
     4: required string description;
-    5: optional i64 brandID;
-    6: required i64 categoryID;
-    7: required string goodsHeadDrawing;
-    8: required double price;
-    9: required string forSale;
-    10: required double shipping;
-    11: required i64 createdAt;
-    12: required i64 updatedAt;
-    13: optional i64 deletedAt;
+    5: required i64 categoryID;
+    6: required string goodsHeadDrawing;
+    7: required double price;
+    8: required string forSale;
+    9: required double shipping;
+    10: required i64 createdAt;
+    11: required i64 updatedAt;
+    12: optional i64 deletedAt;
 }
 
 struct Sku {
     1: required i64 skuID;
-    2: required i64 userID;
+    2: required i64 creatorID;
     3: required double price;
     4: required string name;
     5: required string description;
@@ -84,6 +103,18 @@ struct Sku {
     13: optional list<AttrValue> saleAttr;
     14: required i64 historyID;
     15: required i64 lockStock;
+}
+
+struct SkuInfo {
+    1: required i64 skuID;
+    2: required i64 creatorID;
+    3: required double price;
+    4: required string name;
+    5: required string forSale;
+    6: required i64 lockStock;
+    7: required string styleHeadDrawing;
+    8: required i64 spuID;
+    9: required i64 historyID;
 }
 
 struct OrderGoods {
