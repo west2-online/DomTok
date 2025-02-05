@@ -56,8 +56,8 @@ struct PaymentResponse {
 struct RefundRequest {
     1: required i64 orderID
     2: required i64 userID
-    4: required double refundAmount
-    5: required string refundReason
+    3: required double refundAmount
+    4: required string refundReason
 }
 
 struct RefundResponse {
