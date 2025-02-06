@@ -16,10 +16,20 @@ type PersistencePort interface {
 type CachePort interface {
 }
 
-type UseCase struct {
-	DB PersistencePort
+// TemplateRPCPort 表示模板服务的 RPC 接口
+// 比如 template 服务有非常多的 RPC 接口，但是目前只需要一个接口，也就是 User 不依赖于它所不需要的接口
+type TemplateRPCPort interface {
+	GetTemplateInfo(ctx context.Context) (*entities.TemplateModel, error)
 }
 
-func NewUserCase(db PersistencePort) *UseCase {
-	return &UseCase{DB: db}
+type UseCase struct {
+	DB             PersistencePort
+	templateClient TemplateRPCPort
+}
+
+func NewUserCase(db PersistencePort, tempate TemplateRPCPort) *UseCase {
+	return &UseCase{
+		DB:             db,
+		templateClient: tempate,
+	}
 }
