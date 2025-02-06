@@ -92,8 +92,8 @@ linters-settings:
     # Allowed error "wildcards".
     # Default: []
     allowed-errors-wildcard:
-      - err: "github.com/west2-online/fzuhelper-server/pkg/errno"
-        fun: "github.com/west2-online/fzuhelper-server/pkg/errno"
+      - err: "github.com/west2-online/domtok/pkg/errno"
+        fun: "github.com/west2-online/domtok/pkg/errno"
   misspell:
     # Correct spellings using locale preferences for US or UK.
     # Default is to use a neutral variety of English.
