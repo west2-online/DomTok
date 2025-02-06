@@ -10,6 +10,10 @@ struct UserInfo {
     2: string name,
 }
 
+struct LoginData {
+    1: i64 userId,
+}
+
 struct Coupon {
     1: required i64 couponID;
     2: required i64 userID;
@@ -95,7 +99,7 @@ struct OrderGoods {
     7: required string StyleHeadDrawing; // 款式头图
     8: required double OriginCast; // 原价
     9: required double SaleCast; // 售卖价
-    10: required double PurchaseQuantity; // 购买数量
+    10: required i64 PurchaseQuantity; // 购买数量
     11: required double PaymentAmount; // 支付金额
     12: required double FreightAmount; // 运费金额
     13: required double SettlementAmount; // 结算金额
@@ -108,7 +112,7 @@ struct BaseOrderGoods {
     1: required i64 MerchantID; // 商家 ID
     2: required i64 GoodsID; // 商品 ID
     3: required i64 StyleID; // 商品款式 ID
-    4: required double PurchaseQuantity; // 购买数量
+    4: required i64 PurchaseQuantity; // 购买数量
     5: i64 CouponID // 优惠券 ID
 }
 

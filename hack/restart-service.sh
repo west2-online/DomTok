@@ -17,7 +17,7 @@
 # This script file will automatically pull the latest image (if available), exit, delete the original image and container, and finally launch a new container.
 # Usually, we only need to modify the initial few configurations, and the rest of the content does not need to be changed.
 
-IMAGE_NAME="registry.cn-hangzhou.aliyuncs.com/west2-online/fzuhelper-server:latest"
+IMAGE_NAME="registry.cn-hangzhou.aliyuncs.com/west2-online/DomTok:latest"
 CONTAINER_NAME_PREFIX="fzuhelper"
 NET_MODE="host"
 

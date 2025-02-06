@@ -14,7 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package user
+package constants
 
-// KitexUnusedProtection is used to prevent 'imported and not used' error.
-var KitexUnusedProtection = struct{}{}
+import "time"
+
+const (
+	// 请求体最大体积
+	ServerMaxRequestBodySize = 1 << 31
+
+	CorsMaxAge = 12 * time.Hour
+
+	SentinelThreshold        = 100
+	SentinelStatIntervalInMs = 1000
+)

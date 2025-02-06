@@ -24,7 +24,7 @@ import (
 	"github.com/cloudwego/kitex/pkg/klog"
 	"go.uber.org/zap"
 
-	"github.com/west2-online/fzuhelper-server/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/constants"
 )
 
 type KlogLogger struct{}
@@ -34,87 +34,87 @@ func GetKlogLogger() *KlogLogger {
 }
 
 func (l *KlogLogger) Trace(v ...interface{}) {
-	Debug(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.debug(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) Debug(v ...interface{}) {
-	Debug(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.debug(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) Info(v ...interface{}) {
-	Info(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.info(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) Notice(v ...interface{}) {
-	Info(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.info(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) Warn(v ...interface{}) {
-	Warn(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.warn(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) Error(v ...interface{}) {
-	Error(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.error(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) Fatal(v ...interface{}) {
-	Fatal(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.fatal(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) Tracef(format string, v ...interface{}) {
-	Debug(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.debug(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) Debugf(format string, v ...interface{}) {
-	Debug(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.debug(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) Infof(format string, v ...interface{}) {
-	Info(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.info(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) Noticef(format string, v ...interface{}) {
-	Info(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.info(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) Warnf(format string, v ...interface{}) {
-	Warn(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.warn(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) Errorf(format string, v ...interface{}) {
-	Error(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.error(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) Fatalf(format string, v ...interface{}) {
-	Fatal(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.fatal(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) CtxTracef(ctx context.Context, format string, v ...interface{}) {
-	Debug(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.debug(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) CtxDebugf(ctx context.Context, format string, v ...interface{}) {
-	Debug(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.debug(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) CtxInfof(ctx context.Context, format string, v ...interface{}) {
-	Info(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.info(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) CtxNoticef(ctx context.Context, format string, v ...interface{}) {
-	Info(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.info(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) CtxWarnf(ctx context.Context, format string, v ...interface{}) {
-	Warn(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.warn(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) CtxErrorf(ctx context.Context, format string, v ...interface{}) {
-	Error(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.error(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) CtxFatalf(ctx context.Context, format string, v ...interface{}) {
-	Fatal(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
+	control.fatal(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
 func (l *KlogLogger) SetLevel(klog.Level) {

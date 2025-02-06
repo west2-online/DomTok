@@ -39,7 +39,8 @@ struct ViewOrderResp {
     5: required double PaymentAmount; // 实际付款价
     6: required i64 AddressID; // 地址信息 ID
     7: required string AddressInfo; // 简略地址信息
-    8: required list<model.OrderGoods> OrderGoods; // 商品列表
+    8: required string Status; // 订单状态
+    9: required list<model.OrderGoods> OrderGoods; // 商品列表
 }
 
 struct CancelOrderReq {

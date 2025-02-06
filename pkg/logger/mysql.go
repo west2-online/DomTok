@@ -21,13 +21,13 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/west2-online/fzuhelper-server/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/constants"
 )
 
 type MysqlLogger struct{}
 
 func (l *MysqlLogger) Printf(template string, args ...interface{}) {
-	Info(fmt.Sprintf(template, args...), zap.String(constants.SourceKey, constants.MysqlSource))
+	control.info(fmt.Sprintf(template, args...), zap.String(constants.SourceKey, constants.MysqlSource))
 }
 
 func GetMysqlLogger() *MysqlLogger {

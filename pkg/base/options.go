@@ -19,12 +19,12 @@ package base
 import (
 	cli "github.com/cloudwego/hertz/pkg/app/client"
 
-	"github.com/west2-online/fzuhelper-server/config"
-	"github.com/west2-online/fzuhelper-server/pkg/base/client"
-	"github.com/west2-online/fzuhelper-server/pkg/cache"
-	"github.com/west2-online/fzuhelper-server/pkg/db"
-	"github.com/west2-online/fzuhelper-server/pkg/logger"
-	"github.com/west2-online/fzuhelper-server/pkg/utils"
+	"github.com/west2-online/DomTok/config"
+	"github.com/west2-online/DomTok/pkg/base/client"
+	"github.com/west2-online/DomTok/pkg/cache"
+	"github.com/west2-online/DomTok/pkg/db"
+	"github.com/west2-online/DomTok/pkg/logger"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 // WithRedisClient will create redis object
@@ -45,9 +45,9 @@ func WithRedisClient(dbName int) Option {
 }
 
 // WithDBClient will create database object
-func WithDBClient(tableName string) Option {
+func WithDBClient() Option {
 	return func(clientSet *ClientSet) {
-		DB, err := client.InitMySQL(tableName)
+		DB, err := client.InitMySQL()
 		if err != nil {
 			logger.Fatalf("init database failed, err: %v", err)
 		}

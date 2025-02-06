@@ -26,16 +26,17 @@ import (
 	glogger "gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 
-	"github.com/west2-online/fzuhelper-server/pkg/constants"
-	"github.com/west2-online/fzuhelper-server/pkg/logger"
-	"github.com/west2-online/fzuhelper-server/pkg/utils"
+	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 // InitMySQL 通用初始化mysql函数，传入tableName指定表
-func InitMySQL(tableName string) (db *gorm.DB, err error) {
+func InitMySQL() (db *gorm.DB, err error) {
 	dsn, err := utils.GetMysqlDSN()
 	if err != nil {
-		return nil, fmt.Errorf("dal.InitMySQL %s:get mysql DSN error: %w", tableName, err)
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("dal.InitMySQL get mysql DSN error: %v", err))
 	}
 	db, err = gorm.Open(mysql.Open(dsn),
 		&gorm.Config{
@@ -56,23 +57,23 @@ func InitMySQL(tableName string) (db *gorm.DB, err error) {
 				}),
 		})
 	if err != nil {
-		return nil, fmt.Errorf("dal.InitMySQL %s:mysql connect error: %w", tableName, err)
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("dal.InitMySQL mysql connect error: %v", err))
 	}
 
 	sqlDB, err := db.DB() // 尝试获取 DB 实例对象
 	if err != nil {
-		return nil, fmt.Errorf("get generic database object error: %w", err)
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("get generic database object error: %v", err))
 	}
 
 	sqlDB.SetMaxIdleConns(constants.MaxIdleConns)       // 最大闲置连接数
 	sqlDB.SetMaxOpenConns(constants.MaxConnections)     // 最大连接数
 	sqlDB.SetConnMaxLifetime(constants.ConnMaxLifetime) // 最大可复用时间
 	sqlDB.SetConnMaxIdleTime(constants.ConnMaxIdleTime) // 最长保持空闲状态时间
-	db = db.Table(tableName).WithContext(context.Background())
+	db = db.WithContext(context.Background())
 
 	// 进行连通性测试
 	if err := sqlDB.Ping(); err != nil {
-		return nil, fmt.Errorf("ping database error: %w", err)
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("ping database error: %v", err))
 	}
 
 	return db, nil

@@ -31,7 +31,5 @@ const (
 
 // Redis DB Name
 const (
-	RedisDBEmptyRoom    = 0
-	RedisDBLaunchScreen = 1
-	RedisDBPaper        = 2
+	RedisDBOrder = 0
 )
