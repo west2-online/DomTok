@@ -19,11 +19,11 @@ include "model.thrift"
 struct CreateCouponReq {
     1: required i64 userID;
     2: required string name;
-    3: required string typeInfo;
+    3: required i32 typeInfo;
     4: optional double conditionCost;
     5: optional double discountAmount;
     6: optional double discount;
-    7: required string rangeType;
+    7: required i32 rangeType;
     8: required i64 rangeID;
     9: optional string description;
     10: required i64 expireTime;
@@ -135,7 +135,7 @@ struct CreateSpuReq {
     5: required i64 categoryID;
     6: required string goodsHeadDrawing;
     7: required double price;
-    8: required string forSale;
+    8: required i32 forSale;
     9: required double shipping;
 }
 
@@ -165,7 +165,7 @@ struct UpdateSpuReq {
     5: optional i64 categoryID;
     6: optional string goodsHeadDrawing;
     7: optional double price;
-    8: optional string forSale;
+    8: optional i32 forSale;
     9: optional double shipping;
     10: required i64 spuID;
 }
@@ -249,7 +249,7 @@ struct CreateSkuReq {
     4: required string description;
     5: required string styleHeadDrawing;
     6: required double price;
-    7: required string forSale;
+    7: required i32 forSale;
     8: required double shipping;
     9: required i64 spuID;
     10: required i64 stock;
@@ -279,7 +279,7 @@ struct UpdateSkuReq {
     4: optional string description;
     5: optional string styleHeadDrawing;
     6: optional double price;
-    7: optional string forSale;
+    7: optional i32 forSale;
     8: optional i64 Stock;
     9: optional double shipping;
 }
@@ -495,6 +495,8 @@ service CommodityService {
     ViewSkuResp ViewSku(1: ViewSkuReq req);
     UploadSkuAttrResp UploadSkuAttr(1: UploadSkuAttrReq req);
     ListSkuInfoResp ListSkuInfo(1: ListSkuInfoReq req);
+
+    //供订单服务调用
     DescSkuLockStockResp DescSkuLockStock(1: DescSkuLockStockReq req);
     IncrSkuLockStockResp IncrSkuLockStock(1: IncrSkuLockStockReq req);
     DescSkuStockResp DescSkuStock(1: DescSkuStockReq req);

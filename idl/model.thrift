@@ -21,11 +21,11 @@ struct Coupon {
     2: required i64 creatorID;
     3: required i64 deadlineForGet;
     4: required string name;
-    5: required string typeInfo;
+    5: required i32 typeInfo;
     6: required double conditionCost;
     7: optional double discountAmount;
     8: optional double discount;
-    9: required i64 rangeType;
+    9: required i32 rangeType;
     10: required i64 rangeId;
     11: required i64 expireTime;
     12: required string description;
@@ -39,7 +39,7 @@ struct UserCoupon {
     2: required i64 creatorID;
     3: required i64 userID;
     4: required string name;
-    5: required string typeInfo;
+    5: required i32 typeInfo;
     6: required i64 conditionCost;
     7: optional double discountAmount;
     8: optional double discount;
@@ -80,7 +80,7 @@ struct Spu {
     5: required i64 categoryID;
     6: required string goodsHeadDrawing;
     7: required double price;
-    8: required string forSale;
+    8: required i32 forSale;
     9: required double shipping;
     10: required i64 createdAt;
     11: required i64 updatedAt;
@@ -93,7 +93,7 @@ struct Sku {
     3: required double price;
     4: required string name;
     5: required string description;
-    6: required string forSale;
+    6: required i32 forSale;
     7: required i64 stock;
     8: required string styleHeadDrawing;
     9: required i64 createdAt;
@@ -110,7 +110,7 @@ struct SkuInfo {
     2: required i64 creatorID;
     3: required double price;
     4: required string name;
-    5: required string forSale;
+    5: required i32 forSale;
     6: required i64 lockStock;
     7: required string styleHeadDrawing;
     8: required i64 spuID;
