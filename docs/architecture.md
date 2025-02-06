@@ -11,3 +11,5 @@
 ### 名词解释
 - port：接口，与 golang 中的关键字 interface 做了区分，意思是一样的
 - adapter：实现 port 的具体类
+- application business：需要依赖外部依赖的复杂业务逻辑，比如设计数据库的操作
+- enterprise business：不依赖任何外部依赖的业务逻辑，简单理解为业务逻辑围绕 entity 实体展开
