@@ -71,10 +71,7 @@ env-down:
 # TODO: 这么写是因为 kitex 这个 cli 太难用了，计划修改成 cwgo 的
 .PHONY: kitex-gen-%
 kitex-gen-%:
-	mkdir -p $(CMD)/$* && cd $(CMD)/$* && \
 	kitex \
-	-gen-path ../../kitex_gen \
-	-service "$*" \
 	-module "$(MODULE)" \
 	-type thrift \
 	$(DIR)/idl/$*.thrift

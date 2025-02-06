@@ -6,7 +6,7 @@ struct BaseResp {
 }
 
 struct UserInfo {
-    1: required i64 userId,
+    1: required i64 uid,
     2: required string name,
     3: required string email,
     4: required string phone,

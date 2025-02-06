@@ -5,8 +5,8 @@ include "model.thrift"
 struct RegisterRequest {
     1: required string username,
     2: required string password,
-    3: optional string email,
-    4: optional string phone,
+    3: required string email,
+    4: required string phone,
 }
 
 struct RegisterResponse {

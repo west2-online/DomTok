@@ -8,8 +8,10 @@ require (
 	github.com/bytedance/gopkg v0.1.1
 	github.com/bytedance/mockey v1.2.14
 	github.com/bytedance/sonic v1.12.8
+	github.com/cloudwego/gopkg v0.1.3
 	github.com/cloudwego/hertz v0.9.5
 	github.com/cloudwego/kitex v0.12.1
+	github.com/cloudwego/kitex/pkg/protocol/bthrift v0.0.0-20250124072755-047444c8e964
 	github.com/elastic/go-elasticsearch v0.0.0
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/h2non/filetype v1.1.3
@@ -46,9 +48,7 @@ require (
 	github.com/cloudwego/dynamicgo v0.5.0 // indirect
 	github.com/cloudwego/fastpb v0.0.5 // indirect
 	github.com/cloudwego/frugal v0.2.4 // indirect
-	github.com/cloudwego/gopkg v0.1.3 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
-	github.com/cloudwego/kitex/pkg/protocol/bthrift v0.0.0-20250124072755-047444c8e964 // indirect
 	github.com/cloudwego/localsession v0.1.2 // indirect
 	github.com/cloudwego/netpoll v0.6.5 // indirect
 	github.com/cloudwego/runtimex v0.1.1 // indirect
