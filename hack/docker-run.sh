@@ -33,7 +33,7 @@ get_port() {
 }
 
 # Docker容器的镜像名称
-IMAGE_NAME="registry.cn-hangzhou.aliyuncs.com/west2-online/fzuhelper-server"
+IMAGE_NAME="registry.cn-hangzhou.aliyuncs.com/west2-online/DomTok"
 
 # 要启动的服务，默认为 "all" 如果没有提供参数
 SERVICE_TO_START=${1:-all}

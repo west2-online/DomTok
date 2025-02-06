@@ -24,8 +24,8 @@ import (
 	kafukago "github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/sasl/plain"
 
-	"github.com/west2-online/fzuhelper-server/config"
-	"github.com/west2-online/fzuhelper-server/pkg/constants"
+	"github.com/west2-online/DomTok/config"
+	"github.com/west2-online/DomTok/pkg/constants"
 )
 
 const (

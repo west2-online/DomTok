@@ -34,7 +34,7 @@ elasticsearch:
   host: 127.0.0.1
 
 redis:
-  addr: DomTok-redis:6379
+  addr: domtok-redis:6379
   password: DomTok
 
 jaeger:
@@ -64,3 +64,9 @@ services:
     load-balance: false
     addr:
     - 0.0.0.0:20002
+
+  order:
+    name: order
+    load-balance: false
+    addr:
+      - 0.0.0.0:20003

@@ -42,11 +42,13 @@ const (
 	ParamValueCode         = 20011 // 参数值错误
 	ParamFileNotExistCode  = 20012 // 文件不存在
 	ParamFileReadErrorCode = 20013 // 文件读取错误
+	ParamSourceNotExist    = 20014
 
 	AuthErrorCode          = 30001 // 鉴权错误
 	AuthInvalidCode        = 30002 // 鉴权无效
 	AuthAccessExpiredCode  = 30003 // 访问令牌过期
 	AuthRefreshExpiredCode = 30004 // 刷新令牌过期
+	AuthNotLegal           = 30005 // 访问不合法
 
 	BizErrorCode               = 40001 // 业务错误
 	BizLogicCode               = 40002 // 业务逻辑错误
@@ -75,6 +77,8 @@ const (
 	InternalQueueErrorCode     = 50018 // 队列错误
 	InternalETCDErrorCode      = 50019 // ETCD错误
 	InternalTraceErrorCode     = 50020 // Trace错误
+	InternalESErrorCode        = 50021 // ES错误
+	InternalInitRpcErrorCode   = 50022 // 初始化 RPC 错误
 
 	// SuccessCodePaper paper在旧版Android中的SuccessCode是2000，用作兼容
 	SuccessCodePaper = 2000

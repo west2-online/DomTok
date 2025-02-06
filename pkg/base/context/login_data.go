@@ -21,9 +21,9 @@ import (
 
 	"github.com/bytedance/sonic"
 
-	"github.com/west2-online/fzuhelper-server/kitex_gen/model"
-	"github.com/west2-online/fzuhelper-server/pkg/errno"
-	"github.com/west2-online/fzuhelper-server/pkg/logger"
+	"github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 const loginDataKey string = "loginData"

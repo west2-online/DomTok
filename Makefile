@@ -67,29 +67,18 @@ env-up:
 env-down:
 	@ cd ./docker && docker compose down
 
-# 生成基于 Kitex 的业务代码，在新建业务时使用
-# TODO: 这么写是因为 kitex 这个 cli 太难用了，计划修改成 cwgo 的
+# 基于 idl 生成相关的 go 语言描述文件
 .PHONY: kitex-gen-%
 kitex-gen-%:
-	mkdir -p $(CMD)/$* && cd $(CMD)/$* && \
-	kitex \
-	-gen-path ../../kitex_gen \
-	-service "$*" \
-	-module "$(MODULE)" \
-	-type thrift \
-	$(DIR)/idl/$*.thrift
-	go mod tidy
-
-# 更新 kitex_gen 中的对应模块，不会影响 cmd 中的业务
-.PHONY: kitex-update-%
-kitex-update-%:
-	kitex -module "${MODULE}" idl/$*.thrift
+	@ kitex -module "${MODULE}" \
+		-thrift no_default_serdes \
+		${IDL_PATH}/$*.thrift
+	@ go mod tidy
 
 # 生成基于 Hertz 的脚手架
-# TODO: 这个和 Kitex 的区别在于这个 update 实际上做了 gen 的工作，相关路径需要在 .hz 中修改
-.PHONY: hertz-gen-api
-hertz-gen-api:
-	hz update -idl ${IDL_PATH}/api.thrift
+.PHONY: hz-%
+hz-%:
+	hz update -idl ${IDL_PATH}/$*.thrift
 
 # 单元测试
 # -gcflags="all=-l -N": -l 表示禁用内联优化，-N 表示禁用优化

@@ -29,6 +29,7 @@ const (
 	StackTraceKey = "stacktrace"
 	ServiceKey    = "service"
 	SourceKey     = "source"
+	ErrorCodeKey  = "error_code"
 
 	KlogSource  = "klog"
 	MysqlSource = "mysql"
