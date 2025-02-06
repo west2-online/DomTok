@@ -26,10 +26,12 @@ import (
 
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 const (
-	Timeout = 10 * time.Second // 默认超时时间
+	Timeout = 3 * time.Second // 默认超时时间
 )
 
 // GetConn conn不能保证并发安全,仅可作为单线程的长连接使用。
@@ -38,7 +40,7 @@ func GetConn() (*kafukago.Conn, error) {
 
 	conn, err := dialer.Dial(config.Kafka.Network, config.Kafka.Address)
 	if err != nil {
-		return nil, fmt.Errorf("failed dial kafka server,error: %w", err)
+		return nil, errno.NewErrNo(errno.InternalKafkaErrorCode, fmt.Sprintf("failed dial kafka server,error: %v", err))
 	}
 	return conn, nil
 }
@@ -56,27 +58,51 @@ func GetNewReader(topic string, groupID ...string) *kafukago.Reader {
 		GroupID:     id,
 		MaxBytes:    constants.KafkaReadMaxBytes, // 同上
 		MaxAttempts: constants.KafkaRetries,
+		ErrorLogger: logger.GetKafkaErrorLogger(),
 		Dialer:      getDialer(),
 	}
 	return kafukago.NewReader(cfg)
 }
 
-// GetNewWriter 创建一个writer示例，writer是并发安全的。 errLogger可以传入带有es hook的logger
-func GetNewWriter() (*kafukago.Writer, error) {
+// GetNewWriter 创建一个writer示例，writer是并发安全的。
+func GetNewWriter(topic string, async bool) (*kafukago.Writer, error) {
+	if err := createIfNotExist(topic); err != nil {
+		return nil, err
+	}
+
 	addr, err := net.ResolveTCPAddr(config.Kafka.Network, config.Kafka.Address)
 	if err != nil {
-		return nil, fmt.Errorf("failed create kafka writer,error: %w", err)
+		return nil, errno.NewErrNo(errno.InternalNetworkErrorCode, fmt.Sprintf("failed create kafka writer,error: %v", err))
 	}
 
 	return &kafukago.Writer{
 		Addr:                   addr,
+		Topic:                  topic,
 		Balancer:               &kafukago.RoundRobin{}, // 轮询写入分区
 		MaxAttempts:            constants.KafkaRetries, // 最大尝试次数
 		RequiredAcks:           kafukago.RequireOne,    // 每个消息需要一次Act
-		Async:                  true,                   // 异步写入
-		AllowAutoTopicCreation: false,                  // 不允许自动创建分区
+		Async:                  async,                  // 异步写入
+		AllowAutoTopicCreation: true,
+		ErrorLogger:            logger.GetKafkaErrorLogger(),
 		Transport:              getTransport(),
 	}, nil
+}
+
+func createIfNotExist(topic string) error {
+	conn, err := GetConn()
+	if err != nil {
+		return err
+	}
+
+	err = conn.CreateTopics(kafukago.TopicConfig{
+		Topic:             topic,
+		NumPartitions:     constants.DefaultKafkaNumPartitions,
+		ReplicationFactor: constants.DefaultKafkaReplicationFactor,
+	})
+	if err != nil {
+		return errno.NewErrNo(errno.InternalKafkaErrorCode, fmt.Sprintf("failed to create topic, err: %v", err))
+	}
+	return nil
 }
 
 func getDialer() *kafukago.Dialer {

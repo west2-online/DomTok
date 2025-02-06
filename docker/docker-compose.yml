@@ -1,29 +1,29 @@
 services:
-  domtok-redis:
-    container_name: domtok-redis
-    image: redis:bookworm # 选择使用 redis 官方的 bookworm tag
-    volumes:
-      - ./data/redis:/data
-    ports:
-      - "6379:6379"
-    env_file:
-      - "./env/redis.env"
-    networks:
-      - domtok
-
-  domtok-mysql:
-    container_name: domtok-mysql
-    image: mysql:9.0.1 # 选择使用 mysql 官方的 9.0.1 版本
-    env_file:
-      - "./env/mysql.env"
-    ports:
-      - "3306:3306"
-    networks:
-      - domtok
-    volumes:
-      - ../config/sql:/docker-entrypoint-initdb.d
-      - ./data/mysql:/var/lib/mysql
-
+#  domtok-redis:
+#    container_name: domtok-redis
+#    image: redis:bookworm # 选择使用 redis 官方的 bookworm tag
+#    volumes:
+#      - ./data/redis:/data
+#    ports:
+#      - "6379:6379"
+#    env_file:
+#      - "./env/redis.env"
+#    networks:
+#      - domtok
+#
+#  domtok-mysql:
+#    container_name: domtok-mysql
+#    image: mysql:9.0.1 # 选择使用 mysql 官方的 9.0.1 版本
+#    env_file:
+#      - "./env/mysql.env"
+#    ports:
+#      - "3306:3306"
+#    networks:
+#      - domtok
+#    volumes:
+#      - ../config/sql:/docker-entrypoint-initdb.d
+#      - ./data/mysql:/var/lib/mysql
+#
   domtok-etcd:
     container_name: domtok-etcd
     # image: bitnami/etcd:3.5-debian-12
@@ -214,31 +214,31 @@ services:
 #    networks:
 #       - domtok
 #
-#  kafka:
-#    container_name: domtok-kafka
-#    image: bitnami/kafka:latest
-#    restart: always
-#    user: root
-#    ports:
-#      - "9092:9092"
-#      - "9093:9093"
-#    env_file:
-#      - ./env/kafka.env
-#    volumes:
-#      - ./data/kafka:/bitnami/kafka
-#    networks:
-#      - domtok
-#
-#  kafka-ui:
-#    container_name: domtok-kafka-ui
-#    image: provectuslabs/kafka-ui:latest
-#    restart: always
-#    ports:
-#      - "9091:8080"
-#    env_file:
-#      - ./env/kafka-ui.env
-#    networks:
-#      - domtok
+  kafka:
+    container_name: domtok-kafka
+    image: bitnami/kafka:latest
+    restart: always
+    user: root
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    env_file:
+      - ./env/kafka.env
+    volumes:
+      - ./data/kafka:/bitnami/kafka
+    networks:
+      - domtok
+
+  kafka-ui:
+    container_name: domtok-kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    restart: always
+    ports:
+      - "9091:8080"
+    env_file:
+      - ./env/kafka-ui.env
+    networks:
+      - domtok
 
 networks:
   domtok:

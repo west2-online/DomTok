@@ -15,11 +15,11 @@
 #!/bin/bash
 
 ################ 密码 ################
-PASSWORD=fzuhelper-password
+PASSWORD=domtok-password
 ################ 密码 ################
 
 
-BASE_DIR=/mnt/disk/fzuhelper # SSL各种生成文件的基础路径
+BASE_DIR=/mnt/disk/domtok # SSL各种生成文件的基础路径
 
 if test -d "$BASE_DIR/certs"; then # 判断证书是否已经存在了
     exit 0
@@ -39,7 +39,7 @@ CLUSTER_NAME=kafka-cluster # 指定别名
 CERT_AUTH_FILE="$CERT_OUTPUT_PATH/ca-cert" # CA证书文件路径
 CLUSTER_CERT_FILE="$CERT_OUTPUT_PATH/${CLUSTER_NAME}-cert" # 集群证书文件路径
 DAYS_VALID=3650 # key有效期
-D_NAME="CN=FzuHelper, OU=West2Online, O=West2Online, L=Fujian, ST=Fujian, C=CN" # distinguished name
+D_NAME="CN=DomTok, OU=West2Online, O=West2Online, L=Fujian, ST=Fujian, C=CN" # distinguished name
 
 mkdir -p $CERT_OUTPUT_PATH
 

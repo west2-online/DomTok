@@ -14,18 +14,32 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package constants
+package kafka
 
-const (
-	KafkaReadMinBytes      = 512 * B
-	KafkaReadMaxBytes      = 1 * MB
-	KafkaRetries           = 3
-	DefaultReaderGroupID   = "r"
-	DefaultTimeRetainHours = 6 // 6小时
+import (
+	"context"
+	"os"
+	"testing"
 
-	DefaultConsumerChanCap         = 20
-	DefaultKafkaProductorSyncWrite = false
-
-	DefaultKafkaNumPartitions     = -1
-	DefaultKafkaReplicationFactor = -1
+	"github.com/west2-online/DomTok/config"
 )
+
+func TestKafka(t *testing.T) {
+	originalDir := os.Getenv("CONFIG_PATH")
+	if err := os.Chdir(originalDir); err != nil {
+		panic(err)
+	}
+	config.Init("test")
+
+	k := NewKafkaInstance()
+	topic := "test-topic"
+
+	if err := k.SetWriter(topic); err != nil {
+		t.Log("failed to set writer, err: ", err)
+		return
+	}
+
+	_ = k.Consume(context.Background(), topic, 1, "group1")
+
+	k.Close()
+}
