@@ -14,18 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package constants
+package logger
 
-const (
-	KafkaReadMinBytes      = 512 * B
-	KafkaReadMaxBytes      = 1 * MB
-	KafkaRetries           = 3
-	DefaultReaderGroupID   = "r"
-	DefaultTimeRetainHours = 6 // 6小时
+import (
+	"fmt"
 
-	DefaultConsumerChanCap         = 20
-	DefaultKafkaProductorSyncWrite = false
+	"go.uber.org/zap"
 
-	DefaultKafkaNumPartitions     = -1
-	DefaultKafkaReplicationFactor = -1
+	"github.com/west2-online/DomTok/pkg/constants"
 )
+
+type KafkaErrorLogger struct{}
+
+func GetKafkaErrorLogger() *KafkaErrorLogger {
+	return &KafkaErrorLogger{}
+}
+
+func (l *KafkaErrorLogger) Printf(s string, v ...interface{}) {
+	control.error(fmt.Sprintf(s, v...), zap.String(constants.SourceKey, constants.KafkaSource))
+}
