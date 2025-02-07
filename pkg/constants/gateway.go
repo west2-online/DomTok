@@ -19,17 +19,11 @@ package constants
 import "time"
 
 const (
-	RedisSlowQuery = 10 // ms redis默认的慢查询时间，适用于 logger
-)
+	// 请求体最大体积
+	ServerMaxRequestBodySize = 1 << 31
 
-// Redis Key and Expire Time
-const (
-	ClassroomKeyExpire    = 2 * 24 * time.Hour
-	LaunchScreenKeyExpire = 2 * 24 * time.Hour
-	LastLaunchScreenIdKey = "last_launch_screen_id"
-)
+	CorsMaxAge = 12 * time.Hour
 
-// Redis DB Name
-const (
-	RedisDBOrder = 0
+	SentinelThreshold        = 100
+	SentinelStatIntervalInMs = 1000
 )

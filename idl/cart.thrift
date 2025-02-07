@@ -43,11 +43,31 @@ struct UpdateCartGoodsResponse{
     1: required model.BaseResp base,
 }
 
-/* struct PayCartGoodsRequest 调用支付，暴露
-* @Param skuIdList skuID列表
+/* struct DeleteCartGoodsRequest 删除购物车商品，暴露
+* @Param sku_id skuID
+*/
+struct DeleteCartGoodsRequest{
+    1: required list<i64> sku_id_list,
+}
+
+struct DeleteCartGoodsResponse{
+    1: required model.BaseResp base,
+}
+
+/* struct DeleteAllCartGoodsRequest 清空购物车，暴露
+*/
+struct DeleteAllCartGoodsRequest{
+}
+
+struct DeleteAllCartGoodsResponse{
+    1: required model.BaseResp base,
+}
+
+/* struct UpdateCartGoodsRequest 支付接口调用的rpc，不暴露
+* @Param sku_id skuID
 */
 struct PayCartGoodsRequest{
-    1: required list<i64> skuIdList,
+    1: required list<i64> sku_id_list,
 }
 
 struct PayCartGoodsResponse{

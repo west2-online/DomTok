@@ -31,7 +31,7 @@ var (
 	AuthMissing        = NewErrNo(AuthInvalidCode, "缺失合法鉴权数据")      // 鉴权缺失，如访问令牌缺失
 
 	ParamError         = NewErrNo(ParamErrorCode, "参数错误") // 参数校验失败，可能是参数为空、参数类型错误等
-	ParamMissingHeader = NewErrNo(ParamMissingHeaderCode, "缺失合法学生请求头数据")
+	ParamMissingHeader = NewErrNo(ParamMissingHeaderCode, "参数缺失")
 
 	BizError             = NewErrNo(BizErrorCode, "请求业务出现问题")
 	InternalServiceError = NewErrNo(InternalServiceErrorCode, "内部服务错误")

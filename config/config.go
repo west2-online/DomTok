@@ -18,15 +18,14 @@ package config
 
 import (
 	"errors"
-	"log"
 	"os"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	_ "github.com/spf13/viper/remote"
 
-	"github.com/west2-online/fzuhelper-server/pkg/constants"
-	"github.com/west2-online/fzuhelper-server/pkg/logger"
+	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 var (
@@ -50,7 +49,7 @@ const (
 	remoteFileType = "yaml"
 )
 
-// Init 目的是初始化并读入配置，此时没有初始化Logger，但仍然可以用 logger 来输出，只是没有自定义配置
+// Init 目的是初始化并读入配置
 func Init(service string) {
 	// 从环境变量中获取 etcd 地址
 	etcdAddr := os.Getenv("ETCD_ADDR")
@@ -70,7 +69,7 @@ func Init(service string) {
 	if err := runtimeViper.ReadRemoteConfig(); err != nil {
 		var configFileNotFoundError viper.ConfigFileNotFoundError
 		if errors.As(err, &configFileNotFoundError) {
-			log.Fatal("config.Init: could not find config files")
+			logger.Fatal("config.Init: could not find config files")
 		}
 		logger.Fatalf("config.Init: read config error: %v", err)
 	}

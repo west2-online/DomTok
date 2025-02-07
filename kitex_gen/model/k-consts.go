@@ -14,22 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package constants
+package model
 
-import "time"
-
-const (
-	RedisSlowQuery = 10 // ms redis默认的慢查询时间，适用于 logger
-)
-
-// Redis Key and Expire Time
-const (
-	ClassroomKeyExpire    = 2 * 24 * time.Hour
-	LaunchScreenKeyExpire = 2 * 24 * time.Hour
-	LastLaunchScreenIdKey = "last_launch_screen_id"
-)
-
-// Redis DB Name
-const (
-	RedisDBOrder = 0
-)
+// KitexUnusedProtection is used to prevent 'imported and not used' error.
+var KitexUnusedProtection = struct{}{}

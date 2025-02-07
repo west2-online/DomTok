@@ -17,17 +17,17 @@ limitations under the License.
 package base
 
 import (
-	"errors"
 	"fmt"
 
 	"go.uber.org/zap"
 
-	"github.com/west2-online/fzuhelper-server/kitex_gen/model"
-	"github.com/west2-online/fzuhelper-server/pkg/constants"
-	"github.com/west2-online/fzuhelper-server/pkg/errno"
-	"github.com/west2-online/fzuhelper-server/pkg/logger"
-	jwchErrno "github.com/west2-online/jwch/errno"
+	"github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
+
+var SuccessBase = model.BaseResp{Code: errno.SuccessCode, Msg: errno.SuccessMsg}
 
 func BuildBaseResp(err error) *model.BaseResp {
 	if err == nil {
@@ -78,17 +78,6 @@ func BuildRespAndLog(err error) *model.BaseResp {
 		Code: Errno.ErrorCode,
 		Msg:  Errno.ErrorMsg,
 	}
-}
-
-// HandleJwchError 对于jwch库返回的错误类型，需要使用 HandleJwchError 来保留 cookie 异常
-func HandleJwchError(err error) error {
-	var jwchErr jwchErrno.ErrNo
-	if errors.As(err, &jwchErr) {
-		if errors.Is(jwchErr, jwchErrno.CookieError) {
-			return errno.NewErrNo(errno.BizJwchCookieExceptionCode, jwchErr.ErrorMsg)
-		}
-	}
-	return err
 }
 
 func BuildTypeList[T any, U any](items []U, buildFunc func(U) T) []T {

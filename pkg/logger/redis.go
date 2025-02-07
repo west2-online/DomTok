@@ -25,14 +25,14 @@ import (
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 
-	"github.com/west2-online/fzuhelper-server/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/constants"
 )
 
 // RedisLogger 不加入自定义的 logger 字段, 以使得 logger 更新后无指针引用
 type RedisLogger struct{}
 
 func (l *RedisLogger) Printf(ctx context.Context, template string, args ...interface{}) {
-	Info(fmt.Sprintf(template, args...), zap.String(constants.SourceKey, constants.RedisSource))
+	control.info(fmt.Sprintf(template, args...), zap.String(constants.SourceKey, constants.RedisSource))
 }
 
 func (l *RedisLogger) DialHook(next redis.DialHook) redis.DialHook {

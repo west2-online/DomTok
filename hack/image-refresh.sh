@@ -16,7 +16,7 @@
 # 使用脚本前请保证docker login
 
 # 镜像名称和标签，请根据实际情况进行替换
-IMAGE_NAME="registry.cn-hangzhou.aliyuncs.com/west2-online/fzuhelper-server"
+IMAGE_NAME="registry.cn-hangzhou.aliyuncs.com/west2-online/DomTok"
 IMAGE_TAG="$1"
 FULL_IMAGE_NAME="${IMAGE_NAME}:${IMAGE_TAG}"
 

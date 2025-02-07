@@ -13,9 +13,9 @@
 # 检查 tmux 是否存在
 TMUX_EXISTS := $(shell command -v tmux)
 # 远程仓库
-REMOTE_REPOSITORY = registry.cn-hangzhou.aliyuncs.com/west2-online/fzuhelper-server
+REMOTE_REPOSITORY = registry.cn-hangzhou.aliyuncs.com/west2-online/DomTok
 # 项目 MODULE 名
-MODULE = github.com/west2-online/fzuhelper-server
+MODULE = github.com/west2-online/DomTok
 # 当前架构
 ARCH := $(shell uname -m)
 # 目录相关
@@ -67,27 +67,18 @@ env-up:
 env-down:
 	@ cd ./docker && docker compose down
 
-# 生成基于 Kitex 的业务代码，在新建业务时使用
+# 基于 idl 生成相关的 go 语言描述文件
 .PHONY: kitex-gen-%
 kitex-gen-%:
-	mkdir -p $(CMD)/$* && cd $(CMD)/$* && \
-	kitex \
-	-gen-path ../../kitex_gen \
-	-service "$*" \
-	-module "$(MODULE)" \
-	-type thrift \
-	$(DIR)/idl/$*.thrift
-	go mod tidy
-
-# 更新 kitex_gen 中的对应模块，不会影响 cmd 中的业务
-.PHONY: kitex-update-%
-kitex-update-%:
-	kitex -module "${MODULE}" idl/$*.thrift
+	@ kitex -module "${MODULE}" \
+		-thrift no_default_serdes \
+		${IDL_PATH}/$*.thrift
+	@ go mod tidy
 
 # 生成基于 Hertz 的脚手架
-.PHONY: hertz-gen-api
-hertz-gen-api:
-	hz update -idl ${IDL_PATH}/api.thrift
+.PHONY: hz-%
+hz-%:
+	hz update -idl ${IDL_PATH}/$*.thrift
 
 # 单元测试
 # -gcflags="all=-l -N": -l 表示禁用内联优化，-N 表示禁用优化
@@ -128,18 +119,18 @@ $(SERVICES):
 	fi
 ifndef BUILD_ONLY
 	@echo "$(PREFIX) Automatic run server"
-	@if tmux list-windows -F '#{window_name}' | grep -q "^fzuhelper-$(service)$$"; then \
-		echo "$(PREFIX) Window 'fzuhelper-$(service)' already exists. Reusing the window."; \
-		tmux select-window -t "fzuhelper-$(service)"; \
+	@if tmux list-windows -F '#{window_name}' | grep -q "^domtok-$(service)$$"; then \
+		echo "$(PREFIX) Window 'domtok-$(service)' already exists. Reusing the window."; \
+		tmux select-window -t "domtok-$(service)"; \
 	else \
-		echo "$(PREFIX) Window 'fzuhelper-$(service)' does not exist. Creating a new window."; \
-		tmux new-window -n "fzuhelper-$(service)"; \
+		echo "$(PREFIX) Window 'domtok-$(service)' does not exist. Creating a new window."; \
+		tmux new-window -n "domtok-$(service)"; \
 		tmux split-window -h ; \
-		tmux select-layout -t "fzuhelper-$(service)" even-horizontal; \
+		tmux select-layout -t "domtok-$(service)" even-horizontal; \
 	fi
 	@echo "$(PREFIX) Running $(service) service in tmux..."
-	@tmux send-keys -t fzuhelper-$(service).0 'export SERVICE=$(service) && bash ./docker/script/entrypoint.sh' C-m
-	@tmux select-pane -t fzuhelper-$(service).1
+	@tmux send-keys -t domtok-$(service).0 'export SERVICE=$(service) && bash ./docker/script/entrypoint.sh' C-m
+	@tmux select-pane -t domtok-$(service).1
 endif
 
 # 推送到镜像服务中，需要提前 docker login，否则会推送失败

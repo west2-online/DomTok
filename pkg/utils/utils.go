@@ -22,17 +22,17 @@ import (
 	"mime/multipart"
 	"net"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/h2non/filetype"
 	"github.com/h2non/filetype/types"
+	"github.com/shopspring/decimal"
 
-	"github.com/west2-online/fzuhelper-server/config"
-	"github.com/west2-online/fzuhelper-server/pkg/constants"
-	"github.com/west2-online/fzuhelper-server/pkg/errno"
-	"github.com/west2-online/fzuhelper-server/pkg/logger"
+	"github.com/west2-online/DomTok/config"
+	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 const DefaultFilePermissions = 0o666 // 默认文件权限
@@ -222,7 +222,7 @@ func GetImageFileType(fileBytes *[]byte) (string, error) {
 	}
 }
 
-// GenerateRedisKeyByStuId 开屏页通过学号与sType与device生成缓存对应Key
-func GenerateRedisKeyByStuId(stuId string, sType int64, device string) string {
-	return strings.Join([]string{stuId, device, strconv.FormatInt(sType, 10)}, ":")
+func GetFloat64(d *decimal.Decimal) float64 {
+	v, _ := d.Float64()
+	return v
 }

@@ -14,22 +14,32 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package constants
+package kafka
 
-import "time"
+import (
+	"context"
+	"os"
+	"testing"
 
-const (
-	RedisSlowQuery = 10 // ms redis默认的慢查询时间，适用于 logger
+	"github.com/west2-online/DomTok/config"
 )
 
-// Redis Key and Expire Time
-const (
-	ClassroomKeyExpire    = 2 * 24 * time.Hour
-	LaunchScreenKeyExpire = 2 * 24 * time.Hour
-	LastLaunchScreenIdKey = "last_launch_screen_id"
-)
+func TestKafka(t *testing.T) {
+	originalDir := os.Getenv("CONFIG_PATH")
+	if err := os.Chdir(originalDir); err != nil {
+		panic(err)
+	}
+	config.Init("test")
 
-// Redis DB Name
-const (
-	RedisDBOrder = 0
-)
+	k := NewKafkaInstance()
+	topic := "test-topic"
+
+	if err := k.SetWriter(topic); err != nil {
+		t.Log("failed to set writer, err: ", err)
+		return
+	}
+
+	_ = k.Consume(context.Background(), topic, 1, "group1")
+
+	k.Close()
+}

@@ -14,22 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package constants
+package logger
 
-import "time"
+import (
+	"fmt"
 
-const (
-	RedisSlowQuery = 10 // ms redis默认的慢查询时间，适用于 logger
+	"go.uber.org/zap"
+
+	"github.com/west2-online/DomTok/pkg/constants"
 )
 
-// Redis Key and Expire Time
-const (
-	ClassroomKeyExpire    = 2 * 24 * time.Hour
-	LaunchScreenKeyExpire = 2 * 24 * time.Hour
-	LastLaunchScreenIdKey = "last_launch_screen_id"
-)
+type KafkaErrorLogger struct{}
 
-// Redis DB Name
-const (
-	RedisDBOrder = 0
-)
+func GetKafkaErrorLogger() *KafkaErrorLogger {
+	return &KafkaErrorLogger{}
+}
+
+func (l *KafkaErrorLogger) Printf(s string, v ...interface{}) {
+	control.error(fmt.Sprintf(s, v...), zap.String(constants.SourceKey, constants.KafkaSource))
+}

@@ -22,9 +22,9 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/client"
 	elastic "github.com/elastic/go-elasticsearch"
 
-	"github.com/west2-online/fzuhelper-server/pkg/cache"
-	"github.com/west2-online/fzuhelper-server/pkg/db"
-	"github.com/west2-online/fzuhelper-server/pkg/utils"
+	"github.com/west2-online/DomTok/pkg/cache"
+	"github.com/west2-online/DomTok/pkg/db"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 var (
