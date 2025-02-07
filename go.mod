@@ -1,6 +1,6 @@
 module github.com/west2-online/DomTok
 
-go 1.23.5
+go 1.23.6
 
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
@@ -16,6 +16,7 @@ require (
 	github.com/h2non/filetype v1.1.3
 	github.com/kitex-contrib/registry-etcd v0.2.5
 	github.com/redis/go-redis/v9 v9.7.0
+	github.com/samber/lo v1.49.1
 	github.com/segmentio/kafka-go v0.4.47
 	github.com/shopspring/decimal v1.2.0
 	github.com/smartystreets/goconvey v1.8.1

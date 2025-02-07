@@ -34,4 +34,5 @@ const (
 	KlogSource  = "klog"
 	MysqlSource = "mysql"
 	RedisSource = "redis"
+	KafkaSource = "kafka"
 )

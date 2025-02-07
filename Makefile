@@ -119,18 +119,18 @@ $(SERVICES):
 	fi
 ifndef BUILD_ONLY
 	@echo "$(PREFIX) Automatic run server"
-	@if tmux list-windows -F '#{window_name}' | grep -q "^fzuhelper-$(service)$$"; then \
-		echo "$(PREFIX) Window 'fzuhelper-$(service)' already exists. Reusing the window."; \
-		tmux select-window -t "fzuhelper-$(service)"; \
+	@if tmux list-windows -F '#{window_name}' | grep -q "^domtok-$(service)$$"; then \
+		echo "$(PREFIX) Window 'domtok-$(service)' already exists. Reusing the window."; \
+		tmux select-window -t "domtok-$(service)"; \
 	else \
-		echo "$(PREFIX) Window 'fzuhelper-$(service)' does not exist. Creating a new window."; \
-		tmux new-window -n "fzuhelper-$(service)"; \
+		echo "$(PREFIX) Window 'domtok-$(service)' does not exist. Creating a new window."; \
+		tmux new-window -n "domtok-$(service)"; \
 		tmux split-window -h ; \
-		tmux select-layout -t "fzuhelper-$(service)" even-horizontal; \
+		tmux select-layout -t "domtok-$(service)" even-horizontal; \
 	fi
 	@echo "$(PREFIX) Running $(service) service in tmux..."
-	@tmux send-keys -t fzuhelper-$(service).0 'export SERVICE=$(service) && bash ./docker/script/entrypoint.sh' C-m
-	@tmux select-pane -t fzuhelper-$(service).1
+	@tmux send-keys -t domtok-$(service).0 'export SERVICE=$(service) && bash ./docker/script/entrypoint.sh' C-m
+	@tmux select-pane -t domtok-$(service).1
 endif
 
 # 推送到镜像服务中，需要提前 docker login，否则会推送失败
