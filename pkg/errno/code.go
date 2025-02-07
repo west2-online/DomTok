@@ -79,7 +79,6 @@ const (
 	InternalTraceErrorCode     = 50020 // Trace错误
 	InternalESErrorCode        = 50021 // ES错误
 	InternalInitRpcErrorCode   = 50022 // 初始化 RPC 错误
-	InternalKafkaErrorCode     = 50023
 
 	// SuccessCodePaper paper在旧版Android中的SuccessCode是2000，用作兼容
 	SuccessCodePaper = 2000

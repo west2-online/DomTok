@@ -52,7 +52,6 @@ func defaultConfig() *config {
 	}
 }
 
-// defaultEnc 可以在 debug 时使用 zapcore.NewConsoleEncoder
 func defaultEnc() zapcore.Encoder {
 	cfg := zapcore.EncoderConfig{
 		TimeKey:        "time",
@@ -66,7 +65,6 @@ func defaultEnc() zapcore.Encoder {
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
 
-	// return zapcore.NewConsoleEncoder(cfg)
 	return zapcore.NewJSONEncoder(cfg)
 }
 
