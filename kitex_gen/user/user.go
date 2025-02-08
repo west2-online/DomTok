@@ -5,9 +5,11 @@ package user
 import (
 	"context"
 	"fmt"
-	thrift "github.com/cloudwego/kitex/pkg/protocol/bthrift/apache"
-	"github.com/west2-online/DomTok/kitex_gen/model"
 	"strings"
+
+	thrift "github.com/cloudwego/kitex/pkg/protocol/bthrift/apache"
+
+	"github.com/west2-online/DomTok/kitex_gen/model"
 )
 
 type RegisterRequest struct {

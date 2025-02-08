@@ -17,8 +17,8 @@ limitations under the License.
 package utils
 
 import (
-	"github.com/west2-online/fzuhelper-server/kitex_gen/model"
-	"github.com/west2-online/fzuhelper-server/pkg/errno"
+	"github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 // IsSuccess 通用的rpc结果处理

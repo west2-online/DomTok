@@ -3,6 +3,7 @@ package userservice
 
 import (
 	server "github.com/cloudwego/kitex/server"
+
 	user "github.com/west2-online/DomTok/kitex_gen/user"
 )
 

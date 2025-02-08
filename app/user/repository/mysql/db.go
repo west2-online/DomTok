@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 
+	"gorm.io/gorm"
+
 	"github.com/west2-online/DomTok/app/user/entities"
 	"github.com/west2-online/DomTok/pkg/errno"
-	"gorm.io/gorm"
 )
 
 // DBAdapter impl PersistencePort defined in use case package
@@ -19,7 +20,13 @@ func NewDBAdapter(client *gorm.DB) *DBAdapter {
 }
 
 func (d *DBAdapter) CreateUser(ctx context.Context, entity *entities.User) error {
-	if err := d.client.WithContext(ctx).Create(entity).Error; err != nil {
+	// 将 entity 转换成 mysql 这边的 model
+	model := User{
+		UserName: entity.UserName,
+		Password: entity.Password,
+		Email:    entity.Email,
+	}
+	if err := d.client.WithContext(ctx).Create(model).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create user: %v", err)
 	}
 	return nil

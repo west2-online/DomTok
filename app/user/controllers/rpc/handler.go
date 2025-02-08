@@ -1,8 +1,9 @@
-package controllers
+package rpc
 
 import (
 	"context"
 
+	"github.com/west2-online/DomTok/app/user/controllers/rpc/pack"
 	"github.com/west2-online/DomTok/app/user/entities"
 	"github.com/west2-online/DomTok/kitex_gen/user"
 	"github.com/west2-online/DomTok/pkg/base"
@@ -62,6 +63,6 @@ func (h *UserHandler) Login(ctx context.Context, req *user.LoginRequest) (r *use
 		return resp, nil
 	}
 	resp.Base = base.BuildSuccessResp()
-	resp.User = entities.BuildUser(ans)
+	resp.User = pack.BuildUser(ans)
 	return resp, nil
 }

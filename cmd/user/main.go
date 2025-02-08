@@ -7,7 +7,8 @@ import (
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	etcd "github.com/kitex-contrib/registry-etcd"
-	"github.com/west2-online/DomTok/app/user/controllers"
+
+	"github.com/west2-online/DomTok/app/user/controllers/rpc"
 	"github.com/west2-online/DomTok/app/user/repository/mysql"
 	"github.com/west2-online/DomTok/app/user/repository/rpc/template"
 	"github.com/west2-online/DomTok/app/user/usecase"
@@ -57,7 +58,7 @@ func main() {
 	}
 	svr := userservice.NewServer(
 		// 注入 controller 依赖
-		controllers.NewUserHandler(serviceAdapter),
+		rpc.NewUserHandler(serviceAdapter),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
 			ServiceName: serviceName,
 		}),
