@@ -5,13 +5,13 @@ go 1.23.6
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
+	github.com/apache/thrift v0.16.0
 	github.com/bytedance/gopkg v0.1.1
 	github.com/bytedance/mockey v1.2.14
 	github.com/bytedance/sonic v1.12.8
 	github.com/cloudwego/gopkg v0.1.3
 	github.com/cloudwego/hertz v0.9.5
 	github.com/cloudwego/kitex v0.12.1
-	github.com/cloudwego/kitex/pkg/protocol/bthrift v0.0.0-20250124072755-047444c8e964
 	github.com/elastic/go-elasticsearch v0.0.0
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/h2non/filetype v1.1.3
