@@ -19,9 +19,9 @@ package eshook
 import (
 	elastic "github.com/elastic/go-elasticsearch"
 
-	"github.com/west2-online/fzuhelper-server/config"
-	"github.com/west2-online/fzuhelper-server/pkg/base/client"
-	"github.com/west2-online/fzuhelper-server/pkg/logger"
+	"github.com/west2-online/DomTok/config"
+	"github.com/west2-online/DomTok/pkg/base/client"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // InitLoggerWithHook 初始化带有EsHook的logger

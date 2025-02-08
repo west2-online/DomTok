@@ -214,31 +214,31 @@ services:
 #    networks:
 #       - domtok
 #
-#  kafka:
-#    container_name: domtok-kafka
-#    image: bitnami/kafka:latest
-#    restart: always
-#    user: root
-#    ports:
-#      - "9092:9092"
-#      - "9093:9093"
-#    env_file:
-#      - ./env/kafka.env
-#    volumes:
-#      - ./data/kafka:/bitnami/kafka
-#    networks:
-#      - domtok
-#
-#  kafka-ui:
-#    container_name: domtok-kafka-ui
-#    image: provectuslabs/kafka-ui:latest
-#    restart: always
-#    ports:
-#      - "9091:8080"
-#    env_file:
-#      - ./env/kafka-ui.env
-#    networks:
-#      - domtok
+  kafka:
+    container_name: domtok-kafka
+    image: bitnami/kafka:latest
+    restart: always
+    user: root
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    env_file:
+      - ./env/kafka.env
+    volumes:
+      - ./data/kafka:/bitnami/kafka
+    networks:
+      - domtok
+
+  kafka-ui:
+    container_name: domtok-kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    restart: always
+    ports:
+      - "9091:8080"
+    env_file:
+      - ./env/kafka-ui.env
+    networks:
+      - domtok
 
 networks:
   domtok:

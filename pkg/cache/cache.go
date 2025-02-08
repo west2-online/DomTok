@@ -17,32 +17,15 @@ limitations under the License.
 package cache
 
 import (
-	"context"
-
 	"github.com/redis/go-redis/v9"
-
-	"github.com/west2-online/fzuhelper-server/pkg/cache/classroom"
-	"github.com/west2-online/fzuhelper-server/pkg/cache/launch_screen"
-	"github.com/west2-online/fzuhelper-server/pkg/cache/paper"
 )
 
 type Cache struct {
-	client       *redis.Client
-	Classroom    *classroom.CacheClassroom
-	Paper        *paper.CachePaper
-	LaunchScreen *launch_screen.CacheLaunchScreen
+	Client *redis.Client
 }
 
 func NewCache(client *redis.Client) *Cache {
 	return &Cache{
-		client:       client,
-		Classroom:    classroom.NewCacheClassroom(client),
-		LaunchScreen: launch_screen.NewCacheLaunchScreen(client),
-		Paper:        paper.NewCachePaper(client),
+		Client: client,
 	}
-}
-
-// IsKeyExist will check if key exist
-func (c *Cache) IsKeyExist(ctx context.Context, key string) bool {
-	return c.client.Exists(ctx, key).Val() == 1
 }

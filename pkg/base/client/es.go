@@ -24,7 +24,8 @@ import (
 	"github.com/elastic/go-elasticsearch"
 	"github.com/elastic/go-elasticsearch/esapi"
 
-	"github.com/west2-online/fzuhelper-server/config"
+	"github.com/west2-online/DomTok/config"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 func NewEsClient() (*elasticsearch.Client, error) {
@@ -37,7 +38,7 @@ func NewEsClient() (*elasticsearch.Client, error) {
 	}
 	client, err := elasticsearch.NewClient(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("es clint failed,error: %w", err)
+		return nil, errno.NewErrNo(errno.InternalESErrorCode, fmt.Sprintf("es clint failed,error: %v", err))
 	}
 	return client, nil
 }

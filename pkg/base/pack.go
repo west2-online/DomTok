@@ -29,6 +29,8 @@ import (
 	"github.com/west2-online/DomTok/pkg/logger"
 )
 
+var SuccessBase = model.BaseResp{Code: errno.SuccessCode, Msg: errno.SuccessMsg}
+
 func BuildBaseResp(err error) *model.BaseResp {
 	if err == nil {
 		return &model.BaseResp{

@@ -22,4 +22,10 @@ const (
 	KafkaRetries           = 3
 	DefaultReaderGroupID   = "r"
 	DefaultTimeRetainHours = 6 // 6小时
+
+	DefaultConsumerChanCap         = 20
+	DefaultKafkaProductorSyncWrite = false
+
+	DefaultKafkaNumPartitions     = -1
+	DefaultKafkaReplicationFactor = -1
 )

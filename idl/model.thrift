@@ -6,18 +6,43 @@ struct BaseResp {
 }
 
 struct UserInfo {
-    1: required i64 uid,
-    2: required string name,
-    3: required string email,
-    4: required string phone,
+    1: i64 userId,
+    2: string name,
+}
+
+struct LoginData {
+    1: i64 userId,
+}
+
+struct CategoryInfo {
+    1: required i64 categoryID;
+    2: required string name;
 }
 
 struct Coupon {
     1: required i64 couponID;
-    2: required i64 userID;
-    3: required i64 activityID;
+    2: required i64 creatorID;
+    3: required i64 deadlineForGet;
     4: required string name;
-    5: required string typeInfo;
+    5: required i32 typeInfo;
+    6: required double conditionCost;
+    7: optional double discountAmount;
+    8: optional double discount;
+    9: required i32 rangeType;
+    10: required i64 rangeId;
+    11: required i64 expireTime;
+    12: required string description;
+    13: required i64 createdAt;
+    14: optional i64 updatedAt;
+    15: optional i64 deletedAt;
+}
+
+struct UserCoupon {
+    1: required i64 couponID;
+    2: required i64 creatorID;
+    3: required i64 userID;
+    4: required string name;
+    5: required i32 typeInfo;
     6: required i64 conditionCost;
     7: optional double discountAmount;
     8: optional double discount;
@@ -25,11 +50,8 @@ struct Coupon {
     10: required i64 rangeId;
     11: required i64 expireAt;
     12: required string description;
-    13: required i64 createdAt;
-    14: optional i64 updatedAt;
-    15: optional i64 deletedAt;
-    16: required i64 remainUserUseCount;
-    17: required i64 expireTime
+    13: required i64 remainUserUseCount;
+    14: required i64 createdAt;
 }
 
 struct AttrValue {
@@ -56,26 +78,25 @@ struct SkuImage {
 struct Spu {
     1: required i64 spuID;
     2: required string name;
-    3: required i64 userID;
+    3: required i64 creatorID;
     4: required string description;
-    5: optional i64 brandID;
-    6: required i64 categoryID;
-    7: required string goodsHeadDrawing;
-    8: required double price;
-    9: required string forSale;
-    10: required double shipping;
-    11: required i64 createdAt;
-    12: required i64 updatedAt;
-    13: optional i64 deletedAt;
+    5: required i64 categoryID;
+    6: required string goodsHeadDrawing;
+    7: required double price;
+    8: required i32 forSale;
+    9: required double shipping;
+    10: required i64 createdAt;
+    11: required i64 updatedAt;
+    12: optional i64 deletedAt;
 }
 
 struct Sku {
     1: required i64 skuID;
-    2: required i64 userID;
+    2: required i64 creatorID;
     3: required double price;
     4: required string name;
     5: required string description;
-    6: required string forSale;
+    6: required i32 forSale;
     7: required i64 stock;
     8: required string styleHeadDrawing;
     9: required i64 createdAt;
@@ -85,6 +106,18 @@ struct Sku {
     13: optional list<AttrValue> saleAttr;
     14: required i64 historyID;
     15: required i64 lockStock;
+}
+
+struct SkuInfo {
+    1: required i64 skuID;
+    2: required i64 creatorID;
+    3: required double price;
+    4: required string name;
+    5: required i32 forSale;
+    6: required i64 lockStock;
+    7: required string styleHeadDrawing;
+    8: required i64 spuID;
+    9: required i64 historyID;
 }
 
 struct OrderGoods {
@@ -97,7 +130,7 @@ struct OrderGoods {
     7: required string StyleHeadDrawing; // 款式头图
     8: required double OriginCast; // 原价
     9: required double SaleCast; // 售卖价
-    10: required double PurchaseQuantity; // 购买数量
+    10: required i64 PurchaseQuantity; // 购买数量
     11: required double PaymentAmount; // 支付金额
     12: required double FreightAmount; // 运费金额
     13: required double SettlementAmount; // 结算金额
@@ -110,6 +143,20 @@ struct BaseOrderGoods {
     1: required i64 MerchantID; // 商家 ID
     2: required i64 GoodsID; // 商品 ID
     3: required i64 StyleID; // 商品款式 ID
-    4: required double PurchaseQuantity; // 购买数量
+    4: required i64 PurchaseQuantity; // 购买数量
     5: i64 CouponID // 优惠券 ID
+}
+
+/*
+ * struct CreditCardInfo 信用卡信息
+ * @Param maskedCreditCardNumber 仅存储信用卡号掩码，如 **** **** **** 1234
+ * @Param creditCardExpirationYear 信用卡到期年
+ * @Param creditCardExpirationMonth 信用卡到期月
+ * @Param creditCardCvv 信用卡
+ */
+struct CreditCardInfo {
+    1: required string maskedCreditCardNumber
+    2: required i64 creditCardExpirationYear
+    3: required i64 creditCardExpirationMonth
+    4: required i64 creditCardCvv
 }

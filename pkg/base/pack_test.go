@@ -23,7 +23,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/west2-online/fzuhelper-server/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 func TestBuildBaseResp(t *testing.T) {

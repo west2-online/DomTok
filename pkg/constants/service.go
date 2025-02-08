@@ -18,13 +18,18 @@ package constants
 
 // Service Name
 const (
-	ClassroomServiceName    = "classroom"
-	CourseServiceName       = "course"
-	UserServiceName         = "user"
-	ApiServiceName          = "api"
-	LaunchScreenServiceName = "launch_screen"
-	PaperServiceName        = "paper"
-	VersionServiceName      = "version"
-	AcademicServiceName     = "academic"
-	CommonServiceName       = "common"
+	GatewayServiceName = "gateway"
+	OrderServiceName   = "order"
+)
+
+// OrderService
+const (
+	OrderStatusUnpaidCode = 0
+	OrderStatusPaidCode   = 1
+	OrderStatusFailCode   = 2
+
+	OrderStatusUnpaid  = "未支付"
+	OrderStatusPaid    = "待支付"
+	OrderStatusFail    = "支付失败"
+	OrderStatusUnknown = "未知状态"
 )
