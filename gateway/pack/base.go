@@ -22,7 +22,6 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
-	"github.com/west2-online/DomTok/gateway/model/model"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
@@ -69,62 +68,4 @@ func RespList(c *app.RequestContext, items any) {
 		Data: items,
 	}
 	c.JSON(consts.StatusOK, resp)
-}
-
-/*
-	20241113
-	customize for old client of launch_screen
-*/
-
-type CustomLaunchScreenRespWithData struct {
-	Code int    `json:"code"`
-	Msg  string `json:"message"`
-	Data any    `json:"data"`
-}
-
-type CustomLaunchScreenBase struct {
-	Code int    `json:"code"`
-	Msg  string `json:"message"`
-}
-
-func CustomLaunchScreenRespList(c *app.RequestContext, items any) {
-	Errno := errno.CustomLaunchScreenSuccess
-	resp := CustomLaunchScreenRespWithData{
-		Code: int(Errno.ErrorCode),
-		Msg:  Errno.ErrorMsg,
-		Data: items,
-	}
-	c.JSON(consts.StatusOK, resp)
-}
-
-func CustomLaunchScreenRespSuccess(c *app.RequestContext) {
-	Errno := errno.CustomLaunchScreenSuccess
-	c.JSON(consts.StatusOK, CustomLaunchScreenBase{
-		Code: int(Errno.ErrorCode),
-		Msg:  Errno.ErrorMsg,
-	})
-}
-
-/*
-	20241127
-	customize for urlService
-*/
-
-type CustomUrlRespData struct {
-	Code string `json:"code"`
-	Data any    `json:"data"`
-}
-
-func BuildSuccessBase() *model.BaseResp {
-	return &model.BaseResp{
-		Code: errno.SuccessCode,
-		Msg:  "Success",
-	}
-}
-
-func CustomUrlRespWithData(c *app.RequestContext, data any) {
-	c.JSON(consts.StatusOK, CustomUrlRespData{
-		Code: strconv.Itoa(consts.StatusOK),
-		Data: data,
-	})
 }
