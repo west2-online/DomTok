@@ -208,24 +208,90 @@ var fieldIDToName_LoginData = map[int16]string{
 	1: "userId",
 }
 
+type CategoryInfo struct {
+	CategoryID int64  `thrift:"categoryID,1,required" frugal:"1,required,i64" json:"categoryID"`
+	Name       string `thrift:"name,2,required" frugal:"2,required,string" json:"name"`
+}
+
+func NewCategoryInfo() *CategoryInfo {
+	return &CategoryInfo{}
+}
+
+func (p *CategoryInfo) InitDefault() {
+}
+
+func (p *CategoryInfo) GetCategoryID() (v int64) {
+	return p.CategoryID
+}
+
+func (p *CategoryInfo) GetName() (v string) {
+	return p.Name
+}
+func (p *CategoryInfo) SetCategoryID(val int64) {
+	p.CategoryID = val
+}
+func (p *CategoryInfo) SetName(val string) {
+	p.Name = val
+}
+
+func (p *CategoryInfo) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("CategoryInfo(%+v)", *p)
+}
+
+func (p *CategoryInfo) DeepEqual(ano *CategoryInfo) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.CategoryID) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Name) {
+		return false
+	}
+	return true
+}
+
+func (p *CategoryInfo) Field1DeepEqual(src int64) bool {
+
+	if p.CategoryID != src {
+		return false
+	}
+	return true
+}
+func (p *CategoryInfo) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Name, src) != 0 {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_CategoryInfo = map[int16]string{
+	1: "categoryID",
+	2: "name",
+}
+
 type Coupon struct {
-	CouponID           int64    `thrift:"couponID,1,required" frugal:"1,required,i64" json:"couponID"`
-	UserID             int64    `thrift:"userID,2,required" frugal:"2,required,i64" json:"userID"`
-	ActivityID         int64    `thrift:"activityID,3,required" frugal:"3,required,i64" json:"activityID"`
-	Name               string   `thrift:"name,4,required" frugal:"4,required,string" json:"name"`
-	TypeInfo           string   `thrift:"typeInfo,5,required" frugal:"5,required,string" json:"typeInfo"`
-	ConditionCost      int64    `thrift:"conditionCost,6,required" frugal:"6,required,i64" json:"conditionCost"`
-	DiscountAmount     *float64 `thrift:"discountAmount,7,optional" frugal:"7,optional,double" json:"discountAmount,omitempty"`
-	Discount           *float64 `thrift:"discount,8,optional" frugal:"8,optional,double" json:"discount,omitempty"`
-	RangeType          int64    `thrift:"rangeType,9,required" frugal:"9,required,i64" json:"rangeType"`
-	RangeId            int64    `thrift:"rangeId,10,required" frugal:"10,required,i64" json:"rangeId"`
-	ExpireAt           int64    `thrift:"expireAt,11,required" frugal:"11,required,i64" json:"expireAt"`
-	Description        string   `thrift:"description,12,required" frugal:"12,required,string" json:"description"`
-	CreatedAt          int64    `thrift:"createdAt,13,required" frugal:"13,required,i64" json:"createdAt"`
-	UpdatedAt          *int64   `thrift:"updatedAt,14,optional" frugal:"14,optional,i64" json:"updatedAt,omitempty"`
-	DeletedAt          *int64   `thrift:"deletedAt,15,optional" frugal:"15,optional,i64" json:"deletedAt,omitempty"`
-	RemainUserUseCount int64    `thrift:"remainUserUseCount,16,required" frugal:"16,required,i64" json:"remainUserUseCount"`
-	ExpireTime         int64    `thrift:"expireTime,17,required" frugal:"17,required,i64" json:"expireTime"`
+	CouponID       int64    `thrift:"couponID,1,required" frugal:"1,required,i64" json:"couponID"`
+	CreatorID      int64    `thrift:"creatorID,2,required" frugal:"2,required,i64" json:"creatorID"`
+	DeadlineForGet int64    `thrift:"deadlineForGet,3,required" frugal:"3,required,i64" json:"deadlineForGet"`
+	Name           string   `thrift:"name,4,required" frugal:"4,required,string" json:"name"`
+	TypeInfo       int32    `thrift:"typeInfo,5,required" frugal:"5,required,i32" json:"typeInfo"`
+	ConditionCost  float64  `thrift:"conditionCost,6,required" frugal:"6,required,double" json:"conditionCost"`
+	DiscountAmount *float64 `thrift:"discountAmount,7,optional" frugal:"7,optional,double" json:"discountAmount,omitempty"`
+	Discount       *float64 `thrift:"discount,8,optional" frugal:"8,optional,double" json:"discount,omitempty"`
+	RangeType      int32    `thrift:"rangeType,9,required" frugal:"9,required,i32" json:"rangeType"`
+	RangeId        int64    `thrift:"rangeId,10,required" frugal:"10,required,i64" json:"rangeId"`
+	ExpireTime     int64    `thrift:"expireTime,11,required" frugal:"11,required,i64" json:"expireTime"`
+	Description    string   `thrift:"description,12,required" frugal:"12,required,string" json:"description"`
+	CreatedAt      int64    `thrift:"createdAt,13,required" frugal:"13,required,i64" json:"createdAt"`
+	UpdatedAt      *int64   `thrift:"updatedAt,14,optional" frugal:"14,optional,i64" json:"updatedAt,omitempty"`
+	DeletedAt      *int64   `thrift:"deletedAt,15,optional" frugal:"15,optional,i64" json:"deletedAt,omitempty"`
 }
 
 func NewCoupon() *Coupon {
@@ -239,23 +305,23 @@ func (p *Coupon) GetCouponID() (v int64) {
 	return p.CouponID
 }
 
-func (p *Coupon) GetUserID() (v int64) {
-	return p.UserID
+func (p *Coupon) GetCreatorID() (v int64) {
+	return p.CreatorID
 }
 
-func (p *Coupon) GetActivityID() (v int64) {
-	return p.ActivityID
+func (p *Coupon) GetDeadlineForGet() (v int64) {
+	return p.DeadlineForGet
 }
 
 func (p *Coupon) GetName() (v string) {
 	return p.Name
 }
 
-func (p *Coupon) GetTypeInfo() (v string) {
+func (p *Coupon) GetTypeInfo() (v int32) {
 	return p.TypeInfo
 }
 
-func (p *Coupon) GetConditionCost() (v int64) {
+func (p *Coupon) GetConditionCost() (v float64) {
 	return p.ConditionCost
 }
 
@@ -277,7 +343,7 @@ func (p *Coupon) GetDiscount() (v float64) {
 	return *p.Discount
 }
 
-func (p *Coupon) GetRangeType() (v int64) {
+func (p *Coupon) GetRangeType() (v int32) {
 	return p.RangeType
 }
 
@@ -285,8 +351,8 @@ func (p *Coupon) GetRangeId() (v int64) {
 	return p.RangeId
 }
 
-func (p *Coupon) GetExpireAt() (v int64) {
-	return p.ExpireAt
+func (p *Coupon) GetExpireTime() (v int64) {
+	return p.ExpireTime
 }
 
 func (p *Coupon) GetDescription() (v string) {
@@ -314,30 +380,22 @@ func (p *Coupon) GetDeletedAt() (v int64) {
 	}
 	return *p.DeletedAt
 }
-
-func (p *Coupon) GetRemainUserUseCount() (v int64) {
-	return p.RemainUserUseCount
-}
-
-func (p *Coupon) GetExpireTime() (v int64) {
-	return p.ExpireTime
-}
 func (p *Coupon) SetCouponID(val int64) {
 	p.CouponID = val
 }
-func (p *Coupon) SetUserID(val int64) {
-	p.UserID = val
+func (p *Coupon) SetCreatorID(val int64) {
+	p.CreatorID = val
 }
-func (p *Coupon) SetActivityID(val int64) {
-	p.ActivityID = val
+func (p *Coupon) SetDeadlineForGet(val int64) {
+	p.DeadlineForGet = val
 }
 func (p *Coupon) SetName(val string) {
 	p.Name = val
 }
-func (p *Coupon) SetTypeInfo(val string) {
+func (p *Coupon) SetTypeInfo(val int32) {
 	p.TypeInfo = val
 }
-func (p *Coupon) SetConditionCost(val int64) {
+func (p *Coupon) SetConditionCost(val float64) {
 	p.ConditionCost = val
 }
 func (p *Coupon) SetDiscountAmount(val *float64) {
@@ -346,14 +404,14 @@ func (p *Coupon) SetDiscountAmount(val *float64) {
 func (p *Coupon) SetDiscount(val *float64) {
 	p.Discount = val
 }
-func (p *Coupon) SetRangeType(val int64) {
+func (p *Coupon) SetRangeType(val int32) {
 	p.RangeType = val
 }
 func (p *Coupon) SetRangeId(val int64) {
 	p.RangeId = val
 }
-func (p *Coupon) SetExpireAt(val int64) {
-	p.ExpireAt = val
+func (p *Coupon) SetExpireTime(val int64) {
+	p.ExpireTime = val
 }
 func (p *Coupon) SetDescription(val string) {
 	p.Description = val
@@ -366,12 +424,6 @@ func (p *Coupon) SetUpdatedAt(val *int64) {
 }
 func (p *Coupon) SetDeletedAt(val *int64) {
 	p.DeletedAt = val
-}
-func (p *Coupon) SetRemainUserUseCount(val int64) {
-	p.RemainUserUseCount = val
-}
-func (p *Coupon) SetExpireTime(val int64) {
-	p.ExpireTime = val
 }
 
 func (p *Coupon) IsSetDiscountAmount() bool {
@@ -406,10 +458,10 @@ func (p *Coupon) DeepEqual(ano *Coupon) bool {
 	if !p.Field1DeepEqual(ano.CouponID) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.UserID) {
+	if !p.Field2DeepEqual(ano.CreatorID) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.ActivityID) {
+	if !p.Field3DeepEqual(ano.DeadlineForGet) {
 		return false
 	}
 	if !p.Field4DeepEqual(ano.Name) {
@@ -433,7 +485,7 @@ func (p *Coupon) DeepEqual(ano *Coupon) bool {
 	if !p.Field10DeepEqual(ano.RangeId) {
 		return false
 	}
-	if !p.Field11DeepEqual(ano.ExpireAt) {
+	if !p.Field11DeepEqual(ano.ExpireTime) {
 		return false
 	}
 	if !p.Field12DeepEqual(ano.Description) {
@@ -448,12 +500,6 @@ func (p *Coupon) DeepEqual(ano *Coupon) bool {
 	if !p.Field15DeepEqual(ano.DeletedAt) {
 		return false
 	}
-	if !p.Field16DeepEqual(ano.RemainUserUseCount) {
-		return false
-	}
-	if !p.Field17DeepEqual(ano.ExpireTime) {
-		return false
-	}
 	return true
 }
 
@@ -466,14 +512,14 @@ func (p *Coupon) Field1DeepEqual(src int64) bool {
 }
 func (p *Coupon) Field2DeepEqual(src int64) bool {
 
-	if p.UserID != src {
+	if p.CreatorID != src {
 		return false
 	}
 	return true
 }
 func (p *Coupon) Field3DeepEqual(src int64) bool {
 
-	if p.ActivityID != src {
+	if p.DeadlineForGet != src {
 		return false
 	}
 	return true
@@ -485,14 +531,14 @@ func (p *Coupon) Field4DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *Coupon) Field5DeepEqual(src string) bool {
+func (p *Coupon) Field5DeepEqual(src int32) bool {
 
-	if strings.Compare(p.TypeInfo, src) != 0 {
+	if p.TypeInfo != src {
 		return false
 	}
 	return true
 }
-func (p *Coupon) Field6DeepEqual(src int64) bool {
+func (p *Coupon) Field6DeepEqual(src float64) bool {
 
 	if p.ConditionCost != src {
 		return false
@@ -523,7 +569,7 @@ func (p *Coupon) Field8DeepEqual(src *float64) bool {
 	}
 	return true
 }
-func (p *Coupon) Field9DeepEqual(src int64) bool {
+func (p *Coupon) Field9DeepEqual(src int32) bool {
 
 	if p.RangeType != src {
 		return false
@@ -539,7 +585,7 @@ func (p *Coupon) Field10DeepEqual(src int64) bool {
 }
 func (p *Coupon) Field11DeepEqual(src int64) bool {
 
-	if p.ExpireAt != src {
+	if p.ExpireTime != src {
 		return false
 	}
 	return true
@@ -582,25 +628,336 @@ func (p *Coupon) Field15DeepEqual(src *int64) bool {
 	}
 	return true
 }
-func (p *Coupon) Field16DeepEqual(src int64) bool {
+
+var fieldIDToName_Coupon = map[int16]string{
+	1:  "couponID",
+	2:  "creatorID",
+	3:  "deadlineForGet",
+	4:  "name",
+	5:  "typeInfo",
+	6:  "conditionCost",
+	7:  "discountAmount",
+	8:  "discount",
+	9:  "rangeType",
+	10: "rangeId",
+	11: "expireTime",
+	12: "description",
+	13: "createdAt",
+	14: "updatedAt",
+	15: "deletedAt",
+}
+
+type UserCoupon struct {
+	CouponID           int64    `thrift:"couponID,1,required" frugal:"1,required,i64" json:"couponID"`
+	CreatorID          int64    `thrift:"creatorID,2,required" frugal:"2,required,i64" json:"creatorID"`
+	UserID             int64    `thrift:"userID,3,required" frugal:"3,required,i64" json:"userID"`
+	Name               string   `thrift:"name,4,required" frugal:"4,required,string" json:"name"`
+	TypeInfo           int32    `thrift:"typeInfo,5,required" frugal:"5,required,i32" json:"typeInfo"`
+	ConditionCost      int64    `thrift:"conditionCost,6,required" frugal:"6,required,i64" json:"conditionCost"`
+	DiscountAmount     *float64 `thrift:"discountAmount,7,optional" frugal:"7,optional,double" json:"discountAmount,omitempty"`
+	Discount           *float64 `thrift:"discount,8,optional" frugal:"8,optional,double" json:"discount,omitempty"`
+	RangeType          int64    `thrift:"rangeType,9,required" frugal:"9,required,i64" json:"rangeType"`
+	RangeId            int64    `thrift:"rangeId,10,required" frugal:"10,required,i64" json:"rangeId"`
+	ExpireAt           int64    `thrift:"expireAt,11,required" frugal:"11,required,i64" json:"expireAt"`
+	Description        string   `thrift:"description,12,required" frugal:"12,required,string" json:"description"`
+	RemainUserUseCount int64    `thrift:"remainUserUseCount,13,required" frugal:"13,required,i64" json:"remainUserUseCount"`
+	CreatedAt          int64    `thrift:"createdAt,14,required" frugal:"14,required,i64" json:"createdAt"`
+}
+
+func NewUserCoupon() *UserCoupon {
+	return &UserCoupon{}
+}
+
+func (p *UserCoupon) InitDefault() {
+}
+
+func (p *UserCoupon) GetCouponID() (v int64) {
+	return p.CouponID
+}
+
+func (p *UserCoupon) GetCreatorID() (v int64) {
+	return p.CreatorID
+}
+
+func (p *UserCoupon) GetUserID() (v int64) {
+	return p.UserID
+}
+
+func (p *UserCoupon) GetName() (v string) {
+	return p.Name
+}
+
+func (p *UserCoupon) GetTypeInfo() (v int32) {
+	return p.TypeInfo
+}
+
+func (p *UserCoupon) GetConditionCost() (v int64) {
+	return p.ConditionCost
+}
+
+var UserCoupon_DiscountAmount_DEFAULT float64
+
+func (p *UserCoupon) GetDiscountAmount() (v float64) {
+	if !p.IsSetDiscountAmount() {
+		return UserCoupon_DiscountAmount_DEFAULT
+	}
+	return *p.DiscountAmount
+}
+
+var UserCoupon_Discount_DEFAULT float64
+
+func (p *UserCoupon) GetDiscount() (v float64) {
+	if !p.IsSetDiscount() {
+		return UserCoupon_Discount_DEFAULT
+	}
+	return *p.Discount
+}
+
+func (p *UserCoupon) GetRangeType() (v int64) {
+	return p.RangeType
+}
+
+func (p *UserCoupon) GetRangeId() (v int64) {
+	return p.RangeId
+}
+
+func (p *UserCoupon) GetExpireAt() (v int64) {
+	return p.ExpireAt
+}
+
+func (p *UserCoupon) GetDescription() (v string) {
+	return p.Description
+}
+
+func (p *UserCoupon) GetRemainUserUseCount() (v int64) {
+	return p.RemainUserUseCount
+}
+
+func (p *UserCoupon) GetCreatedAt() (v int64) {
+	return p.CreatedAt
+}
+func (p *UserCoupon) SetCouponID(val int64) {
+	p.CouponID = val
+}
+func (p *UserCoupon) SetCreatorID(val int64) {
+	p.CreatorID = val
+}
+func (p *UserCoupon) SetUserID(val int64) {
+	p.UserID = val
+}
+func (p *UserCoupon) SetName(val string) {
+	p.Name = val
+}
+func (p *UserCoupon) SetTypeInfo(val int32) {
+	p.TypeInfo = val
+}
+func (p *UserCoupon) SetConditionCost(val int64) {
+	p.ConditionCost = val
+}
+func (p *UserCoupon) SetDiscountAmount(val *float64) {
+	p.DiscountAmount = val
+}
+func (p *UserCoupon) SetDiscount(val *float64) {
+	p.Discount = val
+}
+func (p *UserCoupon) SetRangeType(val int64) {
+	p.RangeType = val
+}
+func (p *UserCoupon) SetRangeId(val int64) {
+	p.RangeId = val
+}
+func (p *UserCoupon) SetExpireAt(val int64) {
+	p.ExpireAt = val
+}
+func (p *UserCoupon) SetDescription(val string) {
+	p.Description = val
+}
+func (p *UserCoupon) SetRemainUserUseCount(val int64) {
+	p.RemainUserUseCount = val
+}
+func (p *UserCoupon) SetCreatedAt(val int64) {
+	p.CreatedAt = val
+}
+
+func (p *UserCoupon) IsSetDiscountAmount() bool {
+	return p.DiscountAmount != nil
+}
+
+func (p *UserCoupon) IsSetDiscount() bool {
+	return p.Discount != nil
+}
+
+func (p *UserCoupon) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserCoupon(%+v)", *p)
+}
+
+func (p *UserCoupon) DeepEqual(ano *UserCoupon) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.CouponID) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.CreatorID) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.UserID) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.Name) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.TypeInfo) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.ConditionCost) {
+		return false
+	}
+	if !p.Field7DeepEqual(ano.DiscountAmount) {
+		return false
+	}
+	if !p.Field8DeepEqual(ano.Discount) {
+		return false
+	}
+	if !p.Field9DeepEqual(ano.RangeType) {
+		return false
+	}
+	if !p.Field10DeepEqual(ano.RangeId) {
+		return false
+	}
+	if !p.Field11DeepEqual(ano.ExpireAt) {
+		return false
+	}
+	if !p.Field12DeepEqual(ano.Description) {
+		return false
+	}
+	if !p.Field13DeepEqual(ano.RemainUserUseCount) {
+		return false
+	}
+	if !p.Field14DeepEqual(ano.CreatedAt) {
+		return false
+	}
+	return true
+}
+
+func (p *UserCoupon) Field1DeepEqual(src int64) bool {
+
+	if p.CouponID != src {
+		return false
+	}
+	return true
+}
+func (p *UserCoupon) Field2DeepEqual(src int64) bool {
+
+	if p.CreatorID != src {
+		return false
+	}
+	return true
+}
+func (p *UserCoupon) Field3DeepEqual(src int64) bool {
+
+	if p.UserID != src {
+		return false
+	}
+	return true
+}
+func (p *UserCoupon) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.Name, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *UserCoupon) Field5DeepEqual(src int32) bool {
+
+	if p.TypeInfo != src {
+		return false
+	}
+	return true
+}
+func (p *UserCoupon) Field6DeepEqual(src int64) bool {
+
+	if p.ConditionCost != src {
+		return false
+	}
+	return true
+}
+func (p *UserCoupon) Field7DeepEqual(src *float64) bool {
+
+	if p.DiscountAmount == src {
+		return true
+	} else if p.DiscountAmount == nil || src == nil {
+		return false
+	}
+	if *p.DiscountAmount != *src {
+		return false
+	}
+	return true
+}
+func (p *UserCoupon) Field8DeepEqual(src *float64) bool {
+
+	if p.Discount == src {
+		return true
+	} else if p.Discount == nil || src == nil {
+		return false
+	}
+	if *p.Discount != *src {
+		return false
+	}
+	return true
+}
+func (p *UserCoupon) Field9DeepEqual(src int64) bool {
+
+	if p.RangeType != src {
+		return false
+	}
+	return true
+}
+func (p *UserCoupon) Field10DeepEqual(src int64) bool {
+
+	if p.RangeId != src {
+		return false
+	}
+	return true
+}
+func (p *UserCoupon) Field11DeepEqual(src int64) bool {
+
+	if p.ExpireAt != src {
+		return false
+	}
+	return true
+}
+func (p *UserCoupon) Field12DeepEqual(src string) bool {
+
+	if strings.Compare(p.Description, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *UserCoupon) Field13DeepEqual(src int64) bool {
 
 	if p.RemainUserUseCount != src {
 		return false
 	}
 	return true
 }
-func (p *Coupon) Field17DeepEqual(src int64) bool {
+func (p *UserCoupon) Field14DeepEqual(src int64) bool {
 
-	if p.ExpireTime != src {
+	if p.CreatedAt != src {
 		return false
 	}
 	return true
 }
 
-var fieldIDToName_Coupon = map[int16]string{
+var fieldIDToName_UserCoupon = map[int16]string{
 	1:  "couponID",
-	2:  "userID",
-	3:  "activityID",
+	2:  "creatorID",
+	3:  "userID",
 	4:  "name",
 	5:  "typeInfo",
 	6:  "conditionCost",
@@ -610,11 +967,8 @@ var fieldIDToName_Coupon = map[int16]string{
 	10: "rangeId",
 	11: "expireAt",
 	12: "description",
-	13: "createdAt",
-	14: "updatedAt",
-	15: "deletedAt",
-	16: "remainUserUseCount",
-	17: "expireTime",
+	13: "remainUserUseCount",
+	14: "createdAt",
 }
 
 type AttrValue struct {
@@ -966,17 +1320,16 @@ var fieldIDToName_SkuImage = map[int16]string{
 type Spu struct {
 	SpuID            int64   `thrift:"spuID,1,required" frugal:"1,required,i64" json:"spuID"`
 	Name             string  `thrift:"name,2,required" frugal:"2,required,string" json:"name"`
-	UserID           int64   `thrift:"userID,3,required" frugal:"3,required,i64" json:"userID"`
+	CreatorID        int64   `thrift:"creatorID,3,required" frugal:"3,required,i64" json:"creatorID"`
 	Description      string  `thrift:"description,4,required" frugal:"4,required,string" json:"description"`
-	BrandID          *int64  `thrift:"brandID,5,optional" frugal:"5,optional,i64" json:"brandID,omitempty"`
-	CategoryID       int64   `thrift:"categoryID,6,required" frugal:"6,required,i64" json:"categoryID"`
-	GoodsHeadDrawing string  `thrift:"goodsHeadDrawing,7,required" frugal:"7,required,string" json:"goodsHeadDrawing"`
-	Price            float64 `thrift:"price,8,required" frugal:"8,required,double" json:"price"`
-	ForSale          string  `thrift:"forSale,9,required" frugal:"9,required,string" json:"forSale"`
-	Shipping         float64 `thrift:"shipping,10,required" frugal:"10,required,double" json:"shipping"`
-	CreatedAt        int64   `thrift:"createdAt,11,required" frugal:"11,required,i64" json:"createdAt"`
-	UpdatedAt        int64   `thrift:"updatedAt,12,required" frugal:"12,required,i64" json:"updatedAt"`
-	DeletedAt        *int64  `thrift:"deletedAt,13,optional" frugal:"13,optional,i64" json:"deletedAt,omitempty"`
+	CategoryID       int64   `thrift:"categoryID,5,required" frugal:"5,required,i64" json:"categoryID"`
+	GoodsHeadDrawing string  `thrift:"goodsHeadDrawing,6,required" frugal:"6,required,string" json:"goodsHeadDrawing"`
+	Price            float64 `thrift:"price,7,required" frugal:"7,required,double" json:"price"`
+	ForSale          int32   `thrift:"forSale,8,required" frugal:"8,required,i32" json:"forSale"`
+	Shipping         float64 `thrift:"shipping,9,required" frugal:"9,required,double" json:"shipping"`
+	CreatedAt        int64   `thrift:"createdAt,10,required" frugal:"10,required,i64" json:"createdAt"`
+	UpdatedAt        int64   `thrift:"updatedAt,11,required" frugal:"11,required,i64" json:"updatedAt"`
+	DeletedAt        *int64  `thrift:"deletedAt,12,optional" frugal:"12,optional,i64" json:"deletedAt,omitempty"`
 }
 
 func NewSpu() *Spu {
@@ -994,21 +1347,12 @@ func (p *Spu) GetName() (v string) {
 	return p.Name
 }
 
-func (p *Spu) GetUserID() (v int64) {
-	return p.UserID
+func (p *Spu) GetCreatorID() (v int64) {
+	return p.CreatorID
 }
 
 func (p *Spu) GetDescription() (v string) {
 	return p.Description
-}
-
-var Spu_BrandID_DEFAULT int64
-
-func (p *Spu) GetBrandID() (v int64) {
-	if !p.IsSetBrandID() {
-		return Spu_BrandID_DEFAULT
-	}
-	return *p.BrandID
 }
 
 func (p *Spu) GetCategoryID() (v int64) {
@@ -1023,7 +1367,7 @@ func (p *Spu) GetPrice() (v float64) {
 	return p.Price
 }
 
-func (p *Spu) GetForSale() (v string) {
+func (p *Spu) GetForSale() (v int32) {
 	return p.ForSale
 }
 
@@ -1053,14 +1397,11 @@ func (p *Spu) SetSpuID(val int64) {
 func (p *Spu) SetName(val string) {
 	p.Name = val
 }
-func (p *Spu) SetUserID(val int64) {
-	p.UserID = val
+func (p *Spu) SetCreatorID(val int64) {
+	p.CreatorID = val
 }
 func (p *Spu) SetDescription(val string) {
 	p.Description = val
-}
-func (p *Spu) SetBrandID(val *int64) {
-	p.BrandID = val
 }
 func (p *Spu) SetCategoryID(val int64) {
 	p.CategoryID = val
@@ -1071,7 +1412,7 @@ func (p *Spu) SetGoodsHeadDrawing(val string) {
 func (p *Spu) SetPrice(val float64) {
 	p.Price = val
 }
-func (p *Spu) SetForSale(val string) {
+func (p *Spu) SetForSale(val int32) {
 	p.ForSale = val
 }
 func (p *Spu) SetShipping(val float64) {
@@ -1085,10 +1426,6 @@ func (p *Spu) SetUpdatedAt(val int64) {
 }
 func (p *Spu) SetDeletedAt(val *int64) {
 	p.DeletedAt = val
-}
-
-func (p *Spu) IsSetBrandID() bool {
-	return p.BrandID != nil
 }
 
 func (p *Spu) IsSetDeletedAt() bool {
@@ -1114,37 +1451,34 @@ func (p *Spu) DeepEqual(ano *Spu) bool {
 	if !p.Field2DeepEqual(ano.Name) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.UserID) {
+	if !p.Field3DeepEqual(ano.CreatorID) {
 		return false
 	}
 	if !p.Field4DeepEqual(ano.Description) {
 		return false
 	}
-	if !p.Field5DeepEqual(ano.BrandID) {
+	if !p.Field5DeepEqual(ano.CategoryID) {
 		return false
 	}
-	if !p.Field6DeepEqual(ano.CategoryID) {
+	if !p.Field6DeepEqual(ano.GoodsHeadDrawing) {
 		return false
 	}
-	if !p.Field7DeepEqual(ano.GoodsHeadDrawing) {
+	if !p.Field7DeepEqual(ano.Price) {
 		return false
 	}
-	if !p.Field8DeepEqual(ano.Price) {
+	if !p.Field8DeepEqual(ano.ForSale) {
 		return false
 	}
-	if !p.Field9DeepEqual(ano.ForSale) {
+	if !p.Field9DeepEqual(ano.Shipping) {
 		return false
 	}
-	if !p.Field10DeepEqual(ano.Shipping) {
+	if !p.Field10DeepEqual(ano.CreatedAt) {
 		return false
 	}
-	if !p.Field11DeepEqual(ano.CreatedAt) {
+	if !p.Field11DeepEqual(ano.UpdatedAt) {
 		return false
 	}
-	if !p.Field12DeepEqual(ano.UpdatedAt) {
-		return false
-	}
-	if !p.Field13DeepEqual(ano.DeletedAt) {
+	if !p.Field12DeepEqual(ano.DeletedAt) {
 		return false
 	}
 	return true
@@ -1166,7 +1500,7 @@ func (p *Spu) Field2DeepEqual(src string) bool {
 }
 func (p *Spu) Field3DeepEqual(src int64) bool {
 
-	if p.UserID != src {
+	if p.CreatorID != src {
 		return false
 	}
 	return true
@@ -1178,68 +1512,56 @@ func (p *Spu) Field4DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *Spu) Field5DeepEqual(src *int64) bool {
-
-	if p.BrandID == src {
-		return true
-	} else if p.BrandID == nil || src == nil {
-		return false
-	}
-	if *p.BrandID != *src {
-		return false
-	}
-	return true
-}
-func (p *Spu) Field6DeepEqual(src int64) bool {
+func (p *Spu) Field5DeepEqual(src int64) bool {
 
 	if p.CategoryID != src {
 		return false
 	}
 	return true
 }
-func (p *Spu) Field7DeepEqual(src string) bool {
+func (p *Spu) Field6DeepEqual(src string) bool {
 
 	if strings.Compare(p.GoodsHeadDrawing, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *Spu) Field8DeepEqual(src float64) bool {
+func (p *Spu) Field7DeepEqual(src float64) bool {
 
 	if p.Price != src {
 		return false
 	}
 	return true
 }
-func (p *Spu) Field9DeepEqual(src string) bool {
+func (p *Spu) Field8DeepEqual(src int32) bool {
 
-	if strings.Compare(p.ForSale, src) != 0 {
+	if p.ForSale != src {
 		return false
 	}
 	return true
 }
-func (p *Spu) Field10DeepEqual(src float64) bool {
+func (p *Spu) Field9DeepEqual(src float64) bool {
 
 	if p.Shipping != src {
 		return false
 	}
 	return true
 }
-func (p *Spu) Field11DeepEqual(src int64) bool {
+func (p *Spu) Field10DeepEqual(src int64) bool {
 
 	if p.CreatedAt != src {
 		return false
 	}
 	return true
 }
-func (p *Spu) Field12DeepEqual(src int64) bool {
+func (p *Spu) Field11DeepEqual(src int64) bool {
 
 	if p.UpdatedAt != src {
 		return false
 	}
 	return true
 }
-func (p *Spu) Field13DeepEqual(src *int64) bool {
+func (p *Spu) Field12DeepEqual(src *int64) bool {
 
 	if p.DeletedAt == src {
 		return true
@@ -1255,26 +1577,25 @@ func (p *Spu) Field13DeepEqual(src *int64) bool {
 var fieldIDToName_Spu = map[int16]string{
 	1:  "spuID",
 	2:  "name",
-	3:  "userID",
+	3:  "creatorID",
 	4:  "description",
-	5:  "brandID",
-	6:  "categoryID",
-	7:  "goodsHeadDrawing",
-	8:  "price",
-	9:  "forSale",
-	10: "shipping",
-	11: "createdAt",
-	12: "updatedAt",
-	13: "deletedAt",
+	5:  "categoryID",
+	6:  "goodsHeadDrawing",
+	7:  "price",
+	8:  "forSale",
+	9:  "shipping",
+	10: "createdAt",
+	11: "updatedAt",
+	12: "deletedAt",
 }
 
 type Sku struct {
 	SkuID            int64        `thrift:"skuID,1,required" frugal:"1,required,i64" json:"skuID"`
-	UserID           int64        `thrift:"userID,2,required" frugal:"2,required,i64" json:"userID"`
+	CreatorID        int64        `thrift:"creatorID,2,required" frugal:"2,required,i64" json:"creatorID"`
 	Price            float64      `thrift:"price,3,required" frugal:"3,required,double" json:"price"`
 	Name             string       `thrift:"name,4,required" frugal:"4,required,string" json:"name"`
 	Description      string       `thrift:"description,5,required" frugal:"5,required,string" json:"description"`
-	ForSale          string       `thrift:"forSale,6,required" frugal:"6,required,string" json:"forSale"`
+	ForSale          int32        `thrift:"forSale,6,required" frugal:"6,required,i32" json:"forSale"`
 	Stock            int64        `thrift:"stock,7,required" frugal:"7,required,i64" json:"stock"`
 	StyleHeadDrawing string       `thrift:"styleHeadDrawing,8,required" frugal:"8,required,string" json:"styleHeadDrawing"`
 	CreatedAt        int64        `thrift:"createdAt,9,required" frugal:"9,required,i64" json:"createdAt"`
@@ -1297,8 +1618,8 @@ func (p *Sku) GetSkuID() (v int64) {
 	return p.SkuID
 }
 
-func (p *Sku) GetUserID() (v int64) {
-	return p.UserID
+func (p *Sku) GetCreatorID() (v int64) {
+	return p.CreatorID
 }
 
 func (p *Sku) GetPrice() (v float64) {
@@ -1313,7 +1634,7 @@ func (p *Sku) GetDescription() (v string) {
 	return p.Description
 }
 
-func (p *Sku) GetForSale() (v string) {
+func (p *Sku) GetForSale() (v int32) {
 	return p.ForSale
 }
 
@@ -1365,8 +1686,8 @@ func (p *Sku) GetLockStock() (v int64) {
 func (p *Sku) SetSkuID(val int64) {
 	p.SkuID = val
 }
-func (p *Sku) SetUserID(val int64) {
-	p.UserID = val
+func (p *Sku) SetCreatorID(val int64) {
+	p.CreatorID = val
 }
 func (p *Sku) SetPrice(val float64) {
 	p.Price = val
@@ -1377,7 +1698,7 @@ func (p *Sku) SetName(val string) {
 func (p *Sku) SetDescription(val string) {
 	p.Description = val
 }
-func (p *Sku) SetForSale(val string) {
+func (p *Sku) SetForSale(val int32) {
 	p.ForSale = val
 }
 func (p *Sku) SetStock(val int64) {
@@ -1432,7 +1753,7 @@ func (p *Sku) DeepEqual(ano *Sku) bool {
 	if !p.Field1DeepEqual(ano.SkuID) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.UserID) {
+	if !p.Field2DeepEqual(ano.CreatorID) {
 		return false
 	}
 	if !p.Field3DeepEqual(ano.Price) {
@@ -1486,7 +1807,7 @@ func (p *Sku) Field1DeepEqual(src int64) bool {
 }
 func (p *Sku) Field2DeepEqual(src int64) bool {
 
-	if p.UserID != src {
+	if p.CreatorID != src {
 		return false
 	}
 	return true
@@ -1512,9 +1833,9 @@ func (p *Sku) Field5DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *Sku) Field6DeepEqual(src string) bool {
+func (p *Sku) Field6DeepEqual(src int32) bool {
 
-	if strings.Compare(p.ForSale, src) != 0 {
+	if p.ForSale != src {
 		return false
 	}
 	return true
@@ -1596,7 +1917,7 @@ func (p *Sku) Field15DeepEqual(src int64) bool {
 
 var fieldIDToName_Sku = map[int16]string{
 	1:  "skuID",
-	2:  "userID",
+	2:  "creatorID",
 	3:  "price",
 	4:  "name",
 	5:  "description",
@@ -1612,6 +1933,207 @@ var fieldIDToName_Sku = map[int16]string{
 	15: "lockStock",
 }
 
+type SkuInfo struct {
+	SkuID            int64   `thrift:"skuID,1,required" frugal:"1,required,i64" json:"skuID"`
+	CreatorID        int64   `thrift:"creatorID,2,required" frugal:"2,required,i64" json:"creatorID"`
+	Price            float64 `thrift:"price,3,required" frugal:"3,required,double" json:"price"`
+	Name             string  `thrift:"name,4,required" frugal:"4,required,string" json:"name"`
+	ForSale          int32   `thrift:"forSale,5,required" frugal:"5,required,i32" json:"forSale"`
+	LockStock        int64   `thrift:"lockStock,6,required" frugal:"6,required,i64" json:"lockStock"`
+	StyleHeadDrawing string  `thrift:"styleHeadDrawing,7,required" frugal:"7,required,string" json:"styleHeadDrawing"`
+	SpuID            int64   `thrift:"spuID,8,required" frugal:"8,required,i64" json:"spuID"`
+	HistoryID        int64   `thrift:"historyID,9,required" frugal:"9,required,i64" json:"historyID"`
+}
+
+func NewSkuInfo() *SkuInfo {
+	return &SkuInfo{}
+}
+
+func (p *SkuInfo) InitDefault() {
+}
+
+func (p *SkuInfo) GetSkuID() (v int64) {
+	return p.SkuID
+}
+
+func (p *SkuInfo) GetCreatorID() (v int64) {
+	return p.CreatorID
+}
+
+func (p *SkuInfo) GetPrice() (v float64) {
+	return p.Price
+}
+
+func (p *SkuInfo) GetName() (v string) {
+	return p.Name
+}
+
+func (p *SkuInfo) GetForSale() (v int32) {
+	return p.ForSale
+}
+
+func (p *SkuInfo) GetLockStock() (v int64) {
+	return p.LockStock
+}
+
+func (p *SkuInfo) GetStyleHeadDrawing() (v string) {
+	return p.StyleHeadDrawing
+}
+
+func (p *SkuInfo) GetSpuID() (v int64) {
+	return p.SpuID
+}
+
+func (p *SkuInfo) GetHistoryID() (v int64) {
+	return p.HistoryID
+}
+func (p *SkuInfo) SetSkuID(val int64) {
+	p.SkuID = val
+}
+func (p *SkuInfo) SetCreatorID(val int64) {
+	p.CreatorID = val
+}
+func (p *SkuInfo) SetPrice(val float64) {
+	p.Price = val
+}
+func (p *SkuInfo) SetName(val string) {
+	p.Name = val
+}
+func (p *SkuInfo) SetForSale(val int32) {
+	p.ForSale = val
+}
+func (p *SkuInfo) SetLockStock(val int64) {
+	p.LockStock = val
+}
+func (p *SkuInfo) SetStyleHeadDrawing(val string) {
+	p.StyleHeadDrawing = val
+}
+func (p *SkuInfo) SetSpuID(val int64) {
+	p.SpuID = val
+}
+func (p *SkuInfo) SetHistoryID(val int64) {
+	p.HistoryID = val
+}
+
+func (p *SkuInfo) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("SkuInfo(%+v)", *p)
+}
+
+func (p *SkuInfo) DeepEqual(ano *SkuInfo) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.SkuID) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.CreatorID) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Price) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.Name) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.ForSale) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.LockStock) {
+		return false
+	}
+	if !p.Field7DeepEqual(ano.StyleHeadDrawing) {
+		return false
+	}
+	if !p.Field8DeepEqual(ano.SpuID) {
+		return false
+	}
+	if !p.Field9DeepEqual(ano.HistoryID) {
+		return false
+	}
+	return true
+}
+
+func (p *SkuInfo) Field1DeepEqual(src int64) bool {
+
+	if p.SkuID != src {
+		return false
+	}
+	return true
+}
+func (p *SkuInfo) Field2DeepEqual(src int64) bool {
+
+	if p.CreatorID != src {
+		return false
+	}
+	return true
+}
+func (p *SkuInfo) Field3DeepEqual(src float64) bool {
+
+	if p.Price != src {
+		return false
+	}
+	return true
+}
+func (p *SkuInfo) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.Name, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *SkuInfo) Field5DeepEqual(src int32) bool {
+
+	if p.ForSale != src {
+		return false
+	}
+	return true
+}
+func (p *SkuInfo) Field6DeepEqual(src int64) bool {
+
+	if p.LockStock != src {
+		return false
+	}
+	return true
+}
+func (p *SkuInfo) Field7DeepEqual(src string) bool {
+
+	if strings.Compare(p.StyleHeadDrawing, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *SkuInfo) Field8DeepEqual(src int64) bool {
+
+	if p.SpuID != src {
+		return false
+	}
+	return true
+}
+func (p *SkuInfo) Field9DeepEqual(src int64) bool {
+
+	if p.HistoryID != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_SkuInfo = map[int16]string{
+	1: "skuID",
+	2: "creatorID",
+	3: "price",
+	4: "name",
+	5: "forSale",
+	6: "lockStock",
+	7: "styleHeadDrawing",
+	8: "spuID",
+	9: "historyID",
+}
+
 type OrderGoods struct {
 	MerchantID       int64   `thrift:"MerchantID,1,required" frugal:"1,required,i64" json:"MerchantID"`
 	GoodsID          int64   `thrift:"GoodsID,2,required" frugal:"2,required,i64" json:"GoodsID"`
@@ -1622,7 +2144,7 @@ type OrderGoods struct {
 	StyleHeadDrawing string  `thrift:"StyleHeadDrawing,7,required" frugal:"7,required,string" json:"StyleHeadDrawing"`
 	OriginCast       float64 `thrift:"OriginCast,8,required" frugal:"8,required,double" json:"OriginCast"`
 	SaleCast         float64 `thrift:"SaleCast,9,required" frugal:"9,required,double" json:"SaleCast"`
-	PurchaseQuantity int32   `thrift:"PurchaseQuantity,10,required" frugal:"10,required,i32" json:"PurchaseQuantity"`
+	PurchaseQuantity int64   `thrift:"PurchaseQuantity,10,required" frugal:"10,required,i64" json:"PurchaseQuantity"`
 	PaymentAmount    float64 `thrift:"PaymentAmount,11,required" frugal:"11,required,double" json:"PaymentAmount"`
 	FreightAmount    float64 `thrift:"FreightAmount,12,required" frugal:"12,required,double" json:"FreightAmount"`
 	SettlementAmount float64 `thrift:"SettlementAmount,13,required" frugal:"13,required,double" json:"SettlementAmount"`
@@ -1674,7 +2196,7 @@ func (p *OrderGoods) GetSaleCast() (v float64) {
 	return p.SaleCast
 }
 
-func (p *OrderGoods) GetPurchaseQuantity() (v int32) {
+func (p *OrderGoods) GetPurchaseQuantity() (v int64) {
 	return p.PurchaseQuantity
 }
 
@@ -1728,7 +2250,7 @@ func (p *OrderGoods) SetOriginCast(val float64) {
 func (p *OrderGoods) SetSaleCast(val float64) {
 	p.SaleCast = val
 }
-func (p *OrderGoods) SetPurchaseQuantity(val int32) {
+func (p *OrderGoods) SetPurchaseQuantity(val int64) {
 	p.PurchaseQuantity = val
 }
 func (p *OrderGoods) SetPaymentAmount(val float64) {
@@ -1877,7 +2399,7 @@ func (p *OrderGoods) Field9DeepEqual(src float64) bool {
 	}
 	return true
 }
-func (p *OrderGoods) Field10DeepEqual(src int32) bool {
+func (p *OrderGoods) Field10DeepEqual(src int64) bool {
 
 	if p.PurchaseQuantity != src {
 		return false
@@ -1947,11 +2469,11 @@ var fieldIDToName_OrderGoods = map[int16]string{
 }
 
 type BaseOrderGoods struct {
-	MerchantID       int64   `thrift:"MerchantID,1,required" frugal:"1,required,i64" json:"MerchantID"`
-	GoodsID          int64   `thrift:"GoodsID,2,required" frugal:"2,required,i64" json:"GoodsID"`
-	StyleID          int64   `thrift:"StyleID,3,required" frugal:"3,required,i64" json:"StyleID"`
-	PurchaseQuantity float64 `thrift:"PurchaseQuantity,4,required" frugal:"4,required,double" json:"PurchaseQuantity"`
-	CouponID         int64   `thrift:"CouponID,5" frugal:"5,default,i64" json:"CouponID"`
+	MerchantID       int64 `thrift:"MerchantID,1,required" frugal:"1,required,i64" json:"MerchantID"`
+	GoodsID          int64 `thrift:"GoodsID,2,required" frugal:"2,required,i64" json:"GoodsID"`
+	StyleID          int64 `thrift:"StyleID,3,required" frugal:"3,required,i64" json:"StyleID"`
+	PurchaseQuantity int64 `thrift:"PurchaseQuantity,4,required" frugal:"4,required,i64" json:"PurchaseQuantity"`
+	CouponID         int64 `thrift:"CouponID,5" frugal:"5,default,i64" json:"CouponID"`
 }
 
 func NewBaseOrderGoods() *BaseOrderGoods {
@@ -1973,7 +2495,7 @@ func (p *BaseOrderGoods) GetStyleID() (v int64) {
 	return p.StyleID
 }
 
-func (p *BaseOrderGoods) GetPurchaseQuantity() (v float64) {
+func (p *BaseOrderGoods) GetPurchaseQuantity() (v int64) {
 	return p.PurchaseQuantity
 }
 
@@ -1989,7 +2511,7 @@ func (p *BaseOrderGoods) SetGoodsID(val int64) {
 func (p *BaseOrderGoods) SetStyleID(val int64) {
 	p.StyleID = val
 }
-func (p *BaseOrderGoods) SetPurchaseQuantity(val float64) {
+func (p *BaseOrderGoods) SetPurchaseQuantity(val int64) {
 	p.PurchaseQuantity = val
 }
 func (p *BaseOrderGoods) SetCouponID(val int64) {
@@ -2048,7 +2570,7 @@ func (p *BaseOrderGoods) Field3DeepEqual(src int64) bool {
 	}
 	return true
 }
-func (p *BaseOrderGoods) Field4DeepEqual(src float64) bool {
+func (p *BaseOrderGoods) Field4DeepEqual(src int64) bool {
 
 	if p.PurchaseQuantity != src {
 		return false

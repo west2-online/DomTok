@@ -24,24 +24,28 @@ import (
 	etcd "github.com/kitex-contrib/registry-etcd"
 
 	"github.com/west2-online/DomTok/config"
+	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
 	"github.com/west2-online/DomTok/pkg/constants"
-	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 // 通用的RPC客户端初始化函数
-func initRPCClient[T any](serviceName string, newClientFunc func(string, ...client.Option) (T, error)) (*T, error) { //nolint
+func initRPCClient[T any](serviceName string, newClientFunc func(string, ...client.Option) (T, error)) (*T, error) {
 	if config.Etcd == nil || config.Etcd.Addr == "" {
 		return nil, errors.New("config.Etcd.Addr is nil")
 	}
 	// 初始化Etcd Resolver
 	r, err := etcd.NewEtcdResolver([]string{config.Etcd.Addr})
 	if err != nil {
-		return nil, errno.NewErrNo(errno.InternalETCDErrorCode, fmt.Sprintf("initRPCClient etcd.NewEtcdResolver failed: %v", err))
+		return nil, fmt.Errorf("initRPCClient etcd.NewEtcdResolver failed: %w", err)
 	}
 	// 初始化具体的RPC客户端
 	client, err := newClientFunc(serviceName, client.WithResolver(r), client.WithMuxConnection(constants.MuxConnection))
 	if err != nil {
-		return nil, errno.NewErrNo(errno.InternalInitRpcErrorCode, fmt.Sprintf("initRPCClient NewClient failed: %v", err))
+		return nil, fmt.Errorf("initRPCClient NewClient failed: %w", err)
 	}
 	return &client, nil
+}
+
+func InitUserRPC() (*userservice.Client, error) {
+	return initRPCClient("user", userservice.NewClient)
 }
