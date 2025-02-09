@@ -18,15 +18,14 @@ package cache
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // GetCartCache 获得购物车缓存
-func (c *CacheAdapter) GetCartCache(ctx context.Context, uid int64) (string, error) {
-	data, err := c.client.Get(ctx, strconv.FormatInt(uid, 10)).Result()
+func (c *CacheAdapter) GetCartCache(ctx context.Context, key string) (string, error) {
+	data, err := c.client.Get(ctx, key).Result()
 	if err != nil {
 		logger.Errorf("cache.GetCartCache error:%v", err)
 		return "", errno.Errorf(errno.InternalRedisErrorCode, "cache.GetCartCache error:%v", err.Error())

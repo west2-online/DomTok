@@ -14,17 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package pack
+package entities
 
-import (
-	"github.com/west2-online/DomTok/gateway/model/model"
-	rpcModel "github.com/west2-online/DomTok/kitex_gen/model"
-)
+type Cart struct {
+	UserId  int64
+	SkuJson string
+}
 
-// BuildUserInfo 将 RPC 交流实体转换成 http 返回的实体
-func BuildUserInfo(u *rpcModel.UserInfo) *model.UserInfo {
-	return &model.UserInfo{
-		UserId: u.UserId,
-		Name:   u.Name,
-	}
+type GoodInfo struct {
+	SkuId  int64
+	ShopId int64
+	Count  int64
 }

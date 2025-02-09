@@ -23,6 +23,7 @@ const (
 // Redis Key and Expire Time
 const (
 	RedisCartExpireTime = 5 * 60
+	RedisCartStoreNum   = 30
 )
 
 // Redis DB Name

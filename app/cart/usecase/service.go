@@ -29,8 +29,8 @@ type PersistencePort interface {
 }
 
 type CachePort interface {
-	SetCartCache(ctx context.Context, uid int64, cart string) error
-	GetCartCache(ctx context.Context, uid int64) (string, error)
+	SetCartCache(ctx context.Context, key string, cart string) error
+	GetCartCache(ctx context.Context, key string) (string, error)
 	IsKeyExist(ctx context.Context, key string) bool
 }
 

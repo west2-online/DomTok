@@ -19,6 +19,7 @@ service UserService {
 // cart
 struct AddGoodsIntoCartRequest{
     1: required i64 skuId,
+    2: required i64 shop_id,
     3: required i64 count,
 }
 

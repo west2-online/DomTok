@@ -22,8 +22,7 @@ import (
 	"github.com/west2-online/DomTok/kitex_gen/cart"
 )
 
-type UseCasePort interface {
-}
+type UseCasePort interface{}
 
 type CartHandler struct {
 	useCase UseCasePort
@@ -47,14 +46,17 @@ func (h *CartHandler) UpdateCartGoods(ctx context.Context, req *cart.UpdateCartG
 	r = new(cart.UpdateCartGoodsResponse)
 	return r, nil
 }
+
 func (h *CartHandler) DeleteCartGoods(ctx context.Context, req *cart.DeleteAllCartGoodsRequest) (r *cart.DeleteAllCartGoodsResponse, err error) {
 	r = new(cart.DeleteAllCartGoodsResponse)
 	return r, nil
 }
+
 func (h *CartHandler) DeleteAllCartGoods(ctx context.Context, req *cart.DeleteAllCartGoodsRequest) (r *cart.DeleteAllCartGoodsResponse, err error) {
 	r = new(cart.DeleteAllCartGoodsResponse)
 	return r, nil
 }
+
 func (h *CartHandler) PayCartGoods(ctx context.Context, req *cart.PayCartGoodsRequest) (r *cart.PayCartGoodsResponse, err error) {
 	r = new(cart.PayCartGoodsResponse)
 	return r, nil

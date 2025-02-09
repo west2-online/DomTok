@@ -18,7 +18,6 @@ package cache
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
@@ -26,8 +25,8 @@ import (
 )
 
 // SetCartCache 将购物车存入redis
-func (c *CacheAdapter) SetCartCache(ctx context.Context, uid int64, cart string) error {
-	if err := c.client.Set(ctx, strconv.FormatInt(uid, 10), cart, constants.RedisCartExpireTime).Err(); err != nil {
+func (c *CacheAdapter) SetCartCache(ctx context.Context, key string, cart string) error {
+	if err := c.client.Set(ctx, key, cart, constants.RedisCartExpireTime).Err(); err != nil {
 		logger.Errorf("cache.SetCartCache error:%v", err)
 		return errno.Errorf(errno.InternalRedisErrorCode, "cache.SetCartCache error:%v", err.Error())
 	}

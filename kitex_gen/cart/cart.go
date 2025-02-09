@@ -21,12 +21,14 @@ package cart
 import (
 	"context"
 	"fmt"
+
 	"github.com/west2-online/DomTok/kitex_gen/model"
 )
 
 type AddGoodsIntoCartRequest struct {
-	SkuId int64 `thrift:"skuId,1,required" frugal:"1,required,i64" json:"skuId"`
-	Count int64 `thrift:"count,3,required" frugal:"3,required,i64" json:"count"`
+	SkuId  int64 `thrift:"skuId,1,required" frugal:"1,required,i64" json:"skuId"`
+	ShopId int64 `thrift:"shop_id,2,required" frugal:"2,required,i64" json:"shop_id"`
+	Count  int64 `thrift:"count,3,required" frugal:"3,required,i64" json:"count"`
 }
 
 func NewAddGoodsIntoCartRequest() *AddGoodsIntoCartRequest {
@@ -40,11 +42,18 @@ func (p *AddGoodsIntoCartRequest) GetSkuId() (v int64) {
 	return p.SkuId
 }
 
+func (p *AddGoodsIntoCartRequest) GetShopId() (v int64) {
+	return p.ShopId
+}
+
 func (p *AddGoodsIntoCartRequest) GetCount() (v int64) {
 	return p.Count
 }
 func (p *AddGoodsIntoCartRequest) SetSkuId(val int64) {
 	p.SkuId = val
+}
+func (p *AddGoodsIntoCartRequest) SetShopId(val int64) {
+	p.ShopId = val
 }
 func (p *AddGoodsIntoCartRequest) SetCount(val int64) {
 	p.Count = val
@@ -66,6 +75,9 @@ func (p *AddGoodsIntoCartRequest) DeepEqual(ano *AddGoodsIntoCartRequest) bool {
 	if !p.Field1DeepEqual(ano.SkuId) {
 		return false
 	}
+	if !p.Field2DeepEqual(ano.ShopId) {
+		return false
+	}
 	if !p.Field3DeepEqual(ano.Count) {
 		return false
 	}
@@ -75,6 +87,13 @@ func (p *AddGoodsIntoCartRequest) DeepEqual(ano *AddGoodsIntoCartRequest) bool {
 func (p *AddGoodsIntoCartRequest) Field1DeepEqual(src int64) bool {
 
 	if p.SkuId != src {
+		return false
+	}
+	return true
+}
+func (p *AddGoodsIntoCartRequest) Field2DeepEqual(src int64) bool {
+
+	if p.ShopId != src {
 		return false
 	}
 	return true
@@ -89,6 +108,7 @@ func (p *AddGoodsIntoCartRequest) Field3DeepEqual(src int64) bool {
 
 var fieldIDToName_AddGoodsIntoCartRequest = map[int16]string{
 	1: "skuId",
+	2: "shop_id",
 	3: "count",
 }
 
@@ -302,8 +322,9 @@ var fieldIDToName_ShowCartGoodsListResponse = map[int16]string{
 }
 
 type UpdateCartGoodsRequest struct {
-	SkuId int64 `thrift:"skuId,1,required" frugal:"1,required,i64" json:"skuId"`
-	Count int64 `thrift:"count,3,required" frugal:"3,required,i64" json:"count"`
+	SkuId  int64 `thrift:"skuId,1,required" frugal:"1,required,i64" json:"skuId"`
+	ShopId int64 `thrift:"shop_id,2,required" frugal:"2,required,i64" json:"shop_id"`
+	Count  int64 `thrift:"count,3,required" frugal:"3,required,i64" json:"count"`
 }
 
 func NewUpdateCartGoodsRequest() *UpdateCartGoodsRequest {
@@ -317,11 +338,18 @@ func (p *UpdateCartGoodsRequest) GetSkuId() (v int64) {
 	return p.SkuId
 }
 
+func (p *UpdateCartGoodsRequest) GetShopId() (v int64) {
+	return p.ShopId
+}
+
 func (p *UpdateCartGoodsRequest) GetCount() (v int64) {
 	return p.Count
 }
 func (p *UpdateCartGoodsRequest) SetSkuId(val int64) {
 	p.SkuId = val
+}
+func (p *UpdateCartGoodsRequest) SetShopId(val int64) {
+	p.ShopId = val
 }
 func (p *UpdateCartGoodsRequest) SetCount(val int64) {
 	p.Count = val
@@ -343,6 +371,9 @@ func (p *UpdateCartGoodsRequest) DeepEqual(ano *UpdateCartGoodsRequest) bool {
 	if !p.Field1DeepEqual(ano.SkuId) {
 		return false
 	}
+	if !p.Field2DeepEqual(ano.ShopId) {
+		return false
+	}
 	if !p.Field3DeepEqual(ano.Count) {
 		return false
 	}
@@ -352,6 +383,13 @@ func (p *UpdateCartGoodsRequest) DeepEqual(ano *UpdateCartGoodsRequest) bool {
 func (p *UpdateCartGoodsRequest) Field1DeepEqual(src int64) bool {
 
 	if p.SkuId != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateCartGoodsRequest) Field2DeepEqual(src int64) bool {
+
+	if p.ShopId != src {
 		return false
 	}
 	return true
@@ -366,6 +404,7 @@ func (p *UpdateCartGoodsRequest) Field3DeepEqual(src int64) bool {
 
 var fieldIDToName_UpdateCartGoodsRequest = map[int16]string{
 	1: "skuId",
+	2: "shop_id",
 	3: "count",
 }
 
