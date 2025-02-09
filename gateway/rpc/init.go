@@ -21,3 +21,7 @@ import (
 )
 
 var userClient userservice.Client
+
+func Init() {
+	InitUserRPC()
+}
