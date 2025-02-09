@@ -16,5 +16,4 @@ limitations under the License.
 
 package es
 
-type EsAdapter struct {
-}
+type EsAdapter struct{}

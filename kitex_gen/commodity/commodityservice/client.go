@@ -20,8 +20,10 @@ package commodityservice
 
 import (
 	"context"
+
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
+
 	commodity "github.com/west2-online/DomTok/kitex_gen/commodity"
 )
 

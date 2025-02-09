@@ -24,7 +24,7 @@ import (
 // BuildUserInfo 将 RPC 交流实体转换成 http 返回的实体
 func BuildUserInfo(u *rpcModel.UserInfo) *model.UserInfo {
 	return &model.UserInfo{
-		UID:  u.UserId,
-		Name: u.Name,
+		UserId: u.UserId,
+		Name:   u.Name,
 	}
 }

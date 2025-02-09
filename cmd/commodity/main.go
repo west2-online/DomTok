@@ -14,13 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package commodity
+package main
 
 import (
+	"net"
+
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	etcd "github.com/kitex-contrib/registry-etcd"
+
 	"github.com/west2-online/DomTok/app/commodity/controllers/rpc"
 	"github.com/west2-online/DomTok/app/commodity/repository/cache"
 	"github.com/west2-online/DomTok/app/commodity/repository/db"
@@ -31,15 +34,13 @@ import (
 	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
 	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/constants"
-	"github.com/west2-online/DomTok/pkg/utils"
-	"net"
-
 	"github.com/west2-online/DomTok/pkg/logger"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 // constants部分看了其他的pr有写了，防止冲突先找个数代替，到时候合并完再改掉
 var (
-	serviceName    = "constants.CommodityServiceName" //TODO
+	serviceName    = "constants.CommodityServiceName" // TODO
 	serviceAdapter *usecase.UseCase
 )
 
@@ -56,7 +57,7 @@ func init() {
 	mqClient, _ := client.GetConn()
 	mqAdapter := mq.NewMQAdapter(mqClient)
 
-	//TODO: ES
+	// TODO: ES
 	esClient := es.EsAdapter{}
 
 	serviceAdapter = usecase.NewCommodityCase(dbAdapter, mqAdapter, cacheAdapter, esClient)

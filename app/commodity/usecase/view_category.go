@@ -18,6 +18,7 @@ package usecase
 
 import (
 	"context"
+
 	"github.com/west2-online/DomTok/kitex_gen/model"
 )
 

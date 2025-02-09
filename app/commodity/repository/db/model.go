@@ -16,8 +16,7 @@ limitations under the License.
 
 package db
 
-type Category struct {
-}
+type Category struct{}
 
 func (Category) TableName() string {
 	return ""

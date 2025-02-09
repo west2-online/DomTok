@@ -21,8 +21,10 @@ package commodityservice
 import (
 	"context"
 	"errors"
+
 	client "github.com/cloudwego/kitex/client"
 	kitex "github.com/cloudwego/kitex/pkg/serviceinfo"
+
 	commodity "github.com/west2-online/DomTok/kitex_gen/commodity"
 )
 
