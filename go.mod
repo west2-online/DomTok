@@ -5,6 +5,7 @@ go 1.23.6
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
+	github.com/apache/thrift v0.16.0
 	github.com/bytedance/gopkg v0.1.1
 	github.com/bytedance/mockey v1.2.14
 	github.com/bytedance/sonic v1.12.8
