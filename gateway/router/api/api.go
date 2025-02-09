@@ -20,7 +20,6 @@ package api
 
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
-
 	api "github.com/west2-online/DomTok/gateway/handler/api"
 )
 
