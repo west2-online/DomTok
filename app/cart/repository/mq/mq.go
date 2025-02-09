@@ -14,17 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package constants
+package mq
 
-const (
-	RedisSlowQuery = 10 // ms redis默认的慢查询时间，适用于 logger
+import (
+	kafukago "github.com/segmentio/kafka-go"
 )
 
-// Redis Key and Expire Time
-const ()
+// MQAdapter impl CachePort defined in use case package
+type MQAdapter struct {
+	client *kafukago.Conn
+}
 
-// Redis DB Name
-const (
-	RedisDBOrder = 0
-	RedisDBCart  = 1
-)
+func NewMQAdapter(client *kafukago.Conn) *MQAdapter {
+	return &MQAdapter{client: client}
+}

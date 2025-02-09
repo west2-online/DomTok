@@ -14,17 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package constants
+package cache
 
-const (
-	RedisSlowQuery = 10 // ms redis默认的慢查询时间，适用于 logger
+import (
+	"github.com/redis/go-redis/v9"
 )
 
-// Redis Key and Expire Time
-const ()
+// CacheAdapter impl CachePort defined in use case package
+type CacheAdapter struct {
+	client *redis.Client
+}
 
-// Redis DB Name
-const (
-	RedisDBOrder = 0
-	RedisDBCart  = 1
-)
+func NewCacheAdapter(client *redis.Client) *CacheAdapter {
+	return &CacheAdapter{client: client}
+}

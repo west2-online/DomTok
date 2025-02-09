@@ -16,9 +16,23 @@ limitations under the License.
 
 package usecase
 
-type UseCase struct {
+type PersistencePort interface {
 }
 
-func NewCartCase() *UseCase {
-	return &UseCase{}
+type CachePort interface{}
+
+type MQPort interface{}
+
+type UseCase struct {
+	DB    PersistencePort
+	Cache CachePort
+	MQ    MQPort
+}
+
+func NewCartCase(db PersistencePort, cache CachePort, mq MQPort) *UseCase {
+	return &UseCase{
+		DB:    db,
+		Cache: cache,
+		MQ:    mq,
+	}
 }

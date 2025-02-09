@@ -28,4 +28,5 @@ const (
 const (
 	OrderTableName      = "orders"
 	OrderGoodsTableName = "order_goods"
+	CartTableName       = "cart"
 )

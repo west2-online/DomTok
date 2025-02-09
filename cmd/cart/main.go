@@ -17,18 +17,24 @@ limitations under the License.
 package main
 
 import (
+	"net"
+
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	etcd "github.com/kitex-contrib/registry-etcd"
+
 	"github.com/west2-online/DomTok/app/cart/controllers/rpc"
+	"github.com/west2-online/DomTok/app/cart/repository/cache"
+	"github.com/west2-online/DomTok/app/cart/repository/db"
+	"github.com/west2-online/DomTok/app/cart/repository/mq"
 	"github.com/west2-online/DomTok/app/cart/usecase"
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
+	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/utils"
-	"net"
 )
 
 var (
@@ -41,21 +47,27 @@ func init() {
 	logger.Init(serviceName, config.GetLoggerLevel())
 
 	// 何尝不是一种clientSet
-	serviceAdapter = usecase.NewCartCase()
+	dbClient, _ := client.InitMySQL()
+	dbAdapter := db.NewDBAdapter(dbClient)
+	cacheClient, _ := client.NewRedisClient(constants.RedisDBCart)
+	cacheAdapter := cache.NewCacheAdapter(cacheClient)
+	mqClient, _ := client.GetConn()
+	mqAdapter := mq.NewMQAdapter(mqClient)
+	serviceAdapter = usecase.NewCartCase(dbAdapter, cacheAdapter, mqAdapter)
 }
 
 func main() {
 	r, err := etcd.NewEtcdRegistry([]string{config.Etcd.Addr})
 	if err != nil {
-		logger.Fatalf("User: new etcd registry failed, err: %v", err)
+		logger.Fatalf("Cart: new etcd registry failed, err: %v", err)
 	}
 	listenAddr, err := utils.GetAvailablePort()
 	if err != nil {
-		logger.Fatalf("User: get available port failed, err: %v", err)
+		logger.Fatalf("Cart: get available port failed, err: %v", err)
 	}
 	addr, err := net.ResolveTCPAddr("tcp", listenAddr)
 	if err != nil {
-		logger.Fatalf("User: resolve tcp addr failed, err: %v", err)
+		logger.Fatalf("Cart: resolve tcp addr failed, err: %v", err)
 	}
 	svr := cartservice.NewServer(
 		// 注入 controller 依赖
@@ -72,6 +84,6 @@ func main() {
 		}),
 	)
 	if err = svr.Run(); err != nil {
-		logger.Fatalf("User: run server failed, err: %v", err)
+		logger.Fatalf("Cart: run server failed, err: %v", err)
 	}
 }

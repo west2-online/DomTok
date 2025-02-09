@@ -14,17 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package constants
+package db
 
-const (
-	RedisSlowQuery = 10 // ms redis默认的慢查询时间，适用于 logger
-)
+import "github.com/west2-online/DomTok/pkg/constants"
 
-// Redis Key and Expire Time
-const ()
+type Cart struct{}
 
-// Redis DB Name
-const (
-	RedisDBOrder = 0
-	RedisDBCart  = 1
-)
+func (Cart) TableName() string {
+	return constants.CartTableName
+}

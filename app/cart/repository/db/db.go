@@ -14,17 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package constants
+package db
 
-const (
-	RedisSlowQuery = 10 // ms redis默认的慢查询时间，适用于 logger
-)
+import "gorm.io/gorm"
 
-// Redis Key and Expire Time
-const ()
+// DBAdapter impl PersistencePort defined in use case package
+type DBAdapter struct {
+	client *gorm.DB
+}
 
-// Redis DB Name
-const (
-	RedisDBOrder = 0
-	RedisDBCart  = 1
-)
+func NewDBAdapter(client *gorm.DB) *DBAdapter {
+	return &DBAdapter{client: client}
+}
