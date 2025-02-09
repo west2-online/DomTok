@@ -14,14 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package rpc
+package mw
 
 import (
-	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/hertz-contrib/cors"
+
+	"github.com/west2-online/DomTok/pkg/constants"
 )
 
-var userClient userservice.Client
-
-func Init() {
-	InitUserRPC()
+func CorsMW() app.HandlerFunc {
+	return cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowCredentials: true,
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"*"},
+		MaxAge:           constants.CorsMaxAge,
+		ExposeHeaders:    []string{"Content-Length"},
+	})
 }

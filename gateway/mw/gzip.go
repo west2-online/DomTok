@@ -14,14 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package rpc
+package mw
 
 import (
-	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/hertz-contrib/gzip"
 )
 
-var userClient userservice.Client
-
-func Init() {
-	InitUserRPC()
+func GzipMW() app.HandlerFunc {
+	return gzip.Gzip(gzip.BestSpeed)
 }
