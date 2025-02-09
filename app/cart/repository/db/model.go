@@ -16,10 +16,31 @@ limitations under the License.
 
 package db
 
-import "github.com/west2-online/DomTok/pkg/constants"
+import (
+	"time"
 
-type Cart struct{}
+	"gorm.io/gorm"
+
+	"github.com/west2-online/DomTok/pkg/constants"
+)
+
+type Cart struct {
+	UserId    int64 `gorm:"primary_key"`
+	SkuJson   string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `sql:"index"`
+}
 
 func (Cart) TableName() string {
 	return constants.CartTableName
+}
+
+// DBAdapter impl PersistencePort defined in use case package
+type DBAdapter struct {
+	client *gorm.DB
+}
+
+func NewDBAdapter(client *gorm.DB) *DBAdapter {
+	return &DBAdapter{client: client}
 }

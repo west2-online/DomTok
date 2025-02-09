@@ -14,34 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package usecase
+package db
 
 import (
 	"context"
+	"errors"
 
-	"github.com/west2-online/DomTok/app/cart/repository/db"
+	"gorm.io/gorm"
+
+	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
-type PersistencePort interface {
-	CreateCart(ctx context.Context, uid int64, cart string) error
-	GetCartByUserId(ctx context.Context, uid int64) (bool, *db.Cart, error)
-	SaveCart(ctx context.Context, uid int64, cart string) error
-}
-
-type CachePort interface{}
-
-type MQPort interface{}
-
-type UseCase struct {
-	DB    PersistencePort
-	Cache CachePort
-	MQ    MQPort
-}
-
-func NewCartCase(db PersistencePort, cache CachePort, mq MQPort) *UseCase {
-	return &UseCase{
-		DB:    db,
-		Cache: cache,
-		MQ:    mq,
+func (c *DBAdapter) GetCartByUserId(ctx context.Context, uid int64) (bool, *Cart, error) {
+	model := new(Cart)
+	if err := c.client.WithContext(ctx).Where("user_id=?", uid).First(model).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil, nil
+		}
+		logger.Errorf("dal.GetCartByUserId error:%v", err)
+		return false, nil, errno.Errorf(errno.InternalDatabaseErrorCode, "db.GetCartByUserId error: %v", err)
 	}
+	return true, model, nil
 }

@@ -14,34 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package usecase
+package db
 
 import (
 	"context"
 
-	"github.com/west2-online/DomTok/app/cart/repository/db"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-type PersistencePort interface {
-	CreateCart(ctx context.Context, uid int64, cart string) error
-	GetCartByUserId(ctx context.Context, uid int64) (bool, *db.Cart, error)
-	SaveCart(ctx context.Context, uid int64, cart string) error
-}
-
-type CachePort interface{}
-
-type MQPort interface{}
-
-type UseCase struct {
-	DB    PersistencePort
-	Cache CachePort
-	MQ    MQPort
-}
-
-func NewCartCase(db PersistencePort, cache CachePort, mq MQPort) *UseCase {
-	return &UseCase{
-		DB:    db,
-		Cache: cache,
-		MQ:    mq,
+func (c *DBAdapter) CreateCart(ctx context.Context, uid int64, cart string) error {
+	model := Cart{
+		UserId:  uid,
+		SkuJson: cart,
 	}
+	if err := c.client.WithContext(ctx).Create(&model).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "db.CreateCart error: %v", err)
+	}
+	return nil
 }

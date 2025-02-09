@@ -16,13 +16,21 @@ limitations under the License.
 
 package db
 
-import "gorm.io/gorm"
+import (
+	"context"
 
-// DBAdapter impl PersistencePort defined in use case package
-type DBAdapter struct {
-	client *gorm.DB
-}
+	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
+)
 
-func NewDBAdapter(client *gorm.DB) *DBAdapter {
-	return &DBAdapter{client: client}
+func (c *DBAdapter) SaveCart(ctx context.Context, uid int64, cart string) error {
+	model := &Cart{
+		UserId:  uid,
+		SkuJson: cart,
+	}
+	if err := c.client.WithContext(ctx).Where("user_id = ?", uid).Omit("created_at").Save(model).Error; err != nil {
+		logger.Errorf("db.SaveCart error: %v", err)
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "db.SaveCart error: %v", err)
+	}
+	return nil
 }
