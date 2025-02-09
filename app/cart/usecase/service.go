@@ -28,7 +28,11 @@ type PersistencePort interface {
 	SaveCart(ctx context.Context, uid int64, cart string) error
 }
 
-type CachePort interface{}
+type CachePort interface {
+	SetCartCache(ctx context.Context, uid int64, cart string) error
+	GetCartCache(ctx context.Context, uid int64) (string, error)
+	IsKeyExist(ctx context.Context, key string) bool
+}
 
 type MQPort interface{}
 

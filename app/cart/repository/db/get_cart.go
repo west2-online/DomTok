@@ -26,6 +26,7 @@ import (
 	"github.com/west2-online/DomTok/pkg/logger"
 )
 
+// GetCartByUserId 查询购物车
 func (c *DBAdapter) GetCartByUserId(ctx context.Context, uid int64) (bool, *Cart, error) {
 	model := new(Cart)
 	if err := c.client.WithContext(ctx).Where("user_id=?", uid).First(model).Error; err != nil {

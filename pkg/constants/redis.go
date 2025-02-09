@@ -21,7 +21,9 @@ const (
 )
 
 // Redis Key and Expire Time
-const ()
+const (
+	RedisCartExpireTime = 5 * 60
+)
 
 // Redis DB Name
 const (

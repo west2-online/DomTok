@@ -14,24 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package db
+package cache
 
 import (
 	"context"
+	"strconv"
 
+	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
 )
 
-// CreateCart 创建购物车
-func (c *DBAdapter) CreateCart(ctx context.Context, uid int64, cart string) error {
-	model := Cart{
-		UserId:  uid,
-		SkuJson: cart,
-	}
-	if err := c.client.WithContext(ctx).Create(&model).Error; err != nil {
-		logger.Errorf("db.CreateCart error:%v", err)
-		return errno.Errorf(errno.InternalDatabaseErrorCode, "db.CreateCart error: %v", err)
+// SetCartCache 将购物车存入redis
+func (c *CacheAdapter) SetCartCache(ctx context.Context, uid int64, cart string) error {
+	if err := c.client.Set(ctx, strconv.FormatInt(uid, 10), cart, constants.RedisCartExpireTime).Err(); err != nil {
+		logger.Errorf("cache.SetCartCache error:%v", err)
+		return errno.Errorf(errno.InternalRedisErrorCode, "cache.SetCartCache error:%v", err.Error())
 	}
 	return nil
 }

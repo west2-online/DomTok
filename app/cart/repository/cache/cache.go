@@ -17,6 +17,7 @@ limitations under the License.
 package cache
 
 import (
+	"context"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -27,4 +28,9 @@ type CacheAdapter struct {
 
 func NewCacheAdapter(client *redis.Client) *CacheAdapter {
 	return &CacheAdapter{client: client}
+}
+
+// IsKeyExist will check if key exist
+func (c *CacheAdapter) IsKeyExist(ctx context.Context, key string) bool {
+	return c.client.Exists(ctx, key).Val() == 1
 }

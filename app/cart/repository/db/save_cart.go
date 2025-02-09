@@ -23,6 +23,7 @@ import (
 	"github.com/west2-online/DomTok/pkg/logger"
 )
 
+// SaveCart 保存更新后的购物车
 func (c *DBAdapter) SaveCart(ctx context.Context, uid int64, cart string) error {
 	model := &Cart{
 		UserId:  uid,
