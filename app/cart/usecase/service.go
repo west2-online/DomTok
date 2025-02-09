@@ -14,23 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package constants
+package usecase
 
-// Service Name
-const (
-	GatewayServiceName = "gateway"
-	OrderServiceName   = "order"
-	CartServiceName    = "cart"
-)
+type UseCase struct {
+}
 
-// OrderService
-const (
-	OrderStatusUnpaidCode = 0
-	OrderStatusPaidCode   = 1
-	OrderStatusFailCode   = 2
-
-	OrderStatusUnpaid  = "未支付"
-	OrderStatusPaid    = "待支付"
-	OrderStatusFail    = "支付失败"
-	OrderStatusUnknown = "未知状态"
-)
+func NewCartCase() *UseCase {
+	return &UseCase{}
+}

@@ -15,3 +15,46 @@ limitations under the License.
 */
 
 package rpc
+
+import (
+	"context"
+	"github.com/west2-online/DomTok/kitex_gen/cart"
+)
+
+type UseCasePort interface {
+}
+
+type CartHandler struct {
+	useCase UseCasePort
+}
+
+func NewCartHandler(useCase UseCasePort) *CartHandler {
+	return &CartHandler{useCase: useCase}
+}
+
+func (h *CartHandler) AddGoodsIntoCart(ctx context.Context, req *cart.AddGoodsIntoCartRequest) (r *cart.AddGoodsIntoCartResponse, err error) {
+	r = new(cart.AddGoodsIntoCartResponse)
+	return r, nil
+}
+
+func (h *CartHandler) ShowCartGoodsList(ctx context.Context, req *cart.ShowCartGoodsListRequest) (r *cart.ShowCartGoodsListResponse, err error) {
+	r = new(cart.ShowCartGoodsListResponse)
+	return r, nil
+}
+
+func (h *CartHandler) UpdateCartGoods(ctx context.Context, req *cart.UpdateCartGoodsRequest) (r *cart.UpdateCartGoodsResponse, err error) {
+	r = new(cart.UpdateCartGoodsResponse)
+	return r, nil
+}
+func (h *CartHandler) DeleteCartGoods(ctx context.Context, req *cart.DeleteAllCartGoodsRequest) (r *cart.DeleteAllCartGoodsResponse, err error) {
+	r = new(cart.DeleteAllCartGoodsResponse)
+	return r, nil
+}
+func (h *CartHandler) DeleteAllCartGoods(ctx context.Context, req *cart.DeleteAllCartGoodsRequest) (r *cart.DeleteAllCartGoodsResponse, err error) {
+	r = new(cart.DeleteAllCartGoodsResponse)
+	return r, nil
+}
+func (h *CartHandler) PayCartGoods(ctx context.Context, req *cart.PayCartGoodsRequest) (r *cart.PayCartGoodsResponse, err error) {
+	r = new(cart.PayCartGoodsResponse)
+	return r, nil
+}
