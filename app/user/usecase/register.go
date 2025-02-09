@@ -40,6 +40,11 @@ func (u *UseCase) RegisterUser(ctx context.Context, entity *entities.User) (uid 
 	if valid := entity.IsValidEmail(); !valid {
 		return 0, errno.NewErrNo(errno.BizErrorCode, "invalid email")
 	}
+
+	// 校验密码
+	if valid := entity.IsValidPassword(); !valid {
+		return 0, errno.NewErrNo(errno.BizErrorCode, "invalid password")
+	}
 	// 加密密码，准备存入数据库
 	if err = entity.EncryptPassword(); err != nil {
 		return 0, errno.NewErrNo(errno.BizErrorCode, "encrypt password failed")

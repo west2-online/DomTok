@@ -16,6 +16,12 @@ limitations under the License.
 
 package entities
 
+import (
+	"regexp"
+
+	"golang.org/x/crypto/bcrypt"
+)
+
 // User 用于在 handler ---use case --- repository 之间传递数据的实体类
 // 目的是方便 use case 操作对应的业务
 type User struct {
@@ -27,17 +33,55 @@ type User struct {
 	// AvatarURL string
 }
 
-// IsValidEmail TODO: 根据正则匹配 ？来判断是否是合法的邮箱
+// IsValidEmail 根据正则匹配来判断是否是合法的邮箱
 func (u *User) IsValidEmail() bool {
-	return true
+	regex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	re := regexp.MustCompile(regex)
+	return re.MatchString(u.Email)
 }
 
-// EncryptPassword TODO: 加密密码, 直接修改 User 中的 Password 字段
+// EncryptPassword 加密密码, 直接修改 User 中的 Password 字段
 func (u *User) EncryptPassword() error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	u.Password = string(hashedPassword)
 	return nil
 }
 
-// CheckPassword TODO: 检查密码是否正确
-func (u *User) CheckPassword() bool {
-	return true
+// CheckPassword 检查密码是否正确
+func (u *User) CheckPassword(password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+	return err == nil
+}
+
+func (u *User) IsValidPassword() bool {
+	// 密码长度至少为8个字符
+	if len(u.Password) < ValidPasswordLength {
+		return false
+	}
+
+	// 至少包含一个大写字母、一个小写字母、一个数字和一个特殊字符
+	var (
+		hasUpper   = false
+		hasLower   = false
+		hasNumber  = false
+		hasSpecial = false
+	)
+
+	for _, char := range u.Password {
+		switch {
+		case 'A' <= char && char <= 'Z':
+			hasUpper = true
+		case 'a' <= char && char <= 'z':
+			hasLower = true
+		case '0' <= char && char <= '9':
+			hasNumber = true
+		case regexp.MustCompile(`[!@#\$%\^&\*\(\)_\+\-=\[\]\{\};:'",<>\.\?/\\|]`).MatchString(string(char)):
+			hasSpecial = true
+		}
+	}
+
+	return hasUpper && hasLower && hasNumber && hasSpecial
 }
