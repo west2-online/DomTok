@@ -19,46 +19,25 @@ limitations under the License.
 package api
 
 import (
+	"context"
+
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	api "github.com/west2-online/DomTok/gateway/model/api"
 )
 
-func rootMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
+// AddGoodsIntoCart .
+// @router api/cart/sku/add [POST]
+func AddGoodsIntoCart(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.AddGoodsIntoCartRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
 
-func _apiMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
+	resp := new(api.AddGoodsIntoCartResponse)
 
-func _v1Mw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _userMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _registerMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _cartMw() []app.HandlerFunc {
-	// todo: add authorization
-	// your code...
-	return nil
-}
-
-func _skuMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _addgoodsintocartMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	c.JSON(consts.StatusOK, resp)
 }
