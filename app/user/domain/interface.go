@@ -14,15 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package usecase
+package domain
 
-import (
-	"context"
+import "context"
 
-	"github.com/west2-online/DomTok/app/user/entities"
-)
+// UserDB 表示持久化存储接口 (或者也可以叫做 DBPort)
+type UserDB interface {
+	IsUserExist(ctx context.Context, username string) (bool, error)
+	CreateUser(ctx context.Context, user *User) error
+}
 
-// TODO: 考虑留给新登
-func (u *UseCase) Login(ctx context.Context, entity *entities.User) (*entities.User, error) {
-	return nil, nil
+type UserUseCase interface {
+	RegisterUser(ctx context.Context, user *User) (uid int64, err error)
+	Login(ctx context.Context, user *User) (*User, error)
 }

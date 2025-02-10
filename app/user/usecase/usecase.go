@@ -14,24 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package template
+package usecase
 
 import (
-	"context"
-
-	"github.com/west2-online/DomTok/app/user/entities"
+	"github.com/west2-online/DomTok/app/user/domain"
+	"github.com/west2-online/DomTok/app/user/service"
 )
 
-type TemplateRPCClient struct {
-	// client templateservice.client
+// useCase 实现了 domain.UserUseCase
+// 只会以接口的形式被调用, 所以首字母小写改为私有类型
+type useCase struct {
+	db  domain.UserDB
+	svc *service.UserService
 }
 
-func NewTemplateRPCClient() *TemplateRPCClient {
-	return &TemplateRPCClient{}
-}
-
-func (c *TemplateRPCClient) GetTemplateInfo(ctx context.Context) (*entities.TemplateModel, error) {
-	// rpc call
-	// client.Call()
-	return nil, nil
+func NewUserCase(db domain.UserDB, svc *service.UserService) domain.UserUseCase {
+	return &useCase{
+		db:  db,
+		svc: svc,
+	}
 }

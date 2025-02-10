@@ -24,8 +24,7 @@ type server struct {
 }
 
 type snowflake struct {
-	WorkerID      int64 `mapstructure:"worker-id"`
-	DatancenterID int64 `mapstructure:"datancenter-id"`
+	DatacenterID int64 `mapstructure:"datacenter-id"`
 }
 
 type service struct {

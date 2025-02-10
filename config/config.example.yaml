@@ -12,8 +12,7 @@ defaultUser:
   password: ""
 
 snowflake:
-  worker-id: 0
-  datancenter-id: 0
+  datacenter-id: 0
 
 mysql:
   addr: 127.0.0.1:3306

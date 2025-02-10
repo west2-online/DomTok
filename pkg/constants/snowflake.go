@@ -17,5 +17,10 @@ limitations under the License.
 package constants
 
 const (
-	CheckFileTypeBufferSize = 512 // 适用于判断文件类型，需要读取前512个字节
+	DefaultDataCenterID = int64(0)
+	DefaultWorkerID     = int64(0)
+)
+
+const (
+	WorkerOfUserService = 1 + int64(iota)
 )

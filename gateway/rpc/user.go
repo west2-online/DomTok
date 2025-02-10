@@ -43,7 +43,8 @@ func RegisterRPC(ctx context.Context, req *user.RegisterRequest) (uid int64, err
 		return 0, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsSuccess(resp.Base) {
-		return 0, errno.BizError.WithMessage(resp.Base.Msg)
+		// TODO 这里先这样放在这吧, 太累了, 有兴趣的可以考虑一下怎么返回更好
+		return 0, errno.InternalServiceError.WithMessage(resp.Base.Msg)
 	}
 	return resp.UserID, nil
 }
