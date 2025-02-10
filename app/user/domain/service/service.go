@@ -22,7 +22,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/west2-online/DomTok/app/user/domain"
+	"github.com/west2-online/DomTok/app/user/domain/model"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
@@ -42,7 +42,7 @@ func (svc *UserService) CheckPassword(passwordDigest, password string) error {
 	return nil
 }
 
-func (svc *UserService) CreateUser(ctx context.Context, u *domain.User) error {
+func (svc *UserService) CreateUser(ctx context.Context, u *model.User) error {
 	u.Uid = svc.nextID()
 
 	if err := svc.db.CreateUser(ctx, u); err != nil {

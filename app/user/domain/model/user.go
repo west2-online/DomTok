@@ -14,17 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package domain
+package model
 
-import "context"
-
-// UserDB 表示持久化存储接口 (或者也可以叫做 DBPort)
-type UserDB interface {
-	IsUserExist(ctx context.Context, username string) (bool, error)
-	CreateUser(ctx context.Context, user *User) error
-}
-
-type UserUseCase interface {
-	RegisterUser(ctx context.Context, user *User) (uid int64, err error)
-	Login(ctx context.Context, user *User) (*User, error)
+// User 用于在 handler --- use case --- infrastructure 之间传递数据的实体类
+// 目的是方便 use case 操作对应的业务
+type User struct {
+	Uid      int64
+	UserName string
+	Password string
+	Email    string
+	Phone    string
 }

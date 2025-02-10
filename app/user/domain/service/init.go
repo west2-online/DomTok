@@ -19,18 +19,18 @@ package service
 import (
 	"regexp"
 
-	"github.com/west2-online/DomTok/app/user/domain"
+	"github.com/west2-online/DomTok/app/user/domain/repository"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 type UserService struct {
-	db      domain.UserDB
+	db      repository.UserDB
 	sf      *utils.Snowflake
 	emailRe *regexp.Regexp
 }
 
 // NewUserService 返回一个 NewUserService 实例
-func NewUserService(db domain.UserDB, sf *utils.Snowflake) *UserService {
+func NewUserService(db repository.UserDB, sf *utils.Snowflake) *UserService {
 	if db == nil {
 		panic("userService`s db should not be nil")
 	}

@@ -18,8 +18,8 @@ package user
 
 import (
 	"github.com/west2-online/DomTok/app/user/controllers/rpc"
-	"github.com/west2-online/DomTok/app/user/repository/mysql"
-	"github.com/west2-online/DomTok/app/user/service"
+	"github.com/west2-online/DomTok/app/user/domain/service"
+	"github.com/west2-online/DomTok/app/user/infrastructure/mysql"
 	"github.com/west2-online/DomTok/app/user/usecase"
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/kitex_gen/user"

@@ -22,7 +22,8 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/west2-online/DomTok/app/user/domain"
+	"github.com/west2-online/DomTok/app/user/domain/model"
+	"github.com/west2-online/DomTok/app/user/domain/repository"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
@@ -31,11 +32,11 @@ type userDB struct {
 	client *gorm.DB
 }
 
-func NewUserDB(client *gorm.DB) domain.UserDB {
+func NewUserDB(client *gorm.DB) repository.UserDB {
 	return &userDB{client: client}
 }
 
-func (db *userDB) CreateUser(ctx context.Context, u *domain.User) error {
+func (db *userDB) CreateUser(ctx context.Context, u *model.User) error {
 	// 将 entity 转换成 mysql 这边的 model
 	// TODO 可以考虑整一个函数统一转化, 放在这里占了太多行, 而且这不是这个方法该做的. 这个方法应该做的是创建用户
 	model := User{

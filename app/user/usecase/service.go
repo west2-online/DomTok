@@ -20,16 +20,16 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/west2-online/DomTok/app/user/domain"
+	"github.com/west2-online/DomTok/app/user/domain/model"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 // Login 用户登录 TODO: 考虑留给新登
-func (uc *useCase) Login(ctx context.Context, user *domain.User) (*domain.User, error) {
+func (uc *useCase) Login(ctx context.Context, user *model.User) (*model.User, error) {
 	return nil, nil
 }
 
-func (uc *useCase) RegisterUser(ctx context.Context, u *domain.User) (uid int64, err error) {
+func (uc *useCase) RegisterUser(ctx context.Context, u *model.User) (uid int64, err error) {
 	// 这里进行了简单的密码和邮箱格式的校验, 如果后续还需要对别的参数进行校验可以再加
 	if err = uc.svc.Verify(uc.svc.VerifyEmail(u.Email), uc.svc.VerifyPassword(u.Password)); err != nil {
 		return
