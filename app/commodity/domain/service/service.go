@@ -14,14 +14,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cache
-
-import "github.com/redis/go-redis/v9"
-
-type CacheAdapter struct {
-	client *redis.Client
-}
-
-func NewCacheAdapter(client *redis.Client) *CacheAdapter {
-	return &CacheAdapter{client: client}
-}
+package service

@@ -14,18 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package entities
+package redis
 
 import (
-	"time"
+	"github.com/redis/go-redis/v9"
+
+	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 )
 
-type Category struct {
-	Id        int64
-	Name      string
-	CreatorId int64
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
-	// gorm.Model
+type commodityCache struct {
+	client *redis.Client
+}
+
+func NewCommodityCache(client *redis.Client) repository.CommodityCache {
+	return &commodityCache{client: client}
 }

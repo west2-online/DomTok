@@ -31,5 +31,6 @@ const (
 
 // Redis DB Name
 const (
-	RedisDBOrder = 0
+	RedisDBOrder     = 0
+	RedisDBCommodity = 1
 )

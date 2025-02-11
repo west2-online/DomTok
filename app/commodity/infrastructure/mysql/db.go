@@ -14,14 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package usecase
+package mysql
 
 import (
 	"context"
 
-	"github.com/west2-online/DomTok/kitex_gen/model"
+	"gorm.io/gorm"
+
+	_ "github.com/west2-online/DomTok/app/commodity/domain/model"
+	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 )
 
-func (u *UseCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*model.CategoryInfo, err error) {
-	return resp, err
+// commodityDB impl domain.CommodityDB defined domain
+type commodityDB struct {
+	client *gorm.DB
+}
+
+func NewCommodityDB(client *gorm.DB) repository.CommodityDB {
+	return &commodityDB{client: client}
+}
+
+func (db *commodityDB) CreateCategory(ctx context.Context, name string) error {
+	return nil
 }

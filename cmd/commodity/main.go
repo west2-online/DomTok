@@ -24,15 +24,9 @@ import (
 	"github.com/cloudwego/kitex/server"
 	etcd "github.com/kitex-contrib/registry-etcd"
 
-	"github.com/west2-online/DomTok/app/commodity/controllers/rpc"
-	"github.com/west2-online/DomTok/app/commodity/repository/cache"
-	"github.com/west2-online/DomTok/app/commodity/repository/db"
-	"github.com/west2-online/DomTok/app/commodity/repository/es"
-	"github.com/west2-online/DomTok/app/commodity/repository/mq"
-	"github.com/west2-online/DomTok/app/commodity/usecase"
+	"github.com/west2-online/DomTok/app/commodity"
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
-	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/utils"
@@ -40,27 +34,12 @@ import (
 
 // constants部分看了其他的pr有写了，防止冲突先找个数代替，到时候合并完再改掉
 var (
-	serviceName    = "constants.CommodityServiceName" // TODO
-	serviceAdapter *usecase.UseCase
+	serviceName = "constants.CommodityServiceName" // TODO
 )
 
 func init() {
 	config.Init(serviceName)
 	logger.Init(serviceName, config.GetLoggerLevel())
-
-	dbClient, _ := client.InitMySQL()
-	dbAdapter := db.NewDBAdapter(dbClient)
-
-	cacheClient, _ := client.NewRedisClient(0) // TODO
-	cacheAdapter := cache.NewCacheAdapter(cacheClient)
-
-	mqClient, _ := client.GetConn()
-	mqAdapter := mq.NewMQAdapter(mqClient)
-
-	// TODO: ES
-	esClient := es.EsAdapter{}
-
-	serviceAdapter = usecase.NewCommodityCase(dbAdapter, mqAdapter, cacheAdapter, esClient)
 }
 
 func main() {
@@ -78,7 +57,7 @@ func main() {
 	}
 
 	svr := commodityservice.NewServer(
-		rpc.NewCommodityHandler(serviceAdapter),
+		commodity.InjectCommodityHandlerr(),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
 			ServiceName: serviceName,
 		}),

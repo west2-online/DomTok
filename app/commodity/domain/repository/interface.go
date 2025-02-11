@@ -14,6 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package es
+package repository
 
-type EsAdapter struct{}
+import "context"
+
+type CommodityDB interface {
+	CreateCategory(ctx context.Context, name string) error
+}
+
+type CommodityCache interface{}
