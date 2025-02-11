@@ -18,10 +18,8 @@ package utils
 
 import (
 	"errors"
-	"io"
 	"mime/multipart"
 	"net"
-	"net/http"
 	"strings"
 	"time"
 
@@ -86,53 +84,6 @@ func AddrCheck(addr string) bool {
 	return true
 }
 
-// ParseCookies 将cookie字符串解析为 http.Cookie
-// 这里只能解析这样的数组： "Key=Value; Key=Value"
-func ParseCookies(rawData string) []*http.Cookie {
-	var cookies []*http.Cookie
-	maxSplitNumber := 2
-
-	// 按照分号分割每个 Cookie
-	pairs := strings.Split(rawData, ";")
-	for _, pair := range pairs {
-		// 去除空格并检查是否为空
-		pair = strings.TrimSpace(pair)
-		if pair == "" {
-			continue
-		}
-
-		// 按等号分割键和值
-		parts := strings.SplitN(pair, "=", maxSplitNumber)
-		if len(parts) != maxSplitNumber {
-			continue // 如果格式不正确，跳过
-		}
-
-		key := strings.TrimSpace(parts[0])
-		value := strings.TrimSpace(parts[1])
-
-		// 创建 http.Cookie 并添加到切片
-		cookie := &http.Cookie{
-			Name:  key,
-			Value: value,
-		}
-		cookies = append(cookies, cookie)
-	}
-
-	return cookies
-}
-
-// ParseCookiesToString 会尝试解析 cookies 到 string
-// 只会返回 "Key=Value; Key=Value"样式的文本数组
-func ParseCookiesToString(cookies []*http.Cookie) []string {
-	var cookieStrings []string
-	for _, cookie := range cookies {
-		var parts []string
-		parts = append(parts, cookie.Name+"="+cookie.Value)
-		cookieStrings = append(cookieStrings, strings.Join(parts, "; "))
-	}
-	return cookieStrings
-}
-
 // GetAvailablePort 会尝试获取可用的监听地址
 func GetAvailablePort() (string, error) {
 	if config.Service.AddrList == nil {
@@ -144,33 +95,6 @@ func GetAvailablePort() (string, error) {
 		}
 	}
 	return "", errors.New("utils.GetAvailablePort: not available port from config")
-}
-
-// FileToByteArray 用于将客户端发来的文件转换为[][]byte格式，用于流式传输
-func FileToByteArray(file *multipart.FileHeader) (fileBuf [][]byte, err error) {
-	fileContent, err := file.Open()
-	if err != nil {
-		return nil, errno.ParamError
-	}
-	defer func() {
-		// 捕获并处理关闭文件时可能发生的错误
-		if err := fileContent.Close(); err != nil {
-			logger.Errorf("utils.FileToByteArray: failed to close file: %v", err.Error())
-		}
-	}()
-
-	for {
-		buf := make([]byte, constants.StreamBufferSize)
-		_, err = fileContent.Read(buf)
-		if errors.Is(err, io.EOF) {
-			break
-		}
-		if err != nil {
-			return nil, errno.InternalServiceError
-		}
-		fileBuf = append(fileBuf, buf)
-	}
-	return fileBuf, nil
 }
 
 // CheckImageFileType 检查文件格式是否合规

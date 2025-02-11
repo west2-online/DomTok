@@ -197,9 +197,13 @@ lint:
 vulncheck:
 	govulncheck ./...
 
+.PHONY: tidy
+tidy:
+	go mod tidy
+
 # 一键修正规范并执行代码检查，同时运行 license 检查
 .PHONY: verify
-verify: license vet fmt import lint vulncheck
+verify: license vet fmt import lint vulncheck tidy
 
 # 补齐 license
 .PHONY: license

@@ -41,12 +41,12 @@ func WithLoginData(ctx context.Context, loginData *model.LoginData) context.Cont
 func GetLoginData(ctx context.Context) (*model.LoginData, error) {
 	user, ok := fromContext(ctx, loginDataKey)
 	if !ok {
-		return nil, errno.ParamMissingHeader.WithMessage("Failed to get header in context")
+		return nil, errno.NewErrNo(errno.ParamMissingErrorCode, "Failed to get header in context")
 	}
 	value := new(model.LoginData)
 	err := sonic.UnmarshalString(user, value)
 	if err != nil {
-		return nil, errno.InternalServiceError.WithMessage("Failed to get header in context when unmarshalling loginData")
+		return nil, errno.NewErrNo(errno.InternalServiceErrorCode, "Failed to get header in context when unmarshalling loginData")
 	}
 	return value, nil
 }

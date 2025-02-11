@@ -14,24 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package template
+package repository
 
 import (
 	"context"
 
-	"github.com/west2-online/DomTok/app/user/entities"
+	"github.com/west2-online/DomTok/app/user/domain/model"
 )
 
-type TemplateRPCClient struct {
-	// client templateservice.client
-}
+// domain中的 repository 表示 service / use case 所依赖的外部资源，比如数据库、缓存等
 
-func NewTemplateRPCClient() *TemplateRPCClient {
-	return &TemplateRPCClient{}
-}
-
-func (c *TemplateRPCClient) GetTemplateInfo(ctx context.Context) (*entities.TemplateModel, error) {
-	// rpc call
-	// client.Call()
-	return nil, nil
+// UserDB 表示持久化存储接口 (或者也可以叫做 DBPort)
+type UserDB interface {
+	IsUserExist(ctx context.Context, username string) (bool, error)
+	CreateUser(ctx context.Context, user *model.User) error
 }
