@@ -22,10 +22,17 @@ const (
 	KafkaRetries           = 3
 	DefaultReaderGroupID   = "r"
 	DefaultTimeRetainHours = 6 // 6小时
+	KafkaConsumerNum       = 3
 
 	DefaultConsumerChanCap         = 20
 	DefaultKafkaProductorSyncWrite = false
 
 	DefaultKafkaNumPartitions     = -1
 	DefaultKafkaReplicationFactor = -1
+)
+
+const (
+	KafkaCartTopic                = "cart"
+	KafkaCartAddGoodsPartitionNum = 3
+	KafkaCartAddGoodsGroupId      = "cart_add_goods"
 )

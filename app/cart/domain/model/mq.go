@@ -14,20 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package usecase
+package model
 
-import (
-	"context"
-	"fmt"
-
-	"github.com/west2-online/DomTok/app/cart/domain/model"
-)
-
-func (u *UseCase) AddGoodsIntoCart(ctx context.Context, uid int64, goods *model.GoodInfo) error {
-	err := u.svc.SendAddGoods(ctx, uid, goods)
-	if err != nil {
-		return fmt.Errorf("cartCase.AddGoodsIntoCart send mq error:%w", err)
-	}
-
-	return nil
+type AddGoodsMsg struct {
+	Uid   int64
+	Goods *GoodInfo
 }

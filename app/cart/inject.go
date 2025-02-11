@@ -18,6 +18,7 @@ package cart
 
 import (
 	"github.com/west2-online/DomTok/app/cart/controllers/rpc"
+	"github.com/west2-online/DomTok/app/cart/domain/service"
 	"github.com/west2-online/DomTok/app/cart/repository/cache"
 	"github.com/west2-online/DomTok/app/cart/repository/db"
 	"github.com/west2-online/DomTok/app/cart/usecase"
@@ -32,6 +33,7 @@ func InjectCartHandler() cart.CartService {
 	dbAdapter := db.NewDBAdapter(dbClient)
 	cacheClient, _ := client.NewRedisClient(constants.RedisDBCart)
 	cacheAdapter := cache.NewCacheAdapter(cacheClient)
-	serviceAdapter := usecase.NewCartCase(dbAdapter, cacheAdapter)
+	svc := service.NewCartService(dbAdapter, cacheAdapter)
+	serviceAdapter := usecase.NewCartCase(dbAdapter, cacheAdapter, svc)
 	return rpc.NewCartHandler(serviceAdapter)
 }

@@ -14,17 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package mq
+package service
 
 import (
-	kafukago "github.com/segmentio/kafka-go"
+	"github.com/west2-online/DomTok/app/cart/domain/repository"
+	"github.com/west2-online/DomTok/pkg/kafka"
 )
 
-// MQAdapter impl CachePort defined in use case package
-type MQAdapter struct {
-	client *kafukago.Conn
+type CartService struct {
+	DB    repository.PersistencePort
+	Cache repository.CachePort
+	MQ    *kafka.Kafka
 }
 
-func NewMQAdapter(client *kafukago.Conn) *MQAdapter {
-	return &MQAdapter{client: client}
+func NewCartService(db repository.PersistencePort, cache repository.CachePort) *CartService {
+	svc := &CartService{
+		DB:    db,
+		Cache: cache,
+	}
+	svc.init()
+	return svc
+}
+
+func (s *CartService) init() {
+	s.MQ = kafka.NewKafkaInstance()
 }

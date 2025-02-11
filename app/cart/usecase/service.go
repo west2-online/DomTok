@@ -21,6 +21,7 @@ import (
 
 	"github.com/west2-online/DomTok/app/cart/domain/model"
 	"github.com/west2-online/DomTok/app/cart/domain/repository"
+	"github.com/west2-online/DomTok/app/cart/domain/service"
 )
 
 type CartCasePort interface {
@@ -30,11 +31,13 @@ type CartCasePort interface {
 type UseCase struct {
 	DB    repository.PersistencePort
 	Cache repository.CachePort
+	svc   *service.CartService
 }
 
-func NewCartCase(db repository.PersistencePort, cache repository.CachePort) *UseCase {
+func NewCartCase(db repository.PersistencePort, cache repository.CachePort, svc *service.CartService) *UseCase {
 	return &UseCase{
 		DB:    db,
 		Cache: cache,
+		svc:   svc,
 	}
 }
