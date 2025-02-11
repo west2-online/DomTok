@@ -19,22 +19,19 @@ package rpc
 import (
 	"context"
 
-	"github.com/west2-online/DomTok/app/cart/entities"
+	"github.com/west2-online/DomTok/app/cart/domain/model"
+	"github.com/west2-online/DomTok/app/cart/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/cart"
 	"github.com/west2-online/DomTok/pkg/base"
 	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/logger"
 )
 
-type UseCasePort interface {
-	AddGoodsIntoCart(ctx context.Context, uid int64, goods *entities.GoodInfo) error
-}
-
 type CartHandler struct {
-	useCase UseCasePort
+	useCase usecase.CartCasePort
 }
 
-func NewCartHandler(useCase UseCasePort) *CartHandler {
+func NewCartHandler(useCase usecase.CartCasePort) *CartHandler {
 	return &CartHandler{useCase: useCase}
 }
 
@@ -49,7 +46,7 @@ func (h *CartHandler) AddGoodsIntoCart(ctx context.Context, req *cart.AddGoodsIn
 	}
 
 	// create entity
-	good := &entities.GoodInfo{
+	good := &model.GoodInfo{
 		SkuId:  req.SkuId,
 		ShopId: req.ShopId,
 		Count:  req.Count,

@@ -14,27 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package usecase
+package repository
 
 import (
 	"context"
 
-	"github.com/west2-online/DomTok/app/cart/domain/model"
-	"github.com/west2-online/DomTok/app/cart/domain/repository"
+	"github.com/west2-online/DomTok/app/cart/repository/db"
 )
 
-type CartCasePort interface {
-	AddGoodsIntoCart(ctx context.Context, uid int64, goods *model.GoodInfo) error
+type PersistencePort interface {
+	CreateCart(ctx context.Context, uid int64, cart string) error
+	GetCartByUserId(ctx context.Context, uid int64) (bool, *db.Cart, error)
+	SaveCart(ctx context.Context, uid int64, cart string) error
 }
 
-type UseCase struct {
-	DB    repository.PersistencePort
-	Cache repository.CachePort
-}
-
-func NewCartCase(db repository.PersistencePort, cache repository.CachePort) *UseCase {
-	return &UseCase{
-		DB:    db,
-		Cache: cache,
-	}
+type CachePort interface {
+	SetCartCache(ctx context.Context, key string, cart string) error
+	GetCartCache(ctx context.Context, key string) (string, error)
+	IsKeyExist(ctx context.Context, key string) bool
 }

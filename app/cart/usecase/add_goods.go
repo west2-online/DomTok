@@ -23,17 +23,17 @@ import (
 
 	"github.com/bytedance/sonic"
 
-	"github.com/west2-online/DomTok/app/cart/entities"
+	"github.com/west2-online/DomTok/app/cart/domain/model"
 	"github.com/west2-online/DomTok/pkg/constants"
 )
 
-func (u *UseCase) AddGoodsIntoCart(ctx context.Context, uid int64, goods *entities.GoodInfo) error {
+func (u *UseCase) AddGoodsIntoCart(ctx context.Context, uid int64, goods *model.GoodInfo) error {
 	exist, _, err := u.DB.GetCartByUserId(ctx, uid)
 	if err != nil {
 		return fmt.Errorf("cartCase.AddGoodsIntoCart is cart exist err:%w", err)
 	}
 
-	cartJson := new(entities.CartJson)
+	cartJson := new(model.CartJson)
 
 	// 不存在该用户记录，添加用户购物车
 	if !exist {
@@ -60,7 +60,7 @@ func (u *UseCase) AddGoodsIntoCart(ctx context.Context, uid int64, goods *entiti
 	return nil
 }
 
-func (u *UseCase) createCart(ctx context.Context, uid int64, goods *entities.GoodInfo, cartJson *entities.CartJson) error {
+func (u *UseCase) createCart(ctx context.Context, uid int64, goods *model.GoodInfo, cartJson *model.CartJson) error {
 	cartJson.InsertSku(goods)
 	cartJsonStr, err := sonic.MarshalString(cartJson)
 	if err != nil {
@@ -73,7 +73,7 @@ func (u *UseCase) createCart(ctx context.Context, uid int64, goods *entities.Goo
 	return nil
 }
 
-func (u *UseCase) appendCart(ctx context.Context, uid int64, goods *entities.GoodInfo, cartJson *entities.CartJson) error {
+func (u *UseCase) appendCart(ctx context.Context, uid int64, goods *model.GoodInfo, cartJson *model.CartJson) error {
 	_, cartModel, err := u.DB.GetCartByUserId(ctx, uid)
 	if err != nil {
 		return fmt.Errorf("cartCase.appendCart get cartJsonStr err:%w", err)

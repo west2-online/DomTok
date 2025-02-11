@@ -24,36 +24,20 @@ import (
 	"github.com/cloudwego/kitex/server"
 	etcd "github.com/kitex-contrib/registry-etcd"
 
-	"github.com/west2-online/DomTok/app/cart/controllers/rpc"
-	"github.com/west2-online/DomTok/app/cart/repository/cache"
-	"github.com/west2-online/DomTok/app/cart/repository/db"
-	"github.com/west2-online/DomTok/app/cart/repository/mq"
-	"github.com/west2-online/DomTok/app/cart/usecase"
+	"github.com/west2-online/DomTok/app/cart"
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
-	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
+	"github.com/west2-online/DomTok/pkg/middleware"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
-var (
-	serviceName    = constants.CartServiceName
-	serviceAdapter *usecase.UseCase
-)
+var serviceName = constants.CartServiceName
 
 func init() {
 	config.Init(serviceName)
 	logger.Init(serviceName, config.GetLoggerLevel())
-
-	// 何尝不是一种clientSet
-	dbClient, _ := client.InitMySQL()
-	dbAdapter := db.NewDBAdapter(dbClient)
-	cacheClient, _ := client.NewRedisClient(constants.RedisDBCart)
-	cacheAdapter := cache.NewCacheAdapter(cacheClient)
-	mqClient, _ := client.GetConn()
-	mqAdapter := mq.NewMQAdapter(mqClient)
-	serviceAdapter = usecase.NewCartCase(dbAdapter, cacheAdapter, mqAdapter)
 }
 
 func main() {
@@ -71,7 +55,7 @@ func main() {
 	}
 	svr := cartservice.NewServer(
 		// 注入 controller 依赖
-		rpc.NewCartHandler(serviceAdapter),
+		cart.InjectCartHandler(),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
 			ServiceName: serviceName,
 		}),
@@ -82,6 +66,9 @@ func main() {
 			MaxConnections: constants.MaxConnections,
 			MaxQPS:         constants.MaxQPS,
 		}),
+
+		server.WithMiddleware(middleware.ErrorLog()),
+		server.WithMiddleware(middleware.Respond()),
 	)
 	if err = svr.Run(); err != nil {
 		logger.Fatalf("Cart: run server failed, err: %v", err)

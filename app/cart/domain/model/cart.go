@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package entities
+package model
 
 type Cart struct {
 	UserId  int64
