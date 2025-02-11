@@ -26,8 +26,8 @@ const (
 )
 
 const (
-	UserTableName = "users"
-
+	UserTableName       = "users"
+	CategoryTableName   = "categories"
 	OrderTableName      = "orders"
 	OrderGoodsTableName = "order_goods"
 )
