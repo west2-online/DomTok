@@ -14,17 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package pack
+package commodity
 
-import (
-	"github.com/west2-online/DomTok/gateway/model/model"
-	rpcModel "github.com/west2-online/DomTok/kitex_gen/model"
-)
-
-// BuildUserInfo 将 RPC 交流实体转换成 http 返回的实体
-func BuildUserInfo(u *rpcModel.UserInfo) *model.UserInfo {
-	return &model.UserInfo{
-		UserId: u.UserId,
-		Name:   u.Name,
-	}
-}
+// KitexUnusedProtection is used to prevent 'imported and not used' error.
+var KitexUnusedProtection = struct{}{}

@@ -46,3 +46,148 @@ func _registerMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _commodityMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _categoryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createcategoryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deletecategoryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _viewcategoryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updatecategoryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _couponMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _viewuserallcouponMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createcouponMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deletecouponMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createusercouponMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _viewcouponMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _useusercouponMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _priceMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _viewhistoryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _skuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _uploadskuattrMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createskuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteskuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _viewskuimageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _listskuinfoMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _viewskuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateskuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _spuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createspuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deletespuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _viewspuimageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _viewspuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updatespuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

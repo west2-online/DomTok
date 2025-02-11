@@ -14,17 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package pack
+package mq
 
 import (
-	"github.com/west2-online/DomTok/gateway/model/model"
-	rpcModel "github.com/west2-online/DomTok/kitex_gen/model"
+	kafukago "github.com/segmentio/kafka-go"
 )
 
-// BuildUserInfo 将 RPC 交流实体转换成 http 返回的实体
-func BuildUserInfo(u *rpcModel.UserInfo) *model.UserInfo {
-	return &model.UserInfo{
-		UserId: u.UserId,
-		Name:   u.Name,
-	}
+type MQAdapter struct {
+	client *kafukago.Conn
+}
+
+func NewMQAdapter(client *kafukago.Conn) *MQAdapter {
+	return &MQAdapter{client: client}
 }

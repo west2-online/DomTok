@@ -14,17 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package pack
+package cache
 
-import (
-	"github.com/west2-online/DomTok/gateway/model/model"
-	rpcModel "github.com/west2-online/DomTok/kitex_gen/model"
-)
+import "github.com/redis/go-redis/v9"
 
-// BuildUserInfo 将 RPC 交流实体转换成 http 返回的实体
-func BuildUserInfo(u *rpcModel.UserInfo) *model.UserInfo {
-	return &model.UserInfo{
-		UserId: u.UserId,
-		Name:   u.Name,
-	}
+type CacheAdapter struct {
+	client *redis.Client
+}
+
+func NewCacheAdapter(client *redis.Client) *CacheAdapter {
+	return &CacheAdapter{client: client}
 }

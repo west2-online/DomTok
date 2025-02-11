@@ -2134,6 +2134,145 @@ var fieldIDToName_SkuInfo = map[int16]string{
 	9: "historyID",
 }
 
+type PriceHistory struct {
+	HistoryID   int64  `thrift:"historyID,1,required" frugal:"1,required,i64" json:"historyID"`
+	SkuID       int64  `thrift:"skuID,2,required" frugal:"2,required,i64" json:"skuID"`
+	Price       int64  `thrift:"price,3,required" frugal:"3,required,i64" json:"price"`
+	CreatedAt   int64  `thrift:"createdAt,4,required" frugal:"4,required,i64" json:"createdAt"`
+	PrevVersion *int64 `thrift:"prevVersion,5,optional" frugal:"5,optional,i64" json:"prevVersion,omitempty"`
+}
+
+func NewPriceHistory() *PriceHistory {
+	return &PriceHistory{}
+}
+
+func (p *PriceHistory) InitDefault() {
+}
+
+func (p *PriceHistory) GetHistoryID() (v int64) {
+	return p.HistoryID
+}
+
+func (p *PriceHistory) GetSkuID() (v int64) {
+	return p.SkuID
+}
+
+func (p *PriceHistory) GetPrice() (v int64) {
+	return p.Price
+}
+
+func (p *PriceHistory) GetCreatedAt() (v int64) {
+	return p.CreatedAt
+}
+
+var PriceHistory_PrevVersion_DEFAULT int64
+
+func (p *PriceHistory) GetPrevVersion() (v int64) {
+	if !p.IsSetPrevVersion() {
+		return PriceHistory_PrevVersion_DEFAULT
+	}
+	return *p.PrevVersion
+}
+func (p *PriceHistory) SetHistoryID(val int64) {
+	p.HistoryID = val
+}
+func (p *PriceHistory) SetSkuID(val int64) {
+	p.SkuID = val
+}
+func (p *PriceHistory) SetPrice(val int64) {
+	p.Price = val
+}
+func (p *PriceHistory) SetCreatedAt(val int64) {
+	p.CreatedAt = val
+}
+func (p *PriceHistory) SetPrevVersion(val *int64) {
+	p.PrevVersion = val
+}
+
+func (p *PriceHistory) IsSetPrevVersion() bool {
+	return p.PrevVersion != nil
+}
+
+func (p *PriceHistory) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("PriceHistory(%+v)", *p)
+}
+
+func (p *PriceHistory) DeepEqual(ano *PriceHistory) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.HistoryID) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.SkuID) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Price) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.CreatedAt) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.PrevVersion) {
+		return false
+	}
+	return true
+}
+
+func (p *PriceHistory) Field1DeepEqual(src int64) bool {
+
+	if p.HistoryID != src {
+		return false
+	}
+	return true
+}
+func (p *PriceHistory) Field2DeepEqual(src int64) bool {
+
+	if p.SkuID != src {
+		return false
+	}
+	return true
+}
+func (p *PriceHistory) Field3DeepEqual(src int64) bool {
+
+	if p.Price != src {
+		return false
+	}
+	return true
+}
+func (p *PriceHistory) Field4DeepEqual(src int64) bool {
+
+	if p.CreatedAt != src {
+		return false
+	}
+	return true
+}
+func (p *PriceHistory) Field5DeepEqual(src *int64) bool {
+
+	if p.PrevVersion == src {
+		return true
+	} else if p.PrevVersion == nil || src == nil {
+		return false
+	}
+	if *p.PrevVersion != *src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_PriceHistory = map[int16]string{
+	1: "historyID",
+	2: "skuID",
+	3: "price",
+	4: "createdAt",
+	5: "prevVersion",
+}
+
 type OrderGoods struct {
 	MerchantID       int64   `thrift:"MerchantID,1,required" frugal:"1,required,i64" json:"MerchantID"`
 	GoodsID          int64   `thrift:"GoodsID,2,required" frugal:"2,required,i64" json:"GoodsID"`

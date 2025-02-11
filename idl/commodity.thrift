@@ -238,7 +238,6 @@ struct ViewSpuImageResp {
 * @Param styleHeadDrawing 款式头图
 * @Param price 价钱
 * @Param forSale 是否出售
-* @Param shipping 运费
 * @Param spuID spuID
 * @Param stock 库存
 */
@@ -250,9 +249,8 @@ struct CreateSkuReq {
     5: required string styleHeadDrawing;
     6: required double price;
     7: required i32 forSale;
-    8: required double shipping;
-    9: required i64 spuID;
-    10: required i64 stock;
+    8: required i64 spuID;
+    9: required i64 stock;
 }
 
 struct CreateSkuResp {
@@ -270,7 +268,6 @@ struct CreateSkuResp {
 * @Param price 价钱
 * @Param forSale 是否出售
 * @Param Stock 库存量
-* @Param shipping 运费
 */
 struct UpdateSkuReq {
     1: required i64 skuID;
@@ -280,8 +277,7 @@ struct UpdateSkuReq {
     5: optional string styleHeadDrawing;
     6: optional double price;
     7: optional i32 forSale;
-    8: optional i64 Stock;
-    9: optional double shipping;
+    8: optional i64 stock;
 }
 
 struct UpdateSkuResp {
@@ -470,6 +466,17 @@ struct DescSkuStockResp {
     1: required model.BaseResp base;
 }
 
+struct ViewHistoryPriceReq {
+    1: required i64 historyID;
+    2: required i64 skuID;
+    3: required i64 pageSize;
+    4: required i64 pageNum;
+}
+
+struct ViewHistoryPriceResp {
+    1: required model.BaseResp base;
+    2: required list<model.PriceHistory> records;
+}
 
 service CommodityService {
     // 优惠券
@@ -495,6 +502,7 @@ service CommodityService {
     ViewSkuResp ViewSku(1: ViewSkuReq req);
     UploadSkuAttrResp UploadSkuAttr(1: UploadSkuAttrReq req);
     ListSkuInfoResp ListSkuInfo(1: ListSkuInfoReq req);
+    ViewHistoryPriceResp ViewHistory(1: ViewHistoryPriceReq req)
 
     //供订单服务调用
     DescSkuLockStockResp DescSkuLockStock(1: DescSkuLockStockReq req);

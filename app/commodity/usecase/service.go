@@ -14,17 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package pack
+package usecase
 
-import (
-	"github.com/west2-online/DomTok/gateway/model/model"
-	rpcModel "github.com/west2-online/DomTok/kitex_gen/model"
-)
+type PersistencePort interface{}
 
-// BuildUserInfo 将 RPC 交流实体转换成 http 返回的实体
-func BuildUserInfo(u *rpcModel.UserInfo) *model.UserInfo {
-	return &model.UserInfo{
-		UserId: u.UserId,
-		Name:   u.Name,
+type CachePort interface{}
+
+type MQPort interface{}
+
+type EsPort interface{}
+
+type UseCase struct {
+	DB    PersistencePort
+	MQ    MQPort
+	Cache CachePort
+	Es    EsPort
+}
+
+func NewCommodityCase(db PersistencePort, mq MQPort, cache CachePort, es EsPort) *UseCase {
+	return &UseCase{
+		DB:    db,
+		MQ:    mq,
+		Cache: cache,
+		Es:    es,
 	}
 }
