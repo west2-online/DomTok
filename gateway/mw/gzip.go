@@ -14,7 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package entities
+package mw
 
-// TemplateModel 表示 user 模块所需要的 Template 返回的信息实体
-type TemplateModel struct{}
+import (
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/hertz-contrib/gzip"
+)
+
+func GzipMW() app.HandlerFunc {
+	return gzip.Gzip(gzip.BestSpeed)
+}

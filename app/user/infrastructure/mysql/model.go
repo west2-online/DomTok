@@ -16,14 +16,18 @@ limitations under the License.
 
 package mysql
 
+import "github.com/west2-online/DomTok/pkg/constants"
+
 // User 是 mysql 【独有】的，和 db 中的表数据一一对应，和 entities 层的 User 的作用域不一样
 type User struct {
 	// model    gorm.Model
+	ID       int64
 	UserName string
 	Password string
 	Email    string
+	Phone    string
 }
 
 func (User) TableName() string {
-	return "users"
+	return constants.UserTableName
 }

@@ -72,7 +72,7 @@ func InitMySQL() (db *gorm.DB, err error) {
 	db = db.WithContext(context.Background())
 
 	// 进行连通性测试
-	if err := sqlDB.Ping(); err != nil {
+	if err = sqlDB.Ping(); err != nil {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("ping database error: %v", err))
 	}
 

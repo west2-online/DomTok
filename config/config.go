@@ -119,3 +119,10 @@ func GetLoggerLevel() string {
 	}
 	return Server.LogLevel
 }
+
+func GetDataCenterID() int64 {
+	if Snowflake == nil {
+		return constants.DefaultDataCenterID
+	}
+	return Snowflake.DatacenterID
+}

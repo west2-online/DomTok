@@ -14,17 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package pack
+package mw
 
 import (
-	model2 "github.com/west2-online/DomTok/app/user/domain/model"
-	"github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/hertz-contrib/cors"
+
+	"github.com/west2-online/DomTok/pkg/constants"
 )
 
-// BuildUser 将 entities 定义的 User 实体转换成 idl 定义的 RPC 交流实体，类似 dto
-func BuildUser(u *model2.User) *model.UserInfo {
-	return &model.UserInfo{
-		UserId: u.Uid,
-		Name:   u.UserName,
-	}
+func CorsMW() app.HandlerFunc {
+	return cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowCredentials: true,
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"*"},
+		MaxAge:           constants.CorsMaxAge,
+		ExposeHeaders:    []string{"Content-Length"},
+	})
 }

@@ -14,15 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package usecase
+package errno
 
-import (
-	"context"
-
-	"github.com/west2-online/DomTok/app/user/entities"
+// 业务强相关, 范围是 1000-9999
+const (
+	ServiceWrongPassword = 1000 + iota
+	ServiceUserExist
+	ServiceUserNotExist
 )
-
-// TODO: 考虑留给新登
-func (u *UseCase) Login(ctx context.Context, entity *entities.User) (*entities.User, error) {
-	return nil, nil
-}

@@ -14,17 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package pack
+package constants
 
-import (
-	model2 "github.com/west2-online/DomTok/app/user/domain/model"
-	"github.com/west2-online/DomTok/kitex_gen/model"
+const (
+	DefaultDataCenterID = int64(0)
+	DefaultWorkerID     = int64(0)
 )
 
-// BuildUser 将 entities 定义的 User 实体转换成 idl 定义的 RPC 交流实体，类似 dto
-func BuildUser(u *model2.User) *model.UserInfo {
-	return &model.UserInfo{
-		UserId: u.Uid,
-		Name:   u.UserName,
-	}
-}
+const (
+	WorkerOfUserService = 1 + int64(iota)
+)
