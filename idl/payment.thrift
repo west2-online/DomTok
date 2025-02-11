@@ -54,7 +54,7 @@ struct PaymentResponse {
 /*
  * struct RefundTokenRequest 退款令牌请求
  * @Param orderID 商户订单号
- * @Param userID 用户ID
+ * @Param userID 管理员ID
  */
 struct RefundTokenRequest {
     1: required i64 orderID
