@@ -14,10 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package db
+package mysql
 
-type Category struct{}
+import (
+	"time"
+
+	"github.com/west2-online/DomTok/pkg/constants"
+)
+
+type Category struct {
+	Id        int64
+	Name      string
+	CreatorId int64
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
+	// gorm.Model
+}
 
 func (Category) TableName() string {
-	return ""
+	return constants.CategoryTableName
 }

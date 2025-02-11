@@ -14,14 +14,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package usecase
-
-import (
-	"context"
-
-	"github.com/west2-online/DomTok/app/commodity/entities"
-)
-
-func (u *UseCase) UpdateCategory(ctx context.Context, category *entities.Category) (err error) {
-	return err
-}
+package service

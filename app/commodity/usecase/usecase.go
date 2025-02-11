@@ -20,8 +20,24 @@ import (
 	"context"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	"github.com/west2-online/DomTok/app/commodity/domain/repository"
+	"github.com/west2-online/DomTok/app/commodity/domain/service"
 )
 
-func (us *useCase) CreateCategory(ctx context.Context, category *model.Category) (id int64, err error) {
-	return 0, nil
+type CommodityUseCase interface {
+	CreateCategory(ctx context.Context, category *model.Category) (id int64, err error)
+}
+
+type useCase struct {
+	db    repository.CommodityDB
+	svc   *service.CommodityService
+	cache repository.CommodityCache
+}
+
+func NewCommodityCase(db repository.CommodityDB, svc *service.CommodityService, cache repository.CommodityCache) *useCase {
+	return &useCase{
+		db:    db,
+		svc:   svc,
+		cache: cache,
+	}
 }
