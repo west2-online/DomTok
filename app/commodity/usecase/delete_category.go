@@ -18,10 +18,24 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/west2-online/DomTok/app/commodity/entities"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 func (u *UseCase) DeleteCategory(ctx context.Context, category *entities.Category) (err error) {
+	// 判断是否存在
+	exist, err := u.DB.IsCategoryExist(ctx, category.Name)
+	if err != nil {
+		return fmt.Errorf("check category exist failed: %w", err)
+	}
+	if !exist {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "category does not exist")
+	}
+	err = u.DB.DeleteCategory(ctx, category)
+	if err != nil {
+		return fmt.Errorf("delete category failed: %w", err)
+	}
 	return nil
 }

@@ -16,8 +16,20 @@ limitations under the License.
 
 package usecase
 
-type PersistencePort interface{}
+import (
+	"context"
 
+	"github.com/west2-online/DomTok/app/commodity/entities"
+	"github.com/west2-online/DomTok/kitex_gen/model"
+)
+
+type PersistencePort interface {
+	IsCategoryExist(ctx context.Context, Name string) (bool, error)
+	CreateCategory(ctx context.Context, entity *entities.Category) error
+	DeleteCategory(ctx context.Context, category *entities.Category) error
+	UpdateCategory(ctx context.Context, category *entities.Category) error
+	ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*model.CategoryInfo, err error)
+}
 type CachePort interface{}
 
 type MQPort interface{}

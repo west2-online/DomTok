@@ -18,10 +18,22 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/west2-online/DomTok/app/commodity/entities"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 func (u *UseCase) CreateCategory(ctx context.Context, category *entities.Category) (id int64, err error) {
-	return id, err
+	exist, err := u.DB.IsCategoryExist(ctx, category.Name)
+	if err != nil {
+		return 0, fmt.Errorf("check category exist failed: %w", err)
+	}
+	if exist {
+		return 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "category already exist")
+	}
+	if err = u.DB.CreateCategory(ctx, category); err != nil {
+		return 0, fmt.Errorf("create user failed: %w", err)
+	}
+	return category.Id, nil
 }

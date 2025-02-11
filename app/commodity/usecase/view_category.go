@@ -20,8 +20,13 @@ import (
 	"context"
 
 	"github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 func (u *UseCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*model.CategoryInfo, err error) {
-	return resp, err
+	resp, err = u.DB.ViewCategory(ctx, pageNum, pageSize)
+	if err != nil {
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "failed to view categories: %v", err)
+	}
+	return resp, nil
 }
