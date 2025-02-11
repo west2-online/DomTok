@@ -14,30 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package entities
+package mysql
 
-// User 用于在 handler ---use case --- repository 之间传递数据的实体类
-// 目的是方便 use case 操作对应的业务
+import "github.com/west2-online/DomTok/pkg/constants"
+
+// User 是 mysql 【独有】的，和 db 中的表数据一一对应，和 entities 层的 User 的作用域不一样
 type User struct {
-	Uid      int64
+	// model    gorm.Model
+	ID       int64
 	UserName string
 	Password string
 	Email    string
 	Phone    string
-	// AvatarURL string
 }
 
-// IsValidEmail TODO: 根据正则匹配 ？来判断是否是合法的邮箱
-func (u *User) IsValidEmail() bool {
-	return true
-}
-
-// EncryptPassword TODO: 加密密码, 直接修改 User 中的 Password 字段
-func (u *User) EncryptPassword() error {
-	return nil
-}
-
-// CheckPassword TODO: 检查密码是否正确
-func (u *User) CheckPassword() bool {
-	return true
+func (User) TableName() string {
+	return constants.UserTableName
 }

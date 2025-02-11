@@ -14,73 +14,43 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// This file is designed to define any error code
 package errno
 
+// 错误码的设计原则是, 以尽可能少的错误码来传递必要的信息,
+// 让前端能够根据尽量少的 error code 和具体的场景来告知用户错误信息
+// 总的来说前端不依赖于后端传递的 msg 来告知用户, 而是通过 code 来额外处理
+// 当然如果有一些强指向性错误信息, 你当然可以再写进来一个 code, 比如密码错误或者用户已存在
+// 我们将这种与业务强相关的 code 也放在 errno 包中, 主要是为了方便统一管理与避免 code 冲突
+
 const (
-	// For microservices
+	// SuccessCode For microservices
 	SuccessCode = 10000
 	SuccessMsg  = "ok"
+)
 
-	// Error
-	/*
-		200xx: 参数错误，Param 打头
-		300xx: 鉴权错误，Auth 打头
-		400xx: 业务错误，Biz 打头
-		500xx: 内部错误，Internal 打头
-	*/
-	ParamErrorCode         = 20001 // 参数错误
-	ParamEmptyCode         = 20002 // 参数为空
-	ParamMissingHeaderCode = 20003 // 缺少请求头数据（id or cookies）
-	ParamInvalidCode       = 20004 // 参数无效
-	ParamMissingCode       = 20005 // 参数缺失
-	ParamTooLongCode       = 20006 // 参数过长
-	ParamTooShortCode      = 20007 // 参数过短
-	ParamTypeCode          = 20008 // 参数类型错误
-	ParamFormatCode        = 20009 // 参数格式错误
-	ParamRangeCode         = 20010 // 参数范围错误
-	ParamValueCode         = 20011 // 参数值错误
-	ParamFileNotExistCode  = 20012 // 文件不存在
-	ParamFileReadErrorCode = 20013 // 文件读取错误
-	ParamSourceNotExist    = 20014
+// 200xx: 参数错误，Param 打头
+const (
+	ParamVerifyErrorCode  = 20000 + iota // 参数校验失败
+	ParamMissingErrorCode                // 参数缺失
+)
 
-	AuthErrorCode          = 30001 // 鉴权错误
-	AuthInvalidCode        = 30002 // 鉴权无效
-	AuthAccessExpiredCode  = 30003 // 访问令牌过期
-	AuthRefreshExpiredCode = 30004 // 刷新令牌过期
-	AuthNotLegal           = 30005 // 访问不合法
+// 300xx: 鉴权错误，Auth 打头
+const (
+	AuthInvalidCode             = 30000 + iota // 鉴权失败
+	AuthAccessExpiredCode                      // 访问令牌过期
+	AuthRefreshExpiredCode                     // 刷新令牌过期
+	AuthNoTokenCode                            // 没有 token
+	AuthNoOperatePermissionCode                // 没有操作权限
+)
 
-	BizErrorCode               = 40001 // 业务错误
-	BizLogicCode               = 40002 // 业务逻辑错误
-	BizLimitCode               = 40003 // 业务限制错误
-	BizNotExist                = 40005 // 业务不存在错误
-	BizFileUploadErrorCode     = 40006 // 文件上传错误(service 层)
-	BizJwchCookieExceptionCode = 40007 // jwch cookie异常
-
-	InternalServiceErrorCode   = 50001 // 未知服务错误
-	InternalDatabaseErrorCode  = 50002 // 数据库错误
-	InternalRedisErrorCode     = 50003 // Redis错误
-	InternalNetworkErrorCode   = 50004 // 网络错误
-	InternalTimeoutErrorCode   = 50005 // 超时错误
-	InternalIOErrorCode        = 50006 // IO错误
-	InternalJSONErrorCode      = 50007 // JSON错误
-	InternalXMLErrorCode       = 50008 // XML错误
-	InternalURLEncodeErrorCode = 50009 // URL编码错误
-	InternalHTTPErrorCode      = 50010 // HTTP错误
-	InternalHTTP2ErrorCode     = 50011 // HTTP2错误
-	InternalGRPCErrorCode      = 50012 // GRPC错误
-	InternalThriftErrorCode    = 50013 // Thrift错误
-	InternalProtobufErrorCode  = 50014 // Protobuf错误
-	InternalSQLErrorCode       = 50015 // SQL错误
-	InternalNoSQLErrorCode     = 50016 // NoSQL错误
-	InternalORMErrorCode       = 50017 // ORM错误
-	InternalQueueErrorCode     = 50018 // 队列错误
-	InternalETCDErrorCode      = 50019 // ETCD错误
-	InternalTraceErrorCode     = 50020 // Trace错误
-	InternalESErrorCode        = 50021 // ES错误
-	InternalInitRpcErrorCode   = 50022 // 初始化 RPC 错误
-	InternalKafkaErrorCode     = 50023
-
-	// SuccessCodePaper paper在旧版Android中的SuccessCode是2000，用作兼容
-	SuccessCodePaper = 2000
+// 500xx: 内部错误，Internal 打头
+// 服务级别的错误, 发生的时候说明我们程序自身出了问题
+// 比如数据库断联, 编码错误等. 需要我们人为的去维护
+const (
+	InternalServiceErrorCode  = 50000 + iota // 内部服务错误
+	InternalDatabaseErrorCode                // 数据库错误
+	InternalRedisErrorCode                   // Redis错误
+	InternalNetworkErrorCode                 // 网络错误
+	InternalESErrorCode                      // ES错误
+	InternalKafkaErrorCode                   // kafka 错误
 )

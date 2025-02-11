@@ -22,6 +22,7 @@ import (
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/cache"
+	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/db"
 	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/utils"
@@ -53,7 +54,7 @@ func WithDBClient() Option {
 		}
 
 		// TODO: currently our service only deploy on one or some servers, we do not need specific datacenterID
-		sf, err := utils.NewSnowflake(config.Snowflake.DatancenterID, config.Snowflake.WorkerID)
+		sf, err := utils.NewSnowflake(config.GetDataCenterID(), constants.DefaultWorkerID)
 		if err != nil {
 			logger.Fatalf("init Snowflake object error: %v", err.Error())
 		}

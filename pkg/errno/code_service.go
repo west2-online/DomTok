@@ -14,7 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package entities
+package errno
 
-// TemplateModel 表示 user 模块所需要的 Template 返回的信息实体
-type TemplateModel struct{}
+// 业务强相关, 范围是 1000-9999
+const (
+	ServiceWrongPassword = 1000 + iota
+	ServiceUserExist
+	ServiceUserNotExist
+)

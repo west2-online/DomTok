@@ -38,7 +38,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	var req api.RegisterRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamError.WithError(err))
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 	uid, err := rpc.RegisterRPC(ctx, &user.RegisterRequest{

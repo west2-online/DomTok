@@ -25,14 +25,3 @@ import (
 func IsSuccess(baseResp *model.BaseResp) bool {
 	return baseResp.Code == errno.SuccessCode
 }
-
-// HandleBaseRespWithCookie 调用jwch库的接口的结果处理， 将 resp.Base 中包含的错误转换成 errno 类型
-func HandleBaseRespWithCookie(baseResp *model.BaseResp) error {
-	if baseResp.Code == errno.BizJwchCookieExceptionCode {
-		return errno.NewErrNo(baseResp.Code, baseResp.Msg)
-	}
-	if baseResp.Code != errno.SuccessCode {
-		return errno.BizError.WithMessage(baseResp.Msg)
-	}
-	return nil
-}

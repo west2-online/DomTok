@@ -14,15 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package usecase
+package model
 
-import (
-	"context"
-
-	"github.com/west2-online/DomTok/app/user/entities"
-)
-
-// TODO: 考虑留给新登
-func (u *UseCase) Login(ctx context.Context, entity *entities.User) (*entities.User, error) {
-	return nil, nil
+// User 用于在 handler --- use case --- infrastructure 之间传递数据的实体类
+// 目的是方便 use case 操作对应的业务
+type User struct {
+	Uid      int64
+	UserName string
+	Password string
+	Email    string
+	Phone    string
 }

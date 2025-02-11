@@ -18,33 +18,43 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/west2-online/DomTok/app/user/entities"
+	"github.com/west2-online/DomTok/app/user/domain/model"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-// PersistencePort 表示持久化存储接口 (或者也可以叫做 DBPort)
-type PersistencePort interface {
-	IsUserExist(ctx context.Context, username string) (bool, error)
-	CreateUser(ctx context.Context, entity *entities.User) error
+// Login 用户登录 TODO: 考虑留给新登
+func (uc *useCase) Login(ctx context.Context, user *model.User) (*model.User, error) {
+	return nil, nil
 }
 
-// CachePort 表示缓存接口
-type CachePort interface{}
-
-// TemplateRPCPort 表示模板服务的 RPC 接口
-// 比如 template 服务有非常多的 RPC 接口，但是目前只需要一个接口，也就是 User 不依赖于它所不需要的接口
-type TemplateRPCPort interface {
-	GetTemplateInfo(ctx context.Context) (*entities.TemplateModel, error)
-}
-
-type UseCase struct {
-	DB             PersistencePort
-	templateClient TemplateRPCPort
-}
-
-func NewUserCase(db PersistencePort, tempate TemplateRPCPort) *UseCase {
-	return &UseCase{
-		DB:             db,
-		templateClient: tempate,
+func (uc *useCase) RegisterUser(ctx context.Context, u *model.User) (uid int64, err error) {
+	// 这里进行了简单的密码和邮箱格式的校验, 如果后续还需要对别的参数进行校验可以再加
+	if err = uc.svc.Verify(uc.svc.VerifyEmail(u.Email), uc.svc.VerifyPassword(u.Password)); err != nil {
+		return
 	}
+
+	// 判断是否已经注册过
+	// 注意: 这里使用 uc 调用了 DB, 但显然这个方法其他地方也可能会用的上, 所以可以考虑包装在 service 里面
+	exist, err := uc.db.IsUserExist(ctx, u.UserName)
+	if err != nil {
+		// 这里返回了 fmt.Errorf 而不是 errno 的原因是 db.IsUserExist 返回的已经是 errno 了
+		// 这里是用 %w 占位符做了一层 wrap, 其实这个 error 的底部(origin error) 还是 errno 类型的
+		return 0, fmt.Errorf("check user exist failed: %w", err)
+	}
+	if exist {
+		return 0, errno.NewErrNo(errno.ServiceUserExist, "user already exist")
+	}
+
+	if u.Password, err = uc.svc.EncryptPassword(u.Password); err != nil {
+		return 0, err
+	}
+
+	// 这里没有直接调用 db.CreateUser 是因为 svc.CreateUser 包含了一点业务逻辑, 这些细节不需要被 useCase 知道
+	if err = uc.svc.CreateUser(ctx, u); err != nil {
+		return
+	}
+
+	return u.Uid, nil
 }

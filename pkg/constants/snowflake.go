@@ -14,16 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package mysql
+package constants
 
-// User 是 mysql 【独有】的，和 db 中的表数据一一对应，和 entities 层的 User 的作用域不一样
-type User struct {
-	// model    gorm.Model
-	UserName string
-	Password string
-	Email    string
-}
+const (
+	DefaultDataCenterID = int64(0)
+	DefaultWorkerID     = int64(0)
+)
 
-func (User) TableName() string {
-	return "users"
-}
+const (
+	WorkerOfUserService = 1 + int64(iota)
+)
