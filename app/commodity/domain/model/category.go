@@ -16,4 +16,13 @@ limitations under the License.
 
 package model
 
-type Category struct{}
+import "time"
+
+type Category struct {
+	Id        int64
+	Name      string
+	CreatorId int64
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
+}

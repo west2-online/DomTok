@@ -22,10 +22,15 @@ import (
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 	"github.com/west2-online/DomTok/app/commodity/domain/service"
+	Model "github.com/west2-online/DomTok/kitex_gen/model"
 )
 
 type CommodityUseCase interface {
-	CreateCategory(ctx context.Context, category *model.Category) (id int64, err error)
+	// 增删改查
+	CreateCategory(ctx context.Context, entity *model.Category) error
+	DeleteCategory(ctx context.Context, category *model.Category) error
+	UpdateCategory(ctx context.Context, category *model.Category) error
+	ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*Model.CategoryInfo, err error)
 }
 
 type useCase struct {

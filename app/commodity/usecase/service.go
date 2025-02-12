@@ -18,10 +18,63 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	Model "github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-func (us *useCase) CreateCategory(ctx context.Context, category *model.Category) (id int64, err error) {
-	return 0, nil
+func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category) (err error) {
+	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
+	if err != nil {
+		return fmt.Errorf("check category exist failed: %w", err)
+	}
+	if exist {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "category already exist")
+	}
+	if err = uc.db.CreateCategory(ctx, category); err != nil {
+		return fmt.Errorf("create user failed: %w", err)
+	}
+	return nil
+}
+
+func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category) (err error) {
+	// 判断是否存在
+	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
+	if err != nil {
+		return fmt.Errorf("check category exist failed: %w", err)
+	}
+	if !exist {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "category does not exist")
+	}
+	err = uc.db.DeleteCategory(ctx, category)
+	if err != nil {
+		return fmt.Errorf("delete category failed: %w", err)
+	}
+	return nil
+}
+
+func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category) (err error) {
+	// 判断是否存在
+	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
+	if err != nil {
+		return fmt.Errorf("check category exist failed: %w", err)
+	}
+	if !exist {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "category does not exist")
+	}
+	err = uc.db.UpdateCategory(ctx, category)
+	if err != nil {
+		return fmt.Errorf("update category failed: %w", err)
+	}
+	return err
+}
+
+func (uc *useCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*Model.CategoryInfo, err error) {
+	resp, err = uc.db.ViewCategory(ctx, pageNum, pageSize)
+	if err != nil {
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "failed to view categories: %v", err)
+	}
+	return resp, nil
 }
