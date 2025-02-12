@@ -20,7 +20,7 @@ import (
 	"context"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
-	Model "github.com/west2-online/DomTok/kitex_gen/model"
+	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 )
 
 type CommodityDB interface {
@@ -28,7 +28,7 @@ type CommodityDB interface {
 	CreateCategory(ctx context.Context, entity *model.Category) error
 	DeleteCategory(ctx context.Context, category *model.Category) error
 	UpdateCategory(ctx context.Context, category *model.Category) error
-	ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*Model.CategoryInfo, err error)
+	ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*kmodel.CategoryInfo, err error)
 }
 
 type CommodityCache interface{}

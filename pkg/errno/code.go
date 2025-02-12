@@ -54,3 +54,4 @@ const (
 	InternalESErrorCode                      // ES错误
 	InternalKafkaErrorCode                   // kafka 错误
 )
+

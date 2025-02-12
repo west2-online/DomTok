@@ -24,7 +24,7 @@ import (
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
-	Model "github.com/west2-online/DomTok/kitex_gen/model"
+	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
@@ -78,7 +78,7 @@ func (d *commodityDB) UpdateCategory(ctx context.Context, category *model.Catego
 	return nil
 }
 
-func (u *commodityDB) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*Model.CategoryInfo, err error) {
+func (u *commodityDB) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*kmodel.CategoryInfo, err error) {
 	offset := (pageNum - 1) * pageSize
 	if err := u.client.WithContext(ctx).Offset(offset).Limit(pageSize).Find(&resp).Error; err != nil {
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to list categories: %v", err)

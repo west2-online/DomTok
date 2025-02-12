@@ -48,9 +48,9 @@ func initRPCClient[T any](serviceName string, newClientFunc func(string, ...clie
 }
 
 func InitUserRPC() (*userservice.Client, error) {
-	return initRPCClient("user", userservice.NewClient)
+	return initRPCClient(constants.UserServiceName, userservice.NewClient)
 }
 
 func InitCommodityRPC() (*commodityservice.Client, error) {
-	return initRPCClient("commodity", commodityservice.NewClient)
+	return initRPCClient(constants.CommodityName, commodityservice.NewClient)
 }

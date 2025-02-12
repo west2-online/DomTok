@@ -31,7 +31,7 @@ func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category)
 		return fmt.Errorf("check category exist failed: %w", err)
 	}
 	if exist {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "category already exist")
+		return errno.NewErrNo(errno.ServiceCategoryExist, "category already exist")
 	}
 	if err = uc.db.CreateCategory(ctx, category); err != nil {
 		return fmt.Errorf("create user failed: %w", err)
@@ -46,7 +46,7 @@ func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category)
 		return fmt.Errorf("check category exist failed: %w", err)
 	}
 	if !exist {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "category does not exist")
+		return errno.NewErrNo(errno.ServiceCategoryNotExist, "category does not exist")
 	}
 	err = uc.db.DeleteCategory(ctx, category)
 	if err != nil {
@@ -62,7 +62,7 @@ func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category)
 		return fmt.Errorf("check category exist failed: %w", err)
 	}
 	if !exist {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "category does not exist")
+		return errno.NewErrNo(errno.ServiceCategoryNotExist, "category does not exist")
 	}
 	err = uc.db.UpdateCategory(ctx, category)
 	if err != nil {
@@ -74,7 +74,7 @@ func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category)
 func (uc *useCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*Model.CategoryInfo, err error) {
 	resp, err = uc.db.ViewCategory(ctx, pageNum, pageSize)
 	if err != nil {
-		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "failed to view categories: %v", err)
+		return nil, errno.Errorf(errno.ServiceErrDBQueryFailed, "failed to view categories: %v", err)
 	}
 	return resp, nil
 }

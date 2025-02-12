@@ -21,4 +21,7 @@ const (
 	ServiceWrongPassword = 1000 + iota
 	ServiceUserExist
 	ServiceUserNotExist
+	ServiceCategoryExist
+	ServiceCategoryNotExist
+	ServiceErrDBQueryFailed
 )
