@@ -98,6 +98,7 @@ struct RefundResponse {
     3: required i64 status
 }
 
+
 /*
  * service PaymentService 支付服务
  * @Method RequestPaymentToken 请求支付令牌
