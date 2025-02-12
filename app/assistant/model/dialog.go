@@ -20,7 +20,7 @@ import "context"
 
 // IDialog is an interface to define the methods of a dialog.
 type IDialog interface {
-	Send(string)
+	Send(msg string)
 	Close()
 }
 

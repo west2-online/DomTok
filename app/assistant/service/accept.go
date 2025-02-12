@@ -18,7 +18,9 @@ package service
 
 import (
 	"fmt"
+
 	"github.com/hertz-contrib/websocket"
+
 	"github.com/west2-online/DomTok/app/assistant/cli/ai"
 	"github.com/west2-online/DomTok/app/assistant/model"
 	"github.com/west2-online/DomTok/app/assistant/pack"
@@ -29,7 +31,7 @@ func (s Service) Accept(conn *websocket.Conn) (err error) {
 	// read the message from the websocket connection
 	t, m, err := conn.ReadMessage()
 	if err != nil {
-		return fmt.Errorf("read failed: %v", err)
+		return fmt.Errorf("read failed: %w", err)
 	}
 
 	switch t {
@@ -38,7 +40,7 @@ func (s Service) Accept(conn *websocket.Conn) (err error) {
 
 		err := handleTextMessage(conn, string(m))
 		if err != nil {
-			return fmt.Errorf("handle text message failed: %v", err)
+			return fmt.Errorf("handle text message failed: %w", err)
 		}
 
 	case websocket.BinaryMessage:
@@ -60,7 +62,7 @@ func handleTextMessage(conn *websocket.Conn, input string) (err error) {
 
 	err = conn.WriteMessage(websocket.TextMessage, pack.ResponseFactory.Command("dialog_open"))
 	if err != nil {
-		return fmt.Errorf("write failed: %v", err)
+		return fmt.Errorf("write failed: %w", err)
 	}
 	defer func() {
 		_ = conn.WriteMessage(websocket.TextMessage, pack.ResponseFactory.Command("dialog_close"))
@@ -89,7 +91,7 @@ func handleTextMessage(conn *websocket.Conn, input string) (err error) {
 			index++
 			err := conn.WriteMessage(websocket.TextMessage, pack.ResponseFactory.Message(data))
 			if err != nil {
-				return fmt.Errorf("write failed: %v", err)
+				return fmt.Errorf("write failed: %w", err)
 			}
 		}
 	}

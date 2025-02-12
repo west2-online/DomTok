@@ -18,6 +18,7 @@ package main
 
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
+
 	"github.com/west2-online/DomTok/app/assistant/router"
 	"github.com/west2-online/DomTok/pkg/constants"
 )
@@ -42,12 +43,12 @@ func main() {
 		server.WithMaxRequestBodySize(constants.ServerMaxRequestBodySize),
 	)
 
-	//h.Use(
-	//	mw.RecoveryMW(), // recovery
-	//	mw.CorsMW(),     // cors
-	//	mw.GzipMW(),     // gzip
-	//	mw.SentinelMW(), // sentinel
-	//)
+	// h.Use(
+	//	 mw.RecoveryMW(), // recovery
+	//	 mw.CorsMW(),     // cors
+	//	 mw.GzipMW(),     // gzip
+	//	 mw.SentinelMW(), // sentinel
+	// )
 
 	router.GeneratedRegister(h)
 	h.Spin()

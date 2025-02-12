@@ -20,8 +20,8 @@ import "encoding/json"
 
 // Response is a struct that represents the response of the websocket.
 type Response struct {
-	Meta map[string]interface{} `thrift:"meta,1" form:"meta" json:"meta" query:"meta"`
-	Data map[string]interface{} `thrift:"data,2" form:"data" json:"data" query:"data"`
+	Meta map[string]interface{} `json:"meta" form:"meta" query:"meta"`
+	Data map[string]interface{} `json:"data" form:"data" query:"data"`
 }
 
 // NewResponse creates a new Response.

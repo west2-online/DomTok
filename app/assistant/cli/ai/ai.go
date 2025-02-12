@@ -17,8 +17,9 @@ limitations under the License.
 package ai
 
 import (
-	"github.com/west2-online/DomTok/app/assistant/model"
 	"time"
+
+	"github.com/west2-online/DomTok/app/assistant/model"
 )
 
 // TODO: complete this file
@@ -31,7 +32,7 @@ func Example(input string, dialog model.IDialog) (err error) {
 		}
 		dialog.Send(string(input[i]) + "\n")
 
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(time.Second)
 	}
 	return nil
 }
