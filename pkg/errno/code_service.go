@@ -23,5 +23,6 @@ const (
 	ServiceUserNotExist
 	ServiceCategoryExist
 	ServiceCategoryNotExist
-	ServiceErrDBQueryFailed
+	ServiceDBQueryFailed
+	ServiceCategoryNotFound
 )

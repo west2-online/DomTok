@@ -18,11 +18,13 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	Model "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"gorm.io/gorm"
 )
 
 func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category) (err error) {
@@ -74,7 +76,10 @@ func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category)
 func (uc *useCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*Model.CategoryInfo, err error) {
 	resp, err = uc.db.ViewCategory(ctx, pageNum, pageSize)
 	if err != nil {
-		return nil, errno.Errorf(errno.ServiceErrDBQueryFailed, "failed to view categories: %v", err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errno.Errorf(errno.ServiceCategoryNotFound, "no categories found")
+		}
+		return nil, errno.Errorf(errno.ServiceDBQueryFailed, "failed to view categories: %v", err)
 	}
 	return resp, nil
 }
