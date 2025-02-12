@@ -18,38 +18,33 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
-	Model "github.com/west2-online/DomTok/kitex_gen/model"
+	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
+	kcontext "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/errno"
-	"gorm.io/gorm"
 )
 
-func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category) (err error) {
+func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category) (int64, error) {
+
 	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
 	if err != nil {
-		return fmt.Errorf("check category exist failed: %w", err)
+		return 0, fmt.Errorf("check category exist failed: %w", err)
 	}
 	if exist {
-		return errno.NewErrNo(errno.ServiceCategoryExist, "category already exist")
+		return 0, errno.NewErrNo(errno.ServiceCategoryExist, "category already exist")
 	}
-	if err = uc.db.CreateCategory(ctx, category); err != nil {
-		return fmt.Errorf("create user failed: %w", err)
+
+	if err = uc.svc.CreateCategory(ctx, category); err != nil {
+		return 0, fmt.Errorf("create category failed: %w", err)
 	}
-	return nil
+
+	return category.Id, nil
 }
 
 func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category) (err error) {
-	// 判断是否存在
-	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
-	if err != nil {
-		return fmt.Errorf("check category exist failed: %w", err)
-	}
-	if !exist {
-		return errno.NewErrNo(errno.ServiceCategoryNotExist, "category does not exist")
-	}
+	uc.Check(ctx, category)
 	err = uc.db.DeleteCategory(ctx, category)
 	if err != nil {
 		return fmt.Errorf("delete category failed: %w", err)
@@ -58,14 +53,7 @@ func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category)
 }
 
 func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category) (err error) {
-	// 判断是否存在
-	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
-	if err != nil {
-		return fmt.Errorf("check category exist failed: %w", err)
-	}
-	if !exist {
-		return errno.NewErrNo(errno.ServiceCategoryNotExist, "category does not exist")
-	}
+	uc.Check(ctx, category)
 	err = uc.db.UpdateCategory(ctx, category)
 	if err != nil {
 		return fmt.Errorf("update category failed: %w", err)
@@ -73,13 +61,29 @@ func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category)
 	return err
 }
 
-func (uc *useCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*Model.CategoryInfo, err error) {
+func (uc *useCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*kmodel.CategoryInfo, err error) {
 	resp, err = uc.db.ViewCategory(ctx, pageNum, pageSize)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errno.Errorf(errno.ServiceCategoryNotFound, "no categories found")
-		}
-		return nil, errno.Errorf(errno.ServiceDBQueryFailed, "failed to view categories: %v", err)
+		return nil, errno.Errorf(errno.ServiceListCategoryFailed, "failed to view categories: %v", err)
 	}
 	return resp, nil
+}
+
+func (uc *useCase) Check(ctx context.Context, category *model.Category) (err error) {
+	//判断用户是否有权限
+	_, err = kcontext.GetLoginData(ctx)
+	if err != nil {
+		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
+	}
+	//...后续判断用户是否对应...
+
+	// 判断是否存在
+	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
+	if err != nil {
+		return fmt.Errorf("check category exist failed: %w", err)
+	}
+	if !exist {
+		return errno.NewErrNo(errno.ServiceUserNotExist, "category does not exist")
+	}
+	return nil
 }

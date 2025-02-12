@@ -22,7 +22,5 @@ const (
 	ServiceUserExist
 	ServiceUserNotExist
 	ServiceCategoryExist
-	ServiceCategoryNotExist
-	ServiceDBQueryFailed
-	ServiceCategoryNotFound
+	ServiceListCategoryFailed
 )

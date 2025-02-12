@@ -27,7 +27,7 @@ import (
 
 type CommodityUseCase interface {
 	// 增删改查
-	CreateCategory(ctx context.Context, entity *model.Category) error
+	CreateCategory(ctx context.Context, entity *model.Category) (int64, error)
 	DeleteCategory(ctx context.Context, category *model.Category) error
 	UpdateCategory(ctx context.Context, category *model.Category) error
 	ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*Model.CategoryInfo, err error)
