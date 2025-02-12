@@ -15,3 +15,23 @@ limitations under the License.
 */
 
 package service
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
+)
+
+func (svc *CommodityService) nextID() int64 {
+	id, _ := svc.sf.NextVal()
+	return id
+}
+
+func (svc *CommodityService) CreateCategory(ctx context.Context, category *model.Category) error {
+	category.Id = svc.nextID()
+	if err := svc.db.CreateCategory(ctx, category); err != nil {
+		return fmt.Errorf("create category failed: %w", err)
+	}
+	return nil
+}

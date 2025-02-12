@@ -25,6 +25,9 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
 	api "github.com/west2-online/DomTok/gateway/model/api"
+	"github.com/west2-online/DomTok/gateway/pack"
+	"github.com/west2-online/DomTok/gateway/rpc"
+	"github.com/west2-online/DomTok/kitex_gen/commodity"
 )
 
 // CreateCoupon .
@@ -342,9 +345,14 @@ func CreateCategory(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(api.CreateCategoryResp)
-
-	c.JSON(consts.StatusOK, resp)
+	id, err := rpc.CreateCategoryRPC(ctx, &commodity.CreateCategoryReq{
+		Name: req.Name,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, id)
 }
 
 // DeleteCategory .
@@ -357,10 +365,14 @@ func DeleteCategory(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
-	resp := new(api.DeleteCategoryResp)
-
-	c.JSON(consts.StatusOK, resp)
+	base, err := rpc.DeleteCategoryRPC(ctx, &commodity.DeleteCategoryReq{
+		CategoryID: req.CategoryID,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, base)
 }
 
 // ViewCategory .
@@ -373,10 +385,15 @@ func ViewCategory(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
-	resp := new(api.ViewCategoryResp)
-
-	c.JSON(consts.StatusOK, resp)
+	info, err := rpc.ViewCategoryRPC(ctx, &commodity.ViewCategoryReq{
+		PageNum:  req.PageNum,
+		PageSize: req.PageSize,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, info)
 }
 
 // UpdateCategory .
@@ -389,8 +406,13 @@ func UpdateCategory(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
-	resp := new(api.UpdateCategoryResp)
-
-	c.JSON(consts.StatusOK, resp)
+	base, err := rpc.UpdateCategoryRPC(ctx, &commodity.UpdateCategoryReq{
+		CategoryID: req.CategoryID,
+		Name:       req.Name,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, base)
 }
