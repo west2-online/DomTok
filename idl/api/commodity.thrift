@@ -1,21 +1,5 @@
-namespace go api
-include "model.thrift"
-
-//
-struct RegisterRequest {
-    1: required string name
-    2: required string password
-    3: required string email
-}
-
-struct RegisterResponse {
-}
-
-
-service UserService {
-    RegisterResponse Register(1: RegisterRequest req)(api.get = "api/v1/user/register"),
-}
-
+namespace go api.commodity
+include "../model.thrift"
 
 struct CreateCouponReq {
     1: required i64 deadlineForGet;
@@ -283,35 +267,35 @@ struct ViewHistoryPriceResp {
     2: required list<model.PriceHistory> records;
 }
 
- service CommodityService {
-     // 优惠券
-     CreateCouponResp CreateCoupon(1: CreateCouponReq req) (api.post="/api/commodity/coupon/create");
-     DeleteCouponResp DeleteCoupon(1: DeleteCouponReq req) (api.delete="/api/commodity/coupon/delete");
-     CreateUserCouponResp CreateUserCoupon(1: CreateUserCouponReq req) (api.post="/api/commodity/coupon/receive");
-     ViewCouponResp ViewCoupon(1: ViewCouponReq req) (api.get="/api/commodity/coupon/search");
-     ViewUserAllCouponResp ViewUserAllCoupon(1: ViewUserAllCouponReq req) (api.get="/api/commodity/coupon/all");
-     UseUserCouponResp UseUserCoupon(1: UseUserCouponReq req) (api.post="/api/commodity/coupon/use");
+service CommodityService {
+    // 优惠券
+    CreateCouponResp CreateCoupon(1: CreateCouponReq req) (api.post="/api/v1/commodity/coupon/create");
+    DeleteCouponResp DeleteCoupon(1: DeleteCouponReq req) (api.delete="/api/v1/commodity/coupon/delete");
+    CreateUserCouponResp CreateUserCoupon(1: CreateUserCouponReq req) (api.post="/api/v1/commodity/coupon/receive");
+    ViewCouponResp ViewCoupon(1: ViewCouponReq req) (api.get="/api/v1/commodity/coupon/search");
+    ViewUserAllCouponResp ViewUserAllCoupon(1: ViewUserAllCouponReq req) (api.get="/api/v1/commodity/coupon/all");
+    UseUserCouponResp UseUserCoupon(1: UseUserCouponReq req) (api.post="/api/v1/commodity/coupon/use");
 
-     // SPU
-     CreateSpuResp CreateSpu(1: CreateSpuReq req) (api.post="/api/commodity/spu/create");
-     UpdateSpuResp UpdateSpu(1: UpdateSpuReq req) (api.post="/api/commodity/spu/update");
-     ViewSpuResp ViewSpu(1: ViewSpuReq req) (api.get="/api/commodity/spu/search");
-     DeleteSpuResp DeleteSpu(1: DeleteSpuReq req) (api.delete="/api/commodity/spu/delete");
-     ViewSpuImageResp ViewSpuImage(1: ViewSpuImageReq req) (api.get="/api/commodity/spu/image");
+    // SPU
+    CreateSpuResp CreateSpu(1: CreateSpuReq req) (api.post="/api/v1/commodity/spu/create");
+    UpdateSpuResp UpdateSpu(1: UpdateSpuReq req) (api.post="/api/v1/commodity/spu/update");
+    ViewSpuResp ViewSpu(1: ViewSpuReq req) (api.get="/api/v1/commodity/spu/search");
+    DeleteSpuResp DeleteSpu(1: DeleteSpuReq req) (api.delete="/api/v1/commodity/spu/delete");
+    ViewSpuImageResp ViewSpuImage(1: ViewSpuImageReq req) (api.get="/api/v1/commodity/spu/image");
 
-     //SKU
-     CreateSkuResp CreateSku(1: CreateSkuReq req) (api.post="/api/commodity/sku/create");
-     UpdateSkuResp UpdateSku(1: UpdateSkuReq req) (api.post="/api/commodity/sku/upadte");
-     DeleteSkuResp DeleteSku(1: DeleteSkuReq req) (api.delete="/api/commodity/sku/delete");
-     ViewSkuImageResp ViewSkuImage(1: ViewSkuImageReq req) (api.get="/api/commodity/sku/image");
-     ViewSkuResp ViewSku(1: ViewSkuReq req) (api.get="/api/commodity/sku/search");
-     UploadSkuAttrResp UploadSkuAttr(1: UploadSkuAttrReq req) (api.post="/api/commodity/sku/attr");
-     ListSkuInfoResp ListSkuInfo(1: ListSkuInfoReq req) (api.get="/api/commodity/sku/list");
-     ViewHistoryPriceResp ViewHistory(1: ViewHistoryPriceReq req) (api.get="/api/commodity/price/history")
+    //SKU
+    CreateSkuResp CreateSku(1: CreateSkuReq req) (api.post="/api/v1/commodity/sku/create");
+    UpdateSkuResp UpdateSku(1: UpdateSkuReq req) (api.post="/api/v1/commodity/sku/upadte");
+    DeleteSkuResp DeleteSku(1: DeleteSkuReq req) (api.delete="/api/v1/commodity/sku/delete");
+    ViewSkuImageResp ViewSkuImage(1: ViewSkuImageReq req) (api.get="/api/v1/commodity/sku/image");
+    ViewSkuResp ViewSku(1: ViewSkuReq req) (api.get="/api/v1/commodity/sku/search");
+    UploadSkuAttrResp UploadSkuAttr(1: UploadSkuAttrReq req) (api.post="/api/v1/commodity/sku/attr");
+    ListSkuInfoResp ListSkuInfo(1: ListSkuInfoReq req) (api.get="/api/v1/commodity/sku/list");
+    ViewHistoryPriceResp ViewHistory(1: ViewHistoryPriceReq req) (api.get="/api/v1/commodity/price/history")
 
-     //category
-     CreateCategoryResp CreateCategory(1: CreateCategoryReq req) (api.post = "/api/commodity/category/create");
-     DeleteCategoryResp DeleteCategory(1: DeleteCategoryReq req) (api.delete="/api/commodity/category/delete");
-     ViewCategoryResp ViewCategory(1: ViewCategoryReq req) (api.get="/api/commodity/category/search");
-     UpdateCategoryResp UpdateCategory(1: UpdateCategoryReq req) (api.post="/api/commodity/category/update");
- }
+    //category
+    CreateCategoryResp CreateCategory(1: CreateCategoryReq req) (api.post = "/api/v1/commodity/category/create");
+    DeleteCategoryResp DeleteCategory(1: DeleteCategoryReq req) (api.delete="/api/v1/commodity/category/delete");
+    ViewCategoryResp ViewCategory(1: ViewCategoryReq req) (api.get="/api/v1/commodity/category/search");
+    UpdateCategoryResp UpdateCategory(1: UpdateCategoryReq req) (api.post="/api/v1/commodity/category/update");
+}
