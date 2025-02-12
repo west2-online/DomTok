@@ -27,7 +27,6 @@ import (
 )
 
 func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category) (int64, error) {
-
 	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
 	if err != nil {
 		return 0, fmt.Errorf("check category exist failed: %w", err)
@@ -44,7 +43,10 @@ func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category)
 }
 
 func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category) (err error) {
-	uc.Check(ctx, category)
+	err = uc.Check(ctx, category)
+	if err != nil {
+		return fmt.Errorf("check category failed: %w", err)
+	}
 	err = uc.db.DeleteCategory(ctx, category)
 	if err != nil {
 		return fmt.Errorf("delete category failed: %w", err)
@@ -53,7 +55,10 @@ func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category)
 }
 
 func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category) (err error) {
-	uc.Check(ctx, category)
+	err = uc.Check(ctx, category)
+	if err != nil {
+		return fmt.Errorf("check category failed: %w", err)
+	}
 	err = uc.db.UpdateCategory(ctx, category)
 	if err != nil {
 		return fmt.Errorf("update category failed: %w", err)
@@ -70,12 +75,12 @@ func (uc *useCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (res
 }
 
 func (uc *useCase) Check(ctx context.Context, category *model.Category) (err error) {
-	//判断用户是否有权限
+	// 判断用户是否有权限
 	_, err = kcontext.GetLoginData(ctx)
 	if err != nil {
 		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
 	}
-	//...后续判断用户是否对应...
+	// ...后续判断用户是否对应...
 
 	// 判断是否存在
 	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
