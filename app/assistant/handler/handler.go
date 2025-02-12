@@ -31,9 +31,8 @@ var upgrader = websocket.HertzUpgrader{}
 func Entrypoint(ctx context.Context, c *app.RequestContext) {
 	// upgrade the protocol to websocket
 	err := upgrader.Upgrade(c, func(conn *websocket.Conn) {
-		s := service.NewService()
 		for {
-			err := s.Accept(conn)
+			err := service.Service.Accept(conn)
 			if err != nil {
 				_ = conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
 				return

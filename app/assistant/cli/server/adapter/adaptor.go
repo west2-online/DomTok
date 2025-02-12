@@ -14,16 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package service
+package adapter
 
-import "github.com/west2-online/DomTok/app/assistant/cli/ai/adapter"
+import "context"
 
-type _Service struct {
-	ai adapter.AIClient
-}
-
-var Service _Service
-
-func Init(ai adapter.AIClient) {
-	Service.ai = ai
+type ServerCaller interface {
+	Ping(ctx context.Context) ([]byte, error)
 }

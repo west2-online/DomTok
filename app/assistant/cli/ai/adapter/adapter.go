@@ -14,25 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package ai
+package adapter
 
 import (
-	"time"
-
+	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
 	"github.com/west2-online/DomTok/app/assistant/model"
 )
 
-// TODO: complete this file
-
-func Example(input string, dialog model.IDialog) (err error) {
-	defer dialog.Close()
-	for i := range input {
-		if string(input[i]) == "" {
-			return nil
-		}
-		dialog.Send(string(input[i]) + "\n")
-
-		time.Sleep(time.Second)
-	}
-	return nil
+type AIClient interface {
+	Call(input string, dialog model.IDialog) (history interface{}, err error)
+	SetServerCaller(server adapter.ServerCaller)
 }

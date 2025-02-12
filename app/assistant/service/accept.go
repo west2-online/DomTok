@@ -21,13 +21,12 @@ import (
 
 	"github.com/hertz-contrib/websocket"
 
-	"github.com/west2-online/DomTok/app/assistant/cli/ai"
 	"github.com/west2-online/DomTok/app/assistant/model"
 	"github.com/west2-online/DomTok/app/assistant/pack"
 )
 
 // Accept accepts a websocket message.
-func (s Service) Accept(conn *websocket.Conn) (err error) {
+func (s _Service) Accept(conn *websocket.Conn) (err error) {
 	// read the message from the websocket connection
 	t, m, err := conn.ReadMessage()
 	if err != nil {
@@ -68,7 +67,8 @@ func handleTextMessage(conn *websocket.Conn, input string) (err error) {
 		_ = conn.WriteMessage(websocket.TextMessage, pack.ResponseFactory.Command("dialog_close"))
 	}()
 	go func(d model.IDialog) {
-		errChan <- ai.Example(input, d)
+		_, err := Service.ai.Call(input, d)
+		errChan <- err
 	}(dialog)
 
 	index := 0

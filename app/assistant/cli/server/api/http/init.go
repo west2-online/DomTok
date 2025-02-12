@@ -14,4 +14,32 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package gateway
+package http
+
+import (
+	"time"
+
+	"github.com/cloudwego/hertz/pkg/app/client"
+
+	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
+)
+
+type Client struct {
+	adapter.ServerCaller
+
+	cli     *client.Client
+	baseUrl string
+}
+
+type ClientOption struct {
+	BaseUrl string
+}
+
+func NewClient(opt *ClientOption) *Client {
+	cli, _ := client.NewClient(
+		client.WithDialTimeout(time.Second),
+		client.WithClientReadTimeout(time.Second),
+		client.WithWriteTimeout(time.Second),
+	)
+	return &Client{cli: cli, baseUrl: opt.BaseUrl}
+}

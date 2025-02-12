@@ -14,16 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package service
+package http
 
-import "github.com/west2-online/DomTok/app/assistant/cli/ai/adapter"
+import (
+	"context"
 
-type _Service struct {
-	ai adapter.AIClient
-}
+	"github.com/cloudwego/hertz/pkg/protocol"
+)
 
-var Service _Service
+func (c *Client) Ping(ctx context.Context) ([]byte, error) {
+	req, resp := protocol.AcquireRequest(), protocol.AcquireResponse()
+	req.SetRequestURI(c.baseUrl + "/ping")
+	req.SetMethod("GET")
 
-func Init(ai adapter.AIClient) {
-	Service.ai = ai
+	err := c.cli.Do(ctx, req, resp)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Body(), nil
 }
