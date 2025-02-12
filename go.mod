@@ -19,6 +19,7 @@ require (
 	github.com/hertz-contrib/cors v0.1.0
 	github.com/hertz-contrib/gzip v0.0.3
 	github.com/hertz-contrib/opensergo v0.0.1
+	github.com/hertz-contrib/websocket v0.2.0
 	github.com/kitex-contrib/registry-etcd v0.2.5
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/samber/lo v1.49.1
