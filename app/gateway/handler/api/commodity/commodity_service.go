@@ -24,7 +24,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
-	api "github.com/west2-online/DomTok/gateway/model/api"
+	api "github.com/west2-online/DomTok/app/gateway/model/api/commodity"
 )
 
 // CreateCoupon .
