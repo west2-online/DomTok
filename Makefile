@@ -27,7 +27,7 @@ OUTPUT_PATH = $(DIR)/output
 API_PATH= $(DIR)/cmd/api
 
 # 服务名
-SERVICES := gateway user commodity orders cart payment
+SERVICES := gateway user commodity orders cart payment assistant
 service = $(word 1, $@)
 
 PREFIX = "[Makefile]"
