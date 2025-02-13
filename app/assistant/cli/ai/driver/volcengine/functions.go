@@ -86,7 +86,7 @@ func RebuildFunctions() {
 	functions = &fs
 }
 
-func CallFunction(name, args string, server adapter.ServerCaller) (string, error) {
+func CallFunction(ctx context.Context, name, args string, server adapter.ServerCaller) (string, error) {
 	for _, f := range *GetFunctions() {
 		if f.Name == name {
 			return f.Call(args, server)
@@ -100,15 +100,8 @@ func BuildFunctions() []Function {
 		{
 			Name:        "ping",
 			Description: "测试服务器是否正在运行",
-			Properties: []Property{
-				{
-					Type:        "string",
-					Name:        "args",
-					Description: "任意参数",
-					Required:    false,
-				},
-			},
-			Call: PingFunction,
+			Properties:  []Property{},
+			Call:        PingFunction,
 		},
 	}
 }

@@ -20,6 +20,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine"
+	"github.com/west2-online/DomTok/app/assistant/cli/server/driver/http"
 	"github.com/west2-online/DomTok/app/assistant/router"
 	"github.com/west2-online/DomTok/app/assistant/service"
 	"github.com/west2-online/DomTok/pkg/constants"
@@ -38,6 +39,9 @@ func init() {
 		Region:  ``,
 		Model:   ``,
 	})
+	ai.SetServerCaller(http.NewClient(&http.ClientOption{
+		BaseUrl: ``,
+	}))
 
 	service.Use(ai)
 }

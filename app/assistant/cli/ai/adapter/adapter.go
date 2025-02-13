@@ -17,12 +17,14 @@ limitations under the License.
 package adapter
 
 import (
+	"context"
+
 	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
 	"github.com/west2-online/DomTok/app/assistant/model"
 )
 
 type AIClient interface {
-	Call(dialog model.IDialog) error
+	Call(ctx context.Context, dialog model.IDialog) error
 	ForgetDialog(dialog model.IDialog)
 	SetServerCaller(server adapter.ServerCaller)
 }

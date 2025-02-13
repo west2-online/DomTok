@@ -22,7 +22,7 @@ import (
 )
 
 func (s _Service) Login(ctx context.Context) error {
-	_, ok := ctx.Value("id").(string)
+	_, ok := ctx.Value(CtxKeyID).(string)
 	if !ok {
 		return fmt.Errorf("unexpected or unset id ")
 	}

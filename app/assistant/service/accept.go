@@ -73,7 +73,7 @@ func handleTextMessage(conn *websocket.Conn, ctx context.Context) (err error) {
 		_ = conn.WriteMessage(websocket.TextMessage, pack.ResponseFactory.Command("dialog_close"))
 	}()
 	go func(d model.IDialog) {
-		err := Service.ai.Call(d)
+		err := Service.ai.Call(ctx, d)
 		errChan <- err
 	}(dialog)
 
