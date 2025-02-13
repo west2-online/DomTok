@@ -14,21 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package constants
+package usecase
 
-import "time"
+import (
+	"context"
 
-const (
-	MaxConnections  = 1000             // (DB) 最大连接数
-	MaxIdleConns    = 10               // (DB) 最大空闲连接数
-	ConnMaxLifetime = 10 * time.Second // (DB) 最大可复用时间
-	ConnMaxIdleTime = 5 * time.Minute  // (DB) 最长保持空闲状态时间
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
 )
 
-const (
-	UserTableName       = "users"
-	CategoryTableName   = "categories"
-	OrderTableName      = "orders"
-	OrderGoodsTableName = "order_goods"
-	CartTableName       = "cart"
-)
+func (us *useCase) CreateCategory(ctx context.Context, category *model.Category) (id int64, err error) {
+	return 0, nil
+}

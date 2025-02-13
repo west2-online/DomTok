@@ -16,6 +16,8 @@ limitations under the License.
 
 package constants
 
+import "time"
+
 const (
 	RedisSlowQuery = 10 // ms redis默认的慢查询时间，适用于 logger
 )
@@ -29,5 +31,6 @@ const (
 // Redis DB Name
 const (
 	RedisDBOrder = 0
-	RedisDBCart  = 1
+	RedisDBCommodity = 1
+	RedisDBCart  = 2
 )

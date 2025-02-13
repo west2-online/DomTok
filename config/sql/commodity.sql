@@ -129,8 +129,6 @@ CREATE TABLE `sku_price_history` (
                                      `sku_id` BIGINT NOT NULL COMMENT 'SKU ID',
                                      `mark_price` DECIMAL(11,4) NOT NULL COMMENT '该版本对应的价格',
                                      `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-                                     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                                     `deleted_at` TIMESTAMP COMMENT '删除时间',
                                      `prev_version` BIGINT COMMENT '上个版本的ID',
                                      INDEX `idx_skuId_created` (`sku_id`, `created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

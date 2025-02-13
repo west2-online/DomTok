@@ -14,21 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package constants
+package mysql
 
-import "time"
+import (
+	"context"
 
-const (
-	MaxConnections  = 1000             // (DB) 最大连接数
-	MaxIdleConns    = 10               // (DB) 最大空闲连接数
-	ConnMaxLifetime = 10 * time.Second // (DB) 最大可复用时间
-	ConnMaxIdleTime = 5 * time.Minute  // (DB) 最长保持空闲状态时间
+	"gorm.io/gorm"
+
+	_ "github.com/west2-online/DomTok/app/commodity/domain/model"
+	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 )
 
-const (
-	UserTableName       = "users"
-	CategoryTableName   = "categories"
-	OrderTableName      = "orders"
-	OrderGoodsTableName = "order_goods"
-	CartTableName       = "cart"
-)
+// commodityDB impl domain.CommodityDB defined domain
+type commodityDB struct {
+	client *gorm.DB
+}
+
+func NewCommodityDB(client *gorm.DB) repository.CommodityDB {
+	return &commodityDB{client: client}
+}
+
+func (db *commodityDB) CreateCategory(ctx context.Context, name string) error {
+	return nil
+}

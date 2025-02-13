@@ -14,21 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package constants
+package pack
 
-import "time"
-
-const (
-	MaxConnections  = 1000             // (DB) 最大连接数
-	MaxIdleConns    = 10               // (DB) 最大空闲连接数
-	ConnMaxLifetime = 10 * time.Second // (DB) 最大可复用时间
-	ConnMaxIdleTime = 5 * time.Minute  // (DB) 最长保持空闲状态时间
+import (
+	"github.com/west2-online/DomTok/app/gateway/model/model"
+	rpcModel "github.com/west2-online/DomTok/kitex_gen/model"
 )
 
-const (
-	UserTableName       = "users"
-	CategoryTableName   = "categories"
-	OrderTableName      = "orders"
-	OrderGoodsTableName = "order_goods"
-	CartTableName       = "cart"
-)
+// BuildUserInfo 将 RPC 交流实体转换成 http 返回的实体
+func BuildUserInfo(u *rpcModel.UserInfo) *model.UserInfo {
+	return &model.UserInfo{
+		UserId: u.UserId,
+		Name:   u.Name,
+	}
+}

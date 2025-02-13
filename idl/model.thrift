@@ -120,6 +120,14 @@ struct SkuInfo {
     9: required i64 historyID;
 }
 
+struct PriceHistory {
+    1: required i64 historyID;
+    2: required i64 skuID;
+    3: required i64 price;
+    4: required i64 createdAt;
+    5: optional i64 prevVersion;
+}
+
 struct OrderGoods {
     1: required i64 MerchantID; // 商家 ID
     2: required i64 GoodsID; // 商品 ID
