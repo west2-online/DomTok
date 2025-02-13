@@ -17,7 +17,7 @@ limitations under the License.
 package pack
 
 import (
-	"github.com/west2-online/DomTok/gateway/model/model"
+	"github.com/west2-online/DomTok/app/gateway/model/model"
 	rpcModel "github.com/west2-online/DomTok/kitex_gen/model"
 )
 
