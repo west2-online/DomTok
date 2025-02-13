@@ -19,6 +19,8 @@ package usecase
 import (
 	"context"
 	"github.com/west2-online/DomTok/app/payment/domain/model"
+	"github.com/west2-online/DomTok/app/payment/domain/repository"
+	"github.com/west2-online/DomTok/app/payment/domain/service"
 )
 
 type PaymentUseCase interface {
@@ -26,4 +28,16 @@ type PaymentUseCase interface {
 	//RequestPaymentToken
 	//ProcessRefund
 	//RequestRefundToken
+}
+
+type paymentUseCase struct {
+	db  repository.PaymentDB
+	svc service.PaymentService
+}
+
+func NewPaymentUseCase(db repository.PaymentDB, svc service.PaymentService) PaymentUseCase {
+	return &paymentUseCase{
+		db:  db,
+		svc: svc,
+	}
 }
