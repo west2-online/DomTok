@@ -26,6 +26,7 @@ import (
 	"github.com/west2-online/DomTok/kitex_gen/cart"
 	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/kafka"
 )
 
 // InjectCartHandler 注入外部调用
@@ -35,7 +36,7 @@ func InjectCartHandler() cart.CartService {
 	dbAdapter := db.NewDBAdapter(dbClient)
 	cacheClient, _ := client.NewRedisClient(constants.RedisDBCart)
 	cacheAdapter := cache.NewCacheAdapter(cacheClient)
-	kafkaAdapter := mq.NewKafkaAdapter()
+	kafkaAdapter := mq.NewKafkaAdapter(kafka.NewKafkaInstance())
 	svc := service.NewCartService(dbAdapter, cacheAdapter, kafkaAdapter)
 	serviceAdapter := usecase.NewCartCase(dbAdapter, cacheAdapter, kafkaAdapter, svc)
 	return rpc.NewCartHandler(serviceAdapter)

@@ -17,31 +17,23 @@ limitations under the License.
 package mq
 
 import (
+	"context"
 	"fmt"
 	"strings"
-	"time"
-
-	"golang.org/x/net/context"
 
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/kafka"
 )
 
-// send 对内部库的send添加了一层重试
 func (c *KafkaAdapter) send(ctx context.Context, msg []*kafka.Message) (err error) {
-	// 这里参数没有动的必要，直接设为固定，实际也可以改为调用时传入
-	for i := 0; i < constants.KafkaRetries; i++ {
-		errs := c.mq.Send(ctx, constants.KafkaCartTopic, msg)
-		if len(errs) == 0 {
-			return nil
-		} else {
-			var errMsg string
-			for _, e := range errs {
-				errMsg = strings.Join([]string{errMsg, e.Error(), ";"}, "")
-			}
-			err = fmt.Errorf("mq.Send: send msg failed, errs: %v", errMsg)
+	errs := c.mq.Send(ctx, constants.KafkaCartTopic, msg)
+	if len(errs) != 0 {
+		var errMsg string
+		for _, e := range errs {
+			errMsg = strings.Join([]string{errMsg, e.Error(), ";"}, "")
 		}
-		time.Sleep(time.Second * time.Duration(i+1))
+		err = fmt.Errorf("mq.Send: send msg failed, errs: %v", errMsg)
+		return err
 	}
-	return err
+	return nil
 }

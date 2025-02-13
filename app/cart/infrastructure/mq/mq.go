@@ -23,8 +23,8 @@ type KafkaAdapter struct {
 	mq *kafka.Kafka
 }
 
-func NewKafkaAdapter() *KafkaAdapter {
+func NewKafkaAdapter(mq *kafka.Kafka) *KafkaAdapter {
 	return &KafkaAdapter{
-		mq: kafka.NewKafkaInstance(),
+		mq: mq,
 	}
 }
