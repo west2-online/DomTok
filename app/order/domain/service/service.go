@@ -128,7 +128,7 @@ func (s *OrderService) UpdateOrderAddress(ctx context.Context, orderID int64, ad
 	// 3. 已完成或已取消的订单不能修改地址
 	if order.Status == constants.OrderStatusCompletedCode ||
 		order.Status == constants.OrderStatusCancelledCode {
-		return errno.NewErrNo(errno.ServiceError, "completed or cancelled order cannot change address")
+		return errno.NewErrNo(errno.ServiceError, "completed or canceled order cannot change address")
 	}
 
 	// 4. 更新地址
@@ -210,7 +210,7 @@ func (s *OrderService) ChangeDeliverAddress(ctx context.Context, orderID, addres
 	}
 
 	// 3. 已完成/取消的订单不能修改地址
-	if int32(order.Status) >= constants.OrderStatusCompletedCode {
+	if order.Status >= constants.OrderStatusCompletedCode {
 		return errno.NewErrNo(errno.ServiceError, "order cannot change address")
 	}
 
@@ -236,7 +236,7 @@ func (s *OrderService) DeleteOrder(ctx context.Context, orderID int64) error {
 	}
 
 	// 3. 已支付的订单不能删除
-	if int32(order.Status) == constants.OrderStatusPaidCode {
+	if order.Status == constants.OrderStatusPaidCode {
 		return errno.NewErrNo(errno.ServiceError, "order cannot be deleted")
 	}
 

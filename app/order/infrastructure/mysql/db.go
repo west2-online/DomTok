@@ -18,6 +18,7 @@ package mysql
 
 import (
 	"context"
+	"errors"
 
 	"gorm.io/gorm"
 
@@ -65,7 +66,7 @@ func (db *orderDB) CreateOrderGoods(ctx context.Context, goods []*model.OrderGoo
 func (db *orderDB) GetOrderByID(ctx context.Context, orderID int64) (*model.Order, error) {
 	var order model.Order
 	if err := db.client.WithContext(ctx).First(&order, orderID).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errno.NewErrNo(errno.ServiceOrderNotFound, "order not found")
 		}
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get order: %v", err)
