@@ -19,12 +19,15 @@ package usecase
 import (
 	"context"
 	"fmt"
-
 	"github.com/west2-online/DomTok/app/cart/domain/model"
 	"github.com/west2-online/DomTok/pkg/constants"
 )
 
-func (u *UseCase) AddGoodsIntoCart(ctx context.Context, goods *model.GoodInfo) error {
+func (u *UseCase) AddGoodsIntoCart(ctx context.Context, goods *model.GoodInfo) (err error) {
+	if err = u.svc.Verify(u.svc.VerifyCount(goods.Count)); err != nil {
+		return
+	}
+
 	// todo: 开启metainfo透传
 	/*
 		loginData, err := metainfoContext.GetLoginData(ctx)
@@ -33,7 +36,7 @@ func (u *UseCase) AddGoodsIntoCart(ctx context.Context, goods *model.GoodInfo) e
 		}
 
 	*/
-	err := u.MQ.SendAddGoods(ctx, constants.UserTestId, goods)
+	err = u.MQ.SendAddGoods(ctx, constants.UserTestId, goods)
 	if err != nil {
 		return fmt.Errorf("cartCase.AddGoodsIntoCart send mq error:%w", err)
 	}
