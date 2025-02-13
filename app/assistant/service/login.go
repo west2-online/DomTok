@@ -21,6 +21,7 @@ import (
 	"fmt"
 )
 
+// Login logs in the user
 func (s _Service) Login(ctx context.Context) error {
 	_, ok := ctx.Value(CtxKeyID).(string)
 	if !ok {

@@ -23,8 +23,14 @@ import (
 	"github.com/west2-online/DomTok/app/assistant/model"
 )
 
+// AIClient is the interface for calling the AI
+// It is used by the service to call the AI
 type AIClient interface {
+	// Call calls the AI with the dialog
 	Call(ctx context.Context, dialog model.IDialog) error
+	// ForgetDialog tells the AI to forget the dialog
+	// This is used when the user logs out
 	ForgetDialog(dialog model.IDialog)
+	// SetServerCaller sets the server caller to be used by the AI client
 	SetServerCaller(server adapter.ServerCaller)
 }

@@ -58,10 +58,12 @@ func NewDialog(id string, input string) *Dialog {
 	}
 }
 
+// Unique returns a unique string to identify the dialog.
 func (d *Dialog) Unique() string {
 	return d.unique
 }
 
+// Message returns the message raising the dialog.
 func (d *Dialog) Message() string {
 	return d.message
 }

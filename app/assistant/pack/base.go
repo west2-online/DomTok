@@ -23,6 +23,7 @@ type _ResponseFactory struct{}
 // ResponseFactory is a global variable that points to an instance of _ResponseFactory.
 var ResponseFactory _ResponseFactory
 
+// Error returns a response with an error message.
 func (_ResponseFactory) Error(err error) []byte {
 	resp := model.NewResponse()
 	resp.SetMeta("type", "error")
@@ -30,6 +31,7 @@ func (_ResponseFactory) Error(err error) []byte {
 	return resp.MustMarshal()
 }
 
+// Command returns a response with a command.
 func (_ResponseFactory) Command(command string) []byte {
 	resp := model.NewResponse()
 	resp.SetMeta("type", "command")
@@ -37,6 +39,7 @@ func (_ResponseFactory) Command(command string) []byte {
 	return resp.MustMarshal()
 }
 
+// Message returns a response with a message.
 func (_ResponseFactory) Message(data map[string]interface{}) []byte {
 	resp := model.NewResponse()
 	resp.SetMeta("type", "message")

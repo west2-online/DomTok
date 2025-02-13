@@ -52,10 +52,12 @@ func (r *Response) GetData(key string) interface{} {
 	return r.Data[key]
 }
 
+// Marshal marshals the response into a byte slice.
 func (r *Response) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
+// MustMarshal marshals the response into a byte slice, ignoring errors.
 func (r *Response) MustMarshal() []byte {
 	b, _ := r.Marshal()
 	return b

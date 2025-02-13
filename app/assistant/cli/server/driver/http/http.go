@@ -28,7 +28,7 @@ type Client struct {
 	adapter.ServerCaller
 
 	cli     *client.Client
-	baseUrl string
+	BaseUrl string
 }
 
 type ClientOption struct {
@@ -41,5 +41,5 @@ func NewClient(opt *ClientOption) *Client {
 		client.WithClientReadTimeout(time.Second),
 		client.WithWriteTimeout(time.Second),
 	)
-	return &Client{cli: cli, baseUrl: opt.BaseUrl}
+	return &Client{cli: cli, BaseUrl: opt.BaseUrl}
 }

@@ -34,11 +34,15 @@ func Entrypoint(ctx context.Context, c *app.RequestContext) {
 	err := upgrader.Upgrade(c, func(conn *websocket.Conn) {
 		// assign id to ctx
 		ctx = context.WithValue(ctx, service.CtxKeyID, pack.GenerateUUID())
+
+		// although the service is like a non-stateful service, we still need to log in
+		// in this case, we need to log in to check some args is properly set
 		err := service.Service.Login(ctx)
 		if err != nil {
 			c.JSON(consts.StatusInternalServerError, err)
 			return
 		}
+		// start to accept the message
 		for {
 			errOnAccept := service.Service.Accept(conn, ctx)
 			if errOnAccept != nil {
@@ -46,13 +50,16 @@ func Entrypoint(ctx context.Context, c *app.RequestContext) {
 				break
 			}
 		}
+		// although the service is like a non-stateful service, we still need to log out
+		// in this case, we need to log out to clean up the dialog
+		// in order to avoid the over-accumulation of memory
 		err = service.Service.Logout(ctx)
 		if err != nil {
 			c.JSON(consts.StatusInternalServerError, err)
 			return
 		}
 	})
-	// handle the error
+	// handle the error of upgrading the protocol
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, err)
 		return

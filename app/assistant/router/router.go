@@ -24,6 +24,7 @@ import (
 
 // GeneratedRegister registers routers.
 func GeneratedRegister(r *server.Hertz) {
+	// any path and any method would be handled by the Entrypoint handler
 	root := r.Group("/")
 	root.Any("/", handler.Entrypoint)
 }

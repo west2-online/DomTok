@@ -22,6 +22,7 @@ import (
 
 	"github.com/volcengine/volcengine-go-sdk/service/arkruntime/model"
 
+	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine/tools/remote"
 	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
 )
 
@@ -31,9 +32,10 @@ type Function struct {
 	Name        string
 	Description string
 	Properties  []Property
-	Call        func(args string, server adapter.ServerCaller) (string, error)
+	Call        func(ctx context.Context, args string, server adapter.ServerCaller) (string, error)
 }
 
+// AsTool converts the function to a tool
 func (f Function) AsTool() *model.Tool {
 	type Params struct {
 		Type       string
@@ -66,6 +68,9 @@ func (f Function) AsTool() *model.Tool {
 	}
 }
 
+// Property represents a function parameter
+// 打算让ServerCaller自行依赖gateway的request结构体
+// 因此这里的Property不需要考虑嵌套
 type Property struct {
 	Type        string
 	Name        string
@@ -73,6 +78,7 @@ type Property struct {
 	Required    bool
 }
 
+// GetFunctions returns the functions
 func GetFunctions() *[]Function {
 	if functions != nil {
 		return functions
@@ -81,36 +87,30 @@ func GetFunctions() *[]Function {
 	return functions
 }
 
+// RebuildFunctions rebuilds the functions
 func RebuildFunctions() {
 	fs := BuildFunctions()
 	functions = &fs
 }
 
+// CallFunction calls a function by name
 func CallFunction(ctx context.Context, name, args string, server adapter.ServerCaller) (string, error) {
 	for _, f := range *GetFunctions() {
 		if f.Name == name {
-			return f.Call(args, server)
+			return f.Call(ctx, args, server)
 		}
 	}
 	return "", fmt.Errorf("function %s not found", name)
 }
 
+// BuildFunctions builds the functions
 func BuildFunctions() []Function {
 	return []Function{
 		{
 			Name:        "ping",
 			Description: "测试服务器是否正在运行",
 			Properties:  []Property{},
-			Call:        PingFunction,
+			Call:        remote.Ping,
 		},
 	}
-}
-
-func PingFunction(args string, server adapter.ServerCaller) (string, error) {
-	resp, err := server.Ping(context.Background())
-	if err != nil {
-		return "", err
-	}
-
-	return string(resp), nil
 }

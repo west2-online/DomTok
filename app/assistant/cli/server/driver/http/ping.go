@@ -24,7 +24,7 @@ import (
 
 func (c *Client) Ping(ctx context.Context) ([]byte, error) {
 	req, resp := protocol.AcquireRequest(), protocol.AcquireResponse()
-	req.SetRequestURI(c.baseUrl + "/ping")
+	req.SetRequestURI(c.BaseUrl + "/ping")
 	req.SetMethod("GET")
 
 	err := c.cli.Do(ctx, req, resp)

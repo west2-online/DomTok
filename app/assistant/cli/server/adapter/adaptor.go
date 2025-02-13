@@ -18,6 +18,9 @@ package adapter
 
 import "context"
 
+// ServerCaller is the interface for calling the server
+// It is used by the AI client to call the server
+// List required methods here
 type ServerCaller interface {
 	Ping(ctx context.Context) ([]byte, error)
 }

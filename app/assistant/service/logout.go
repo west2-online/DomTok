@@ -22,6 +22,7 @@ import (
 	"github.com/west2-online/DomTok/app/assistant/model"
 )
 
+// Logout logs out the user
 func (s _Service) Logout(ctx context.Context) error {
 	id, ok := ctx.Value("id").(string)
 	if ok {

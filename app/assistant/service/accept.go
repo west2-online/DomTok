@@ -34,11 +34,11 @@ func (s _Service) Accept(conn *websocket.Conn, ctx context.Context) (err error) 
 		return fmt.Errorf("read failed: %w", err)
 	}
 
+	// set the message in the context
 	ctx = context.WithValue(ctx, CtxKeyInput, string(m))
 	switch t {
 	case websocket.TextMessage:
-		// TODO: handle text message
-
+		// handle text message
 		err := handleTextMessage(conn, ctx)
 		if err != nil {
 			return fmt.Errorf("handle text message failed: %w", err)
@@ -62,17 +62,23 @@ func handleTextMessage(conn *websocket.Conn, ctx context.Context) (err error) {
 	id, _ := ctx.Value(CtxKeyID).(string)
 	// Input is set in Accept
 	input, _ := ctx.Value(CtxKeyInput).(string)
+	// Create a new dialog
 	dialog := model.NewDialog(id, input)
 	errChan := make(chan error)
 
+	// Mark the dialog as opened
+	// Therefore, the frontend can start a dialog to present the messages
 	err = conn.WriteMessage(websocket.TextMessage, pack.ResponseFactory.Command("dialog_open"))
 	if err != nil {
 		return fmt.Errorf("write failed: %w", err)
 	}
 	defer func() {
+		// Mark the dialog as closed
+		// Therefore, the frontend can end the dialog
 		_ = conn.WriteMessage(websocket.TextMessage, pack.ResponseFactory.Command("dialog_close"))
 	}()
 	go func(d model.IDialog) {
+		// Call the AI service
 		err := Service.ai.Call(ctx, d)
 		errChan <- err
 	}(dialog)
@@ -81,20 +87,31 @@ func handleTextMessage(conn *websocket.Conn, ctx context.Context) (err error) {
 	for {
 		select {
 		case <-dialog.NotifyOnClosed():
+			// if the dialog is closed, return nil
 			return nil
+
 		case err := <-errChan:
+			// if there is an error, return it
 			if err != nil {
 				return err
 			}
+
 		case msg := <-dialog.NotifyOnMessage():
+			// if there is a message, send it to the frontend
+
+			// skip empty messages
 			if msg == "" {
 				continue
 			}
+
+			// format the message
 			data := map[string]interface{}{
 				"index":   index,
 				"content": msg,
 			}
 			index++
+
+			// send the message
 			err := conn.WriteMessage(websocket.TextMessage, pack.ResponseFactory.Message(data))
 			if err != nil {
 				return fmt.Errorf("write failed: %w", err)

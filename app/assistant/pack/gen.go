@@ -18,6 +18,7 @@ package pack
 
 import "github.com/google/uuid"
 
+// GenerateUUID generates a UUID
 func GenerateUUID() string {
 	return uuid.New().String()
 }

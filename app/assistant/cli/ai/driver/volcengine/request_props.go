@@ -30,6 +30,7 @@ var (
 	tools        *[]*model.Tool
 )
 
+// GetPrevMessages returns the prevMessages
 func GetPrevMessages() *[]*model.ChatCompletionMessage {
 	if prevMessages != nil {
 		return prevMessages
@@ -38,6 +39,7 @@ func GetPrevMessages() *[]*model.ChatCompletionMessage {
 	return prevMessages
 }
 
+// RebuildPrevMessages rebuilds the prevMessages
 func RebuildPrevMessages() {
 	prevMessages = &[]*model.ChatCompletionMessage{
 		{
@@ -49,6 +51,7 @@ func RebuildPrevMessages() {
 	}
 }
 
+// GetTools returns the tools
 func GetTools() *[]*model.Tool {
 	if tools != nil {
 		return tools
@@ -57,6 +60,7 @@ func GetTools() *[]*model.Tool {
 	return tools
 }
 
+// RebuildTools rebuilds the tools
 func RebuildTools() {
 	tools = nil
 	RebuildFunctions()
