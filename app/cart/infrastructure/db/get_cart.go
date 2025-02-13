@@ -14,30 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package usecase
+package db
 
 import (
 	"context"
+	"errors"
 
-	"github.com/west2-online/DomTok/app/cart/domain/model"
-	"github.com/west2-online/DomTok/app/cart/domain/repository"
-	"github.com/west2-online/DomTok/app/cart/domain/service"
+	"gorm.io/gorm"
+
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-type CartCasePort interface {
-	AddGoodsIntoCart(ctx context.Context, uid int64, goods *model.GoodInfo) error
-}
-
-type UseCase struct {
-	DB    repository.PersistencePort
-	Cache repository.CachePort
-	svc   *service.CartService
-}
-
-func NewCartCase(db repository.PersistencePort, cache repository.CachePort, svc *service.CartService) *UseCase {
-	return &UseCase{
-		DB:    db,
-		Cache: cache,
-		svc:   svc,
+// GetCartByUserId 查询购物车
+func (c *DBAdapter) GetCartByUserId(ctx context.Context, uid int64) (bool, *Cart, error) {
+	model := new(Cart)
+	if err := c.client.WithContext(ctx).Where("user_id=?", uid).First(model).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil, nil
+		}
+		return false, nil, errno.Errorf(errno.InternalDatabaseErrorCode, "db.GetCartByUserId error: %v", err)
 	}
+	return true, model, nil
 }

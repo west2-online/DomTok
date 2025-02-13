@@ -19,8 +19,8 @@ package cart
 import (
 	"github.com/west2-online/DomTok/app/cart/controllers/rpc"
 	"github.com/west2-online/DomTok/app/cart/domain/service"
-	"github.com/west2-online/DomTok/app/cart/repository/cache"
-	"github.com/west2-online/DomTok/app/cart/repository/db"
+	"github.com/west2-online/DomTok/app/cart/infrastructure/cache"
+	"github.com/west2-online/DomTok/app/cart/infrastructure/db"
 	"github.com/west2-online/DomTok/app/cart/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/cart"
 	"github.com/west2-online/DomTok/pkg/base/client"

@@ -32,8 +32,9 @@ import (
 * @Param count 数量
  */
 type AddGoodsIntoCartRequest struct {
-	SkuId int64 `thrift:"skuId,1,required" form:"skuId,required" json:"skuId,required" query:"skuId,required"`
-	Count int64 `thrift:"count,3,required" form:"count,required" json:"count,required" query:"count,required"`
+	SkuId  int64 `thrift:"skuId,1,required" form:"skuId,required" json:"skuId,required" query:"skuId,required"`
+	ShopID int64 `thrift:"shop_id,2,required" form:"shop_id,required" json:"shop_id,required" query:"shop_id,required"`
+	Count  int64 `thrift:"count,3,required" form:"count,required" json:"count,required" query:"count,required"`
 }
 
 func NewAddGoodsIntoCartRequest() *AddGoodsIntoCartRequest {
@@ -47,12 +48,17 @@ func (p *AddGoodsIntoCartRequest) GetSkuId() (v int64) {
 	return p.SkuId
 }
 
+func (p *AddGoodsIntoCartRequest) GetShopID() (v int64) {
+	return p.ShopID
+}
+
 func (p *AddGoodsIntoCartRequest) GetCount() (v int64) {
 	return p.Count
 }
 
 var fieldIDToName_AddGoodsIntoCartRequest = map[int16]string{
 	1: "skuId",
+	2: "shop_id",
 	3: "count",
 }
 
@@ -61,6 +67,7 @@ func (p *AddGoodsIntoCartRequest) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetSkuId bool = false
+	var issetShopID bool = false
 	var issetCount bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
@@ -83,6 +90,15 @@ func (p *AddGoodsIntoCartRequest) Read(iprot thrift.TProtocol) (err error) {
 					goto ReadFieldError
 				}
 				issetSkuId = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetShopID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -110,6 +126,11 @@ func (p *AddGoodsIntoCartRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetSkuId {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetShopID {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 
@@ -146,6 +167,17 @@ func (p *AddGoodsIntoCartRequest) ReadField1(iprot thrift.TProtocol) error {
 	p.SkuId = _field
 	return nil
 }
+func (p *AddGoodsIntoCartRequest) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.ShopID = _field
+	return nil
+}
 func (p *AddGoodsIntoCartRequest) ReadField3(iprot thrift.TProtocol) error {
 
 	var _field int64
@@ -167,6 +199,10 @@ func (p *AddGoodsIntoCartRequest) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 		if err = p.writeField3(oprot); err != nil {
@@ -206,6 +242,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AddGoodsIntoCartRequest) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("shop_id", thrift.I64, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.ShopID); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *AddGoodsIntoCartRequest) writeField3(oprot thrift.TProtocol) (err error) {
@@ -826,8 +879,9 @@ func (p *ShowCartGoodsListResponse) String() string {
 * @Param count 数量
  */
 type UpdateCartGoodsRequest struct {
-	SkuId int64 `thrift:"skuId,1,required" form:"skuId,required" json:"skuId,required" query:"skuId,required"`
-	Count int64 `thrift:"count,3,required" form:"count,required" json:"count,required" query:"count,required"`
+	SkuId  int64 `thrift:"skuId,1,required" form:"skuId,required" json:"skuId,required" query:"skuId,required"`
+	ShopID int64 `thrift:"shop_id,2,required" form:"shop_id,required" json:"shop_id,required" query:"shop_id,required"`
+	Count  int64 `thrift:"count,3,required" form:"count,required" json:"count,required" query:"count,required"`
 }
 
 func NewUpdateCartGoodsRequest() *UpdateCartGoodsRequest {
@@ -841,12 +895,17 @@ func (p *UpdateCartGoodsRequest) GetSkuId() (v int64) {
 	return p.SkuId
 }
 
+func (p *UpdateCartGoodsRequest) GetShopID() (v int64) {
+	return p.ShopID
+}
+
 func (p *UpdateCartGoodsRequest) GetCount() (v int64) {
 	return p.Count
 }
 
 var fieldIDToName_UpdateCartGoodsRequest = map[int16]string{
 	1: "skuId",
+	2: "shop_id",
 	3: "count",
 }
 
@@ -855,6 +914,7 @@ func (p *UpdateCartGoodsRequest) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetSkuId bool = false
+	var issetShopID bool = false
 	var issetCount bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
@@ -877,6 +937,15 @@ func (p *UpdateCartGoodsRequest) Read(iprot thrift.TProtocol) (err error) {
 					goto ReadFieldError
 				}
 				issetSkuId = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetShopID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -904,6 +973,11 @@ func (p *UpdateCartGoodsRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetSkuId {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetShopID {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 
@@ -940,6 +1014,17 @@ func (p *UpdateCartGoodsRequest) ReadField1(iprot thrift.TProtocol) error {
 	p.SkuId = _field
 	return nil
 }
+func (p *UpdateCartGoodsRequest) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.ShopID = _field
+	return nil
+}
 func (p *UpdateCartGoodsRequest) ReadField3(iprot thrift.TProtocol) error {
 
 	var _field int64
@@ -961,6 +1046,10 @@ func (p *UpdateCartGoodsRequest) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 		if err = p.writeField3(oprot); err != nil {
@@ -1000,6 +1089,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *UpdateCartGoodsRequest) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("shop_id", thrift.I64, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.ShopID); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *UpdateCartGoodsRequest) writeField3(oprot thrift.TProtocol) (err error) {

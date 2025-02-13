@@ -30,7 +30,7 @@ import (
 	"github.com/west2-online/DomTok/pkg/kafka"
 )
 
-func (s *CartService) SendAddGoods(ctx context.Context, uid int64, goods *model.GoodInfo) error {
+func (svc *CartService) SendAddGoods(ctx context.Context, uid int64, goods *model.GoodInfo) error {
 	msgValue := &model.AddGoodsMsg{
 		Uid:   uid,
 		Goods: goods,
@@ -48,7 +48,7 @@ func (s *CartService) SendAddGoods(ctx context.Context, uid int64, goods *model.
 	}
 
 	for i := 0; i < constants.KafkaRetries; i++ {
-		errs := s.MQ.Send(ctx, constants.KafkaCartTopic, msg)
+		errs := svc.MQ.Send(ctx, constants.KafkaCartTopic, msg)
 		if len(errs) == 0 {
 			return nil
 		} else {

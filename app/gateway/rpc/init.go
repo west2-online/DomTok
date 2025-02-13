@@ -17,11 +17,16 @@ limitations under the License.
 package rpc
 
 import (
+	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
 	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
 )
 
-var userClient userservice.Client
+var (
+	userClient userservice.Client
+	cartClient cartservice.Client
+)
 
 func Init() {
 	InitUserRPC()
+	InitCartRPC()
 }

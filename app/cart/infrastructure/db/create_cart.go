@@ -20,18 +20,16 @@ import (
 	"context"
 
 	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
-// SaveCart 保存更新后的购物车
-func (c *DBAdapter) SaveCart(ctx context.Context, uid int64, cart string) error {
-	model := &Cart{
+// CreateCart 创建购物车
+func (c *DBAdapter) CreateCart(ctx context.Context, uid int64, cart string) error {
+	model := Cart{
 		UserId:  uid,
 		SkuJson: cart,
 	}
-	if err := c.client.WithContext(ctx).Where("user_id = ?", uid).Omit("created_at").Save(model).Error; err != nil {
-		logger.Errorf("db.SaveCart error: %v", err)
-		return errno.Errorf(errno.InternalDatabaseErrorCode, "db.SaveCart error: %v", err)
+	if err := c.client.WithContext(ctx).Create(&model).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "db.CreateCart error: %v", err)
 	}
 	return nil
 }

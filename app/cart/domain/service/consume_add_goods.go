@@ -28,8 +28,8 @@ import (
 	"github.com/west2-online/DomTok/pkg/logger"
 )
 
-func (s *CartService) ConsumeAddGoods(ctx context.Context) {
-	msgCh := s.MQ.Consume(ctx,
+func (svc *CartService) ConsumeAddGoods(ctx context.Context) {
+	msgCh := svc.MQ.Consume(ctx,
 		constants.KafkaCartTopic,
 		constants.KafkaConsumerNum,
 		constants.KafkaCartAddGoodsGroupId,
@@ -41,7 +41,7 @@ func (s *CartService) ConsumeAddGoods(ctx context.Context) {
 			if err != nil {
 				logger.Errorf("CartService.ConsumeAddGoods: Unmarshal err: %v", err)
 			}
-			err = s.addGoodsIntoCart(ctx, req.Uid, req.Goods)
+			err = svc.addGoodsIntoCart(ctx, req.Uid, req.Goods)
 			if err != nil {
 				logger.Errorf("CartService.ConsumeAddGoods: addGoodsIntoCart err: %v", err)
 			}
@@ -49,8 +49,8 @@ func (s *CartService) ConsumeAddGoods(ctx context.Context) {
 	}()
 }
 
-func (s *CartService) addGoodsIntoCart(ctx context.Context, uid int64, goods *model.GoodInfo) error {
-	exist, _, err := s.DB.GetCartByUserId(ctx, uid)
+func (svc *CartService) addGoodsIntoCart(ctx context.Context, uid int64, goods *model.GoodInfo) error {
+	exist, _, err := svc.DB.GetCartByUserId(ctx, uid)
 	if err != nil {
 		return fmt.Errorf("CartService.AddGoodsIntoCart is cart exist err:%w", err)
 	}
@@ -58,10 +58,10 @@ func (s *CartService) addGoodsIntoCart(ctx context.Context, uid int64, goods *mo
 
 	// 不存在该用户记录，添加用户购物车
 	if !exist {
-		err = s.createCart(ctx, uid, goods, cartJson)
+		err = svc.createCart(ctx, uid, goods, cartJson)
 		// 存在该用户记录，追加其购物车
 	} else {
-		err = s.appendCart(ctx, uid, goods, cartJson)
+		err = svc.appendCart(ctx, uid, goods, cartJson)
 	}
 	if err != nil {
 		return err
@@ -74,28 +74,28 @@ func (s *CartService) addGoodsIntoCart(ctx context.Context, uid int64, goods *mo
 	if err != nil {
 		return fmt.Errorf("CartService.AddGoodsIntoCart marshalString err:%w", err)
 	}
-	err = s.Cache.SetCartCache(ctx, key, cacheCartJsonStr)
+	err = svc.Cache.SetCartCache(ctx, key, cacheCartJsonStr)
 	if err != nil {
 		return fmt.Errorf("CartService.AddGoodsIntoCart cache err:%w", err)
 	}
 	return nil
 }
 
-func (s *CartService) createCart(ctx context.Context, uid int64, goods *model.GoodInfo, cartJson *model.CartJson) error {
+func (svc *CartService) createCart(ctx context.Context, uid int64, goods *model.GoodInfo, cartJson *model.CartJson) error {
 	cartJson.InsertSku(goods)
 	cartJsonStr, err := sonic.MarshalString(cartJson)
 	if err != nil {
 		return fmt.Errorf("CartService.createCart marshalString err:%w", err)
 	}
-	err = s.DB.CreateCart(ctx, uid, cartJsonStr)
+	err = svc.DB.CreateCart(ctx, uid, cartJsonStr)
 	if err != nil {
 		return fmt.Errorf("CartService.createCart create cart err:%w", err)
 	}
 	return nil
 }
 
-func (s *CartService) appendCart(ctx context.Context, uid int64, goods *model.GoodInfo, cartJson *model.CartJson) error {
-	_, cartModel, err := s.DB.GetCartByUserId(ctx, uid)
+func (svc *CartService) appendCart(ctx context.Context, uid int64, goods *model.GoodInfo, cartJson *model.CartJson) error {
+	_, cartModel, err := svc.DB.GetCartByUserId(ctx, uid)
 	if err != nil {
 		return fmt.Errorf("CartService.appendCart get cartJsonStr err:%w", err)
 	}
@@ -108,7 +108,7 @@ func (s *CartService) appendCart(ctx context.Context, uid int64, goods *model.Go
 	if err != nil {
 		return fmt.Errorf("CartService.appendCart marshalString err:%w", err)
 	}
-	err = s.DB.SaveCart(ctx, uid, cartJsonStr)
+	err = svc.DB.SaveCart(ctx, uid, cartJsonStr)
 	if err != nil {
 		return fmt.Errorf("CartService.appendCart save cart err:%w", err)
 	}

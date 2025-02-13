@@ -24,7 +24,7 @@ import (
 
 	"github.com/apache/thrift/lib/go/thrift"
 
-	"github.com/west2-online/DomTok/gateway/model/model"
+	"github.com/west2-online/DomTok/app/gateway/model/model"
 )
 
 type RegisterRequest struct {

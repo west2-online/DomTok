@@ -18,23 +18,18 @@ package db
 
 import (
 	"context"
-	"errors"
-
-	"gorm.io/gorm"
 
 	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
-// GetCartByUserId 查询购物车
-func (c *DBAdapter) GetCartByUserId(ctx context.Context, uid int64) (bool, *Cart, error) {
-	model := new(Cart)
-	if err := c.client.WithContext(ctx).Where("user_id=?", uid).First(model).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, nil, nil
-		}
-		logger.Errorf("dal.GetCartByUserId error:%v", err)
-		return false, nil, errno.Errorf(errno.InternalDatabaseErrorCode, "db.GetCartByUserId error: %v", err)
+// SaveCart 保存更新后的购物车
+func (c *DBAdapter) SaveCart(ctx context.Context, uid int64, cart string) error {
+	model := &Cart{
+		UserId:  uid,
+		SkuJson: cart,
 	}
-	return true, model, nil
+	if err := c.client.WithContext(ctx).Where("user_id = ?", uid).Omit("created_at").Save(model).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "db.SaveCart error: %v", err)
+	}
+	return nil
 }

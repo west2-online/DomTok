@@ -23,8 +23,6 @@ import (
 	"github.com/west2-online/DomTok/app/cart/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/cart"
 	"github.com/west2-online/DomTok/pkg/base"
-	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 type CartHandler struct {
@@ -37,22 +35,14 @@ func NewCartHandler(useCase usecase.CartCasePort) *CartHandler {
 
 func (h *CartHandler) AddGoodsIntoCart(ctx context.Context, req *cart.AddGoodsIntoCartRequest) (r *cart.AddGoodsIntoCartResponse, err error) {
 	r = new(cart.AddGoodsIntoCartResponse)
-	// metainfo透传
-	loginData, err := metainfoContext.GetLoginData(ctx)
-	if err != nil {
-		logger.Infof("CartHandler.AddGoodsIntoCart err: %v", err)
-		r.Base = base.BuildBaseResp(err)
-		return r, nil
-	}
-
-	// create entity
+	// create model
 	good := &model.GoodInfo{
 		SkuId:  req.SkuId,
 		ShopId: req.ShopId,
 		Count:  req.Count,
 	}
 	// useCase
-	err = h.useCase.AddGoodsIntoCart(ctx, loginData.UserId, good)
+	err = h.useCase.AddGoodsIntoCart(ctx, good)
 	r.Base = base.BuildBaseResp(err)
 	return r, nil
 }

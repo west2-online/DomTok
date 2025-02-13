@@ -25,6 +25,10 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
 	api "github.com/west2-online/DomTok/app/gateway/model/api/cart"
+	"github.com/west2-online/DomTok/app/gateway/pack"
+	"github.com/west2-online/DomTok/app/gateway/rpc"
+	"github.com/west2-online/DomTok/kitex_gen/cart"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 // AddGoodsIntoCart .
@@ -34,13 +38,20 @@ func AddGoodsIntoCart(ctx context.Context, c *app.RequestContext) {
 	var req api.AddGoodsIntoCartRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.AddGoodsIntoCartResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	err = rpc.AddGoodsIntoCartRPC(ctx, &cart.AddGoodsIntoCartRequest{
+		SkuId:  req.SkuId,
+		ShopId: req.ShopID,
+		Count:  req.Count,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespSuccess(c)
 }
 
 // ShowCartGoodsList .

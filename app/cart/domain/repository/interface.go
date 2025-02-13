@@ -19,7 +19,7 @@ package repository
 import (
 	"context"
 
-	"github.com/west2-online/DomTok/app/cart/repository/db"
+	"github.com/west2-online/DomTok/app/cart/infrastructure/db"
 )
 
 type PersistencePort interface {

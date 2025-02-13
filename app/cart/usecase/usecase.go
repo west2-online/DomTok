@@ -14,24 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package db
+package usecase
 
 import (
 	"context"
 
-	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/logger"
+	"github.com/west2-online/DomTok/app/cart/domain/model"
+	"github.com/west2-online/DomTok/app/cart/domain/repository"
+	"github.com/west2-online/DomTok/app/cart/domain/service"
 )
 
-// CreateCart 创建购物车
-func (c *DBAdapter) CreateCart(ctx context.Context, uid int64, cart string) error {
-	model := Cart{
-		UserId:  uid,
-		SkuJson: cart,
+type CartCasePort interface {
+	AddGoodsIntoCart(ctx context.Context, goods *model.GoodInfo) error
+}
+
+type UseCase struct {
+	DB    repository.PersistencePort
+	Cache repository.CachePort
+	svc   *service.CartService
+}
+
+func NewCartCase(db repository.PersistencePort, cache repository.CachePort, svc *service.CartService) *UseCase {
+	return &UseCase{
+		DB:    db,
+		Cache: cache,
+		svc:   svc,
 	}
-	if err := c.client.WithContext(ctx).Create(&model).Error; err != nil {
-		logger.Errorf("db.CreateCart error:%v", err)
-		return errno.Errorf(errno.InternalDatabaseErrorCode, "db.CreateCart error: %v", err)
-	}
-	return nil
 }

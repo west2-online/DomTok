@@ -14,21 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cache
+package service
 
-import (
-	"context"
+import "github.com/west2-online/DomTok/pkg/errno"
 
-	"github.com/west2-online/DomTok/pkg/constants"
-	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/logger"
-)
+type CartVerifyOps func() error
 
-// SetCartCache 将购物车存入redis
-func (c *CacheAdapter) SetCartCache(ctx context.Context, key string, cart string) error {
-	if err := c.client.Set(ctx, key, cart, constants.RedisCartExpireTime).Err(); err != nil {
-		logger.Errorf("cache.SetCartCache error:%v", err)
-		return errno.Errorf(errno.InternalRedisErrorCode, "cache.SetCartCache error:%v", err.Error())
+// Verify 通过传来的参数进行一系列的校验
+func (svc *CartService) Verify(opts ...CartVerifyOps) error {
+	for _, opt := range opts {
+		if err := opt(); err != nil {
+			return err
+		}
 	}
 	return nil
+}
+
+func (svc *CartService) VerifyCount(cnt int64) CartVerifyOps {
+	return func() error {
+		if cnt < 1 {
+			return errno.NewErrNo(errno.ParamVerifyErrorCode, "wrong goods count format")
+		}
+		return nil
+	}
 }

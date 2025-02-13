@@ -36,6 +36,6 @@ func NewCartService(db repository.PersistencePort, cache repository.CachePort) *
 	return svc
 }
 
-func (s *CartService) init() {
-	s.MQ = kafka.NewKafkaInstance()
+func (svc *CartService) init() {
+	svc.MQ = kafka.NewKafkaInstance()
 }
