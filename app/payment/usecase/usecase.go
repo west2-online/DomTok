@@ -36,6 +36,7 @@ type paymentUseCase struct {
 	svc service.PaymentService
 }
 
+// 这里要带指针吗？
 func NewPaymentUseCase(db repository.PaymentDB, svc *service.PaymentService) PaymentUseCase {
 	return &paymentUseCase{
 		db:  db,
