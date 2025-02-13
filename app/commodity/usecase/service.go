@@ -48,7 +48,7 @@ func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category)
 	if err != nil {
 		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
 	}
-	if LoginData.UserId != category.Id {
+	if LoginData.UserId != category.CreatorId  {
 		return errno.NewErrNo(errno.AuthNoOperatePermissionCode, " You are not authorized to delete this category")
 	}
 	// 判断是否存在
@@ -72,7 +72,7 @@ func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category)
 	if err != nil {
 		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
 	}
-	if LoginData.UserId != category.Id {
+	if LoginData.UserId != category.CreatorId {
 		return errno.NewErrNo(errno.AuthNoOperatePermissionCode, " You are not authorized to delete this category")
 	}
 	// 判断是否存在
