@@ -43,9 +43,21 @@ func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category)
 }
 
 func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category) (err error) {
-	err = uc.Check(ctx, category)
+	// 判断用户是否有权限
+	LoginData, err := kcontext.GetLoginData(ctx)
 	if err != nil {
-		return fmt.Errorf("check category failed: %w", err)
+		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
+	}
+	if LoginData.UserId != category.Id {
+		return errno.NewErrNo(errno.AuthNoOperatePermissionCode, " You are not authorized to delete this category")
+	}
+	// 判断是否存在
+	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
+	if err != nil {
+		return fmt.Errorf("check category exist failed: %w", err)
+	}
+	if !exist {
+		return errno.NewErrNo(errno.ServiceUserNotExist, "category does not exist")
 	}
 	err = uc.db.DeleteCategory(ctx, category)
 	if err != nil {
@@ -55,9 +67,21 @@ func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category)
 }
 
 func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category) (err error) {
-	err = uc.Check(ctx, category)
+	// 判断用户是否有权限
+	LoginData, err := kcontext.GetLoginData(ctx)
 	if err != nil {
-		return fmt.Errorf("check category failed: %w", err)
+		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
+	}
+	if LoginData.UserId != category.Id {
+		return errno.NewErrNo(errno.AuthNoOperatePermissionCode, " You are not authorized to delete this category")
+	}
+	// 判断是否存在
+	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
+	if err != nil {
+		return fmt.Errorf("check category exist failed: %w", err)
+	}
+	if !exist {
+		return errno.NewErrNo(errno.ServiceUserNotExist, "category does not exist")
 	}
 	err = uc.db.UpdateCategory(ctx, category)
 	if err != nil {
@@ -72,23 +96,4 @@ func (uc *useCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (res
 		return nil, errno.Errorf(errno.ServiceListCategoryFailed, "failed to view categories: %v", err)
 	}
 	return resp, nil
-}
-
-func (uc *useCase) Check(ctx context.Context, category *model.Category) (err error) {
-	// 判断用户是否有权限
-	_, err = kcontext.GetLoginData(ctx)
-	if err != nil {
-		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
-	}
-	// ...后续判断用户是否对应...
-
-	// 判断是否存在
-	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
-	if err != nil {
-		return fmt.Errorf("check category exist failed: %w", err)
-	}
-	if !exist {
-		return errno.NewErrNo(errno.ServiceUserNotExist, "category does not exist")
-	}
-	return nil
 }
