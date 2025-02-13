@@ -14,15 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package adapter
+package service
 
-import (
-	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
-	"github.com/west2-online/DomTok/app/assistant/model"
-)
+import "github.com/west2-online/DomTok/app/assistant/cli/ai/adapter"
 
-type AIClient interface {
-	Call(dialog model.IDialog) error
-	ForgetDialog(dialog model.IDialog)
-	SetServerCaller(server adapter.ServerCaller)
+// Use sets the ai adapter to be used by the service
+// Goland 索引老是出错
+func Use(ai adapter.AIClient) {
+	Service.ai = ai
 }

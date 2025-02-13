@@ -20,13 +20,25 @@ import "context"
 
 // IDialog is an interface to define the methods of a dialog.
 type IDialog interface {
+	// Unique returns a unique string to identify the dialog.
+	Unique() string
+
+	// Message returns the message raising the dialog.
+	Message() string
+
+	// Send sends a message to the dialog.
 	Send(msg string)
+
+	// Close closes the dialog.
 	Close()
 }
 
 // Dialog is a struct that represents a dialog. A simple implementation of IDialog.
 type Dialog struct {
 	IDialog
+
+	unique  string
+	message string
 
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -35,13 +47,23 @@ type Dialog struct {
 }
 
 // NewDialog creates a new Dialog.
-func NewDialog() *Dialog {
+func NewDialog(id string, input string) *Dialog {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Dialog{
 		_receiver: make(chan string),
 		ctx:       ctx,
 		cancel:    cancel,
+		unique:    id,
+		message:   input,
 	}
+}
+
+func (d *Dialog) Unique() string {
+	return d.unique
+}
+
+func (d *Dialog) Message() string {
+	return d.message
 }
 
 // Send sends a message to the dialog.

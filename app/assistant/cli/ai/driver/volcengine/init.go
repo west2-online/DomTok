@@ -17,12 +17,14 @@ limitations under the License.
 package volcengine
 
 import (
+	"sync"
+
 	"github.com/volcengine/volcengine-go-sdk/service/arkruntime"
-	"github.com/volcengine/volcengine-go-sdk/service/arkruntime/model"
+	arkmodel "github.com/volcengine/volcengine-go-sdk/service/arkruntime/model"
 
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/adapter"
 	server "github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
-	model2 "github.com/west2-online/DomTok/app/assistant/model"
+	"github.com/west2-online/DomTok/app/assistant/model"
 )
 
 type Client struct {
@@ -30,7 +32,9 @@ type Client struct {
 
 	cli     *arkruntime.Client
 	caller  server.ServerCaller
-	baseReq *model.CreateChatCompletionRequest
+	baseReq *arkmodel.CreateChatCompletionRequest
+
+	recorder sync.Map
 }
 
 type ClientOption struct {
@@ -46,7 +50,7 @@ func NewClient(opt *ClientOption) *Client {
 		arkruntime.WithBaseUrl(opt.BaseUrl),
 		arkruntime.WithRegion(opt.Region),
 	)
-	baseReq := &model.CreateChatCompletionRequest{
+	baseReq := &arkmodel.CreateChatCompletionRequest{
 		Model:    opt.Model,
 		Messages: *GetPrevMessages(),
 		Tools:    *GetTools(),
@@ -58,8 +62,26 @@ func (c *Client) SetServerCaller(caller server.ServerCaller) {
 	c.caller = caller
 }
 
-func (c *Client) Call(input string, dialog model2.IDialog) (history interface{}, err error) {
-	// TODO: complete this function
+func (c *Client) Call(dialog model.IDialog) (err error) {
 	defer dialog.Close()
-	return nil, nil
+
+	id := dialog.Unique()
+	h := ""
+	v, ok := c.recorder.Load(id)
+	if ok {
+		h, _ = v.(string)
+	}
+
+	input := dialog.Message()
+
+	h += input
+	dialog.Send(h)
+
+	c.recorder.Store(id, h)
+
+	return nil
+}
+
+func (c *Client) ForgetDialog(dialog model.IDialog) {
+	c.recorder.Delete(dialog.Unique())
 }

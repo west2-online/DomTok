@@ -14,15 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package adapter
+package service
 
 import (
-	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
-	"github.com/west2-online/DomTok/app/assistant/model"
+	"context"
+	"fmt"
 )
 
-type AIClient interface {
-	Call(dialog model.IDialog) error
-	ForgetDialog(dialog model.IDialog)
-	SetServerCaller(server adapter.ServerCaller)
+func (s _Service) Login(ctx context.Context) error {
+	_, ok := ctx.Value("id").(string)
+	if !ok {
+		return fmt.Errorf("unexpected or unset id ")
+	}
+
+	return nil
 }

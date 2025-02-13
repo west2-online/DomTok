@@ -19,7 +19,9 @@ package main
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 
+	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine"
 	"github.com/west2-online/DomTok/app/assistant/router"
+	"github.com/west2-online/DomTok/app/assistant/service"
 	"github.com/west2-online/DomTok/pkg/constants"
 )
 
@@ -28,6 +30,16 @@ import (
 func init() {
 	// config.Init(serviceName)
 	// logger.Init(serviceName, config.GetLoggerLevel())
+
+	// 先这样加载
+	ai := volcengine.NewClient(&volcengine.ClientOption{
+		ApiKey:  ``,
+		BaseUrl: ``,
+		Region:  ``,
+		Model:   ``,
+	})
+
+	service.Use(ai)
 }
 
 func main() {

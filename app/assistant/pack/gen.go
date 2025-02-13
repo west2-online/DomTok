@@ -14,15 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package adapter
+package pack
 
-import (
-	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
-	"github.com/west2-online/DomTok/app/assistant/model"
-)
+import "github.com/google/uuid"
 
-type AIClient interface {
-	Call(dialog model.IDialog) error
-	ForgetDialog(dialog model.IDialog)
-	SetServerCaller(server adapter.ServerCaller)
+func GenerateUUID() string {
+	return uuid.New().String()
 }

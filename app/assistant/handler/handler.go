@@ -23,6 +23,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/hertz-contrib/websocket"
 
+	"github.com/west2-online/DomTok/app/assistant/pack"
 	"github.com/west2-online/DomTok/app/assistant/service"
 )
 
@@ -31,12 +32,24 @@ var upgrader = websocket.HertzUpgrader{}
 func Entrypoint(ctx context.Context, c *app.RequestContext) {
 	// upgrade the protocol to websocket
 	err := upgrader.Upgrade(c, func(conn *websocket.Conn) {
+		// assign id to ctx
+		ctx = context.WithValue(ctx, service.CtxKeyID, pack.GenerateUUID())
+		err := service.Service.Login(ctx)
+		if err != nil {
+			c.JSON(consts.StatusInternalServerError, err)
+			return
+		}
 		for {
-			err := service.Service.Accept(conn)
-			if err != nil {
-				_ = conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
-				return
+			errOnAccept := service.Service.Accept(conn, ctx)
+			if errOnAccept != nil {
+				_ = conn.WriteMessage(websocket.TextMessage, []byte(errOnAccept.Error()))
+				break
 			}
+		}
+		err = service.Service.Logout(ctx)
+		if err != nil {
+			c.JSON(consts.StatusInternalServerError, err)
+			return
 		}
 	})
 	// handle the error

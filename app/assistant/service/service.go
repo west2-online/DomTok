@@ -24,6 +24,10 @@ type _Service struct {
 
 var Service _Service
 
-func Init(ai adapter.AIClient) {
-	Service.ai = ai
-}
+// CtxKey 先把service的ctx key定义在这里
+type CtxKey string
+
+const (
+	CtxKeyID    CtxKey = "id"
+	CtxKeyInput CtxKey = "input"
+)

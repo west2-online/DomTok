@@ -17,6 +17,7 @@ limitations under the License.
 package service
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hertz-contrib/websocket"
@@ -26,18 +27,19 @@ import (
 )
 
 // Accept accepts a websocket message.
-func (s _Service) Accept(conn *websocket.Conn) (err error) {
+func (s _Service) Accept(conn *websocket.Conn, ctx context.Context) (err error) {
 	// read the message from the websocket connection
 	t, m, err := conn.ReadMessage()
 	if err != nil {
 		return fmt.Errorf("read failed: %w", err)
 	}
 
+	ctx = context.WithValue(ctx, CtxKeyInput, string(m))
 	switch t {
 	case websocket.TextMessage:
 		// TODO: handle text message
 
-		err := handleTextMessage(conn, string(m))
+		err := handleTextMessage(conn, ctx)
 		if err != nil {
 			return fmt.Errorf("handle text message failed: %w", err)
 		}
@@ -55,8 +57,12 @@ func (s _Service) Accept(conn *websocket.Conn) (err error) {
 }
 
 // handleTextMessage handles a text message.
-func handleTextMessage(conn *websocket.Conn, input string) (err error) {
-	dialog := model.NewDialog()
+func handleTextMessage(conn *websocket.Conn, ctx context.Context) (err error) {
+	// Login has been called before Accept
+	id, _ := ctx.Value(CtxKeyID).(string)
+	// Input is set in Accept
+	input, _ := ctx.Value(CtxKeyInput).(string)
+	dialog := model.NewDialog(id, input)
 	errChan := make(chan error)
 
 	err = conn.WriteMessage(websocket.TextMessage, pack.ResponseFactory.Command("dialog_open"))
@@ -67,7 +73,7 @@ func handleTextMessage(conn *websocket.Conn, input string) (err error) {
 		_ = conn.WriteMessage(websocket.TextMessage, pack.ResponseFactory.Command("dialog_close"))
 	}()
 	go func(d model.IDialog) {
-		_, err := Service.ai.Call(input, d)
+		err := Service.ai.Call(d)
 		errChan <- err
 	}(dialog)
 
