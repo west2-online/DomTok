@@ -26,7 +26,8 @@ type PaymentHandler struct {
 	useCase usecase.PaymentUseCase
 }
 
-// usecase只管逻辑，不涉及具体实现
+// 任何一个error必须是errno类型的
+// code路径：pkg/errno/code_service.go
 func (handler *PaymentHandler) ProcessPayment(ctx context.Context, req *payment.PaymentRequest) (r *payment.PaymentResponse, err error) {
 	r = new(payment.PaymentResponse)
 	p, err := handler.useCase.ProcessPayment(ctx, req.GetOrderID())

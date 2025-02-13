@@ -16,7 +16,7 @@ limitations under the License.
 
 package model
 
-//这里的model要导入哪一个包？两个包有什么区别？
+// 这里的model要导入哪一个包？两个包有什么区别？
 type Payment struct {
 	Base      *model.BaseResp // 这里要导入哪一个包？
 	PaymentID int64
