@@ -39,7 +39,7 @@ func (svc *CommodityService) CreateSpu(ctx context.Context, spu *model.Spu) (int
 	var eg errgroup.Group
 
 	eg.Go(func() error {
-		if err := upyun.SaveFile(spu.GoodsHeadDrawing, constants.TempSpuStorage, constants.SpuDirDEST, spu.GoodsHeadDrawingName); err != nil {
+		if err := upyun.SaveFile(spu.GoodsHeadDrawing, constants.TempSpuStorage, spu.GoodsHeadDrawingName); err != nil {
 			return fmt.Errorf("service.CreateSpu: save file failed: %w", err)
 		}
 		return nil
@@ -64,7 +64,7 @@ func (svc *CommodityService) CreateSpuImage(ctx context.Context, spuImage *model
 	var eg errgroup.Group
 
 	eg.Go(func() error {
-		if err := upyun.SaveFile(spuImage.Data, constants.TempSpuImageStorage, constants.SpuImageDirDest, spuImage.Url); err != nil {
+		if err := upyun.SaveFile(spuImage.Data, constants.TempSpuImageStorage, spuImage.Url); err != nil {
 			return fmt.Errorf("service.CreateSpuImage: create spuImage failed: %w", err)
 		}
 		return nil

@@ -19,7 +19,7 @@ package constants
 import "time"
 
 const (
-	SpuDirDEST          = "spu/"
+	SpuDirDest          = "spu/"
 	SpuImageDirDest     = "spu_image/"
 	TempSpuStorage      = "tmp_spu/"
 	TempSpuImageStorage = "tmp_spu_image/"

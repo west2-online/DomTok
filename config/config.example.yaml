@@ -51,7 +51,7 @@ upyuns:
     password: ""
     token-secret: ""
     token-timeout: 60
-    uss-domain: ""
+    uss-domain: "http://w2-domtok.test.upcdn.net" # 测试域名
     download-domain: ""
 
 

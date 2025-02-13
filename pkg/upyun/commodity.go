@@ -45,7 +45,7 @@ func NewUpYun() {
 			Password: config.Upyun.Password,
 		},
 	)
-	go uploadToUpYun(constants.TempSpuStorage, constants.SpuDirDEST)
+	go uploadToUpYun(constants.TempSpuStorage, constants.SpuDirDest)
 	go uploadToUpYun(constants.TempSpuImageStorage, constants.SpuImageDirDest)
 }
 
@@ -57,14 +57,18 @@ func uploadFile(src, dest string) error {
 	})
 }
 
-func GetImageUrl(uri string) (string, error) {
+// GetImageUrl 传参规则：
+/*
+假设一个文件在test目录下，uri参数传入/test/filename即可
+*/
+func GetImageUrl(uri string) string {
 	etime := strconv.FormatInt(time.Now().Unix()+config.Upyun.TokenTimeout, 10)
 	sign := utils.MD5(strings.Join([]string{config.Upyun.TokenSecret, etime, uri}, "&"))
 	url := fmt.Sprintf("%s%s?_upt=%s%s", config.Upyun.UssDomain, utils.UriEncode(uri), sign[12:20], etime)
-	return url, nil
+	return url
 }
 
-func SaveFile(data []byte, tmpFile, destDir, filename string) error {
+func SaveFile(data []byte, tmpFile, filename string) error {
 	err := os.MkdirAll(tmpFile, os.ModePerm)
 	if err != nil {
 		return errno.OSOperationError.WithError(err)
