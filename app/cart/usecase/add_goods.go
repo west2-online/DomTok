@@ -19,18 +19,21 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"github.com/west2-online/DomTok/pkg/constants"
 
 	"github.com/west2-online/DomTok/app/cart/domain/model"
-	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
 )
 
 func (u *UseCase) AddGoodsIntoCart(ctx context.Context, goods *model.GoodInfo) error {
-	// metainfo透传
-	loginData, err := metainfoContext.GetLoginData(ctx)
-	if err != nil {
-		return fmt.Errorf("cartCase.AddGoodsIntoCart metainfo unmarshal error:%w", err)
-	}
-	err = u.svc.SendAddGoods(ctx, loginData.GetUserId(), goods)
+	// todo: 开启metainfo透传
+	/*
+		loginData, err := metainfoContext.GetLoginData(ctx)
+		if err != nil {
+			return fmt.Errorf("cartCase.AddGoodsIntoCart metainfo unmarshal error:%w", err)
+		}
+
+	*/
+	err := u.svc.SendAddGoods(ctx, constants.UserTestId, goods)
 	if err != nil {
 		return fmt.Errorf("cartCase.AddGoodsIntoCart send mq error:%w", err)
 	}

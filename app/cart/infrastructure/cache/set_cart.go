@@ -18,7 +18,6 @@ package cache
 
 import (
 	"context"
-
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 )

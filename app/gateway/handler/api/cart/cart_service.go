@@ -43,7 +43,7 @@ func AddGoodsIntoCart(ctx context.Context, c *app.RequestContext) {
 	}
 
 	err = rpc.AddGoodsIntoCartRPC(ctx, &cart.AddGoodsIntoCartRequest{
-		SkuId:  req.SkuId,
+		SkuId:  req.SkuID,
 		ShopId: req.ShopID,
 		Count:  req.Count,
 	})

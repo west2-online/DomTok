@@ -35,8 +35,8 @@ type Store struct {
 }
 
 type Sku struct {
-	Count int64 `json:"count"`
 	SkuID int64 `json:"sku_id"`
+	Count int64 `json:"count"`
 }
 
 // SortStoresByUpdatedAt 对CartJson进行降序排序（最近的时间在前）
@@ -46,7 +46,7 @@ func (cart *CartJson) SortStoresByUpdatedAt() {
 	})
 }
 
-// InsertSku 将sku插入json
+// InsertSku 将sku插入json，如果sku已存在则增加count
 func (cart *CartJson) InsertSku(info *GoodInfo) {
 	index := -1
 
@@ -61,18 +61,35 @@ func (cart *CartJson) InsertSku(info *GoodInfo) {
 	// shopID 存在
 	if index != -1 {
 		store := cart.Store[index]
-		store.Goods = append([]Sku{
-			{
-				SkuID: info.SkuId,
-				Count: info.Count,
-			},
-		}, store.Goods...)
+
+		// 查找是否已存在 skuID
+		skuIndex := -1
+		for i, sku := range store.Goods {
+			if sku.SkuID == info.SkuId {
+				skuIndex = i
+				break
+			}
+		}
+
+		// skuID 存在，增加 count
+		if skuIndex != -1 {
+			store.Goods[skuIndex].Count += info.Count
+		} else {
+			// skuID 不存在，插入新的 sku
+			store.Goods = append([]Sku{
+				{
+					SkuID: info.SkuId,
+					Count: info.Count,
+				},
+			}, store.Goods...)
+		}
+
 		// 删除旧位置
 		cart.Store = append(cart.Store[:index], cart.Store[index+1:]...)
 		// 插到最前面
 		cart.Store = append([]Store{store}, cart.Store...)
 	} else {
-		// 不存在，追加
+		// shopID 不存在，创建新的 store 并插入 sku
 		newStore := Store{
 			StoreID: info.ShopId,
 			Goods: []Sku{
@@ -88,6 +105,7 @@ func (cart *CartJson) InsertSku(info *GoodInfo) {
 	}
 }
 
+// GetRecentNStores 获得CartJson中前n个店铺
 func (cart *CartJson) GetRecentNStores(n int) *CartJson {
 	cartJson := new(CartJson)
 	if len(cart.Store) > n {

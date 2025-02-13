@@ -16,13 +16,15 @@ limitations under the License.
 
 package constants
 
+import "time"
+
 const (
 	RedisSlowQuery = 10 // ms redis默认的慢查询时间，适用于 logger
 )
 
 // Redis Key and Expire Time
 const (
-	RedisCartExpireTime = 5 * 60
+	RedisCartExpireTime = 5 * 60 * time.Second
 	RedisCartStoreNum   = 30
 )
 

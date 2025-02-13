@@ -31,6 +31,7 @@ const (
 	DefaultKafkaReplicationFactor = -1
 )
 
+// CartService
 const (
 	KafkaCartTopic                = "cart"
 	KafkaCartAddGoodsPartitionNum = 3

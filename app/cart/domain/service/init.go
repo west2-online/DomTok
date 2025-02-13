@@ -17,6 +17,8 @@ limitations under the License.
 package service
 
 import (
+	"context"
+
 	"github.com/west2-online/DomTok/app/cart/domain/repository"
 	"github.com/west2-online/DomTok/pkg/kafka"
 )
@@ -38,4 +40,9 @@ func NewCartService(db repository.PersistencePort, cache repository.CachePort) *
 
 func (svc *CartService) init() {
 	svc.MQ = kafka.NewKafkaInstance()
+	svc.initConsumer()
+}
+
+func (svc *CartService) initConsumer() {
+	go svc.ConsumeAddGoods(context.Background())
 }
