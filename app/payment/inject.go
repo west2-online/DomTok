@@ -15,6 +15,3 @@ limitations under the License.
 */
 
 package payment
-
-// KitexUnusedProtection is used to prevent 'imported and not used' error.
-var KitexUnusedProtection = struct{}{}

@@ -14,7 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package payment
+package usecase
 
-// KitexUnusedProtection is used to prevent 'imported and not used' error.
-var KitexUnusedProtection = struct{}{}
+import (
+	"context"
+	"github.com/west2-online/DomTok/app/payment/domain/model"
+)
+
+type PaymentUseCase interface {
+	ProcessPayment(ctx context.Context, orderID int64) (*model.Payment, error)
+	//RequestPaymentToken
+	//ProcessRefund
+	//RequestRefundToken
+}

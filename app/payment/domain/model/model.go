@@ -14,7 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package payment
+package model
 
-// KitexUnusedProtection is used to prevent 'imported and not used' error.
-var KitexUnusedProtection = struct{}{}
+type Payment struct {
+	Base      *model.BaseResp // 这里要导入哪一个包？
+	PaymentID int64
+	Status    int64
+}
