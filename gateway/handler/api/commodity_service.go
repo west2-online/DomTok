@@ -25,6 +25,10 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
 	api "github.com/west2-online/DomTok/gateway/model/api"
+	"github.com/west2-online/DomTok/gateway/pack"
+	"github.com/west2-online/DomTok/gateway/rpc"
+	"github.com/west2-online/DomTok/kitex_gen/commodity"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 // CreateCoupon .
@@ -130,13 +134,62 @@ func CreateSpu(ctx context.Context, c *app.RequestContext) {
 	var req api.CreateSpuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.CreateSpuResp)
+	files, err := c.MultipartForm()
+	if err != nil {
+		pack.RespError(c, errno.ParamMissingError.WithError(err))
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	goodsHeadDrawing := files.File["goodsHeadDrawing"]
+	if len(goodsHeadDrawing) == 0 {
+		pack.RespError(c, errno.ParamMissingError.WithError(err))
+		return
+	}
+
+	spuImagesBytes := make([][]byte, 0)
+	spuImagesName := make([]string, 0)
+	spuImages := files.File["spuImage"]
+	if len(spuImages) > 0 {
+		for _, img := range spuImages {
+			b := make([]byte, 0)
+			b, err = pack.BuildFileDataBytes(img)
+			if err != nil {
+				pack.RespError(c, err)
+				return
+			}
+			spuImagesBytes = append(spuImagesBytes, b)
+			spuImagesName = append(spuImagesName, img.Filename)
+		}
+	}
+
+	goodsHeadDrawingBytes, err := pack.BuildFileDataBytes(goodsHeadDrawing[0])
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	res, err := rpc.CreateSpuRPC(ctx, &commodity.CreateSpuReq{
+		Name:                 req.Name,
+		Description:          req.Description,
+		CategoryID:           req.CategoryID,
+		GoodsHeadDrawingName: goodsHeadDrawing[0].Filename,
+		GoodsHeadDrawing:     goodsHeadDrawingBytes,
+		Price:                req.Price,
+		ForSale:              req.ForSale,
+		Shipping:             req.Shipping,
+		SpuImage:             spuImagesBytes,
+		SpuImageName:         spuImagesName,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespData(c, res)
 }
 
 // UpdateSpu .

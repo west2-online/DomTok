@@ -14,19 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package repository
+package constants
 
-import (
-	"context"
+import "time"
 
-	"github.com/west2-online/DomTok/app/commodity/domain/model"
+const (
+	SpuDirDEST          = "spu/"
+	SpuImageDirDest     = "spu_image/"
+	TempSpuStorage      = "tmp_spu/"
+	TempSpuImageStorage = "tmp_spu_image/"
+
+	TickerTimer = 10 * time.Second
 )
-
-type CommodityDB interface {
-	CreateCategory(ctx context.Context, name string) error
-
-	CreateSpu(ctx context.Context, spu *model.Spu) error
-	CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
-}
-
-type CommodityCache interface{}

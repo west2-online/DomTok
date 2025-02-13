@@ -14,19 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package repository
+package model
 
-import (
-	"context"
-
-	"github.com/west2-online/DomTok/app/commodity/domain/model"
-)
-
-type CommodityDB interface {
-	CreateCategory(ctx context.Context, name string) error
-
-	CreateSpu(ctx context.Context, spu *model.Spu) error
-	CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
+type Spu struct {
+	SpuId                int64
+	Name                 string
+	CreatorId            int64
+	Description          string
+	CategoryId           int64
+	GoodsHeadDrawingName string
+	GoodsHeadDrawing     []byte
+	Price                float64
+	ForSale              int
+	Shipping             float64
+	CreatedAt            int64
+	UpdatedAt            int64
+	DeletedAt            int64
+	SpuImageName         []string
+	SpuImage             [][]byte
 }
-
-type CommodityCache interface{}

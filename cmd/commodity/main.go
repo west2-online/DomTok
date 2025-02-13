@@ -29,17 +29,19 @@ import (
 	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
+	"github.com/west2-online/DomTok/pkg/upyun"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 // constants部分看了其他的pr有写了，防止冲突先找个数代替，到时候合并完再改掉
 var (
-	serviceName = "constants.CommodityServiceName" // TODO
+	serviceName = constants.CommodityServiceName
 )
 
 func init() {
 	config.Init(serviceName)
 	logger.Init(serviceName, config.GetLoggerLevel())
+	upyun.NewUpYun()
 }
 
 func main() {

@@ -21,8 +21,9 @@ import (
 
 	"gorm.io/gorm"
 
-	_ "github.com/west2-online/DomTok/app/commodity/domain/model"
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 // commodityDB impl domain.CommodityDB defined domain
@@ -35,5 +36,36 @@ func NewCommodityDB(client *gorm.DB) repository.CommodityDB {
 }
 
 func (db *commodityDB) CreateCategory(ctx context.Context, name string) error {
+	return nil
+}
+
+func (db *commodityDB) CreateSpu(ctx context.Context, spu *model.Spu) error {
+	s := &Spu{
+		Id:               spu.SpuId,
+		Name:             spu.Name,
+		CreatorId:        spu.CreatorId,
+		Description:      spu.Description,
+		CategoryId:       spu.CategoryId,
+		GoodsHeadDrawing: spu.GoodsHeadDrawingName,
+		Price:            spu.Price,
+		ForSale:          spu.ForSale,
+		Shipping:         spu.Shipping,
+	}
+
+	if err := db.client.WithContext(ctx).Table(s.TableName()).Create(spu).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to spu: %v", err)
+	}
+	return nil
+}
+
+func (db *commodityDB) CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
+	s := &SpuImage{
+		Id:    spuImage.ImageID,
+		SpuId: spuImage.SpuID,
+		Url:   spuImage.Url,
+	}
+	if err := db.client.WithContext(ctx).Table(s.TableName()).Create(s).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to spu image: %v", err)
+	}
 	return nil
 }

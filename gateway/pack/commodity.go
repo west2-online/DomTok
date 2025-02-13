@@ -14,19 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package repository
+package pack
 
 import (
-	"context"
+	"io/ioutil"
+	"mime/multipart"
 
-	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-type CommodityDB interface {
-	CreateCategory(ctx context.Context, name string) error
+func BuildFileDataBytes(file *multipart.FileHeader) ([]byte, error) {
+	src, err := file.Open()
+	if err != nil {
+		return nil, errno.OSOperationError.WithError(err)
+	}
+	defer src.Close()
 
-	CreateSpu(ctx context.Context, spu *model.Spu) error
-	CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
+	data, err := ioutil.ReadAll(src)
+	if err != nil {
+		return nil, errno.IOOperationError.WithError(err)
+	}
+	return data, err
 }
-
-type CommodityCache interface{}

@@ -19,8 +19,13 @@ package rpc
 import (
 	"context"
 
+	"golang.org/x/sync/errgroup"
+
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
+	"github.com/west2-online/DomTok/pkg/base"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 type CommodityHandler struct {
@@ -58,8 +63,52 @@ func (c CommodityHandler) UseUserCoupon(ctx context.Context, req *commodity.UseU
 }
 
 func (c CommodityHandler) CreateSpu(ctx context.Context, req *commodity.CreateSpuReq) (r *commodity.CreateSpuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	s := &model.Spu{
+		Name:                 req.Name,
+		Description:          req.Description,
+		CategoryId:           req.CategoryID,
+		GoodsHeadDrawingName: req.GoodsHeadDrawingName,
+		Price:                req.Price,
+		ForSale:              int(req.ForSale),
+		Shipping:             req.Shipping,
+		GoodsHeadDrawing:     req.GoodsHeadDrawing,
+		SpuImageName:         req.SpuImageName,
+		SpuImage:             req.SpuImage,
+	}
+
+	var eg errgroup.Group
+
+	s.SpuId, err = c.useCase.CreateSpu(ctx, s)
+	if err != nil {
+		logger.Errorf("CommodityHandler.CreateSpu: create spu failed: %v", err)
+		r.Base = base.BuildBaseResp(nil)
+		return r, nil
+	}
+
+	if len(s.SpuImageName) > 0 {
+		for i, sName := range s.SpuImageName {
+			eg.Go(func() error {
+				_, err = c.useCase.CreateSpuImage(ctx, &model.SpuImage{
+					SpuID: s.SpuId,
+					Url:   sName,
+					Data:  s.SpuImage[i],
+				})
+				if err != nil {
+					logger.Errorf("CommodityHandler.CreateSpuImage: create spu image failed: %v", err)
+					return err
+				}
+				return nil
+			})
+		}
+	}
+
+	if err := eg.Wait(); err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return r, nil
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	return r, nil
 }
 
 func (c CommodityHandler) UpdateSpu(ctx context.Context, req *commodity.UpdateSkuReq) (r *commodity.UpdateSpuResp, err error) {

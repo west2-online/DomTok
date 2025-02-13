@@ -18,10 +18,42 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
 )
 
 func (us *useCase) CreateCategory(ctx context.Context, category *model.Category) (id int64, err error) {
 	return 0, nil
+}
+
+func (us *useCase) CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err error) {
+	if err = us.svc.Verify(us.svc.VerifyFileType(spu.GoodsHeadDrawingName)); err != nil {
+		return 0, fmt.Errorf("usecase.CreateSpu failed: %w", err)
+	}
+
+	loginData, err := contextLogin.GetLoginData(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("usecase.CreateSpu failed: %w", err)
+	}
+	spu.CreatorId = loginData.UserId
+
+	id, err = us.svc.CreateSpu(ctx, spu)
+	if err != nil {
+		return 0, fmt.Errorf("usecase.CreateSpu failed: %w", err)
+	}
+	return id, nil
+}
+
+func (us *useCase) CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) (int64, error) {
+	if err := us.svc.Verify(us.svc.VerifyFileType(spuImage.Url)); err != nil {
+		return 0, fmt.Errorf("usecase.CreateSpuImage failed: %w", err)
+	}
+
+	id, err := us.svc.CreateSpuImage(ctx, spuImage)
+	if err != nil {
+		return 0, fmt.Errorf("usecase.CreateSpuImage failed: %w", err)
+	}
+	return id, nil
 }

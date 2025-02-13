@@ -53,4 +53,6 @@ const (
 	InternalNetworkErrorCode                 // 网络错误
 	InternalESErrorCode                      // ES错误
 	InternalKafkaErrorCode                   // kafka 错误
+	OSOperateErrorCode
+	IOOperateErrorCode
 )

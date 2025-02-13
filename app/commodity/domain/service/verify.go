@@ -15,3 +15,35 @@ limitations under the License.
 */
 
 package service
+
+import (
+	"path/filepath"
+	"strings"
+
+	"github.com/west2-online/DomTok/pkg/errno"
+)
+
+type CommodityVerifyOps func() error
+
+func (svc *CommodityService) Verify(opts ...CommodityVerifyOps) error {
+	for _, opt := range opts {
+		if err := opt(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (svc *CommodityService) VerifyFileType(filename string) CommodityVerifyOps {
+	return func() error {
+		// TODO: 类型需要更多的吗？
+		ext := strings.ToLower(filepath.Ext(filename))
+		legals := []string{".jpg", ".jpeg", ".png", ".gif", ".bmp"}
+		for _, legal := range legals {
+			if ext == legal {
+				return nil
+			}
+		}
+		return errno.NewErrNo(errno.ParamVerifyErrorCode, "invalid file type")
+	}
+}

@@ -26,6 +26,8 @@ import (
 
 type CommodityUseCase interface {
 	CreateCategory(ctx context.Context, category *model.Category) (id int64, err error)
+	CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err error)
+	CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) (int64, error)
 }
 
 type useCase struct {

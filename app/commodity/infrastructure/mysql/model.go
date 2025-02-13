@@ -32,6 +32,32 @@ type Category struct {
 	// gorm.Model
 }
 
+type Spu struct {
+	Id               int64
+	Name             string
+	CreatorId        int64
+	Description      string
+	CategoryId       int64
+	GoodsHeadDrawing string
+	Price            float64
+	ForSale          int
+	Shipping         float64
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+	DeletedAt        time.Time
+	// gorm.Model
+}
+
+type SpuImage struct {
+	Id        int64
+	Url       string
+	SpuId     int64
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
+	//	gorm.Model
+}
+
 func (Category) TableName() string {
 	return constants.CategoryTableName
 }
