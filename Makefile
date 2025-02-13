@@ -27,7 +27,7 @@ OUTPUT_PATH = $(DIR)/output
 API_PATH= $(DIR)/cmd/api
 
 # 服务名
-SERVICES := api user commodity orders cart payment
+SERVICES := gateway user commodity orders cart payment
 service = $(word 1, $@)
 
 PREFIX = "[Makefile]"
@@ -78,7 +78,7 @@ kitex-gen-%:
 # 生成基于 Hertz 的脚手架
 .PHONY: hz-%
 hz-%:
-	hz update -idl ${IDL_PATH}/$*.thrift
+	hz update -idl ${IDL_PATH}/api/$*.thrift
 
 # 单元测试
 # -gcflags="all=-l -N": -l 表示禁用内联优化，-N 表示禁用优化

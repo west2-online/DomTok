@@ -62,8 +62,8 @@ services:
     addr:
     - 127.0.0.1:10001
 
-  api:
-    name: api
+  gateway:
+    name: gateway
     load-balance: false
     addr:
     - 0.0.0.0:20001
