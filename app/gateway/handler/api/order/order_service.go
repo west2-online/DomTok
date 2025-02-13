@@ -25,100 +25,232 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
 	api "github.com/west2-online/DomTok/app/gateway/model/api/order"
+	"github.com/west2-online/DomTok/app/gateway/model/model"
+	"github.com/west2-online/DomTok/app/gateway/rpc"
+	module2 "github.com/west2-online/DomTok/kitex_gen/model"
+	orderrpc "github.com/west2-online/DomTok/kitex_gen/order"
+	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // CreateOrder .
-// @router /api/api/create [POST]
+// @router /api/v1/create [POST]
 func CreateOrder(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.CreateOrderReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, &model.BaseResp{
+			Code: errno.ParamVerifyErrorCode,
+			Msg:  err.Error(),
+		})
 		return
 	}
 
-	resp := new(api.CreateOrderResp)
+	// 先准备商品列表
+	goods := make([]*module2.BaseOrderGoods, 0, len(req.BaseOrderGoods))
+	for _, g := range req.BaseOrderGoods {
+		goods = append(goods, &module2.BaseOrderGoods{
+			GoodsID:          g.GoodsID,
+			PurchaseQuantity: g.PurchaseQuantity,
+		})
+	}
 
+	rpcReq := &orderrpc.CreateOrderReq{
+		AddressID:      req.AddressID,
+		AddressInfo:    req.AddressInfo,
+		BaseOrderGoods: goods,
+	}
+
+	orderID, err := rpc.CreateOrderRPC(ctx, rpcReq)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &model.BaseResp{
+			Code: errno.ServiceError,
+			Msg:  err.Error(),
+		})
+		return
+	}
+
+	resp := &api.CreateOrderResp{
+		Base: &model.BaseResp{
+			Code: errno.SuccessCode,
+			Msg:  "success",
+		},
+		OrderID: orderID,
+	}
 	c.JSON(consts.StatusOK, resp)
 }
 
 // ViewOrderList .
-// @router /api/api/list [GET]
+// @router /api/v1/list [GET]
 func ViewOrderList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.ViewOrderListReq
+
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		logger.Errorf("[ViewOrderList] bind and validate failed: %v", err)
+		c.JSON(consts.StatusBadRequest, &model.BaseResp{
+			Code: errno.ParamVerifyErrorCode,
+			Msg:  err.Error(),
+		})
 		return
 	}
 
-	resp := new(api.ViewOrderListResp)
+	// 转换请求
+	rpcReq := &orderrpc.ViewOrderListReq{
+		Page: req.Page,
+		Size: req.Size,
+	}
+
+	logger.Infof("[ViewOrderList] calling RPC")
+	resp, err := rpc.ViewOrderListRPC(ctx, rpcReq)
+	if err != nil {
+		logger.Errorf("[ViewOrderList] RPC call failed: %v", err)
+		c.JSON(consts.StatusInternalServerError, &model.BaseResp{
+			Code: errno.ServiceError,
+			Msg:  err.Error(),
+		})
+		return
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
 
 // ViewOrder .
-// @router /api/api/view [GET]
+// @router /api/v1/view [GET]
 func ViewOrder(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.ViewOrderReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, &model.BaseResp{
+			Code: errno.ParamVerifyErrorCode,
+			Msg:  err.Error(),
+		})
 		return
 	}
 
-	resp := new(api.ViewOrderResp)
+	// 转换请求
+	rpcReq := &orderrpc.ViewOrderReq{
+		OrderID: req.OrderID,
+	}
+
+	resp, err := rpc.ViewOrderRPC(ctx, rpcReq)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &model.BaseResp{
+			Code: errno.ServiceError,
+			Msg:  err.Error(),
+		})
+		return
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
 
 // CancelOrder .
-// @router /api/api/cancel [DELETE]
+// @router /api/v1/cancel [DELETE]
 func CancelOrder(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.CancelOrderReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, &model.BaseResp{
+			Code: errno.ParamVerifyErrorCode,
+			Msg:  err.Error(),
+		})
 		return
 	}
 
-	resp := new(api.CancelOrderResp)
+	// 转换请求
+	rpcReq := &orderrpc.CancelOrderReq{
+		OrderID: req.OrderID,
+	}
 
+	err = rpc.CancelOrderRPC(ctx, rpcReq)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &model.BaseResp{
+			Code: errno.ServiceError,
+			Msg:  err.Error(),
+		})
+		return
+	}
+
+	resp := &api.CancelOrderResp{
+		Base: &model.BaseResp{
+			Code: errno.SuccessCode,
+			Msg:  "success",
+		},
+	}
 	c.JSON(consts.StatusOK, resp)
 }
 
 // ChangeDeliverAddress .
-// @router /api/api/change-address [PUT]
+// @router /api/v1/change-address [PUT]
 func ChangeDeliverAddress(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.ChangeDeliverAddressReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, &model.BaseResp{
+			Code: errno.ParamVerifyErrorCode,
+			Msg:  err.Error(),
+		})
 		return
 	}
 
-	resp := new(api.ChangeDeliverAddressResp)
+	// 转换请求
+	rpcReq := &orderrpc.ChangeDeliverAddressReq{
+		OrderID:     req.OrderID,
+		AddressID:   req.AddressID,
+		AddressInfo: req.AddressInfo,
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	err = rpc.ChangeDeliverAddressRPC(ctx, rpcReq)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &model.BaseResp{
+			Code: errno.ServiceError,
+			Msg:  err.Error(),
+		})
+		return
+	}
+
+	c.JSON(consts.StatusOK, &model.BaseResp{
+		Code: errno.SuccessCode,
+		Msg:  "success",
+	})
 }
 
 // DeleteOrder .
-// @router /api/api/delete [DELETE]
+// @router /api/v1/delete [DELETE]
 func DeleteOrder(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.DeleteOrderReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, &model.BaseResp{
+			Code: errno.ParamVerifyErrorCode,
+			Msg:  err.Error(),
+		})
 		return
 	}
 
-	resp := new(api.DeleteOrderResp)
+	// 转换请求
+	rpcReq := &orderrpc.DeleteOrderReq{
+		OrderID: req.OrderID,
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	err = rpc.DeleteOrderRPC(ctx, rpcReq)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, &model.BaseResp{
+			Code: errno.ServiceError,
+			Msg:  err.Error(),
+		})
+		return
+	}
+
+	c.JSON(consts.StatusOK, &model.BaseResp{
+		Code: errno.SuccessCode,
+		Msg:  "success",
+	})
 }

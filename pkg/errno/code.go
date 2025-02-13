@@ -28,6 +28,10 @@ const (
 	SuccessMsg  = "ok"
 )
 
+const (
+	ServiceError = 10001
+)
+
 // 200xx: 参数错误，Param 打头
 const (
 	ParamVerifyErrorCode  = 20000 + iota // 参数校验失败
