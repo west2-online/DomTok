@@ -29,11 +29,7 @@ import (
 )
 
 func (svc *CartService) ConsumeAddGoods(ctx context.Context) {
-	msgCh := svc.MQ.Consume(ctx,
-		constants.KafkaCartTopic,
-		constants.KafkaConsumerNum,
-		constants.KafkaCartAddGoodsGroupId,
-		constants.DefaultConsumerChanCap)
+	msgCh := svc.MQ.ConsumeAddGoods(ctx)
 	go func() {
 		for msg := range msgCh {
 			req := new(model.AddGoodsMsg)

@@ -19,7 +19,9 @@ package repository
 import (
 	"context"
 
+	"github.com/west2-online/DomTok/app/cart/domain/model"
 	"github.com/west2-online/DomTok/app/cart/infrastructure/db"
+	"github.com/west2-online/DomTok/pkg/kafka"
 )
 
 type PersistencePort interface {
@@ -32,4 +34,9 @@ type CachePort interface {
 	SetCartCache(ctx context.Context, key string, cart string) error
 	GetCartCache(ctx context.Context, key string) (string, error)
 	IsKeyExist(ctx context.Context, key string) bool
+}
+
+type MqPort interface {
+	SendAddGoods(ctx context.Context, uid int64, goods *model.GoodInfo) error
+	ConsumeAddGoods(ctx context.Context) <-chan *kafka.Message
 }

@@ -14,41 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package service
+package mq
 
 import (
-	"context"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
+	"golang.org/x/net/context"
 
-	"github.com/west2-online/DomTok/app/cart/domain/model"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/kafka"
 )
 
-func (svc *CartService) SendAddGoods(ctx context.Context, uid int64, goods *model.GoodInfo) error {
-	msgValue := &model.AddGoodsMsg{
-		Uid:   uid,
-		Goods: goods,
-	}
-	v, err := sonic.Marshal(msgValue)
-	if err != nil {
-		return fmt.Errorf("service.Send: marshal msg failed, err: %w", err)
-	}
-	msg := []*kafka.Message{
-		{
-			// 用%来简陋实现一下分区
-			K: []byte(strconv.FormatInt(uid%constants.KafkaCartAddGoodsPartitionNum, 10)),
-			V: v,
-		},
-	}
-
+// send 对内部库的send添加了一层重试
+func (c *KafkaAdapter) send(ctx context.Context, msg []*kafka.Message) (err error) {
+	// 这里参数没有动的必要，直接设为固定，实际也可以改为调用时传入
 	for i := 0; i < constants.KafkaRetries; i++ {
-		errs := svc.MQ.Send(ctx, constants.KafkaCartTopic, msg)
+		errs := c.mq.Send(ctx, constants.KafkaCartTopic, msg)
 		if len(errs) == 0 {
 			return nil
 		} else {
@@ -56,10 +39,9 @@ func (svc *CartService) SendAddGoods(ctx context.Context, uid int64, goods *mode
 			for _, e := range errs {
 				errMsg = strings.Join([]string{errMsg, e.Error(), ";"}, "")
 			}
-			err = fmt.Errorf("service.Send: send msg failed, errs: %v", errMsg)
+			err = fmt.Errorf("mq.Send: send msg failed, errs: %v", errMsg)
 		}
 		time.Sleep(time.Second * time.Duration(i+1))
 	}
-
 	return err
 }

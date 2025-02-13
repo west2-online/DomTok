@@ -14,34 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package service
+package mq
 
 import (
 	"context"
 
-	"github.com/west2-online/DomTok/app/cart/domain/repository"
+	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/kafka"
 )
 
-type CartService struct {
-	DB    repository.PersistencePort
-	Cache repository.CachePort
-	MQ    repository.MqPort
-}
-
-func NewCartService(db repository.PersistencePort, cache repository.CachePort, mq repository.MqPort) *CartService {
-	svc := &CartService{
-		DB:    db,
-		Cache: cache,
-		MQ:    mq,
-	}
-	svc.init()
-	return svc
-}
-
-func (svc *CartService) init() {
-	svc.initConsumer()
-}
-
-func (svc *CartService) initConsumer() {
-	go svc.ConsumeAddGoods(context.Background())
+func (c *KafkaAdapter) ConsumeAddGoods(ctx context.Context) <-chan *kafka.Message {
+	msgCh := c.mq.Consume(ctx,
+		constants.KafkaCartTopic,
+		constants.KafkaCartAddGoodsConsumerNum,
+		constants.KafkaCartAddGoodsGroupId,
+		constants.DefaultConsumerChanCap)
+	return msgCh
 }

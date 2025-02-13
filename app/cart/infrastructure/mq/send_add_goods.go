@@ -14,29 +14,39 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package usecase
+package mq
 
 import (
 	"context"
 	"fmt"
+	"strconv"
+
+	"github.com/bytedance/sonic"
 
 	"github.com/west2-online/DomTok/app/cart/domain/model"
 	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/kafka"
 )
 
-func (u *UseCase) AddGoodsIntoCart(ctx context.Context, goods *model.GoodInfo) error {
-	// todo: 开启metainfo透传
-	/*
-		loginData, err := metainfoContext.GetLoginData(ctx)
-		if err != nil {
-			return fmt.Errorf("cartCase.AddGoodsIntoCart metainfo unmarshal error:%w", err)
-		}
-
-	*/
-	err := u.MQ.SendAddGoods(ctx, constants.UserTestId, goods)
-	if err != nil {
-		return fmt.Errorf("cartCase.AddGoodsIntoCart send mq error:%w", err)
+// SendAddGoods 将goodsInfo传递到mq
+func (c *KafkaAdapter) SendAddGoods(ctx context.Context, uid int64, goods *model.GoodInfo) error {
+	msgValue := &model.AddGoodsMsg{
+		Uid:   uid,
+		Goods: goods,
 	}
-
+	v, err := sonic.Marshal(msgValue)
+	if err != nil {
+		return fmt.Errorf("mq.SendAddGoods: marshal msg failed, err: %w", err)
+	}
+	msg := []*kafka.Message{
+		{
+			// 用%来简陋实现一下分区
+			K: []byte(strconv.FormatInt(uid%constants.KafkaCartAddGoodsPartitionNum, 10)),
+			V: v,
+		},
+	}
+	if err = c.send(ctx, msg); err != nil {
+		return fmt.Errorf("mq.SendAddGoods: marshal msg failed, err: %w", err)
+	}
 	return nil
 }

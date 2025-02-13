@@ -14,34 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package service
+package mq
 
-import (
-	"context"
+import "github.com/west2-online/DomTok/pkg/kafka"
 
-	"github.com/west2-online/DomTok/app/cart/domain/repository"
-)
-
-type CartService struct {
-	DB    repository.PersistencePort
-	Cache repository.CachePort
-	MQ    repository.MqPort
+// KafkaAdapter 这里不是mqAdapter的原因是我们调用的是在pkg封装的kafka
+type KafkaAdapter struct {
+	mq *kafka.Kafka
 }
 
-func NewCartService(db repository.PersistencePort, cache repository.CachePort, mq repository.MqPort) *CartService {
-	svc := &CartService{
-		DB:    db,
-		Cache: cache,
-		MQ:    mq,
+func NewKafkaAdapter() *KafkaAdapter {
+	return &KafkaAdapter{
+		mq: kafka.NewKafkaInstance(),
 	}
-	svc.init()
-	return svc
-}
-
-func (svc *CartService) init() {
-	svc.initConsumer()
-}
-
-func (svc *CartService) initConsumer() {
-	go svc.ConsumeAddGoods(context.Background())
 }

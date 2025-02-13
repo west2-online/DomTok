@@ -31,13 +31,15 @@ type CartCasePort interface {
 type UseCase struct {
 	DB    repository.PersistencePort
 	Cache repository.CachePort
+	MQ    repository.MqPort
 	svc   *service.CartService
 }
 
-func NewCartCase(db repository.PersistencePort, cache repository.CachePort, svc *service.CartService) *UseCase {
+func NewCartCase(db repository.PersistencePort, cache repository.CachePort, mq repository.MqPort, svc *service.CartService) *UseCase {
 	return &UseCase{
 		DB:    db,
 		Cache: cache,
+		MQ:    mq,
 		svc:   svc,
 	}
 }
