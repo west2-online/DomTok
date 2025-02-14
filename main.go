@@ -14,23 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package constants
+package main
 
-import "time"
+import (
+	"log"
 
-const (
-	MaxConnections  = 1000             // (DB) 最大连接数
-	MaxIdleConns    = 10               // (DB) 最大空闲连接数
-	ConnMaxLifetime = 10 * time.Second // (DB) 最大可复用时间
-	ConnMaxIdleTime = 5 * time.Minute  // (DB) 最长保持空闲状态时间
+	payment "github.com/west2-online/DomTok/kitex_gen/payment/paymentservice"
 )
 
-const (
-	UserTableName = "users"
+func main() {
+	svr := payment.NewServer(new(PaymentServiceImpl))
 
-	OrderTableName         = "orders"
-	OrderGoodsTableName    = "order_goods"
-	PaymentTableName       = "payments"
-	PaymentRefundTableName = "payment_refunds"
-	PaymentLedgerTableName = "payment_ledgers"
-)
+	err := svr.Run()
+	if err != nil {
+		log.Println(err.Error())
+	}
+}

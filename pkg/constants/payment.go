@@ -1,0 +1,8 @@
+package constants
+
+const (
+	PaymentStatusPending    = 0 // 待支付
+	PaymentStatusProcessing = 1 // 处理中
+	PaymentStatusSuccess    = 2 // 成功支付
+	PaymentStatusFailed     = 3 // 支付失败
+)
