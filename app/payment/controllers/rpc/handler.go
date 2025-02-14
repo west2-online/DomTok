@@ -22,7 +22,7 @@ import (
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	"github.com/west2-online/DomTok/app/payment/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/payment"
-	"github.com/west2-online/DomTok/pkg/constants/payment"
+	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 )
 
 type PaymentHandler struct {
@@ -56,17 +56,20 @@ func (handler *PaymentHandler) RequestPaymentToken(ctx context.Context, req *pay
 		OrderID: req.OrderID,
 		UserID: req.UserID,
 	}
+
 	// 1. 检查订单是否存在
 	_,err=handler.useCase.GetOrderByID(ctx,p)
 	// 这里直接return就可以吗？
 	if err != nil {
 		return
 	}
+
 	// 2. 检查用户是否存在
 	_, err = handler.useCase.GetUserByID(ctx,p)
 	if err != nil {
 		return
 	}
+
 	// 3. 检查订单支付信息
 	// 这里用int还是int8？
 	var paymentInfo int
@@ -74,35 +77,33 @@ func (handler *PaymentHandler) RequestPaymentToken(ctx context.Context, req *pay
 	if err != nil {
 		return
 	}
-	// 如果创建过，检查支付状态是否为待支付或者支付失败。
-	if paymentInfo != nil {
-		if paymentInfo.Status == "paid" || paymentInfo.Status == "processing" {
-			return nil, fmt.Errorf("支付正在进行或已完成，拒绝生成令牌")
-		}
+	if paymentInfo == paymentStatus.PaymentStatusSuccess||paymentInfo == paymentStatus.PaymentStatusProcessing {
+		return
 	} else {
-		// 创建新的支付信息
-		err = handler.useCase.CreatePaymentInfo(ctx, req.OrderID, req.UserID)
+		err:=handler.useCase.CreatePaymentInfo(ctx,p)
 		if err != nil {
-			return nil, fmt.Errorf("创建支付信息失败: %w", err)
+			return
 		}
 	}
 
 	// 4. 生成支付令牌
-	token, err := handler.useCase.GeneratePaymentToken(ctx, req.OrderID, req.UserID)
+	var token string
+	var expTime int64
+	// 感觉这里一次返回三个值非常非常非常不优雅，但是不知道要怎么写得更优雅
+	token,expTime,err = handler.useCase.GeneratePaymentToken(ctx, p)
 	if err != nil {
-		return nil, fmt.Errorf("生成支付令牌失败: %w", err)
+		return
 	}
+	r.PaymentToken = token
+	r.ExpirationTime = expTime
 
 	// 5. 存储令牌到 Redis
-	err = handler.useCase.StorePaymentToken(ctx, req.OrderID, token)
+	err = handler.useCase.StorePaymentToken(ctx, p)
 	if err != nil {
-		return nil, fmt.Errorf("存储支付令牌失败: %w", err)
+		return
 	}
 
-	r.PaymentToken = token
-	r.ExpirationTime = time
-	return r, nilreturn nil, err
-
+	return
 }
 
 func (handler *PaymentHandler) ProcessRefund(ctx context.Context, req *payment.RefundRequest) (r *payment.RefundResponse, err error) {
