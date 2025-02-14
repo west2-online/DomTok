@@ -30,4 +30,5 @@ const (
 
 	OrderTableName      = "orders"
 	OrderGoodsTableName = "order_goods"
+	PaymentTableName    = "payments"
 )
