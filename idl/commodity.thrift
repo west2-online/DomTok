@@ -223,6 +223,14 @@ struct ViewSpuImageResp {
     2: required list<model.SpuImage> images;
 }
 
+struct DeleteSpuImageReq {
+    1: required i64 spuImageID;
+}
+
+struct DeleteSpuImageResp {
+    1: required model.BaseResp base;
+}
+
 /*
 * struct CreateSkuReq 创建Sku请求
 * @Param skuImages sku图片

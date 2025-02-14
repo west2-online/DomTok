@@ -19,6 +19,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"github.com/west2-online/DomTok/pkg/errno"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
@@ -56,4 +57,76 @@ func (us *useCase) CreateSpuImage(ctx context.Context, spuImage *model.SpuImage)
 		return 0, fmt.Errorf("usecase.CreateSpuImage failed: %w", err)
 	}
 	return id, nil
+}
+
+func (us *useCase) DeleteSpu(ctx context.Context, spuId int64) error {
+	exists, err := us.db.IsExistSku(ctx, spuId)
+	if err != nil {
+		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
+	}
+	if exists {
+		return fmt.Errorf("usecase.DeleteSpu failed: spu-%d‘s sku already exists", spuId)
+	}
+
+	ret, err := us.db.GetSpuBySpuId(ctx, spuId)
+	if err != nil {
+		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
+	}
+
+	loginData, err := contextLogin.GetLoginData(ctx)
+	if err != nil {
+		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
+	}
+
+	if loginData.UserId != ret.CreatorId {
+		return errno.AuthNoOperatePermission
+	}
+
+	if err = us.db.DeleteSpu(ctx, spuId); err != nil {
+		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
+	}
+
+	return nil
+}
+
+func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
+	ret, err := us.db.GetSpuBySpuId(ctx, spu.SpuId)
+	if err != nil {
+		return fmt.Errorf("usecase.UpdateSpu failed: %w", err)
+	}
+	loginData, err := contextLogin.GetLoginData(ctx)
+	if err != nil {
+		return fmt.Errorf("usecase.UpdateSpu failed: %w", err)
+	}
+	if loginData.UserId != ret.CreatorId {
+		return errno.AuthNoOperatePermission
+	}
+	if err = us.svc.UpdateSpu(ctx, spu); err != nil {
+		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
+	}
+	return nil
+}
+
+func (us *useCase) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
+	image, err := us.db.GetSpuImage(ctx, spuImage.ImageID)
+	if err != nil {
+		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
+	}
+
+	spu, err := us.db.GetSpuBySpuId(ctx, image.SpuID)
+	if err != nil {
+		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
+	}
+	// 上面这部分封装一下
+	loginData, err := contextLogin.GetLoginData(ctx)
+	if err != nil {
+		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
+	}
+	if loginData.UserId != spu.CreatorId {
+		return errno.AuthNoOperatePermission
+	}
+	if err = us.svc.UpdateSpuImage(ctx, image); err != nil {
+		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
+	}
+	return nil
 }

@@ -18,6 +18,7 @@ package repository
 
 import (
 	"context"
+	"github.com/west2-online/DomTok/pkg/kafka"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 )
@@ -27,6 +28,20 @@ type CommodityDB interface {
 
 	CreateSpu(ctx context.Context, spu *model.Spu) error
 	CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
+	DeleteSpu(ctx context.Context, spuId int64) error
+	DeleteSpuImageToSpu(ctx context.Context, spuImageId int64, spuId int64) error
+	IsExistSku(ctx context.Context, spuId int64) (bool, error)
+	GetSpuBySpuId(ctx context.Context, spuId int64) (*model.Spu, error)
+	GetSpuImage(ctx context.Context, spuImageId int64) (*model.SpuImage, error)
+	UpdateSpu(ctx context.Context, spu *model.Spu) error
+	UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
+	DeleteSpuImage(ctx context.Context, spuImageId int64) error
 }
 
 type CommodityCache interface{}
+
+type CommodityMQ interface {
+	SendSaveImage(ctx context.Context, image *model.Image) error
+	ConsumeSaveImage(ctx context.Context) <-chan *kafka.Message
+	Send(ctx context.Context, topic string, message []*kafka.Message) error
+}

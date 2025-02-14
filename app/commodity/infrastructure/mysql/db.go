@@ -18,7 +18,7 @@ package mysql
 
 import (
 	"context"
-
+	"github.com/west2-online/DomTok/pkg/constants"
 	"gorm.io/gorm"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
@@ -68,4 +68,74 @@ func (db *commodityDB) CreateSpuImage(ctx context.Context, spuImage *model.SpuIm
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to spu image: %v", err)
 	}
 	return nil
+}
+
+func (db *commodityDB) DeleteSpu(ctx context.Context, spuId int64) error {
+	s := &Spu{}
+	if err := db.client.WithContext(ctx).Table(s.TableName()).Where("spu_id = ?", spuId).Delete(s); err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete spu: %v", err)
+	}
+	return nil
+}
+
+func (db *commodityDB) IsExistSku(ctx context.Context, spuId int64) (bool, error) {
+	var cnt int64
+	if err := db.client.WithContext(ctx).Table(constants.SpuSkuTableName).Where("spu_id = ?", spuId).Count(&cnt).Error; err != nil {
+		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get count: %v", err)
+	}
+	return cnt != 0, nil
+}
+
+func (db *commodityDB) GetSpuBySpuId(ctx context.Context, spuId int64) (*model.Spu, error) {
+	var s Spu
+	if err := db.client.WithContext(ctx).Table(constants.SpuTableName).Where("spu_id = ?", spuId).Find(&s).Error; err != nil {
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get spu: %v", err)
+	}
+	ret := &model.Spu{
+		SpuId:                s.Id,
+		Name:                 s.Name,
+		CreatorId:            s.CreatorId,
+		CategoryId:           s.CategoryId,
+		Description:          s.Description,
+		GoodsHeadDrawingName: s.GoodsHeadDrawing,
+		Price:                s.Price,
+		ForSale:              s.ForSale,
+		Shipping:             s.Shipping,
+		CreatedAt:            s.CreatedAt.Unix(),
+		UpdatedAt:            s.UpdatedAt.Unix(),
+		DeletedAt:            s.DeletedAt.Unix(),
+	}
+
+	return ret, nil
+}
+
+func (db *commodityDB) UpdateSpu(ctx context.Context, spu *model.Spu) error {
+	if err := db.client.WithContext(ctx).Table(constants.SpuTableName).Where("spu_id = ?", spu.SpuId).Updates(spu); err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update spu: %v", err)
+	}
+	return nil
+}
+
+func (db *commodityDB) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
+	if err := db.client.WithContext(ctx).Table(constants.SpuImageTableName).Where("spu_id = ?", spuImage.ImageID).Updates(spuImage); err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update spu image: %v", err)
+	}
+	return nil
+}
+
+func (db *commodityDB) DeleteSpuImage(ctx context.Context, spuImageId int64) error {
+	s := &SpuImage{}
+	if err := db.client.WithContext(ctx).Table(s.TableName()).Where("spu_id = ?", spuImageId).Delete(s); err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete spu image: %v", err)
+	}
+	return nil
+}
+
+func (db *commodityDB) DeleteSpuImageToSpu(ctx context.Context, spuImageId int64, spuId int64) error {
+	return nil
+}
+
+func (db *commodityDB) GetSpuImage(ctx context.Context, spuImageId int64) (*model.SpuImage, error) {
+	//TODO implement me
+	panic("implement me")
 }

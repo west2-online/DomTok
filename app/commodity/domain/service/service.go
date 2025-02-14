@@ -82,3 +82,11 @@ func (svc *CommodityService) CreateSpuImage(ctx context.Context, spuImage *model
 	}
 	return spuImage.ImageID, nil
 }
+
+func (svc *CommodityService) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
+	return nil
+}
+
+func (svc *CommodityService) UpdateSpu(ctx context.Context, spu *model.Spu) error {
+	return nil
+}

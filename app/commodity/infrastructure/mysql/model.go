@@ -18,8 +18,6 @@ package mysql
 
 import (
 	"time"
-
-	"github.com/west2-online/DomTok/pkg/constants"
 )
 
 type Category struct {
@@ -58,6 +56,10 @@ type SpuImage struct {
 	//	gorm.Model
 }
 
-func (Category) TableName() string {
-	return constants.CategoryTableName
+type SpuToSku struct {
+	SkuId     int64
+	SpuId     int64
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
 }

@@ -133,6 +133,14 @@ struct ViewSpuImageResp {
     2: required list<model.SpuImage> images;
 }
 
+struct DeleteSpuImageReq {
+    1: required i64 spuImageID;
+}
+
+struct DeleteSpuImageResp {
+    1: required model.BaseResp base;
+}
+
 struct CreateSkuReq {
     1: optional list<binary> skuImages;
     2: required string name;
