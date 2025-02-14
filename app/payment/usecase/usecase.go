@@ -24,7 +24,7 @@ import (
 	"github.com/west2-online/DomTok/app/payment/domain/service"
 )
 
-// usecase是逻辑层，不管具体的细节实现
+// PaymentUseCase usecase是逻辑层，不管具体的细节实现
 type PaymentUseCase interface {
 	ProcessPayment(ctx context.Context, orderID int64) (*model.Payment, error)
 	RequestPaymentToken(ctx context.Context, orderID int64) (*model.Payment, error)
@@ -37,8 +37,6 @@ type paymentUseCase struct {
 	svc service.PaymentService
 }
 
-// 这里要带指针吗？
-// 不用，但是要完善方法
 func NewPaymentUseCase(db repository.PaymentDB, svc *service.PaymentService) PaymentUseCase {
 	return &paymentUseCase{
 		db:  db,
