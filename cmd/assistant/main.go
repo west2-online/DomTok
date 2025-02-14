@@ -18,29 +18,33 @@ package main
 
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/west2-online/DomTok/app/assistant/cli/server/driver/http"
+	"github.com/west2-online/DomTok/app/gateway/mw"
+	"github.com/west2-online/DomTok/config"
+	"github.com/west2-online/DomTok/pkg/logger"
+	"github.com/west2-online/DomTok/pkg/utils"
 
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine"
-	"github.com/west2-online/DomTok/app/assistant/cli/server/driver/http"
 	"github.com/west2-online/DomTok/app/assistant/router"
 	"github.com/west2-online/DomTok/app/assistant/service"
 	"github.com/west2-online/DomTok/pkg/constants"
 )
 
-// var serviceName = constants.AssistantServiceName
+var serviceName = "assistant"
 
 func init() {
-	// config.Init(serviceName)
-	// logger.Init(serviceName, config.GetLoggerLevel())
+	config.Init(serviceName)
+	logger.Init(serviceName, config.GetLoggerLevel())
 
-	// 先这样加载
-	ai := volcengine.NewClient(&volcengine.ClientOption{
-		ApiKey:  ``,
-		BaseUrl: ``,
-		Region:  ``,
-		Model:   ``,
+	ai := volcengine.NewClient(&volcengine.ClientConfig{
+		ApiKey:  config.Volcengine.ApiKey,
+		BaseUrl: config.Volcengine.BaseUrl,
+		Region:  config.Volcengine.Region,
+		Model:   config.Volcengine.Model,
 	})
-	ai.SetServerCaller(http.NewClient(&http.ClientOption{
-		BaseUrl: ``,
+	// TODO: BaseUrl放在哪
+	ai.SetServerCaller(http.NewClient(&http.ClientConfig{
+		BaseUrl: `http://localhost:8888`,
 	}))
 
 	service.Use(ai)
@@ -48,23 +52,23 @@ func init() {
 
 func main() {
 	// get available port from config set
-	//// listenAddr, err := utils.GetAvailablePort()
-	// if err != nil {
-	//	logger.Fatalf("get available port failed, err: %v", err)
-	// }
+	listenAddr, err := utils.GetAvailablePort()
+	if err != nil {
+		logger.Fatalf("get available port failed, err: %v", err)
+	}
 
 	h := server.New(
-		server.WithHostPorts(":8080"),
+		server.WithHostPorts(listenAddr),
 		server.WithHandleMethodNotAllowed(true),
 		server.WithMaxRequestBodySize(constants.ServerMaxRequestBodySize),
 	)
 
-	// h.Use(
-	//	 mw.RecoveryMW(), // recovery
-	//	 mw.CorsMW(),     // cors
-	//	 mw.GzipMW(),     // gzip
-	//	 mw.SentinelMW(), // sentinel
-	// )
+	h.Use(
+		mw.RecoveryMW(), // recovery
+		mw.CorsMW(),     // cors
+		mw.GzipMW(),     // gzip
+		mw.SentinelMW(), // sentinel
+	)
 
 	router.GeneratedRegister(h)
 	h.Spin()

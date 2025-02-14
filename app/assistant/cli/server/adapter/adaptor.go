@@ -22,5 +22,8 @@ import "context"
 // It is used by the AI client to call the server
 // List required methods here
 type ServerCaller interface {
+	// Ping TODO: remove this method
 	Ping(ctx context.Context) ([]byte, error)
+
+	// TODO: add more methods here
 }

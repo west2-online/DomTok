@@ -43,8 +43,8 @@ type Client struct {
 	recorder sync.Map
 }
 
-// ClientOption is the option for creating a new volcengine client
-type ClientOption struct {
+// ClientConfig is the option for creating a new volcengine client
+type ClientConfig struct {
 	ApiKey  string
 	BaseUrl string
 	Region  string
@@ -52,7 +52,7 @@ type ClientOption struct {
 }
 
 // NewClient creates a new volcengine client
-func NewClient(opt *ClientOption) *Client {
+func NewClient(opt *ClientConfig) *Client {
 	cli := arkruntime.NewClientWithApiKey(
 		opt.ApiKey,
 		arkruntime.WithBaseUrl(opt.BaseUrl),

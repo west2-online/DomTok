@@ -18,6 +18,8 @@ package remote
 
 import (
 	"context"
+	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine/model"
+	"github.com/west2-online/DomTok/pkg/logger"
 
 	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
 )
@@ -26,13 +28,38 @@ import (
 
 // TODO: remove or keep as a example
 
-// Ping pings the server
-func Ping(ctx context.Context, _ string, server adapter.ServerCaller) (string, error) {
+func Ping() model.Function {
+	return model.Function{
+		Name:        "ping",
+		Description: "测试服务是否正在运行",
+		Parameters: model.RootParameter{
+			Type: model.RootType,
+			Properties: map[string]model.PropertyField{
+				"argument": model.BaseProperty{
+					Type:        model.StringType,
+					Description: "参数,设定的角色名",
+				},
+			},
+			Required: []string{"argument"},
+		},
+		Call: ping,
+	}
+}
+
+// ping pings the server
+func ping(ctx context.Context, args string, server adapter.ServerCaller) (string, error) {
 	resp, err := server.Ping(ctx)
 	if err != nil {
 		return "", err
 	}
 
+	// TODO: remove this line
+	logger.Infof(`{
+Stage: "remote.Ping",
+args: %v,
+resp: %v,
+err: %v,
+}`, args, string(resp), err)
 	return string(resp), nil
 }
 

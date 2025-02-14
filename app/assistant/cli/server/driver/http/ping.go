@@ -18,16 +18,33 @@ package http
 
 import (
 	"context"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/west2-online/DomTok/pkg/logger"
 
 	"github.com/cloudwego/hertz/pkg/protocol"
 )
 
+// Tips: This function should not be used in the future
+
+const (
+	_PingPath   = "/ping"
+	_PingMethod = consts.MethodGet
+)
+
 func (c *Client) Ping(ctx context.Context) ([]byte, error) {
 	req, resp := protocol.AcquireRequest(), protocol.AcquireResponse()
-	req.SetRequestURI(c.BaseUrl + "/ping")
-	req.SetMethod("GET")
+	req.SetRequestURI(c.buildUrl(_PingPath))
+	req.SetMethod(_PingMethod)
 
-	err := c.cli.Do(ctx, req, resp)
+	err := c.do(ctx, req, resp)
+	// TODO: remove this line
+	logger.Infof(`{
+Stage: "http.Ping",
+req: %v,
+resp: %v,
+err: %v,
+}`, req, string(resp.Body()), err)
+
 	if err != nil {
 		return nil, err
 	}

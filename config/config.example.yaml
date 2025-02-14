@@ -45,6 +45,12 @@ kafka:
   user: domtok
   password: domtok-password
 
+volcengine:
+  api-key: ""
+  base-url: ""
+  region: ""
+  model: ""
+
 services:
   template:
     name: template
@@ -69,3 +75,9 @@ services:
     load-balance: false
     addr:
       - 0.0.0.0:20003
+
+  assistant:
+    name: assistant
+    load-balance: false
+    addr:
+      - 0.0.0.0:20008

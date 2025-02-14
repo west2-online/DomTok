@@ -17,6 +17,8 @@ limitations under the License.
 package http
 
 import (
+	"context"
+	"github.com/cloudwego/hertz/pkg/protocol"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app/client"
@@ -28,18 +30,26 @@ type Client struct {
 	adapter.ServerCaller
 
 	cli     *client.Client
+	baseUrl string
+}
+
+type ClientConfig struct {
 	BaseUrl string
 }
 
-type ClientOption struct {
-	BaseUrl string
-}
-
-func NewClient(opt *ClientOption) *Client {
+func NewClient(opt *ClientConfig) *Client {
 	cli, _ := client.NewClient(
 		client.WithDialTimeout(time.Second),
 		client.WithClientReadTimeout(time.Second),
 		client.WithWriteTimeout(time.Second),
 	)
-	return &Client{cli: cli, BaseUrl: opt.BaseUrl}
+	return &Client{cli: cli, baseUrl: opt.BaseUrl}
+}
+
+func (c *Client) buildUrl(path string) string {
+	return c.baseUrl + path
+}
+
+func (c *Client) do(ctx context.Context, req *protocol.Request, resp *protocol.Response) error {
+	return c.cli.Do(ctx, req, resp)
 }

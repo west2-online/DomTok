@@ -19,67 +19,17 @@ package volcengine
 import (
 	"context"
 	"fmt"
-
-	"github.com/volcengine/volcengine-go-sdk/service/arkruntime/model"
+	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine/model"
+	"github.com/west2-online/DomTok/pkg/logger"
 
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine/tools/remote"
 	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
 )
 
-var functions *[]Function
-
-type Function struct {
-	Name        string
-	Description string
-	Properties  []Property
-	Call        func(ctx context.Context, args string, server adapter.ServerCaller) (string, error)
-}
-
-// AsTool converts the function to a tool
-func (f Function) AsTool() *model.Tool {
-	type Params struct {
-		Type       string
-		Properties map[string]interface{}
-		Required   []string
-	}
-
-	params := Params{
-		Type:       "object",
-		Properties: make(map[string]interface{}),
-		Required:   make([]string, 0),
-	}
-	for _, p := range f.Properties {
-		params.Properties[p.Name] = map[string]interface{}{
-			"type":        p.Type,
-			"description": p.Description,
-		}
-		if p.Required {
-			params.Required = append(params.Required, p.Name)
-		}
-	}
-
-	return &model.Tool{
-		Type: model.ToolTypeFunction,
-		Function: &model.FunctionDefinition{
-			Name:        f.Name,
-			Description: f.Description,
-			Parameters:  params,
-		},
-	}
-}
-
-// Property represents a function parameter
-// 打算让ServerCaller自行依赖gateway的request结构体
-// 因此这里的Property不需要考虑嵌套
-type Property struct {
-	Type        string
-	Name        string
-	Description string
-	Required    bool
-}
+var functions *[]model.Function
 
 // GetFunctions returns the functions
-func GetFunctions() *[]Function {
+func GetFunctions() *[]model.Function {
 	if functions != nil {
 		return functions
 	}
@@ -95,6 +45,12 @@ func RebuildFunctions() {
 
 // CallFunction calls a function by name
 func CallFunction(ctx context.Context, name, args string, server adapter.ServerCaller) (string, error) {
+	// TODO: remove this line
+	logger.Infof(`{
+Stage: "CallFunction",
+Name: %s,
+Args: %s,
+}`, name, args)
 	for _, f := range *GetFunctions() {
 		if f.Name == name {
 			return f.Call(ctx, args, server)
@@ -104,13 +60,8 @@ func CallFunction(ctx context.Context, name, args string, server adapter.ServerC
 }
 
 // BuildFunctions builds the functions
-func BuildFunctions() []Function {
-	return []Function{
-		{
-			Name:        "ping",
-			Description: "测试服务器是否正在运行",
-			Properties:  []Property{},
-			Call:        remote.Ping,
-		},
+func BuildFunctions() []model.Function {
+	return []model.Function{
+		remote.Ping(),
 	}
 }
