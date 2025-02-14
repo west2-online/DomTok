@@ -29,3 +29,10 @@ const (
 	DefaultKafkaNumPartitions     = -1
 	DefaultKafkaReplicationFactor = -1
 )
+
+// Commodity Service
+const (
+	KafkaImageTopic   = "ImageTopic"
+	KafkaPartitionNum = 3
+	KafkaImageGroupId = "ImageGroupId"
+)
