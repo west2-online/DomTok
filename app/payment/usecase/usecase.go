@@ -38,7 +38,8 @@ type paymentUseCase struct {
 }
 
 // 这里要带指针吗？
-func NewPaymentUseCase(db repository.PaymentDB, svc *service.PaymentService) *paymentUseCase {
+// 不用，但是要完善方法
+func NewPaymentUseCase(db repository.PaymentDB, svc *service.PaymentService) PaymentUseCase {
 	return &paymentUseCase{
 		db:  db,
 		svc: svc,

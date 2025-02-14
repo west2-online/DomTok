@@ -27,6 +27,10 @@ func (uc *paymentUseCase) ProcessPayment(ctx context.Context, orderID int64) (*m
 	return nil, nil
 }
 
+func (uc *paymentUseCase) RequestPaymentToken(ctx context.Context, orderID int64) (*model.Payment, error) {
+	return nil, nil
+}
+
 // 这里没有直接调用 db.CreateUser 是因为 svc.CreateUser 包含了一点业务逻辑, 这些细节不需要被 useCase 知道
 // if err = uc.svc.CreateUser(ctx, u); err != nil {
 // return
