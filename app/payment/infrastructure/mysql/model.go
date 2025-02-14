@@ -23,7 +23,8 @@ import (
 	"time"
 )
 
-type Payment struct {
+// PaymentOrder 支付订单表
+type PaymentOrder struct {
 	ID                        int64           `gorm:"primaryKey;autoIncrement;comment:支付订单的唯一标识"`
 	OrderID                   int64           `gorm:"not null;comment:商户订单号"`
 	UserID                    int64           `gorm:"not null;comment:用户的唯一标识"`
@@ -38,6 +39,46 @@ type Payment struct {
 	DeletedAt                 gorm.DeletedAt  `gorm:"index;comment:订单删除时间"`
 }
 
-func (Payment) TableName() string {
+// PaymentRefund 退款表
+type PaymentRefund struct {
+	ID                        int64           `gorm:"primaryKey;autoIncrement;comment:支付退款的唯一标识"`
+	OrderID                   string          `gorm:"size:64;not null;comment:关联的商户订单号"`
+	UserID                    int64           `gorm:"not null;comment:用户的唯一标识"`
+	RefundAmount              decimal.Decimal `gorm:"type:decimal(15,4);not null;comment:退款金额，单位为元"`
+	RefundReason              string          `gorm:"size:255;comment:退款原因"`
+	Status                    int8            `gorm:"not null;default:0;comment:退款状态：0-待处理，1-处理中，2-成功退款，3-退款失败"`
+	MaskedCreditCardNumber    string          `gorm:"size:19;comment:信用卡号（仅存储掩码，如 **** **** **** 1234）"`
+	CreditCardExpirationYear  int             `gorm:"comment:信用卡到期年"`
+	CreditCardExpirationMonth int             `gorm:"comment:信用卡到期月"`
+	CreatedAt                 time.Time       `gorm:"not null;default:CURRENT_TIMESTAMP;comment:退款申请时间"`
+	UpdatedAt                 time.Time       `gorm:"not null;default:CURRENT_TIMESTAMP;autoUpdateTime;comment:退款最后更新时间"`
+	DeletedAt                 gorm.DeletedAt  `gorm:"index;comment:退款记录删除时间"`
+}
+
+// PaymentLedger 流水信息表
+type PaymentLedger struct {
+	ID                        int64           `gorm:"primaryKey;autoIncrement;comment:支付退款的唯一标识"`
+	OrderID                   string          `gorm:"size:64;not null;comment:关联的商户订单号"`
+	UserID                    int64           `gorm:"not null;comment:用户的唯一标识"`
+	RefundAmount              decimal.Decimal `gorm:"type:decimal(15,4);not null;comment:退款金额，单位为元"`
+	RefundReason              string          `gorm:"size:255;comment:退款原因"`
+	Status                    int8            `gorm:"not null;default:0;comment:退款状态：0-待处理，1-处理中，2-成功退款，3-退款失败"`
+	MaskedCreditCardNumber    string          `gorm:"size:19;comment:信用卡号（仅存储掩码，如 **** **** **** 1234）"`
+	CreditCardExpirationYear  int             `gorm:"comment:信用卡到期年"`
+	CreditCardExpirationMonth int             `gorm:"comment:信用卡到期月"`
+	CreatedAt                 time.Time       `gorm:"not null;default:CURRENT_TIMESTAMP;comment:退款申请时间"`
+	UpdatedAt                 time.Time       `gorm:"not null;default:CURRENT_TIMESTAMP;autoUpdateTime;comment:退款最后更新时间"`
+	DeletedAt                 gorm.DeletedAt  `gorm:"index;comment:退款记录删除时间"`
+}
+
+func (PaymentOrder) TableName() string {
 	return constants.PaymentTableName
+}
+
+func (PaymentRefund) TableName() string {
+	return constants.PaymentRefundTableName
+}
+
+func (PaymentLedger) TableName() string {
+	return constants.PaymentLedgerTableName
 }
