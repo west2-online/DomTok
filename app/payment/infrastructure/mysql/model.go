@@ -15,3 +15,14 @@ limitations under the License.
 */
 
 package mysql
+
+import "github.com/west2-online/DomTok/pkg/constants"
+
+type Payment struct {
+	// model    gorm.Model
+
+}
+
+func (User) TableName() string {
+	return constants.PaymentTableName
+}

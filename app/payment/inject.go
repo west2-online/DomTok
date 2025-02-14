@@ -15,3 +15,31 @@ limitations under the License.
 */
 
 package payment
+
+import (
+	"github.com/west2-online/DomTok/app/user/controllers/rpc"
+	"github.com/west2-online/DomTok/app/user/domain/service"
+	"github.com/west2-online/DomTok/app/user/infrastructure/mysql"
+	"github.com/west2-online/DomTok/app/user/usecase"
+	"github.com/west2-online/DomTok/kitex_gen/payment"
+	"github.com/west2-online/DomTok/pkg/base/client"
+	"github.com/west2-online/DomTok/pkg/utils"
+)
+
+func InjectPaymentHandler() payment.PaymentService {
+	gormDB, err := client.InitMySQL()
+	if err != nil {
+		panic(err)
+	}
+	// 这个地方要补充一下
+	sf, err := utils.NewSnowflake(nil, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	db := mysql.NewPaymentDB(gormDB)
+	svc := service.NewPaymentService(db, sf)
+	uc := usecase.NewPaymentCase(db, svc)
+
+	return rpc.NewPaymentHandler(uc)
+}

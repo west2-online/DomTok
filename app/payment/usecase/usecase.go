@@ -27,7 +27,7 @@ import (
 // usecase是逻辑层，不管具体的细节实现
 type PaymentUseCase interface {
 	ProcessPayment(ctx context.Context, orderID int64) (*model.Payment, error)
-	// RequestPaymentToken
+	RequestPaymentToken(ctx context.Context, orderID int64) (*model.Payment, error)
 	// ProcessRefund
 	// RequestRefundToken
 }
@@ -38,7 +38,7 @@ type paymentUseCase struct {
 }
 
 // 这里要带指针吗？
-func NewPaymentUseCase(db repository.PaymentDB, svc *service.PaymentService) PaymentUseCase {
+func NewPaymentUseCase(db repository.PaymentDB, svc *service.PaymentService) *paymentUseCase {
 	return &paymentUseCase{
 		db:  db,
 		svc: svc,
