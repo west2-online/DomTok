@@ -37,16 +37,21 @@ func NewCommodityDB(client *gorm.DB) repository.CommodityDB {
 	return &commodityDB{client: client}
 }
 
-func (d *commodityDB) IsCategoryExist(ctx context.Context, name string) (int64, error) {
+func (d *commodityDB) IsCategoryExist(ctx context.Context, Id int64) (bool, error) {
 	var category model.Category
-	err := d.client.WithContext(ctx).Where("name = ?", name).First(&category).Error
+	err := d.client.WithContext(ctx).Where("id = ?", Id).First(&category).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return 0, nil
+			return false, nil
 		}
-		return 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
+		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
 	}
-	return category.CreatorId, nil
+	return true, nil
+}
+func (d *commodityDB) CategoryCreatorId(ctx context.Context, Id int64) int64 {
+	var category model.Category
+	_ = d.client.WithContext(ctx).Where("Id = ?", Id).First(&category).Error
+	return category.CreatorId
 }
 
 func (d *commodityDB) CreateCategory(ctx context.Context, entity *model.Category) error {
