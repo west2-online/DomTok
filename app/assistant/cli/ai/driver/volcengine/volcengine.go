@@ -75,6 +75,12 @@ func (c *Client) SetServerCaller(caller server.ServerCaller) {
 func (c *Client) Call(ctx context.Context, dialog model.IDialog) (err error) {
 	defer dialog.Close()
 
+	if c.caller == nil {
+		return fmt.Errorf("server caller is not set")
+	}
+
+	c.markDialog(dialog)
+
 	// use the dialog's unique id as the key
 	history, err := c.readHistory(dialog.Unique())
 	if err != nil {
@@ -108,7 +114,11 @@ func (c *Client) Call(ctx context.Context, dialog model.IDialog) (err error) {
 	// if the first round of conversation is a function calling, the second round will send messages in stream
 	// otherwise, the second round will send the first round of conversation
 	// tips: if there's no function calling, the stream would not send any message
-	stream, err := c.cli.CreateChatCompletionStream(ctx, req)
+	stream, err := c.cli.CreateChatCompletionStream(
+		ctx,
+		req,
+		arkruntime.WithCustomHeader(arkmodel.ClientRequestHeader, dialog.Unique()),
+	)
 	if err != nil {
 		return err
 	}
@@ -139,16 +149,32 @@ func (c *Client) Call(ctx context.Context, dialog model.IDialog) (err error) {
 	// if the assistant does not send a message, send the first conversation.
 	if !isMessageSent {
 		dialog.Send(*resp.Choices[0].Message.Content.StringValue)
-		c.recorder.Store(dialog.Unique(), req.Messages)
+		c.storeMarkedDialog(dialog, req.Messages)
 		return nil
 	}
 
 	// if the assistant sends a message, it's clear that the first round of conversation is a function calling
 	// therefore, we need to append the assistant message to the request
 	c.appendAssistantMessage(req, output)
-	c.recorder.Store(dialog.Unique(), req.Messages)
+	c.storeMarkedDialog(dialog, req.Messages)
 
 	return nil
+}
+
+func (c *Client) markDialog(dialog model.IDialog) {
+	_, exist := c.recorder.Load(dialog.Unique())
+	if !exist {
+		c.recorder.Store(dialog.Unique(), make([]*arkmodel.ChatCompletionMessage, 0))
+	}
+}
+
+func (c *Client) storeMarkedDialog(dialog model.IDialog, messages []*arkmodel.ChatCompletionMessage) {
+	v, exist := c.recorder.Load(dialog.Unique())
+	if !exist || v == nil {
+		return
+	}
+
+	c.recorder.Store(dialog.Unique(), messages)
 }
 
 // ForgetDialog forgets the dialog

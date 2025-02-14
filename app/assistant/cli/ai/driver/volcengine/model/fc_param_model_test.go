@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package model_test
+package model
 
 import (
 	"encoding/json"
@@ -22,16 +22,14 @@ import (
 
 	. "github.com/bytedance/mockey"
 	. "github.com/smartystreets/goconvey/convey"
-
-	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine/model"
 )
 
 func TestMarshalFcParamModelStruct(t *testing.T) {
 	PatchConvey("Test if the fc param model can be marshaled correctly", t, func() {
 		PatchConvey("Test root parameter with no properties", func() {
-			p := model.RootParameter{
-				Type:       model.RootType,
-				Properties: make(map[string]model.PropertyField),
+			p := RootParameter{
+				Type:       RootType,
+				Properties: make(map[string]PropertyField),
 				Required:   []string{},
 			}
 
@@ -42,9 +40,9 @@ func TestMarshalFcParamModelStruct(t *testing.T) {
 		})
 
 		PatchConvey("Test base property", func() {
-			types := []string{model.StringType, model.IntegerType, model.NumberType, model.BooleanType}
+			types := []string{StringType, IntegerType, NumberType, BooleanType}
 			for _, c := range types {
-				p := model.BaseProperty{
+				p := BaseProperty{
 					Type:        c,
 					Description: "test",
 				}
@@ -57,16 +55,16 @@ func TestMarshalFcParamModelStruct(t *testing.T) {
 		})
 
 		PatchConvey("Test array property", func() {
-			p := model.ArrayProperty{
-				Type:        model.ArrayType,
+			p := ArrayProperty{
+				Type:        ArrayType,
 				Description: "test",
-				Items: []model.PropertyField{
-					model.BaseProperty{
-						Type:        model.StringType,
+				Items: []PropertyField{
+					BaseProperty{
+						Type:        StringType,
 						Description: "test",
 					},
-					model.BaseProperty{
-						Type:        model.IntegerType,
+					BaseProperty{
+						Type:        IntegerType,
 						Description: "test",
 					},
 				},
@@ -83,16 +81,16 @@ func TestMarshalFcParamModelStruct(t *testing.T) {
 		})
 
 		PatchConvey("Test object property", func() {
-			p := model.ObjectProperty{
-				Type:        model.ObjectType,
+			p := ObjectProperty{
+				Type:        ObjectType,
 				Description: "test",
-				Properties: map[string]model.PropertyField{
-					"string": model.BaseProperty{
-						Type:        model.StringType,
+				Properties: map[string]PropertyField{
+					"string": BaseProperty{
+						Type:        StringType,
 						Description: "test",
 					},
-					"integer": model.BaseProperty{
-						Type:        model.IntegerType,
+					"integer": BaseProperty{
+						Type:        IntegerType,
 						Description: "test",
 					},
 				},
@@ -112,15 +110,15 @@ func TestMarshalFcParamModelStruct(t *testing.T) {
 		})
 
 		PatchConvey("Test root parameter with properties", func() {
-			p := model.RootParameter{
-				Type: model.RootType,
-				Properties: map[string]model.PropertyField{
-					"string": model.BaseProperty{
-						Type:        model.StringType,
+			p := RootParameter{
+				Type: RootType,
+				Properties: map[string]PropertyField{
+					"string": BaseProperty{
+						Type:        StringType,
 						Description: "test",
 					},
-					"integer": model.BaseProperty{
-						Type:        model.IntegerType,
+					"integer": BaseProperty{
+						Type:        IntegerType,
 						Description: "test",
 					},
 				},
@@ -139,23 +137,23 @@ func TestMarshalFcParamModelStruct(t *testing.T) {
 		})
 
 		PatchConvey("Test root parameter with properties and nested object", func() {
-			p := model.RootParameter{
-				Type: model.RootType,
-				Properties: map[string]model.PropertyField{
-					"string": model.BaseProperty{
-						Type:        model.StringType,
+			p := RootParameter{
+				Type: RootType,
+				Properties: map[string]PropertyField{
+					"string": BaseProperty{
+						Type:        StringType,
 						Description: "test",
 					},
-					"object": model.ObjectProperty{
-						Type:        model.ObjectType,
+					"object": ObjectProperty{
+						Type:        ObjectType,
 						Description: "test",
-						Properties: map[string]model.PropertyField{
-							"string": model.BaseProperty{
-								Type:        model.StringType,
+						Properties: map[string]PropertyField{
+							"string": BaseProperty{
+								Type:        StringType,
 								Description: "test",
 							},
-							"integer": model.BaseProperty{
-								Type:        model.IntegerType,
+							"integer": BaseProperty{
+								Type:        IntegerType,
 								Description: "test",
 							},
 						},

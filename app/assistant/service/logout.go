@@ -24,7 +24,7 @@ import (
 
 // Logout logs out the user
 func (s _Service) Logout(ctx context.Context) error {
-	id, ok := ctx.Value("id").(string)
+	id, ok := ctx.Value(CtxKeyID).(string)
 	if ok {
 		s.ai.ForgetDialog(model.NewDialog(id, ""))
 	}

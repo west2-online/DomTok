@@ -16,7 +16,10 @@ limitations under the License.
 
 package model
 
-import "context"
+import (
+	"context"
+	"sync"
+)
 
 // IDialog is an interface to define the methods of a dialog.
 type IDialog interface {
@@ -44,17 +47,21 @@ type Dialog struct {
 	cancel context.CancelFunc
 
 	_receiver chan string
+	_mutex    sync.Mutex
+	_done     *struct{}
 }
 
 // NewDialog creates a new Dialog.
 func NewDialog(id string, input string) *Dialog {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Dialog{
-		_receiver: make(chan string),
 		ctx:       ctx,
 		cancel:    cancel,
 		unique:    id,
 		message:   input,
+		_receiver: make(chan string),
+		_mutex:    sync.Mutex{},
+		_done:     nil,
 	}
 }
 
@@ -70,9 +77,15 @@ func (d *Dialog) Message() string {
 
 // Send sends a message to the dialog.
 func (d *Dialog) Send(message string) {
+	d._mutex.Lock()
+	defer d._mutex.Unlock()
 	select {
-	case <-d.ctx.Done():
+	case done := <-d.ctx.Done():
+		d._done = &done
 	case d._receiver <- message:
+		if d._done != nil {
+			<-d._receiver
+		}
 	}
 }
 
