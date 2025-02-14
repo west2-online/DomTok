@@ -21,4 +21,5 @@ const (
 	ServiceWrongPassword = 1000 + iota
 	ServiceUserExist
 	ServiceUserNotExist
+	PaymentOrderNotExist
 )

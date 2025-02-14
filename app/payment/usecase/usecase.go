@@ -24,23 +24,17 @@ import (
 	"github.com/west2-online/DomTok/app/payment/domain/service"
 )
 
-// PaymentUseCase usecase是逻辑层，不管具体的细节实现
 type PaymentUseCase interface {
-	ProcessPayment(ctx context.Context, orderID int64) (*model.PaymentOrder, error)
-	RequestPaymentToken(ctx context.Context, orderID int64) (*model.PaymentOrder, error)
-	GetOrderByID(ctx context.Context, p *model.PaymentOrder) (interface{}, error)
-	GetUserByID(ctx context.Context, p *model.PaymentOrder) (interface{}, error)
-	GetPaymentInfo(ctx context.Context, p *model.PaymentOrder) (int, error)
-	CreatePaymentInfo(ctx context.Context, p *model.PaymentOrder) interface{}
-	GeneratePaymentToken(ctx context.Context, p *model.PaymentOrder) (string, int64, error)
-	StorePaymentToken(ctx context.Context, p *model.PaymentOrder) error
+	CreatePayment(ctx context.Context, orderID int64) (*model.PaymentOrder, error)
+	// GetPaymentToken 这里一次返回三个参数很不优雅但我不知道要怎么搞>_<
+	GetPaymentToken(ctx context.Context, payment *model.PaymentOrder) (string, int64, error)
 	// ProcessRefund
 	// RequestRefundToken
 }
 
 type paymentUseCase struct {
 	db  repository.PaymentDB
-	svc service.PaymentService
+	svc *service.PaymentService
 }
 
 func NewPaymentUseCase(db repository.PaymentDB, svc *service.PaymentService) PaymentUseCase {

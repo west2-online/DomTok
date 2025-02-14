@@ -18,17 +18,68 @@ package usecase
 
 import (
 	"context"
+	"fmt"
+	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 
 	"github.com/west2-online/DomTok/app/payment/domain/model"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-// ProcessPayment 这里定义一些具体的方法和函数，比如校验密码，加密密码，创建用户之类的
-func (uc *paymentUseCase) ProcessPayment(ctx context.Context, orderID int64) (*model.PaymentOrder, error) {
+// CreatePayment 这里定义一些具体的方法和函数，比如校验密码，加密密码，创建用户之类的
+func (uc *paymentUseCase) CreatePayment(ctx context.Context, orderID int64) (*model.PaymentOrder, error) {
 	return nil, nil
 }
 
-func (uc *paymentUseCase) RequestPaymentToken(ctx context.Context, orderID int64) (*model.PaymentOrder, error) {
-	return nil, nil
+// GetPaymentToken 这里要怎么让他一次只返回两个参数呢
+func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, p *model.PaymentOrder) (token string, expTime int64, err error) {
+	// 1. 检查订单是否存在
+	pid, err := uc.db.GetOrderByID(ctx, p)
+	// 这里直接return就可以吗？
+	if err != nil {
+		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime, fmt.Errorf("check payment order existed failed:%w", err)
+	}
+	if pid == paymentStatus.PaymentOrderNotExist {
+		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime, errno.NewErrNo(errno.PaymentOrderNotExist, "payment order does not exist")
+	}
+	
+	// 2. 检查用户是否存在
+	_, err = uc.svc.GetUserByID(ctx, p)
+	if err != nil {
+		return
+	}
+
+	// 3. 检查订单支付信息
+	// 这里用int还是int8？
+	var paymentInfo int
+	paymentInfo, err = uc.svc.GetPaymentInfo(ctx, p)
+	if err != nil {
+		return
+	}
+	if paymentInfo == paymentStatus.PaymentStatusSuccess || paymentInfo == paymentStatus.PaymentStatusProcessing {
+		return
+	} else {
+		err := uc.svc.CreatePaymentInfo(ctx, p)
+		if err != nil {
+			return
+		}
+	}
+
+	// 4. 生成支付令牌
+
+	// 感觉这里一次返回三个值非常非常非常不优雅，但是不知道要怎么写得更优雅
+	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, p)
+	if err != nil {
+		return
+	}
+	r.PaymentToken = token
+	r.ExpirationTime = expTime
+
+	// 5. 存储令牌到 Redis
+	err = uc.svc.StorePaymentToken(ctx, p)
+	if err != nil {
+		return
+	}
+	return
 }
 
 // 这里没有直接调用 db.CreateUser 是因为 svc.CreateUser 包含了一点业务逻辑, 这些细节不需要被 useCase 知道
