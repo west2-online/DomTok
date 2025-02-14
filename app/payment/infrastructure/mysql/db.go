@@ -24,6 +24,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// paymentDB impl domain.PaymentDB defined domain
 type paymentDB struct {
 	client *gorm.DB
 }
@@ -34,11 +35,11 @@ func NewPaymentDB(client *gorm.DB) repository.PaymentDB {
 }
 
 // ConvertPayment 后面把转换函数单独抽出来
-func (db *paymentDB) ConvertPayment(ctx context.Context, p *model.Payment) (*model.Payment, error) {
+func (db *paymentDB) ConvertPayment(ctx context.Context, p *model.PaymentOrder) (*model.PaymentOrder, error) {
 	return nil, nil
 }
 
-func (db *paymentDB) CreatePayment(ctx context.Context, p *model.Payment) error {
+func (db *paymentDB) CreatePayment(ctx context.Context, p *model.PaymentOrder) error {
 	// 将 entity 转换成 mysql 这边的 model
 	// TODO 可以考虑整一个函数统一转化, 放在这里占了太多行, 而且这不是这个方法该做的. 这个方法应该做的是创建用户
 	model := PaymentOrder{

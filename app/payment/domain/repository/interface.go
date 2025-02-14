@@ -18,10 +18,10 @@ package repository
 
 import (
 	"context"
-
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 )
 
 type PaymentDB interface {
-	ProcessPayment(ctx context.Context, paymentID int64) (model.Payment, error)
+	ProcessPayment(ctx context.Context, paymentID int64) (model.PaymentOrder, error)
+	RequestPaymentToken(ctx context.Context, orderID int64) (*model.PaymentOrder, error)
 }

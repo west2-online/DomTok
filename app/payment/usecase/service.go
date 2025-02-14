@@ -23,11 +23,11 @@ import (
 )
 
 // ProcessPayment 这里定义一些具体的方法和函数，比如校验密码，加密密码，创建用户之类的
-func (uc *paymentUseCase) ProcessPayment(ctx context.Context, orderID int64) (*model.Payment, error) {
+func (uc *paymentUseCase) ProcessPayment(ctx context.Context, orderID int64) (*model.PaymentOrder, error) {
 	return nil, nil
 }
 
-func (uc *paymentUseCase) RequestPaymentToken(ctx context.Context, orderID int64) (*model.Payment, error) {
+func (uc *paymentUseCase) RequestPaymentToken(ctx context.Context, orderID int64) (*model.PaymentOrder, error) {
 	return nil, nil
 }
 

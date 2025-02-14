@@ -26,8 +26,8 @@ import (
 
 // PaymentUseCase usecase是逻辑层，不管具体的细节实现
 type PaymentUseCase interface {
-	ProcessPayment(ctx context.Context, orderID int64) (*model.Payment, error)
-	RequestPaymentToken(ctx context.Context, orderID int64) (*model.Payment, error)
+	ProcessPayment(ctx context.Context, orderID int64) (*model.PaymentOrder, error)
+	RequestPaymentToken(ctx context.Context, orderID int64) (*model.PaymentOrder, error)
 	// ProcessRefund
 	// RequestRefundToken
 }
