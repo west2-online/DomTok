@@ -19,9 +19,9 @@ package usecase
 import (
 	"context"
 	"fmt"
-	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
-
 	"github.com/west2-online/DomTok/app/payment/domain/model"
+	"github.com/west2-online/DomTok/app/payment/domain/repository"
+	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
@@ -41,24 +41,28 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, p *model.PaymentO
 	if pid == paymentStatus.PaymentOrderNotExist {
 		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime, errno.NewErrNo(errno.PaymentOrderNotExist, "payment order does not exist")
 	}
-	
+
 	// 2. 检查用户是否存在
-	_, err = uc.svc.GetUserByID(ctx, p)
+	uid, err := uc.db.GetUserByID(ctx, p)
 	if err != nil {
-		return
+		return paymentStatus.UserNotExistToken, paymentStatus.UserNotExistExpirationTime, fmt.Errorf("check user existed failed:%w", err)
+	}
+	if uid == paymentStatus.UserNotExist {
+		return paymentStatus.UserNotExistToken, paymentStatus.UserNotExistExpirationTime, errno.NewErrNo(errno.UserNotExist, "user does not exist")
 	}
 
 	// 3. 检查订单支付信息
 	// 这里用int还是int8？
 	var paymentInfo int
-	paymentInfo, err = uc.svc.GetPaymentInfo(ctx, p)
+	paymentInfo, err = uc.db.GetPaymentInfo(ctx, p)
 	if err != nil {
-		return
+		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime, fmt.Errorf("check payment information failed:%w", err)
 	}
 	if paymentInfo == paymentStatus.PaymentStatusSuccess || paymentInfo == paymentStatus.PaymentStatusProcessing {
-		return
+		return paymentStatus.HavePaidToken, paymentStatus.HavePaidExpirationTime, fmt.Errorf("payment is processing or has already done:%w", err)
 	} else {
-		err := uc.svc.CreatePaymentInfo(ctx, p)
+		//// zhelikaishi
+		pid, err := uc.svc.CreatePaymentInfo(ctx, p)
 		if err != nil {
 			return
 		}

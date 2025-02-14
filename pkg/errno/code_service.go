@@ -22,4 +22,5 @@ const (
 	ServiceUserExist
 	ServiceUserNotExist
 	PaymentOrderNotExist
+	UserNotExist
 )

@@ -8,4 +8,9 @@ const (
 	PaymentStatusFailed                = 3 // 支付失败
 	PaymentOrderNotExistToken          = ""
 	PaymentOrderNotExistExpirationTime = 0
+	UserNotExist                       = -1
+	UserNotExistToken                  = ""
+	UserNotExistExpirationTime         = 0
+	HavePaidToken                      = ""
+	HavePaidExpirationTime             = 0
 )

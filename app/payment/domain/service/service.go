@@ -26,6 +26,9 @@ type PaymentService interface {
 	GetOrderByID(ctx context.Context, p *model.PaymentOrder) (interface{}, error)
 	GetUserByID(ctx context.Context, p *model.PaymentOrder) (interface{}, error)
 	GetPaymentInfo(ctx context.Context, p *model.PaymentOrder) (int, error)
-	CreatePaymentInfo(ctx context.Context, p *model.PaymentOrder) interface{}
 	GeneratePaymentToken(ctx context.Context, p *model.PaymentOrder) (string, int64, error)
+}
+
+func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, p *model.PaymentOrder) (int64, error) {
+	return 0, nil
 }
