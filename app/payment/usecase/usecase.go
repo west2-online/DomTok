@@ -18,6 +18,7 @@ package usecase
 
 import (
 	"context"
+
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	"github.com/west2-online/DomTok/app/payment/domain/repository"
 	"github.com/west2-online/DomTok/app/payment/domain/service"
@@ -26,9 +27,9 @@ import (
 // usecase是逻辑层，不管具体的细节实现
 type PaymentUseCase interface {
 	ProcessPayment(ctx context.Context, orderID int64) (*model.Payment, error)
-	//RequestPaymentToken
-	//ProcessRefund
-	//RequestRefundToken
+	// RequestPaymentToken
+	// ProcessRefund
+	// RequestRefundToken
 }
 
 type paymentUseCase struct {

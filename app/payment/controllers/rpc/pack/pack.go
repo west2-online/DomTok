@@ -14,7 +14,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package service
-
-// sf可以生成id,详见user/domain/service/service.go
-type PaymentService interface{}
+package pack
