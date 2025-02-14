@@ -16,5 +16,18 @@ limitations under the License.
 
 package service
 
+import (
+	"context"
+	"github.com/west2-online/DomTok/app/payment/domain/model"
+)
+
 // sf可以生成id,详见user/domain/service/service.go
 type PaymentService interface{}
+
+func GetOrderByID(ctx context.Context, p *model.PaymentOrder) (interface{}, error) {
+}
+func GetUserByID(ctx context.Context, p *model.PaymentOrder) (interface{}, error)
+func GetPaymentInfo(ctx context.Context, p *model.PaymentOrder) (int, error)
+func CreatePaymentInfo(ctx context.Context, p *model.PaymentOrder) interface{}
+func GeneratePaymentToken(ctx context.Context, p *model.PaymentOrder) (string, int64, error)
+func StorePaymentToken(ctx context.Context, p *model.PaymentOrder) error
