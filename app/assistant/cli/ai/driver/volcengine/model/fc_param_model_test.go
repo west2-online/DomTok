@@ -1,12 +1,29 @@
+/*
+Copyright 2024 The west2-online Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package model_test
 
 import (
 	"encoding/json"
-	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine/model"
 	"testing"
 
 	. "github.com/bytedance/mockey"
 	. "github.com/smartystreets/goconvey/convey"
+
+	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine/model"
 )
 
 func TestMarshalFcParamModelStruct(t *testing.T) {
@@ -57,8 +74,12 @@ func TestMarshalFcParamModelStruct(t *testing.T) {
 
 			b, err := json.Marshal(p)
 
+			expected := `{"type":"array"` +
+				`,"description":"test"` +
+				`,"items":[{"type":"string","description":"test"},{"type":"integer","description":"test"}]}`
+
 			So(err, ShouldEqual, nil)
-			So(string(b), ShouldEqual, `{"type":"array","description":"test","items":[{"type":"string","description":"test"},{"type":"integer","description":"test"}]}`)
+			So(string(b), ShouldEqual, expected)
 		})
 
 		PatchConvey("Test object property", func() {
@@ -80,8 +101,14 @@ func TestMarshalFcParamModelStruct(t *testing.T) {
 
 			b, err := json.Marshal(p)
 
+			expected := `{"type":"object"` +
+				`,"description":"test"` +
+				`,"properties":{"integer":{"type":"integer","description":"test"}` +
+				`,"string":{"type":"string","description":"test"}}` +
+				`,"required":["string"]}`
+
 			So(err, ShouldEqual, nil)
-			So(string(b), ShouldEqual, `{"type":"object","description":"test","properties":{"integer":{"type":"integer","description":"test"},"string":{"type":"string","description":"test"}},"required":["string"]}`)
+			So(string(b), ShouldEqual, expected)
 		})
 
 		PatchConvey("Test root parameter with properties", func() {
@@ -102,8 +129,13 @@ func TestMarshalFcParamModelStruct(t *testing.T) {
 
 			b, err := json.Marshal(p)
 
+			expected := `{"type":"object"` +
+				`,"properties":{"integer":{"type":"integer","description":"test"}` +
+				`,"string":{"type":"string","description":"test"}}` +
+				`,"required":["string"]}`
+
 			So(err, ShouldEqual, nil)
-			So(string(b), ShouldEqual, `{"type":"object","properties":{"integer":{"type":"integer","description":"test"},"string":{"type":"string","description":"test"}},"required":["string"]}`)
+			So(string(b), ShouldEqual, expected)
 		})
 
 		PatchConvey("Test root parameter with properties and nested object", func() {
@@ -135,9 +167,16 @@ func TestMarshalFcParamModelStruct(t *testing.T) {
 
 			b, err := json.Marshal(p)
 
+			expected := `{"type":"object"` +
+				`,"properties":{"object":{"type":"object","description":"test"` +
+				`,"properties":{"integer":{"type":"integer","description":"test"}` +
+				`,"string":{"type":"string","description":"test"}}` +
+				`,"required":["string"]}` +
+				`,"string":{"type":"string","description":"test"}}` +
+				`,"required":["string"]}`
+
 			So(err, ShouldEqual, nil)
-			So(string(b), ShouldEqual, `{"type":"object","properties":{"object":{"type":"object","description":"test","properties":{"integer":{"type":"integer","description":"test"},"string":{"type":"string","description":"test"}},"required":["string"]},"string":{"type":"string","description":"test"}},"required":["string"]}`)
+			So(string(b), ShouldEqual, expected)
 		})
 	})
-
 }

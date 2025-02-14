@@ -18,10 +18,11 @@ package http
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/west2-online/DomTok/pkg/logger"
 
 	"github.com/cloudwego/hertz/pkg/protocol"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // Tips: This function should not be used in the future

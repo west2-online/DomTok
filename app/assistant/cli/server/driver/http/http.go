@@ -18,10 +18,10 @@ package http
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/protocol"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app/client"
+	"github.com/cloudwego/hertz/pkg/protocol"
 
 	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
 )

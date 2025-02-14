@@ -19,11 +19,11 @@ package volcengine
 import (
 	"context"
 	"fmt"
-	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine/model"
-	"github.com/west2-online/DomTok/pkg/logger"
 
+	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine/model"
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine/tools/remote"
 	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 var functions *[]model.Function

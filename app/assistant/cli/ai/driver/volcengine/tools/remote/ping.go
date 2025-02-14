@@ -18,10 +18,10 @@ package remote
 
 import (
 	"context"
-	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine/model"
-	"github.com/west2-online/DomTok/pkg/logger"
 
+	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine/model"
 	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // Tips: This function should not be used in the future

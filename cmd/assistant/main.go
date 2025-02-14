@@ -18,16 +18,16 @@ package main
 
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
-	"github.com/west2-online/DomTok/app/assistant/cli/server/driver/http"
-	"github.com/west2-online/DomTok/app/gateway/mw"
-	"github.com/west2-online/DomTok/config"
-	"github.com/west2-online/DomTok/pkg/logger"
-	"github.com/west2-online/DomTok/pkg/utils"
 
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine"
+	"github.com/west2-online/DomTok/app/assistant/cli/server/driver/http"
 	"github.com/west2-online/DomTok/app/assistant/router"
 	"github.com/west2-online/DomTok/app/assistant/service"
+	"github.com/west2-online/DomTok/app/gateway/mw"
+	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/logger"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 var serviceName = "assistant"
