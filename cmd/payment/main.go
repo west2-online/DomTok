@@ -15,3 +15,60 @@ limitations under the License.
 */
 
 package payment
+
+import (
+	"github.com/cloudwego/kitex/pkg/limit"
+	"github.com/cloudwego/kitex/pkg/rpcinfo"
+	"github.com/cloudwego/kitex/server"
+	etcd "github.com/kitex-contrib/registry-etcd"
+	"github.com/west2-online/DomTok/app/payment"
+	"github.com/west2-online/DomTok/config"
+	"github.com/west2-online/DomTok/kitex_gen/payment/paymentservice"
+	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/logger"
+	"github.com/west2-online/DomTok/pkg/middleware"
+	"github.com/west2-online/DomTok/pkg/utils"
+	"net"
+)
+
+var serviceName = constants.PaymentServiceName
+
+func init() {
+	config.Init(serviceName)
+	logger.Init(serviceName, config.GetLoggerLevel())
+}
+
+func main() {
+	r, err := etcd.NewEtcdRegistry([]string{config.Etcd.Addr})
+	if err != nil {
+		logger.Fatalf("Payment: new etcd registry failed, err: %v", err)
+	}
+	listenAddr, err := utils.GetAvailablePort()
+	if err != nil {
+		logger.Fatalf("Payment: get available port failed, err: %v", err)
+	}
+	addr, err := net.ResolveTCPAddr("tcp", listenAddr)
+	if err != nil {
+		logger.Fatalf("Payment: resolve tcp addr failed, err: %v", err)
+	}
+	svr := paymentservice.NewServer(
+		// 注入依赖
+		payment.InjectPaymentHandler(),
+		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
+			ServiceName: serviceName,
+		}),
+		server.WithMuxTransport(),
+		server.WithServiceAddr(addr),
+		server.WithRegistry(r),
+		server.WithLimit(&limit.Option{
+			MaxConnections: constants.MaxConnections,
+			MaxQPS:         constants.MaxQPS,
+		}),
+
+		server.WithMiddleware(middleware.ErrorLog()),
+		server.WithMiddleware(middleware.Respond()),
+	)
+	if err = svr.Run(); err != nil {
+		logger.Fatalf("User: run server failed, err: %v", err)
+	}
+}
