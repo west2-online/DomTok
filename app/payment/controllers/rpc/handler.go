@@ -35,31 +35,27 @@ func NewPaymentHandler(useCase usecase.PaymentUseCase) *PaymentHandler {
 
 // ProcessPayment 任何一个error必须是errno类型的
 // code路径：pkg/errno/code_service.go
+// TODO 待完善
 func (handler *PaymentHandler) ProcessPayment(ctx context.Context, req *payment.PaymentRequest) (r *payment.PaymentResponse, err error) {
 	r = new(payment.PaymentResponse)
 	p, err := handler.useCase.CreatePayment(ctx, req.GetOrderID())
+	r.Status = int64(p.Status)
 	if err != nil {
 		return r, err
 	}
-
-
-	r.Base = p.
-
-	r.PaymentID = p.PaymentID
-	r.Status = p.Status
 	return r, err
 }
 
 func (handler *PaymentHandler) RequestPaymentToken(ctx context.Context, req *payment.PaymentTokenRequest) (r *payment.PaymentTokenResponse, err error) {
 	r = new(payment.PaymentTokenResponse)
-	p:=&model.PaymentOrder{
+	p := &model.PaymentOrder{
 		OrderID: req.OrderID,
-		UserID: req.UserID,
+		UserID:  req.UserID,
 	}
 	// 我需要token和expTime，这里一次返回三个数值很不优雅，但我不知道要怎么优化
 	var token string
 	var expTime int64
-	token,expTime,err=handler.useCase.GetPaymentToken(ctx,p)
+	token, expTime, err = handler.useCase.GetPaymentToken(ctx, p)
 	if err != nil {
 		return
 	}

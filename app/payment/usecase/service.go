@@ -61,23 +61,24 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, paramToken string
 		return paymentStatus.HavePaidToken, paymentStatus.HavePaidExpirationTime, fmt.Errorf("payment is processing or has already done:%w", err)
 	} else {
 		// 创建支付订单
+		// TODO 这里的CreatePaymentInfo逻辑要怎么写？
 		_, err := uc.svc.CreatePaymentInfo(ctx, paramToken)
 		if err != nil {
 			return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("create payment info failed:%w", err)
 		}
 	}
 
-	// 4. 生成支付令牌
+	// 4. HMAC生成支付令牌
 
 	// 感觉这里一次返回三个值非常非常非常不优雅，但是不知道要怎么写得更优雅
 	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, paramToken)
 	if err != nil {
 		return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("generate payment token failed:%w", err)
 	}
-
+	var redisStatus int
 	// 5. 存储令牌到 Redis
-	_, err = uc.svc.StorePaymentToken(ctx, paramToken)
-	if err != nil {
+	redisStatus, err = uc.svc.StorePaymentToken(ctx, paramToken, expTime)
+	if err != nil && redisStatus != paymentStatus.RedisStoreSuccess {
 		return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("store payment token failed:%w", err)
 	}
 	return token, expTime, nil

@@ -59,15 +59,23 @@ func (db *paymentDB) GetUserByToken(ctx context.Context, paramToken string) (int
 		// 这里报错了就不是业务错误了, 而是服务级别的错误
 		return paymentStatus.UserNotExist, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment token: %v", err)
 	}
-	return paymentOrder.UserID, nil // 查询成功，返回 order_id
+	return paymentOrder.UserID, nil // 查询成功，返回 user_id
 }
 
 func (db *paymentDB) GetPaymentInfo(ctx context.Context, paramToken string) (int, error) {
-	//TODO implement me
-	panic("implement me")
+	var paymentOrder PaymentOrder
+	err := db.client.WithContext(ctx).Where("token = ?", paramToken).First(&paymentOrder).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return paymentStatus.UserNotExist, nil
+		}
+		// 这里报错了就不是业务错误了, 而是服务级别的错误
+		return paymentStatus.UserNotExist, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment token: %v", err)
+	}
+	return int(paymentOrder.Status), nil // 查询成功，返回支付状态
 }
 
-// ConvertPayment 后面把转换函数单独抽出来
+// ConvertPayment TODO 后面把转换函数单独抽出来
 func (db *paymentDB) ConvertPayment(ctx context.Context, p *model.PaymentOrder) (*model.PaymentOrder, error) {
 	return nil, nil
 }
