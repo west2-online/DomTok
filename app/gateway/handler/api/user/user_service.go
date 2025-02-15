@@ -21,14 +21,15 @@ package api
 import (
 	"context"
 
+	"github.com/west2-online/DomTok/kitex_gen/model"
+	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
+
 	"github.com/cloudwego/hertz/pkg/app"
 
 	api "github.com/west2-online/DomTok/app/gateway/model/api/user"
 	"github.com/west2-online/DomTok/app/gateway/pack"
 	"github.com/west2-online/DomTok/app/gateway/rpc"
-	"github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/kitex_gen/user"
-	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
@@ -55,7 +56,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 }
 
 // Login .
-// @router api/v1/user/login [GET]
+// @router api/v1/user/login [POST]
 func Login(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.LoginRequest
