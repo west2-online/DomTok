@@ -13,4 +13,6 @@ const (
 	UserNotExistExpirationTime         = 0
 	HavePaidToken                      = ""
 	HavePaidExpirationTime             = 0
+	ErrorToken                         = ""
+	ErrorExpirationTime                = 0
 )

@@ -15,3 +15,27 @@ limitations under the License.
 */
 
 package service
+
+import (
+	"github.com/west2-online/DomTok/app/payment/domain/repository"
+	"github.com/west2-online/DomTok/pkg/utils"
+)
+
+type PaymentService struct {
+	db repository.PaymentDB
+	sf *utils.Snowflake
+	// 是不是还要把redis的加进去
+	// emailRe *regexp.Regexp
+}
+
+func NewPaymentService(db repository.PaymentDB, sf *utils.Snowflake) *PaymentService {
+	if db == nil {
+		panic("paymentService`s db should not be nil")
+	}
+	if sf == nil {
+		panic("paymentService`s sf should not be nil")
+	}
+	svc := &PaymentService{db: db}
+	//svc.init() 我需要写这个吗？
+	return svc
+}

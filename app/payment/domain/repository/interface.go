@@ -26,5 +26,4 @@ type PaymentDB interface {
 	RequestPaymentToken(ctx context.Context, orderID int64) (*model.PaymentOrder, error)
 	GetOrderByID(ctx context.Context, p *model.PaymentOrder) (int64, error)
 	GetUserByID(ctx context.Context, p *model.PaymentOrder) (int64, error)
-	GetPaymentInfo(ctx context.Context, p *model.PaymentOrder) (int, error)
 }

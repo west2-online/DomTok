@@ -61,10 +61,10 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, p *model.PaymentO
 	if paymentInfo == paymentStatus.PaymentStatusSuccess || paymentInfo == paymentStatus.PaymentStatusProcessing {
 		return paymentStatus.HavePaidToken, paymentStatus.HavePaidExpirationTime, fmt.Errorf("payment is processing or has already done:%w", err)
 	} else {
-		//// zhelikaishi
-		pid, err := uc.svc.CreatePaymentInfo(ctx, p)
+		// 创建支付订单
+		_, err := uc.svc.CreatePaymentInfo(ctx, p)
 		if err != nil {
-			return
+			return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("create payment info failed:%w", err)
 		}
 	}
 

@@ -22,13 +22,10 @@ import (
 )
 
 // sf可以生成id,详见user/domain/service/service.go
-type PaymentService interface {
-	GetOrderByID(ctx context.Context, p *model.PaymentOrder) (interface{}, error)
-	GetUserByID(ctx context.Context, p *model.PaymentOrder) (interface{}, error)
-	GetPaymentInfo(ctx context.Context, p *model.PaymentOrder) (int, error)
-	GeneratePaymentToken(ctx context.Context, p *model.PaymentOrder) (string, int64, error)
-}
 
 func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, p *model.PaymentOrder) (int64, error) {
 	return 0, nil
+}
+func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, p *model.PaymentOrder) (string, int64, error) {
+	return "", 0, nil
 }
