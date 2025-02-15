@@ -29,7 +29,7 @@ func (uc *paymentUseCase) CreatePayment(ctx context.Context, orderID int64) (*mo
 	return nil, nil
 }
 
-// GetPaymentToken 这里要怎么让他一次只返回两个参数呢
+// GetPaymentToken 这里要怎么让他一次只返回两个参数呢，然后为什么svc下面的方法总是识别不了呢？
 func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, p *model.PaymentOrder) (token string, expTime int64, err error) {
 	// 1. 检查订单是否存在
 	pid, err := uc.db.GetOrderByID(ctx, p)

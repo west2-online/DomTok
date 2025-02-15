@@ -29,3 +29,8 @@ func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, p *model.Payme
 func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, p *model.PaymentOrder) (string, int64, error) {
 	return "", 0, nil
 }
+
+// StorePaymentToken 这里的返回值还没有想好，是返回状态码还是消息字段？
+func (svc *PaymentService) StorePaymentToken(ctx context.Context, p *model.PaymentOrder) (int, error) {
+	return 0, nil
+}

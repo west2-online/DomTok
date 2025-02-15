@@ -39,3 +39,7 @@ func NewPaymentService(db repository.PaymentDB, sf *utils.Snowflake) *PaymentSer
 	//svc.init() 我需要写这个吗？
 	return svc
 }
+
+func (svc *PaymentService) init() {
+	return
+}
