@@ -17,9 +17,14 @@ limitations under the License.
 package main
 
 import (
+	"context"
+
+	"github.com/cloudwego/eino-ext/components/model/ark"
+	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/hertz/pkg/app/server"
 
-	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/volcengine"
+	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino"
+	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
 	"github.com/west2-online/DomTok/app/assistant/cli/server/driver/http"
 	"github.com/west2-online/DomTok/app/assistant/router"
 	"github.com/west2-online/DomTok/app/assistant/service"
@@ -36,16 +41,21 @@ func init() {
 	config.Init(serviceName)
 	logger.Init(serviceName, config.GetLoggerLevel())
 
-	ai := volcengine.NewClient(&volcengine.ClientConfig{
-		ApiKey:  config.Volcengine.ApiKey,
-		BaseUrl: config.Volcengine.BaseUrl,
-		Region:  config.Volcengine.Region,
-		Model:   config.Volcengine.Model,
-	})
+	ai := eino.NewClient()
 	// TODO: BaseUrl放在哪
-	ai.SetServerCaller(http.NewClient(&http.ClientConfig{
-		BaseUrl: `http://localhost:8888`,
-	}))
+	ai.SetServerCategory(func(functionName string) adapter.ServerCaller {
+		return http.NewClient(&http.ClientConfig{
+			BaseUrl: `http://localhost:8888`,
+		})
+	})
+	ai.SetBuilder(func(ctx context.Context) (model.ChatModel, error) {
+		return ark.NewChatModel(ctx, &ark.ChatModelConfig{
+			APIKey:  config.Volcengine.ApiKey,
+			BaseURL: config.Volcengine.BaseUrl,
+			Region:  config.Volcengine.Region,
+			Model:   config.Volcengine.Model,
+		})
+	})
 
 	service.Use(ai)
 }
