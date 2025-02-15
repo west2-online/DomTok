@@ -17,10 +17,13 @@ limitations under the License.
 package payment
 
 import (
+	"net"
+
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	etcd "github.com/kitex-contrib/registry-etcd"
+
 	"github.com/west2-online/DomTok/app/payment"
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/kitex_gen/payment/paymentservice"
@@ -28,7 +31,6 @@ import (
 	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/middleware"
 	"github.com/west2-online/DomTok/pkg/utils"
-	"net"
 )
 
 var serviceName = constants.PaymentServiceName
@@ -69,6 +71,6 @@ func main() {
 		server.WithMiddleware(middleware.Respond()),
 	)
 	if err = svr.Run(); err != nil {
-		logger.Fatalf("User: run server failed, err: %v", err)
+		logger.Fatalf("Payment: run server failed, err: %v", err)
 	}
 }
