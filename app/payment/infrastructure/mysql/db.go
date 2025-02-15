@@ -29,9 +29,24 @@ type paymentDB struct {
 	client *gorm.DB
 }
 
-// 为什么这里会报错 return &paymentDB{client: client}
 func NewPaymentDB(client *gorm.DB) repository.PaymentDB {
 	return &paymentDB{client: client}
+}
+
+func (db *paymentDB) GetOrderByID(ctx context.Context, p *model.PaymentOrder) (int64, error) {
+	//TODO implement me
+	var paymentOrder PaymentOrder
+	err := db.client.WithContext(ctx).Where("order_id = ?", p.OrderID).First(&paymentOrder).Error
+}
+
+func (db *paymentDB) GetUserByID(ctx context.Context, p *model.PaymentOrder) (int64, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (db *paymentDB) GetPaymentInfo(ctx context.Context, p *model.PaymentOrder) (int, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 // ConvertPayment 后面把转换函数单独抽出来
@@ -40,14 +55,14 @@ func (db *paymentDB) ConvertPayment(ctx context.Context, p *model.PaymentOrder) 
 }
 
 func (db *paymentDB) CreatePayment(ctx context.Context, p *model.PaymentOrder) error {
-	// 将 entity 转换成 mysql 这边的 model
+	// 将 entity 转换成 mysql 这边的 paymentOrder
 	// TODO 可以考虑整一个函数统一转化, 放在这里占了太多行, 而且这不是这个方法该做的. 这个方法应该做的是创建用户
-	model := PaymentOrder{
-		OrderID: p.PaymentID
+	paymentOrder := PaymentOrder{
+		OrderID: p.OrderID,
+		UserID:  p.UserID,
 	}
-
-	if err := db.client.WithContext(ctx).Create(model).Error; err != nil {
-		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create user: %v", err)
+	if err := db.client.WithContext(ctx).Create(paymentOrder).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create payment: %v", err)
 	}
 	return nil
 }

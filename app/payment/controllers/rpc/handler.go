@@ -33,7 +33,7 @@ func NewPaymentHandler(useCase usecase.PaymentUseCase) *PaymentHandler {
 	return &PaymentHandler{useCase: useCase}
 }
 
-// 任何一个error必须是errno类型的
+// ProcessPayment 任何一个error必须是errno类型的
 // code路径：pkg/errno/code_service.go
 func (handler *PaymentHandler) ProcessPayment(ctx context.Context, req *payment.PaymentRequest) (r *payment.PaymentResponse, err error) {
 	r = new(payment.PaymentResponse)

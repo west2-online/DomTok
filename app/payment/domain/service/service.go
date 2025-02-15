@@ -18,19 +18,18 @@ package service
 
 import (
 	"context"
-	"github.com/west2-online/DomTok/app/payment/domain/model"
 )
 
 // sf可以生成id,详见user/domain/service/service.go
 
-func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, p *model.PaymentOrder) (int64, error) {
+func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, paramToken string) (int64, error) {
 	return 0, nil
 }
-func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, p *model.PaymentOrder) (string, int64, error) {
+func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, paramToken string) (string, int64, error) {
 	return "", 0, nil
 }
 
 // StorePaymentToken 这里的返回值还没有想好，是返回状态码还是消息字段？
-func (svc *PaymentService) StorePaymentToken(ctx context.Context, p *model.PaymentOrder) (int, error) {
+func (svc *PaymentService) StorePaymentToken(ctx context.Context, paramToken string) (int, error) {
 	return 0, nil
 }

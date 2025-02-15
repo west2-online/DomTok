@@ -18,11 +18,10 @@ package repository
 
 import (
 	"context"
-	"github.com/west2-online/DomTok/app/payment/domain/model"
 )
 
 type PaymentDB interface {
-	GetOrderByID(ctx context.Context, p *model.PaymentOrder) (int64, error)
-	GetUserByID(ctx context.Context, p *model.PaymentOrder) (int64, error)
-	GetPaymentInfo(ctx context.Context, p *model.PaymentOrder) (int, error)
+	GetOrderByToken(ctx context.Context, paramToken string) (int64, error)
+	GetUserByToken(ctx context.Context, paramToken string) (int64, error)
+	GetPaymentInfo(ctx context.Context, paramToken string) (int, error)
 }

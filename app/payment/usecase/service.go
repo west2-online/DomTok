@@ -30,9 +30,9 @@ func (uc *paymentUseCase) CreatePayment(ctx context.Context, orderID int64) (*mo
 }
 
 // GetPaymentToken 这里要怎么让他一次只返回两个参数呢，然后为什么svc下面的方法总是识别不了呢？
-func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, p *model.PaymentOrder) (token string, expTime int64, err error) {
+func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, paramToken string) (token string, expTime int64, err error) {
 	// 1. 检查订单是否存在
-	pid, err := uc.db.GetOrderByID(ctx, p)
+	pid, err := uc.db.GetOrderByToken(ctx, paramToken)
 	// 这里直接return就可以吗？
 	if err != nil {
 		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime, fmt.Errorf("check payment order existed failed:%w", err)
@@ -42,7 +42,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, p *model.PaymentO
 	}
 
 	// 2. 检查用户是否存在
-	uid, err := uc.db.GetUserByID(ctx, p)
+	uid, err := uc.db.GetUserByToken(ctx, paramToken)
 	if err != nil {
 		return paymentStatus.UserNotExistToken, paymentStatus.UserNotExistExpirationTime, fmt.Errorf("check user existed failed:%w", err)
 	}
@@ -53,7 +53,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, p *model.PaymentO
 	// 3. 检查订单支付信息
 	// 这里用int还是int8？
 	var paymentInfo int
-	paymentInfo, err = uc.db.GetPaymentInfo(ctx, p)
+	paymentInfo, err = uc.db.GetPaymentInfo(ctx, paramToken)
 	if err != nil {
 		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime, fmt.Errorf("check payment information failed:%w", err)
 	}
@@ -61,7 +61,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, p *model.PaymentO
 		return paymentStatus.HavePaidToken, paymentStatus.HavePaidExpirationTime, fmt.Errorf("payment is processing or has already done:%w", err)
 	} else {
 		// 创建支付订单
-		_, err := uc.svc.CreatePaymentInfo(ctx, p)
+		_, err := uc.svc.CreatePaymentInfo(ctx, paramToken)
 		if err != nil {
 			return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("create payment info failed:%w", err)
 		}
@@ -70,13 +70,13 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, p *model.PaymentO
 	// 4. 生成支付令牌
 
 	// 感觉这里一次返回三个值非常非常非常不优雅，但是不知道要怎么写得更优雅
-	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, p)
+	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, paramToken)
 	if err != nil {
 		return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("generate payment token failed:%w", err)
 	}
 
 	// 5. 存储令牌到 Redis
-	err = uc.svc.StorePaymentToken(ctx, p)
+	_, err = uc.svc.StorePaymentToken(ctx, paramToken)
 	if err != nil {
 		return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("store payment token failed:%w", err)
 	}
