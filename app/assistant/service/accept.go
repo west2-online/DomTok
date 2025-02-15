@@ -70,6 +70,8 @@ func (s _Service) Accept(conn *websocket.Conn, ctx context.Context) (err error) 
 			_ = conn.WriteMessage(websocket.TextMessage,
 				pack.ResponseFactory.Error(fmt.Errorf("unsupported message type")))
 		}
+
+		busy.Delete(id)
 	}()
 
 	return nil

@@ -51,7 +51,7 @@ func (t *ToolPing) InvokableRun(ctx context.Context, argumentsInJSON string, opt
 	}
 	resp, err := t.server.Ping(ctx)
 	if err != nil {
-		return "", err
+		return err.Error(), nil //nolint: nilerr
 	}
 
 	return string(resp), nil

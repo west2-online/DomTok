@@ -31,7 +31,7 @@ import (
 	"github.com/cloudwego/eino/schema"
 
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/adapter"
-	category "github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/model"
+	strategy "github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/model"
 	"github.com/west2-online/DomTok/app/assistant/model"
 	"github.com/west2-online/DomTok/pkg/logger"
 )
@@ -42,8 +42,8 @@ type Client struct {
 
 	persona string
 
-	caller  category.GetServerCaller
-	builder category.BuildChatModel
+	caller  strategy.GetServerCaller
+	builder strategy.BuildChatModel
 
 	tools []tool.BaseTool
 
@@ -59,13 +59,13 @@ func NewClient() *Client {
 }
 
 // SetServerCategory sets the server category
-func (c *Client) SetServerCategory(category category.GetServerCaller) {
+func (c *Client) SetServerStrategy(category strategy.GetServerCaller) {
 	c.caller = category
 	c.tools = *GetTools(category)
 }
 
 // SetBuilder sets the build chat model
-func (c *Client) SetBuilder(buildChatModel category.BuildChatModel) {
+func (c *Client) SetBuilder(buildChatModel strategy.BuildChatModel) {
 	c.builder = buildChatModel
 }
 
@@ -207,7 +207,7 @@ func (cb *LoggerCallback) OnEndWithStreamOutput(ctx context.Context, info *callb
 	go func() {
 		defer func() {
 			if err := recover(); err != nil {
-				logger.Fatalf("internal error: %v", err)
+				logger.Errorf("internal error: %v", err)
 			}
 		}()
 

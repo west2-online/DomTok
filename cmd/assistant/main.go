@@ -43,7 +43,7 @@ func init() {
 
 	ai := eino.NewClient()
 	// TODO: BaseUrl放在哪
-	ai.SetServerCategory(func(functionName string) adapter.ServerCaller {
+	ai.SetServerStrategy(func(functionName string) adapter.ServerCaller {
 		return http.NewClient(&http.ClientConfig{
 			BaseUrl: `http://localhost:8888`,
 		})

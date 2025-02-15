@@ -181,10 +181,10 @@ func TestClient_Call(t *testing.T) {
 func TestClient_SetServerCategory(t *testing.T) {
 	cli := NewClient()
 	defaultCaller := cli.caller
-	PatchConvey("Test the eino client SetServerCategory", t, func() {
+	PatchConvey("Test the eino client SetServerStrategy", t, func() {
 		Mock(GetTools).Return(&[]tool.BaseTool{}).Build()
 		PatchConvey("Test when server category is set", func() {
-			cli.SetServerCategory(func(functionName string) adapter.ServerCaller { return nil })
+			cli.SetServerStrategy(func(functionName string) adapter.ServerCaller { return nil })
 			So(cli.caller, ShouldNotEqual, defaultCaller)
 		})
 	})

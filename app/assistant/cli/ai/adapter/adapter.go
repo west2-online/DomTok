@@ -19,7 +19,7 @@ package adapter
 import (
 	"context"
 
-	category "github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/model"
+	strategy "github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/model"
 	"github.com/west2-online/DomTok/app/assistant/model"
 )
 
@@ -31,6 +31,6 @@ type AIClient interface {
 	// ForgetDialog tells the AI to forget the dialog
 	// This is used when the user logs out
 	ForgetDialog(dialog model.IDialog)
-	// SetServerCategory sets the server category
-	SetServerCategory(category category.GetServerCaller)
+	// SetServerStrategy sets the server category
+	SetServerStrategy(strategy strategy.GetServerCaller)
 }
