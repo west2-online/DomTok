@@ -18,12 +18,12 @@ package remote
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/schema"
 
 	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // Tips: This function should not be used in the future
@@ -47,21 +47,13 @@ func Ping(server adapter.ServerCaller) *ToolPing {
 
 func (t *ToolPing) InvokableRun(ctx context.Context, argumentsInJSON string, opts ...tool.Option) (string, error) {
 	if t.server == nil {
-		panic("server is nil")
+		return "", fmt.Errorf("tool ping: server caller is not set")
 	}
 	resp, err := t.server.Ping(ctx)
 	if err != nil {
 		return "", err
 	}
 
-	// TODO: remove this line
-	logger.Infof(`{
-Stage: "remote.Ping",
-args: %v,
-resp: %v,
-opts: %v,
-err: %v,
-}`, argumentsInJSON, string(resp), opts, err)
 	return string(resp), nil
 }
 

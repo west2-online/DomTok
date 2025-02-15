@@ -19,12 +19,15 @@ package service
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/hertz-contrib/websocket"
 
 	"github.com/west2-online/DomTok/app/assistant/model"
 	"github.com/west2-online/DomTok/app/assistant/pack"
 )
+
+var busy = sync.Map{}
 
 // Accept accepts a websocket message.
 func (s _Service) Accept(conn *websocket.Conn, ctx context.Context) (err error) {
@@ -34,24 +37,40 @@ func (s _Service) Accept(conn *websocket.Conn, ctx context.Context) (err error) 
 		return fmt.Errorf("read failed: %w", err)
 	}
 
-	// set the message in the context
-	ctx = context.WithValue(ctx, CtxKeyInput, string(m))
-	switch t {
-	case websocket.TextMessage:
-		// handle text message
-		err := handleTextMessage(conn, ctx)
-		if err != nil {
-			return fmt.Errorf("handle text message failed: %w", err)
+	id, _ := ctx.Value(CtxKeyID).(string)
+
+	b, ok := busy.LoadOrStore(id, false)
+	if ok {
+		if isBusy, _ := b.(bool); isBusy {
+			_ = conn.WriteMessage(websocket.TextMessage,
+				pack.ResponseFactory.Error(fmt.Errorf("only one dialog is allowed at the same time")))
+			return nil
 		}
-
-	case websocket.BinaryMessage:
-		// binary message is not supported
-		return fmt.Errorf("binary message is not supported")
-
-	default:
-		// other message types are not expected to be handled
-		return nil
 	}
+	busy.Store(id, true)
+
+	go func() {
+		// set the message in the context
+		ctx := context.WithValue(ctx, CtxKeyInput, string(m))
+		switch t {
+		case websocket.TextMessage:
+			// handle text message
+			err := handleTextMessage(conn, ctx)
+			if err != nil {
+				_ = conn.WriteMessage(websocket.TextMessage, pack.ResponseFactory.Error(err))
+			}
+
+		case websocket.BinaryMessage:
+			// binary message is not supported
+			_ = conn.WriteMessage(websocket.TextMessage,
+				pack.ResponseFactory.Error(fmt.Errorf("binary message is not supported")))
+
+		default:
+			// other message types are not expected to be handled
+			_ = conn.WriteMessage(websocket.TextMessage,
+				pack.ResponseFactory.Error(fmt.Errorf("unsupported message type")))
+		}
+	}()
 
 	return nil
 }

@@ -21,8 +21,6 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/protocol"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // Tips: This function should not be used in the future
@@ -38,14 +36,6 @@ func (c *Client) Ping(ctx context.Context) ([]byte, error) {
 	req.SetMethod(_PingMethod)
 
 	err := c.do(ctx, req, resp)
-	// TODO: remove this line
-	logger.Infof(`{
-Stage: "http.Ping",
-req: %v,
-resp: %v,
-err: %v,
-}`, req, string(resp.Body()), err)
-
 	if err != nil {
 		return nil, err
 	}

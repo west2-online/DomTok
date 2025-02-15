@@ -25,6 +25,7 @@ import (
 	"time"
 
 	. "github.com/bytedance/mockey"
+	"github.com/cloudwego/eino/callbacks"
 	model2 "github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/flow/agent/react"
@@ -33,9 +34,10 @@ import (
 
 	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
 	"github.com/west2-online/DomTok/app/assistant/model"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
-func ReceiveDialog(dialog *model.Dialog, timeout time.Duration, cancel context.CancelFunc, t *testing.T,
+func ReceiveDialog(dialog *model.Dialog, timeout time.Duration, cancel context.CancelFunc,
 ) (string, error) {
 	ticker := time.NewTicker(timeout)
 	res := ""
@@ -52,7 +54,7 @@ func ReceiveDialog(dialog *model.Dialog, timeout time.Duration, cancel context.C
 	}
 }
 
-func RunCallTest(c *Client, t *testing.T) (error, error, string) {
+func RunCallTest(c *Client) (error, error, string) {
 	dialog := model.NewDialog("", "")
 	wg := sync.WaitGroup{}
 	wg.Add(2)
@@ -62,7 +64,7 @@ func RunCallTest(c *Client, t *testing.T) (error, error, string) {
 	var res string
 	var err error
 	go func(res *string, err *error, wg *sync.WaitGroup) {
-		*res, *err = ReceiveDialog(dialog, 1000*time.Millisecond, cancel, t)
+		*res, *err = ReceiveDialog(dialog, 1000*time.Millisecond, cancel)
 		wg.Done()
 	}(&res, &err, &wg)
 	go func(err *error, wg *sync.WaitGroup) {
@@ -80,39 +82,39 @@ func RunCallTest(c *Client, t *testing.T) (error, error, string) {
 	return err1, err, res
 }
 
+func ClientCallNormalize(c *Client, stream *schema.StreamReader[*schema.Message]) {
+	MockValue(&c.caller).To(func(functionName string) adapter.ServerCaller { return nil })
+	MockValue(&c.builder).To(func(ctx context.Context) (model2.ChatModel, error) { return nil, nil })
+
+	index := 0
+	MockGeneric((*schema.StreamReader[*schema.Message]).Recv).To(func() (*schema.Message, error) {
+		if index == 0 {
+			index++
+			return &schema.Message{Content: "completion"}, nil
+		}
+		return nil, io.EOF
+	}).Build()
+	MockGeneric((*schema.StreamReader[*schema.Message]).Close).To(func() {}).Build()
+	Mock(react.NewAgent).Return(nil, nil).Build()
+	Mock((*react.Agent).Stream).Return(stream, nil).Build()
+	Mock(GetTools).Return(&[]tool.BaseTool{}).Build()
+	Mock((*Client).BuildChatModel).Return(nil, nil).Build()
+}
+
 func TestClient_Call(t *testing.T) {
 	c := NewClient()
 	stream := &schema.StreamReader[*schema.Message]{}
 
-	PatchConvey("Test the volcengine client Call", t, func() {
+	PatchConvey("Test the eino client Call", t, func() {
+		ClientCallNormalize(c, stream)
 		PatchConvey("Test when no error occurs", func() {
-			MockValue(&c.caller).To(func(functionName string) adapter.ServerCaller { return nil })
-			MockValue(&c.builder).To(func(ctx context.Context) (model2.ChatModel, error) { return nil, nil })
-
-			index := 0
-			MockGeneric((*schema.StreamReader[*schema.Message]).Recv).To(func() (*schema.Message, error) {
-				if index == 0 {
-					index++
-					return &schema.Message{Content: "completion"}, nil
-				}
-				return nil, io.EOF
-			}).Build()
-			MockGeneric((*schema.StreamReader[*schema.Message]).Close).To(func() {}).Build()
-			Mock(react.NewAgent).Return(nil, nil).Build()
-			Mock((*react.Agent).Stream).Return(stream, nil).Build()
-			Mock(GetTools).Return(&[]tool.BaseTool{}).Build()
-			Mock((*Client).BuildChatModel).Return(nil, nil).Build()
-
-			err1, err, res := RunCallTest(c, t)
+			err1, err, res := RunCallTest(c)
 			So(err1, ShouldBeNil)
 			So(err, ShouldBeNil)
 			So(res, ShouldEqual, "completion")
 		})
 
 		PatchConvey("Test when stream delta contents", func() {
-			MockValue(&c.caller).To(func(functionName string) adapter.ServerCaller { return nil })
-			MockValue(&c.builder).To(func(ctx context.Context) (model2.ChatModel, error) { return nil, nil })
-
 			helloWorld := "hello world"
 			index := 0
 			MockGeneric((*schema.StreamReader[*schema.Message]).Recv).To(func() (*schema.Message, error) {
@@ -122,13 +124,8 @@ func TestClient_Call(t *testing.T) {
 				}
 				return &schema.Message{Content: "completion"}, io.EOF
 			}).Build()
-			MockGeneric((*schema.StreamReader[*schema.Message]).Close).To(func() {}).Build()
-			Mock(react.NewAgent).Return(nil, nil).Build()
-			Mock((*react.Agent).Stream).Return(stream, nil).Build()
-			Mock(GetTools).Return(&[]tool.BaseTool{}).Build()
-			Mock((*Client).BuildChatModel).Return(nil, nil).Build()
 
-			err1, err, msg := RunCallTest(c, t)
+			err1, err, msg := RunCallTest(c)
 			So(err1, ShouldBeNil)
 			So(err, ShouldBeNil)
 			So(msg, ShouldEqual, helloWorld)
@@ -136,33 +133,287 @@ func TestClient_Call(t *testing.T) {
 
 		PatchConvey("Test when server category is not set", func() {
 			MockValue(&c.caller).To(nil)
-			MockValue(&c.builder).To(func(ctx context.Context) (model2.ChatModel, error) { return nil, nil })
-			err1, _, _ := RunCallTest(c, t)
+			err1, _, _ := RunCallTest(c)
 			So(err1, ShouldNotBeNil)
 		})
 
 		PatchConvey("Test when build chat model is not set", func() {
-			MockValue(&c.caller).To(func(functionName string) adapter.ServerCaller { return nil })
 			MockValue(&c.builder).To(nil)
-			err1, _, _ := RunCallTest(c, t)
+			err1, _, _ := RunCallTest(c)
+			So(err1, ShouldNotBeNil)
+		})
+
+		PatchConvey("Test when read history failed", func() {
+			Mock((*Client).readHistory).Return(nil, fmt.Errorf("read history failed")).Build()
+			err1, _, _ := RunCallTest(c)
+			So(err1, ShouldNotBeNil)
+		})
+
+		PatchConvey("Test when build chat model failed", func() {
+			Mock((*Client).BuildChatModel).Return(nil, fmt.Errorf("build chat model failed")).Build()
+			err1, _, _ := RunCallTest(c)
+			So(err1, ShouldNotBeNil)
+		})
+
+		PatchConvey("Test when create agent failed", func() {
+			Mock(react.NewAgent).Return(nil, fmt.Errorf("create agent failed")).Build()
+			err1, _, _ := RunCallTest(c)
+			So(err1, ShouldNotBeNil)
+		})
+
+		PatchConvey("Test when create stream failed", func() {
+			Mock((*react.Agent).Stream).Return(nil, fmt.Errorf("create stream failed")).Build()
+			err1, _, _ := RunCallTest(c)
 			So(err1, ShouldNotBeNil)
 		})
 
 		PatchConvey("Test when stream recv failed", func() {
-			MockValue(&c.caller).To(func(functionName string) adapter.ServerCaller { return nil })
-			MockValue(&c.builder).To(func(ctx context.Context) (model2.ChatModel, error) { return nil, nil })
-
 			MockGeneric((*schema.StreamReader[*schema.Message]).Recv).To(func() (*schema.Message, error) {
 				return nil, fmt.Errorf("stream recv failed")
 			}).Build()
-			MockGeneric((*schema.StreamReader[*schema.Message]).Close).To(func() {}).Build()
-			Mock(react.NewAgent).Return(nil, nil).Build()
-			Mock((*react.Agent).Stream).Return(stream, nil).Build()
-			Mock(GetTools).Return(&[]tool.BaseTool{}).Build()
-			Mock((*Client).BuildChatModel).Return(nil, nil).Build()
 
-			err1, _, _ := RunCallTest(c, t)
+			err1, _, _ := RunCallTest(c)
 			So(err1, ShouldNotBeNil)
+		})
+	})
+}
+
+func TestClient_SetServerCategory(t *testing.T) {
+	cli := NewClient()
+	defaultCaller := cli.caller
+	PatchConvey("Test the eino client SetServerCategory", t, func() {
+		Mock(GetTools).Return(&[]tool.BaseTool{}).Build()
+		PatchConvey("Test when server category is set", func() {
+			cli.SetServerCategory(func(functionName string) adapter.ServerCaller { return nil })
+			So(cli.caller, ShouldNotEqual, defaultCaller)
+		})
+	})
+}
+
+func TestClient_SetBuilder(t *testing.T) {
+	cli := NewClient()
+	defaultBuilder := cli.builder
+	PatchConvey("Test the eino client SetBuilder", t, func() {
+		PatchConvey("Test when build chat model is set", func() {
+			cli.SetBuilder(func(ctx context.Context) (model2.ChatModel, error) { return nil, nil })
+			So(cli.builder, ShouldNotEqual, defaultBuilder)
+		})
+	})
+}
+
+func TestClient_BuildChatModel(t *testing.T) {
+	cli := NewClient()
+	type X struct {
+		model2.ChatModel
+	}
+	m := struct {
+		model2.ChatModel
+		x X
+	}{}
+	testBuilder := func(ctx context.Context) (model2.ChatModel, error) { return m, nil }
+	PatchConvey("Test the eino client BuildChatModel", t, func() {
+		cli.SetBuilder(testBuilder)
+		PatchConvey("Test when build chat model is set", func() {
+			chatModel, err := cli.BuildChatModel(context.Background())
+			So(chatModel, ShouldEqual, m)
+			So(err, ShouldBeNil)
+		})
+	})
+}
+
+func IsDialogExist(cli *Client, dialog *model.Dialog) bool {
+	exist := false
+	cli.recorder.Range(func(key, value interface{}) bool {
+		if key == dialog.Unique() {
+			exist = true
+		}
+		return true
+	})
+
+	return exist
+}
+
+func TestClient_ForgetDialog(t *testing.T) {
+	cli := NewClient()
+	d1 := model.NewDialog("1", "")
+	d2 := model.NewDialog("2", "")
+	PatchConvey("Test the eino client ForgetDialog", t, func() {
+		PatchConvey("Test when dialog is not exist", func() {
+			cli.ForgetDialog(d1)
+			So(IsDialogExist(cli, d1), ShouldBeFalse)
+			So(IsDialogExist(cli, d2), ShouldBeFalse)
+		})
+
+		PatchConvey("Test when dialog is exist", func() {
+			cli.recorder.Store(d1.Unique(), nil)
+			cli.recorder.Store(d2.Unique(), nil)
+			cli.ForgetDialog(d1)
+			So(IsDialogExist(cli, d1), ShouldBeFalse)
+			So(IsDialogExist(cli, d2), ShouldBeTrue)
+		})
+	})
+}
+
+func TestClient_Recorder(t *testing.T) {
+	cli := NewClient()
+	d1 := model.NewDialog("1", "")
+	d2 := model.NewDialog("2", "")
+	PatchConvey("Test the eino client Recorder", t, func() {
+		PatchConvey("Test when logic is normal", func() {
+			cli.markDialog(d1)
+			cli.storeMarkedDialog(d1, nil)
+			So(IsDialogExist(cli, d1), ShouldBeTrue)
+
+			cli.ForgetDialog(d1)
+			So(IsDialogExist(cli, d1), ShouldBeFalse)
+		})
+
+		PatchConvey("Test when dialog is not marked", func() {
+			cli.storeMarkedDialog(d1, nil)
+			So(IsDialogExist(cli, d1), ShouldBeFalse)
+
+			cli.ForgetDialog(d1)
+			So(IsDialogExist(cli, d1), ShouldBeFalse)
+		})
+
+		PatchConvey("Test dialog cannot impact each other", func() {
+			cli.markDialog(d1)
+			cli.storeMarkedDialog(d1, nil)
+			So(IsDialogExist(cli, d1), ShouldBeTrue)
+
+			cli.ForgetDialog(d2)
+			So(IsDialogExist(cli, d1), ShouldBeTrue)
+		})
+
+		PatchConvey("Test when forget dialog first", func() {
+			cli.ForgetDialog(d1)
+			cli.storeMarkedDialog(d1, nil)
+			So(IsDialogExist(cli, d1), ShouldBeFalse)
+		})
+	})
+}
+
+func TestClient_ReadHistory(t *testing.T) {
+	cli := NewClient()
+	PatchConvey("Test the eino client ReadHistory", t, func() {
+		PatchConvey("Test when dialog is not exist", func() {
+			history, err := cli.readHistory("1")
+			So(history, ShouldNotBeNil)
+			So(err, ShouldBeNil)
+		})
+
+		PatchConvey("Test when dialog is exist but unexpected type", func() {
+			cli.recorder.Store("1", "1")
+			history, err := cli.readHistory("1")
+			So(history, ShouldBeNil)
+			So(err, ShouldNotBeNil)
+		})
+	})
+}
+
+func RunLogger(cb LoggerCallback,
+	input callbacks.CallbackInput,
+	output callbacks.CallbackOutput,
+) {
+	ctx := context.Background()
+	info := &callbacks.RunInfo{}
+	cb.OnError(cb.OnEnd(cb.OnStart(ctx, info, input), info, output), info, fmt.Errorf("error"))
+}
+
+func RunStreamLogger(cb LoggerCallback,
+	input *schema.StreamReader[callbacks.CallbackInput],
+	output *schema.StreamReader[callbacks.CallbackOutput],
+) {
+	ctx := context.Background()
+	info := &callbacks.RunInfo{}
+	cb.OnEndWithStreamOutput(
+		cb.OnStartWithStreamInput(ctx, info, input), info, output)
+}
+
+func TestLoggerCallback(t *testing.T) {
+	cb := &LoggerCallback{}
+	input := struct{ callbacks.CallbackInput }{}
+	inputStream := schema.StreamReader[callbacks.CallbackInput]{}
+	output := struct{ callbacks.CallbackOutput }{}
+	outputStream := schema.StreamReader[callbacks.CallbackOutput]{}
+
+	PatchConvey("Test the eino logger callback", t, func() {
+		Mock(logger.Infof).To(func(string, ...interface{}) {}).Build()
+		Mock(logger.Errorf).To(func(string, ...interface{}) {}).Build()
+		Mock(logger.Fatalf).To(func(string, ...interface{}) {}).Build()
+		Mock(logger.Warnf).To(func(string, ...interface{}) {}).Build()
+		PatchConvey("Test the logger callback on completion", func() {
+			RunLogger(*cb, input, output)
+			// if no panic, it means the logger callback is correct
+		})
+
+		PatchConvey("Test the logger callback on input stream", func() {
+			x := make(chan struct{})
+			MockGeneric((*schema.StreamReader[any]).Recv).Return(nil, io.EOF).Build()
+			MockGeneric((*schema.StreamReader[any]).Close).To(func() {
+				x <- struct{}{}
+			}).Build()
+			wg := sync.WaitGroup{}
+			wg.Add(1)
+			isInputClosed := false
+			go func() {
+				ticker := time.NewTicker(time.Second)
+				select {
+				case <-x:
+					isInputClosed = true
+				case <-ticker.C:
+				}
+				wg.Done()
+			}()
+			go RunStreamLogger(*cb, &inputStream, &outputStream)
+			wg.Wait()
+			So(isInputClosed, ShouldBeTrue)
+		})
+
+		PatchConvey("Test the logger callback on output stream", func() {
+			x := make(chan struct{})
+			MockGeneric((*schema.StreamReader[any]).Recv).Return(nil, io.EOF).Build()
+			MockGeneric((*schema.StreamReader[any]).Close).To(func() {
+				x <- struct{}{}
+			}).Build()
+			wg := sync.WaitGroup{}
+			wg.Add(1)
+			isOutputClosed := false
+			go func() {
+				ticker := time.NewTicker(time.Second)
+				select {
+				case <-x:
+					isOutputClosed = true
+				case <-ticker.C:
+				}
+				wg.Done()
+			}()
+			go RunStreamLogger(*cb, &inputStream, &outputStream)
+			wg.Wait()
+			So(isOutputClosed, ShouldBeTrue)
+		})
+
+		PatchConvey("Test the logger callback on output stream with error", func() {
+			x := make(chan struct{})
+			MockGeneric((*schema.StreamReader[any]).Recv).Return(nil, fmt.Errorf("")).Build()
+			MockGeneric((*schema.StreamReader[any]).Close).To(func() {
+				x <- struct{}{}
+			}).Build()
+			wg := sync.WaitGroup{}
+			wg.Add(1)
+			isOutputClosed := false
+			go func() {
+				ticker := time.NewTicker(time.Second)
+				select {
+				case <-x:
+					isOutputClosed = true
+				case <-ticker.C:
+				}
+				wg.Done()
+			}()
+			go RunStreamLogger(*cb, &inputStream, &outputStream)
+			wg.Wait()
+			So(isOutputClosed, ShouldBeTrue)
 		})
 	})
 }

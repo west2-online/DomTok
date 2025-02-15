@@ -18,6 +18,7 @@ package http
 
 import (
 	"context"
+	"net/url"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app/client"
@@ -47,7 +48,8 @@ func NewClient(opt *ClientConfig) *Client {
 }
 
 func (c *Client) buildUrl(path string) string {
-	return c.baseUrl + path
+	u, _ := url.JoinPath(c.baseUrl, path)
+	return u
 }
 
 func (c *Client) do(ctx context.Context, req *protocol.Request, resp *protocol.Response) error {
