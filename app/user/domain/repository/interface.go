@@ -28,4 +28,5 @@ import (
 type UserDB interface {
 	IsUserExist(ctx context.Context, username string) (bool, error)
 	CreateUser(ctx context.Context, user *model.User) error
+	GetUserInfo(ctx context.Context, username string) (*model.User, error)
 }

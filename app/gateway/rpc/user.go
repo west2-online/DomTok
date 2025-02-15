@@ -19,7 +19,9 @@ package rpc
 import (
 	"context"
 
+	"github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/kitex_gen/user"
+
 	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
@@ -47,4 +49,16 @@ func RegisterRPC(ctx context.Context, req *user.RegisterRequest) (uid int64, err
 		return 0, errno.InternalServiceError.WithMessage(resp.Base.Msg)
 	}
 	return resp.UserID, nil
+}
+
+func LoginRPC(ctx context.Context, req *user.LoginRequest) (userInfo *model.UserInfo, err error) {
+	resp, err := userClient.Login(ctx, req)
+	if err != nil {
+		logger.Errorf("LoginRPC: RPC called failed: %v", err.Error())
+		return nil, errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return resp.User, nil
 }

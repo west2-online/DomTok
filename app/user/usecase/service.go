@@ -26,7 +26,12 @@ import (
 
 // Login 用户登录 TODO: 考虑留给新登
 func (uc *useCase) Login(ctx context.Context, user *model.User) (*model.User, error) {
-	return nil, nil
+	user, err := uc.svc.Login(ctx, user)
+	if err != nil {
+		return nil, fmt.Errorf("get user info failed: %w", err)
+	}
+
+	return user, nil
 }
 
 func (uc *useCase) RegisterUser(ctx context.Context, u *model.User) (uid int64, err error) {

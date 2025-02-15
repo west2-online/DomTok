@@ -26,7 +26,9 @@ import (
 	api "github.com/west2-online/DomTok/app/gateway/model/api/user"
 	"github.com/west2-online/DomTok/app/gateway/pack"
 	"github.com/west2-online/DomTok/app/gateway/rpc"
+	"github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/kitex_gen/user"
+	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
@@ -50,4 +52,31 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	pack.RespData(c, uid)
+}
+
+// Login .
+// @router api/v1/user/login [GET]
+func Login(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.LoginRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	resp, err := rpc.LoginRPC(ctx, &user.LoginRequest{
+		Username: req.Name,
+		Password: req.Password,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	ctx = metainfoContext.WithLoginData(ctx, &model.LoginData{
+		UserId: resp.UserId,
+	})
+
+	pack.RespData(c, resp)
 }

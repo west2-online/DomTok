@@ -52,6 +52,26 @@ func (svc *UserService) CreateUser(ctx context.Context, u *model.User) error {
 	return nil
 }
 
+func (svc *UserService) Login(ctx context.Context, u *model.User) (*model.User, error) {
+	user, err := svc.db.GetUserInfo(ctx, u.UserName)
+	if err != nil {
+		return nil, fmt.Errorf("get user info failed: %w", err)
+	}
+
+	if err = svc.CheckPassword(user.Password, u.Password); err != nil {
+		return nil, err
+	}
+
+	resp := &model.User{
+		Uid:      user.Uid,
+		UserName: user.UserName,
+		Email:    user.Email,
+		Phone:    user.Phone,
+	}
+
+	return resp, nil
+}
+
 func (svc *UserService) nextID() int64 {
 	id, _ := svc.sf.NextVal()
 	return id

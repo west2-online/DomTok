@@ -19,6 +19,8 @@ package rpc
 import (
 	"context"
 
+	"github.com/west2-online/DomTok/pkg/base"
+
 	"github.com/west2-online/DomTok/app/user/controllers/rpc/pack"
 	"github.com/west2-online/DomTok/app/user/domain/model"
 	"github.com/west2-online/DomTok/app/user/usecase"
@@ -62,9 +64,11 @@ func (h *UserHandler) Login(ctx context.Context, req *user.LoginRequest) (r *use
 
 	ans, err := h.useCase.Login(ctx, u)
 	if err != nil {
+		r.Base = base.BuildBaseResp(err)
 		return
 	}
 
+	r.Base = base.BuildBaseResp(nil)
 	r.User = pack.BuildUser(ans)
 	return
 }
