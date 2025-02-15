@@ -19,6 +19,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
@@ -27,6 +28,11 @@ import (
 // CreatePayment 这里定义一些具体的方法和函数，比如校验密码，加密密码，创建用户之类的
 func (uc *paymentUseCase) CreatePayment(ctx context.Context, orderID int64) (*model.PaymentOrder, error) {
 	return nil, nil
+}
+
+// GetParamToken TODO 这个要等User那边写好了才能写
+func (uc *paymentUseCase) GetParamToken(ctx context.Context) (token string, err error) {
+	return "", nil
 }
 
 // GetPaymentToken 这里要怎么让他一次只返回两个参数呢，然后为什么svc下面的方法总是识别不了呢？

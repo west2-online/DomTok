@@ -22,8 +22,9 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"time"
+
+	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 )
 
 // sf可以生成id,详见user/domain/service/service.go

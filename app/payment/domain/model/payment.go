@@ -17,9 +17,10 @@ limitations under the License.
 package model
 
 import (
+	"time"
+
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
-	"time"
 )
 
 // PaymentOrder 支付订单表

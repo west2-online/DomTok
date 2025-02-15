@@ -1,0 +1,86 @@
+[33m15f56c0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mpayment[m[33m, [m[1;32mmain[m[33m)[m HEAD@{0}: checkout: moving from main to payment
+[33m15f56c0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mpayment[m[33m, [m[1;32mmain[m[33m)[m HEAD@{1}: reset: moving to HEAD@{5}
+[33ma601fed[m[33m ([m[1;31mupstream/main[m[33m)[m HEAD@{2}: reset: moving to upstream/main
+[33mfa45f4b[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{3}: checkout: moving from main to main
+[33mfa45f4b[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{4}: checkout: moving from payment to main
+[33m1e422ad[m HEAD@{5}: checkout: moving from main to payment
+[33mfa45f4b[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{6}: commit: fix payment/usecase/service.go
+[33m15f56c0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mpayment[m[33m, [m[1;32mmain[m[33m)[m HEAD@{7}: commit: fix payment/usecase/service.go
+[33m2924e90[m HEAD@{8}: commit: fix payment/usecase/service.go
+[33m1024c5c[m HEAD@{9}: commit: finish payment/usecase/service.go
+[33m7afbb07[m HEAD@{10}: commit: finish payment/usecase/service.go
+[33m7a51260[m HEAD@{11}: commit: add payment/usecase/service.go
+[33m51004b6[m HEAD@{12}: commit: add payment/usecase/service.go
+[33m7b1079a[m HEAD@{13}: commit: add payment/usecase/service.go
+[33m2abbed8[m HEAD@{14}: rebase (finish): returning to refs/heads/main
+[33m2abbed8[m HEAD@{15}: rebase (pick): fix: gateway used incorrect service_name
+[33md4cba17[m HEAD@{16}: rebase (pick): feat: unifies the interface specification (#20)
+[33m968fd40[m HEAD@{17}: rebase (continue): feat: add commodity base
+[33m0a57d95[m HEAD@{18}: rebase (pick): fix: CI
+[33mc0a62a6[m HEAD@{19}: rebase (continue): feat: add commodity base
+[33m8c6958e[m HEAD@{20}: pull origin main --rebase (start): checkout 8c6958e293979cfd9dad0c9e5659ef30641a54c8
+[33m119d7ba[m HEAD@{21}: checkout: moving from payment to main
+[33m1e422ad[m HEAD@{22}: checkout: moving from main to payment
+[33m119d7ba[m HEAD@{23}: merge upstream/main: Merge made by the 'ort' strategy.
+[33m00515db[m HEAD@{24}: checkout: moving from payment to main
+[33m1e422ad[m HEAD@{25}: commit: fix conflict
+[33ma5d32cd[m HEAD@{26}: checkout: moving from main to payment
+[33m00515db[m HEAD@{27}: checkout: moving from payment to main
+[33ma5d32cd[m HEAD@{28}: commit: fix handler
+[33m41ef0db[m HEAD@{29}: commit: fix handler
+[33mb974ccf[m HEAD@{30}: commit: fix handler
+[33meaaaee2[m HEAD@{31}: commit: fix handler
+[33m8ee80e9[m HEAD@{32}: commit: fix domain/model/payment.go
+[33mc2ca036[m HEAD@{33}: commit: fix domain/model/payment.go
+[33mf10e18e[m HEAD@{34}: commit: add payment models:refund and ledger
+[33m36bd14a[m HEAD@{35}: commit: perfect db and model interface
+[33ma0d0f57[m HEAD@{36}: commit: perfect interface
+[33m8616c18[m HEAD@{37}: commit: perfect interface
+[33ma143949[m HEAD@{38}: commit: perfect interface
+[33maae3bed[m HEAD@{39}: commit: perfect interface
+[33mece8ed5[m HEAD@{40}: commit: perfect interface
+[33m3eba29a[m HEAD@{41}: commit: perfect interface
+[33m71bc360[m HEAD@{42}: commit: perfect interface
+[33m1b66d7b[m HEAD@{43}: commit: perfect interface
+[33mb67712c[m HEAD@{44}: commit: perfect interface
+[33mab39966[m HEAD@{45}: commit: perfect interface
+[33m09e72a1[m HEAD@{46}: commit: perfect interface
+[33mce25922[m HEAD@{47}: commit: perfect interface
+[33m00515db[m HEAD@{48}: checkout: moving from main to payment
+[33m00515db[m HEAD@{49}: checkout: moving from main to main
+[33m00515db[m HEAD@{50}: checkout: moving from payment to main
+[33mc92af6a[m HEAD@{51}: commit: 删除了旧有分支，增加了新的分支
+[33m00515db[m HEAD@{52}: checkout: moving from main to payment
+[33m00515db[m HEAD@{53}: checkout: moving from feature/payment to main
+[33ma1ab1d0[m HEAD@{54}: rebase (finish): returning to refs/heads/feature/payment
+[33ma1ab1d0[m HEAD@{55}: rebase (pick): update:payment.thrift
+[33m7f046e9[m HEAD@{56}: rebase (pick): update:payment.thrift
+[33m76cbe92[m HEAD@{57}: rebase (continue): update:payment.thrift
+[33m00515db[m HEAD@{58}: rebase (start): checkout main
+[33m835832c[m HEAD@{59}: checkout: moving from main to feature/payment
+[33m00515db[m HEAD@{60}: checkout: moving from main to main
+[33m00515db[m HEAD@{61}: checkout: moving from feature/payment to main
+[33m835832c[m HEAD@{62}: checkout: moving from main to feature/payment
+[33m00515db[m HEAD@{63}: reset: moving to HEAD
+[33m00515db[m HEAD@{64}: checkout: moving from feature/payment to main
+[33m835832c[m HEAD@{65}: checkout: moving from main to feature/payment
+[33m00515db[m HEAD@{66}: reset: moving to HEAD
+[33m00515db[m HEAD@{67}: checkout: moving from main to main
+[33m00515db[m HEAD@{68}: checkout: moving from feature/payment to main
+[33m835832c[m HEAD@{69}: commit: update:payment.thrift
+[33m288d772[m HEAD@{70}: checkout: moving from main to feature/payment
+[33m00515db[m HEAD@{71}: reset: moving to HEAD
+[33m00515db[m HEAD@{72}: checkout: moving from main to main
+[33m00515db[m HEAD@{73}: commit: update:payment.thrift
+[33m970a66a[m HEAD@{74}: commit: update idl/payment.thrift/PaymentService
+[33m8f7c5fc[m HEAD@{75}: checkout: moving from feature/payment to main
+[33m288d772[m HEAD@{76}: checkout: moving from main to feature/payment
+[33m8f7c5fc[m HEAD@{77}: checkout: moving from main to main
+[33m8f7c5fc[m HEAD@{78}: merge upstream/main: Fast-forward
+[33m6962bd0[m HEAD@{79}: checkout: moving from feature/payment to main
+[33m288d772[m HEAD@{80}: commit: update:payment.thrift
+[33mc948c99[m HEAD@{81}: commit: update:payment.thrift
+[33mded2867[m HEAD@{82}: commit: update:payment.thrift
+[33m16e8e94[m HEAD@{83}: commit: update:payment.thrift
+[33m6962bd0[m HEAD@{84}: checkout: moving from main to feature/payment
+[33m6962bd0[m HEAD@{85}: clone: from https://github.com/LingeringAutumn/DomTok

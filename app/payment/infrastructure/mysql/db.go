@@ -19,11 +19,13 @@ package mysql
 import (
 	"context"
 	"errors"
+
+	"gorm.io/gorm"
+
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	"github.com/west2-online/DomTok/app/payment/domain/repository"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
-	"gorm.io/gorm"
 )
 
 // paymentDB impl domain.PaymentDB defined domain
