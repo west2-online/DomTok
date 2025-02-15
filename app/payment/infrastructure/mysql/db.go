@@ -18,8 +18,10 @@ package mysql
 
 import (
 	"context"
+	"errors"
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	"github.com/west2-online/DomTok/app/payment/domain/repository"
+	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"gorm.io/gorm"
 )
@@ -33,18 +35,34 @@ func NewPaymentDB(client *gorm.DB) repository.PaymentDB {
 	return &paymentDB{client: client}
 }
 
-func (db *paymentDB) GetOrderByID(ctx context.Context, p *model.PaymentOrder) (int64, error) {
-	//TODO implement me
+// TODO 这里是直接传token去查询，还是要把token解析出来？
+func (db *paymentDB) GetOrderByToken(ctx context.Context, paramToken string) (int64, error) {
 	var paymentOrder PaymentOrder
-	err := db.client.WithContext(ctx).Where("order_id = ?", p.OrderID).First(&paymentOrder).Error
+	err := db.client.WithContext(ctx).Where("token = ?", paramToken).First(&paymentOrder).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return paymentStatus.PaymentOrderNotExist, nil
+		}
+		// 这里报错了就不是业务错误了, 而是服务级别的错误
+		return paymentStatus.PaymentOrderNotExist, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment token: %v", err)
+	}
+	return paymentOrder.OrderID, nil // 查询成功，返回 order_id
 }
 
-func (db *paymentDB) GetUserByID(ctx context.Context, p *model.PaymentOrder) (int64, error) {
-	//TODO implement me
-	panic("implement me")
+func (db *paymentDB) GetUserByToken(ctx context.Context, paramToken string) (int64, error) {
+	var paymentOrder PaymentOrder
+	err := db.client.WithContext(ctx).Where("token = ?", paramToken).First(&paymentOrder).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return paymentStatus.UserNotExist, nil
+		}
+		// 这里报错了就不是业务错误了, 而是服务级别的错误
+		return paymentStatus.UserNotExist, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment token: %v", err)
+	}
+	return paymentOrder.UserID, nil // 查询成功，返回 order_id
 }
 
-func (db *paymentDB) GetPaymentInfo(ctx context.Context, p *model.PaymentOrder) (int, error) {
+func (db *paymentDB) GetPaymentInfo(ctx context.Context, paramToken string) (int, error) {
 	//TODO implement me
 	panic("implement me")
 }
