@@ -32,7 +32,7 @@ func InjectPaymentHandler() payment.PaymentService {
 		panic(err)
 	}
 	// 这个地方要补充一下
-	sf, err := utils.NewSnowflake(nil, nil)
+	sf, err := utils.NewSnowflake(0, 0)
 	if err != nil {
 		panic(err)
 	}

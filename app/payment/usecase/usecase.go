@@ -37,7 +37,7 @@ type paymentUseCase struct {
 	svc *service.PaymentService
 }
 
-func NewPaymentUseCase(db repository.PaymentDB, svc *service.PaymentService) PaymentUseCase {
+func NewPaymentCase(db repository.PaymentDB, svc *service.PaymentService) PaymentUseCase {
 	return &paymentUseCase{
 		db:  db,
 		svc: svc,

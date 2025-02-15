@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/west2-online/DomTok/app/payment/domain/model"
-	"github.com/west2-online/DomTok/app/payment/domain/repository"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
@@ -73,17 +72,15 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, p *model.PaymentO
 	// 感觉这里一次返回三个值非常非常非常不优雅，但是不知道要怎么写得更优雅
 	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, p)
 	if err != nil {
-		return
+		return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("generate payment token failed:%w", err)
 	}
-	r.PaymentToken = token
-	r.ExpirationTime = expTime
 
 	// 5. 存储令牌到 Redis
 	err = uc.svc.StorePaymentToken(ctx, p)
 	if err != nil {
-		return
+		return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("store payment token failed:%w", err)
 	}
-	return
+	return token, expTime, nil
 }
 
 // 这里没有直接调用 db.CreateUser 是因为 svc.CreateUser 包含了一点业务逻辑, 这些细节不需要被 useCase 知道
