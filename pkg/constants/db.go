@@ -26,10 +26,10 @@ const (
 )
 
 const (
-	UserTableName = "users"
-
-	OrderTableName         = "orders"
-	OrderGoodsTableName    = "order_goods"
+	UserTableName       = "users"
+	CategoryTableName   = "categories"
+	OrderTableName      = "orders"
+	OrderGoodsTableName = "order_goods"
 	PaymentTableName       = "payments"
 	PaymentRefundTableName = "payment_refunds"
 	PaymentLedgerTableName = "payment_ledgers"
