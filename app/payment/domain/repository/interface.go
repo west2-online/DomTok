@@ -25,3 +25,4 @@ type PaymentDB interface {
 	GetUserByToken(ctx context.Context, paramToken string) (int64, error)
 	GetPaymentInfo(ctx context.Context, paramToken string) (int, error)
 }
+type PaymentRedis interface{}

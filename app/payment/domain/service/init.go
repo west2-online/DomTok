@@ -17,8 +17,6 @@ limitations under the License.
 package service
 
 import (
-	"github.com/redis/go-redis/v9"
-
 	"github.com/west2-online/DomTok/app/payment/domain/repository"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
@@ -27,7 +25,9 @@ type PaymentService struct {
 	db repository.PaymentDB
 	sf *utils.Snowflake
 	// 是不是还要把redis的加进去
-	redisClient *redis.Client
+	// redisClient *redis.Client
+	// TODO
+	redis repository.PaymentRedis
 	// emailRe *regexp.Regexp
 }
 
