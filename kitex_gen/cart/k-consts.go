@@ -14,19 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package rpc
+package cart
 
-import (
-	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
-	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
-)
-
-var (
-	userClient userservice.Client
-	cartClient cartservice.Client
-)
-
-func Init() {
-	InitUserRPC()
-	InitCartRPC()
-}
+// KitexUnusedProtection is used to prevent 'imported and not used' error.
+var KitexUnusedProtection = struct{}{}

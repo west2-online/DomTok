@@ -14,19 +14,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package rpc
+package service
 
 import (
-	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
-	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
+	"context"
+
+	"github.com/west2-online/DomTok/app/cart/domain/repository"
 )
 
-var (
-	userClient userservice.Client
-	cartClient cartservice.Client
-)
+type CartService struct {
+	DB    repository.PersistencePort
+	Cache repository.CachePort
+	MQ    repository.MqPort
+}
 
-func Init() {
-	InitUserRPC()
-	InitCartRPC()
+func NewCartService(db repository.PersistencePort, cache repository.CachePort, mq repository.MqPort) *CartService {
+	svc := &CartService{
+		DB:    db,
+		Cache: cache,
+		MQ:    mq,
+	}
+	svc.init()
+	return svc
+}
+
+func (svc *CartService) init() {
+	svc.initConsumer()
+}
+
+func (svc *CartService) initConsumer() {
+	go svc.ConsumeAddGoods(context.Background())
 }
