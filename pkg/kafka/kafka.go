@@ -35,6 +35,7 @@ type Kafka struct {
 	consumeChans map[string]chan *Message
 }
 
+// Message 属于domain层的通用Msg. DO NOT EDIT.
 type Message struct {
 	K, V []byte
 }
