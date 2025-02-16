@@ -34,4 +34,5 @@ const (
 	SpuImageTableName   = "spu_image"
 
 	SpuSkuTableName = "spu_to_sku"
+	CartTableName   = "cart"
 )

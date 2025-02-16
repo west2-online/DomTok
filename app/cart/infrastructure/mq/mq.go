@@ -14,24 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package rpc
+package mq
 
-import (
-	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
-	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
-	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
-)
+import "github.com/west2-online/DomTok/pkg/kafka"
 
-var (
-	userClient            userservice.Client
-	commodityClient       commodityservice.Client
-	commodityStreamClient commodityservice.StreamClient
-	cartClient            cartservice.Client
-)
+// KafkaAdapter 这里不是mqAdapter的原因是我们调用的是在pkg封装的kafka
+type KafkaAdapter struct {
+	mq *kafka.Kafka
+}
 
-func Init() {
-	InitUserRPC()
-	InitCommodityRPC()
-	InitCommodityStreamClientRPC()
-	InitCartRPC()
+func NewKafkaAdapter(mq *kafka.Kafka) *KafkaAdapter {
+	return &KafkaAdapter{
+		mq: mq,
+	}
 }

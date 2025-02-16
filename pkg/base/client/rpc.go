@@ -25,6 +25,7 @@ import (
 	etcd "github.com/kitex-contrib/registry-etcd"
 
 	"github.com/west2-online/DomTok/config"
+	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
 	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
 	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
 	"github.com/west2-online/DomTok/pkg/constants"
@@ -66,4 +67,8 @@ func InitCommodityStreamClientRPC() (*commodityservice.StreamClient, error) {
 	}
 	cli := commodityservice.MustNewStreamClient(constants.CommodityServiceName, streamclient.WithResolver(r))
 	return &cli, nil
+}
+
+func InitCartRPC() (*cartservice.Client, error) {
+	return initRPCClient(constants.CartServiceName, cartservice.NewClient)
 }

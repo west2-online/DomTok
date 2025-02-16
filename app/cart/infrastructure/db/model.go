@@ -14,24 +14,33 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package rpc
+package db
 
 import (
-	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
-	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
-	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
+	"time"
+
+	"gorm.io/gorm"
+
+	"github.com/west2-online/DomTok/pkg/constants"
 )
 
-var (
-	userClient            userservice.Client
-	commodityClient       commodityservice.Client
-	commodityStreamClient commodityservice.StreamClient
-	cartClient            cartservice.Client
-)
+type Cart struct {
+	UserId    int64 `gorm:"primary_key"`
+	SkuJson   string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `sql:"index"`
+}
 
-func Init() {
-	InitUserRPC()
-	InitCommodityRPC()
-	InitCommodityStreamClientRPC()
-	InitCartRPC()
+func (Cart) TableName() string {
+	return constants.CartTableName
+}
+
+// DBAdapter impl PersistencePort defined in use case package
+type DBAdapter struct {
+	client *gorm.DB
+}
+
+func NewDBAdapter(client *gorm.DB) *DBAdapter {
+	return &DBAdapter{client: client}
 }

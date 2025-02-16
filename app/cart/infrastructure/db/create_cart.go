@@ -14,24 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package rpc
+package db
 
 import (
-	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
-	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
-	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
+	"context"
+
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-var (
-	userClient            userservice.Client
-	commodityClient       commodityservice.Client
-	commodityStreamClient commodityservice.StreamClient
-	cartClient            cartservice.Client
-)
-
-func Init() {
-	InitUserRPC()
-	InitCommodityRPC()
-	InitCommodityStreamClientRPC()
-	InitCartRPC()
+// CreateCart 创建购物车
+func (c *DBAdapter) CreateCart(ctx context.Context, uid int64, cart string) error {
+	model := Cart{
+		UserId:  uid,
+		SkuJson: cart,
+	}
+	if err := c.client.WithContext(ctx).Create(&model).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "db.CreateCart error: %v", err)
+	}
+	return nil
 }

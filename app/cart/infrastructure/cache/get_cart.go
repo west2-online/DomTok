@@ -14,24 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package rpc
+package cache
 
 import (
-	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
-	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
-	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
+	"context"
+
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-var (
-	userClient            userservice.Client
-	commodityClient       commodityservice.Client
-	commodityStreamClient commodityservice.StreamClient
-	cartClient            cartservice.Client
-)
-
-func Init() {
-	InitUserRPC()
-	InitCommodityRPC()
-	InitCommodityStreamClientRPC()
-	InitCartRPC()
+// GetCartCache 获得购物车缓存
+func (c *CacheAdapter) GetCartCache(ctx context.Context, key string) (string, error) {
+	data, err := c.client.Get(ctx, key).Result()
+	if err != nil {
+		return "", errno.Errorf(errno.InternalRedisErrorCode, "cache.GetCartCache error:%v", err.Error())
+	}
+	return data, nil
 }

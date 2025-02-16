@@ -14,24 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package rpc
+package cache
 
 import (
-	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
-	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
-	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
+	"context"
+
+	"github.com/redis/go-redis/v9"
 )
 
-var (
-	userClient            userservice.Client
-	commodityClient       commodityservice.Client
-	commodityStreamClient commodityservice.StreamClient
-	cartClient            cartservice.Client
-)
+// CacheAdapter impl CachePort defined in use case package
+type CacheAdapter struct {
+	client *redis.Client
+}
 
-func Init() {
-	InitUserRPC()
-	InitCommodityRPC()
-	InitCommodityStreamClientRPC()
-	InitCartRPC()
+func NewCacheAdapter(client *redis.Client) *CacheAdapter {
+	return &CacheAdapter{client: client}
+}
+
+// IsKeyExist will check if key exist
+func (c *CacheAdapter) IsKeyExist(ctx context.Context, key string) bool {
+	return c.client.Exists(ctx, key).Val() == 1
 }

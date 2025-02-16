@@ -19,14 +19,32 @@ CREATE TABLE `coupon_info` (
                                `type_info` TINYINT NOT NULL COMMENT '1：满减券，2：满减折扣',
                                `condition_cost` DECIMAL(15,4) DEFAULT 0 COMMENT '用券门槛',
                                `discount_amount` DECIMAL(15,4) DEFAULT 0.0 COMMENT '满减金额',
-                               `discount` DECIMAL(2,1) DEFAULT 0.0 COMMENT '折扣，例如0.8表示八折',
-                               `range_type` TINYINT NOT NULL COMMENT '优惠券的范围 1-商品(spu_id)，2-商品类型，3-任意类型',
+                               `discount` DECIMAL(2,1) DEFAULT 1.0 COMMENT '折扣，例如0.8表示八折',
+                               `range_type` TINYINT NOT NULL COMMENT '优惠券的范围 1-商品(spu_id)，2-商品类型',
                                `range_id` BIGINT NOT NULL COMMENT '优惠券的范围对应类型ID',
                                `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                                `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                                `deleted_at` TIMESTAMP COMMENT '删除时间',
                                `expire_time` TIMESTAMP NOT NULL COMMENT '有效期',
                                 `deadline_for_get` TIMESTAMP NOT NULL COMMENT '可以领取该券的截止时间',
+                               `description` VARCHAR(255) DEFAULT '' COMMENT '描述',
+                                INDEX `idx_coupon_info_range_id` (`range_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 通用优惠券信息表
+CREATE TABLE `general_coupon_info` (
+                               `id` BIGINT NOT NULL PRIMARY KEY COMMENT '优惠券ID',
+                               `uid` BIGINT NOT NULL COMMENT '用户ID',
+                               `name` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '优惠券名称',
+                               `type_info` TINYINT NOT NULL COMMENT '1：满减券，2：满减折扣',
+                               `condition_cost` DECIMAL(15,4) DEFAULT 0 COMMENT '用券门槛',
+                               `discount_amount` DECIMAL(15,4) DEFAULT 0.0 COMMENT '满减金额',
+                               `discount` DECIMAL(2,1) DEFAULT 1.0 COMMENT '折扣，例如0.8表示八折',
+                               `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                               `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                               `deleted_at` TIMESTAMP COMMENT '删除时间',
+                               `expire_time` TIMESTAMP NOT NULL COMMENT '有效期',
+                               `deadline_for_get` TIMESTAMP NOT NULL COMMENT '可以领取该券的截止时间',
                                `description` VARCHAR(255) DEFAULT '' COMMENT '描述'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -38,7 +56,7 @@ CREATE TABLE `user_coupon` (
                                `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                                `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                                `deleted_at` TIMESTAMP COMMENT '删除时间',
-                               PRIMARY KEY (`coupon_id`, `uid`) -- 复合主键存疑
+                               PRIMARY KEY (`uid`, `coupon_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- stock keeping unit 库存量单位表
