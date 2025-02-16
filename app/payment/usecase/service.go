@@ -44,7 +44,8 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, paramToken string
 		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime, fmt.Errorf("check payment order existed failed:%w", err)
 	}
 	if pid == paymentStatus.PaymentOrderNotExist {
-		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime, errno.NewErrNo(errno.PaymentOrderNotExist, "payment order does not exist")
+		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime,
+			errno.NewErrNo(errno.PaymentOrderNotExist, "payment order does not exist")
 	}
 
 	// 2. 检查用户是否存在

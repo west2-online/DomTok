@@ -34,4 +34,6 @@ const (
 	PaymentSecretKey                   = "west2online"
 	RedisStoreSuccess                  = 0  // 成功
 	RedisStoreFailed                   = -1 // Redis 存储失败
+	ExpirationTime                     = 15
+	PingTime                           = 2
 )

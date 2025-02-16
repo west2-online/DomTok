@@ -36,7 +36,7 @@ func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, paramToken str
 // GeneratePaymentToken HMAC生成支付令牌
 func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, paramToken string) (string, int64, error) {
 	// 1. 设定过期时间为15分钟后
-	expirationTime := time.Now().Add(15 * time.Minute).Unix()
+	expirationTime := time.Now().Add(paymentStatus.ExpirationTime * time.Minute).Unix()
 
 	// 2. 获取 HMAC 密钥（可以从环境变量或配置文件获取）
 	secretKey := []byte(paymentStatus.PaymentSecretKey)

@@ -47,15 +47,6 @@ func NewPaymentService(db repository.PaymentDB, sf *utils.Snowflake, redis repos
 		redis: redis,
 	}
 	// TODO redis的初始化放在哪里？
-	//svc.init() 我需要写这个吗？
+	// svc.init() 我需要写这个吗？
 	return svc
-}
-
-func (svc *PaymentService) init() {
-	//TODO redis的初始化放在这里吗？
-	//svc.redisClient = redis.NewClient(&redis.Options{
-	//Addr: "localhost:6379", // Redis 服务器地址
-	//DB:   0,                // 默认使用 0 号数据库
-	//})
-	return
 }

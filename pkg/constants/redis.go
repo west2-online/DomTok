@@ -34,3 +34,10 @@ const (
 	RedisDBOrder     = 0
 	RedisDBCommodity = 1
 )
+
+// Redis Connection Pool Configuration
+const (
+	RedisPoolSize           = 50              // 最大连接数
+	RedisMinIdleConnections = 10              // 最小空闲连接数
+	RedisDialTimeout        = 5 * time.Second // 连接超时时间
+)
