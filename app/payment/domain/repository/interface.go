@@ -18,6 +18,7 @@ package repository
 
 import (
 	"context"
+	"time"
 )
 
 type PaymentDB interface {
@@ -25,4 +26,7 @@ type PaymentDB interface {
 	GetUserByToken(ctx context.Context, paramToken string) (int64, error)
 	GetPaymentInfo(ctx context.Context, paramToken string) (int, error)
 }
-type PaymentRedis interface{}
+type PaymentRedis interface {
+	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error
+	Get(ctx context.Context, key string) (string, error)
+}

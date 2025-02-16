@@ -31,14 +31,21 @@ type PaymentService struct {
 	// emailRe *regexp.Regexp
 }
 
-func NewPaymentService(db repository.PaymentDB, sf *utils.Snowflake) *PaymentService {
+func NewPaymentService(db repository.PaymentDB, sf *utils.Snowflake, redis repository.PaymentRedis) *PaymentService {
 	if db == nil {
 		panic("paymentService`s db should not be nil")
 	}
 	if sf == nil {
 		panic("paymentService`s sf should not be nil")
 	}
-	svc := &PaymentService{db: db}
+	if redis == nil {
+		panic("paymentService`s redis should not be nil")
+	}
+	svc := &PaymentService{
+		db:    db,
+		sf:    sf,
+		redis: redis,
+	}
 	// TODO redis的初始化放在哪里？
 	//svc.init() 我需要写这个吗？
 	return svc

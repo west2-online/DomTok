@@ -34,13 +34,16 @@ type PaymentUseCase interface {
 }
 
 type paymentUseCase struct {
-	db  repository.PaymentDB
-	svc *service.PaymentService
+	db    repository.PaymentDB
+	svc   *service.PaymentService
+	redis repository.PaymentRedis
 }
 
-func NewPaymentCase(db repository.PaymentDB, svc *service.PaymentService) PaymentUseCase {
+func NewPaymentCase(db repository.PaymentDB, svc *service.PaymentService, redis repository.PaymentRedis) PaymentUseCase {
 	return &paymentUseCase{
 		db:  db,
 		svc: svc,
+		// TODO redis加在这里吗
+		redis: redis,
 	}
 }
