@@ -14,19 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package rpc
+package cache
 
 import (
-	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
-	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
+	"context"
+
+	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-var (
-	userClient userservice.Client
-	cartClient cartservice.Client
-)
-
-func Init() {
-	InitUserRPC()
-	InitCartRPC()
+// SetCartCache 将购物车存入redis
+func (c *CacheAdapter) SetCartCache(ctx context.Context, key string, cart string) error {
+	if err := c.client.Set(ctx, key, cart, constants.RedisCartExpireTime).Err(); err != nil {
+		return errno.Errorf(errno.InternalRedisErrorCode, "cache.SetCartCache error:%v", err.Error())
+	}
+	return nil
 }

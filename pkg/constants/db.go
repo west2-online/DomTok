@@ -30,4 +30,5 @@ const (
 	CategoryTableName   = "categories"
 	OrderTableName      = "orders"
 	OrderGoodsTableName = "order_goods"
+	CartTableName       = "cart"
 )
