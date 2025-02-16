@@ -26,7 +26,10 @@ import (
 	"github.com/west2-online/DomTok/pkg/logger"
 )
 
+// TODO 放 constants 里
 const loginDataKey string = "loginData"
+
+// TODO 两个函数都改掉, 不要传什么 model.LoginData 了, 要么就找一个通用的地方声明一个专门的结构体来放结果, 要么直接返回 uid 得了
 
 // WithLoginData 将LoginData加入到context中，通过metainfo传递到RPC server
 func WithLoginData(ctx context.Context, loginData *model.LoginData) context.Context {

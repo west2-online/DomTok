@@ -61,11 +61,13 @@ func (h *UserHandler) Login(ctx context.Context, req *user.LoginRequest) (r *use
 		Password: req.Password,
 	}
 
-	ans, err := h.useCase.Login(ctx, u)
+	//  TODO 改一下 resp 的内容, 让 token返回回去, 需要的话生成两个 token 都返回
+	ans, token, err := h.useCase.Login(ctx, u)
 	if err != nil {
 		r.Base = base.BuildBaseResp(err)
 		return
 	}
+	_ = token
 
 	r.Base = base.BuildBaseResp(nil)
 	r.User = pack.BuildUser(ans)
