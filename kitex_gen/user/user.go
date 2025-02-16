@@ -297,8 +297,10 @@ var fieldIDToName_LoginRequest = map[int16]string{
 }
 
 type LoginResponse struct {
-	Base *model.BaseResp `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
-	User *model.UserInfo `thrift:"user,2" frugal:"2,default,model.UserInfo" json:"user"`
+	Base         *model.BaseResp `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
+	User         *model.UserInfo `thrift:"user,2" frugal:"2,default,model.UserInfo" json:"user"`
+	Accesstoken  string          `thrift:"accesstoken,3" frugal:"3,default,string" json:"accesstoken"`
+	Refreshtoken string          `thrift:"refreshtoken,4" frugal:"4,default,string" json:"refreshtoken"`
 }
 
 func NewLoginResponse() *LoginResponse {
@@ -325,11 +327,25 @@ func (p *LoginResponse) GetUser() (v *model.UserInfo) {
 	}
 	return p.User
 }
+
+func (p *LoginResponse) GetAccesstoken() (v string) {
+	return p.Accesstoken
+}
+
+func (p *LoginResponse) GetRefreshtoken() (v string) {
+	return p.Refreshtoken
+}
 func (p *LoginResponse) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
 func (p *LoginResponse) SetUser(val *model.UserInfo) {
 	p.User = val
+}
+func (p *LoginResponse) SetAccesstoken(val string) {
+	p.Accesstoken = val
+}
+func (p *LoginResponse) SetRefreshtoken(val string) {
+	p.Refreshtoken = val
 }
 
 func (p *LoginResponse) IsSetBase() bool {
@@ -359,6 +375,12 @@ func (p *LoginResponse) DeepEqual(ano *LoginResponse) bool {
 	if !p.Field2DeepEqual(ano.User) {
 		return false
 	}
+	if !p.Field3DeepEqual(ano.Accesstoken) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.Refreshtoken) {
+		return false
+	}
 	return true
 }
 
@@ -376,10 +398,26 @@ func (p *LoginResponse) Field2DeepEqual(src *model.UserInfo) bool {
 	}
 	return true
 }
+func (p *LoginResponse) Field3DeepEqual(src string) bool {
+
+	if strings.Compare(p.Accesstoken, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *LoginResponse) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.Refreshtoken, src) != 0 {
+		return false
+	}
+	return true
+}
 
 var fieldIDToName_LoginResponse = map[int16]string{
 	1: "base",
 	2: "user",
+	3: "accesstoken",
+	4: "refreshtoken",
 }
 
 type UserService interface {

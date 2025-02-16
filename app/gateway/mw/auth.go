@@ -22,7 +22,6 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"github.com/west2-online/DomTok/app/gateway/pack"
-	"github.com/west2-online/DomTok/kitex_gen/model"
 	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/utils"
@@ -47,9 +46,7 @@ func Auth() app.HandlerFunc {
 		}
 
 		// 实现规范化服务透传，不需要中间进行编解码
-		ctx = metainfoContext.WithLoginData(ctx, &model.LoginData{
-			UserId: uid,
-		})
+		ctx = metainfoContext.WithLoginData(ctx, uid)
 
 		c.Header(constants.AccessTokenHeader, access)
 		c.Header(constants.RefreshTokenHeader, refresh)

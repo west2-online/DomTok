@@ -50,14 +50,14 @@ func RegisterRPC(ctx context.Context, req *user.RegisterRequest) (uid int64, err
 	return resp.UserID, nil
 }
 
-func LoginRPC(ctx context.Context, req *user.LoginRequest) (userInfo *model.UserInfo, err error) {
+func LoginRPC(ctx context.Context, req *user.LoginRequest) (userInfo *model.UserInfo, accessToken string, refreshToken string, err error) {
 	resp, err := userClient.Login(ctx, req)
 	if err != nil {
 		logger.Errorf("LoginRPC: RPC called failed: %v", err.Error())
-		return nil, errno.InternalServiceError.WithError(err)
+		return nil, "", "", errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsSuccess(resp.Base) {
-		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return nil, "", "", errno.InternalServiceError.WithMessage(resp.Base.Msg)
 	}
-	return resp.User, nil
+	return resp.User, resp.Accesstoken, resp.Refreshtoken, nil
 }

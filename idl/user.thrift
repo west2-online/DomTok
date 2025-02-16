@@ -23,6 +23,8 @@ struct LoginRequest {
 struct LoginResponse {
     1: model.BaseResp base,
     2: model.UserInfo user,
+    3: string accesstoken,
+    4: string refreshtoken,
 }
 
 service UserService {

@@ -21,6 +21,8 @@ package api
 import (
 	"context"
 
+	"github.com/west2-online/DomTok/pkg/constants"
+
 	"github.com/cloudwego/hertz/pkg/app"
 
 	api "github.com/west2-online/DomTok/app/gateway/model/api/user"
@@ -63,8 +65,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// TODO 改一下 idl, 让生成的 token 直接返回到 gateway, 需要的话生成两个 token 然后都返回
-	resp, err := rpc.LoginRPC(ctx, &user.LoginRequest{
+	resp, accessToken, refreshToken, err := rpc.LoginRPC(ctx, &user.LoginRequest{
 		Username: req.Name,
 		Password: req.Password,
 	})
@@ -72,14 +73,8 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-
-	//access, refresh, err := mw.CreateAllToken()
-	//if err != nil {
-	//	pack.RespError(c, err)
-	//	return
-	//}
-	//c.Header(constants.AccessTokenHeader, access)
-	//c.Header(constants.RefreshTokenHeader, refresh)
+	c.Header(constants.AccessTokenHeader, accessToken)
+	c.Header(constants.RefreshTokenHeader, refreshToken)
 
 	pack.RespData(c, resp)
 }
