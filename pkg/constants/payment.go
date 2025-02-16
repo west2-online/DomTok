@@ -17,7 +17,9 @@ limitations under the License.
 package constants
 
 const (
-	PaymentOrderNotExist               = -1
+	OrderNotExist                      = -1
+	PaymentExist                       = 1
+	PaymentNotExist                    = 0
 	PaymentStatusPending               = 0 // 待支付
 	PaymentStatusProcessing            = 1 // 处理中
 	PaymentStatusSuccess               = 2 // 成功支付

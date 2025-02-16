@@ -28,13 +28,28 @@ import (
 )
 
 // sf可以生成id,详见user/domain/service/service.go
-// TODO 这个函数的逻辑不知道要怎么写
-func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, paramToken string) (int64, error) {
+// TODO 这个函数的逻辑不知道要怎么写，我只知道大概要包括生成订单信息、往sql里存信息、返回支付id这三步
+func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64) error {
+	return nil
+}
+
+// TODO 等Sser模块完成了再写这个，从ctx里获取userID
+func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error) {
+	return 0, nil
+}
+
+// TODO 后面完善这个接口，要发起RPC请求向order模块申请数据库的查询，所以后面再来写
+func (svc *PaymentService) CheckOrderExist(ctx context.Context, orderID int64) (orderInfo int64, err error) {
+	return 0, nil
+}
+
+// TODO
+func (svc *PaymentService) GetPaymentInfo(ctx context.Context, orderID int64) (payStatus int64, err error) {
 	return 0, nil
 }
 
 // GeneratePaymentToken HMAC生成支付令牌
-func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, paramToken string) (string, int64, error) {
+func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int64) (string, int64, error) {
 	// 1. 设定过期时间为15分钟后
 	expirationTime := time.Now().Add(paymentStatus.ExpirationTime * time.Minute).Unix()
 
@@ -43,7 +58,7 @@ func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, paramToken 
 
 	// 3. 计算 HMAC-SHA256 哈希
 	h := hmac.New(sha256.New, secretKey)
-	_, err := h.Write([]byte(fmt.Sprintf("%s:%d", paramToken, expirationTime)))
+	_, err := h.Write([]byte(fmt.Sprintf("%d:%d", orderID, expirationTime)))
 	if err != nil {
 		return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("failed to generate HMAC: %w", err)
 	}
@@ -56,13 +71,13 @@ func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, paramToken 
 }
 
 // StorePaymentToken 这里的返回值还没有想好，是返回状态码还是消息字段？
-func (svc *PaymentService) StorePaymentToken(ctx context.Context, paramToken string, expTime int64) (int, error) {
+func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, expTime int64) (int, error) {
 	// 1. 计算令牌的过期时间（转换成 Duration）
 	expirationDuration := time.Until(time.Unix(expTime, 0))
 
 	// 2. 存储到 Redis（key: "payment_token:<token>"，value: token）
-	redisKey := fmt.Sprintf("payment_token:%s", paramToken)
-	err := svc.redis.SetPaymentToken(ctx, redisKey, paramToken, expirationDuration)
+	redisKey := fmt.Sprintf("payment_token:%s", token)
+	err := svc.redis.SetPaymentToken(ctx, redisKey, token, expirationDuration)
 	if err != nil {
 		return paymentStatus.RedisStoreFailed, fmt.Errorf("failed to store payment token in redis: %w", err)
 	}

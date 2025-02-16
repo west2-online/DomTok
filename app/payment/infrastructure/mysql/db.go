@@ -37,16 +37,15 @@ func NewPaymentDB(client *gorm.DB) repository.PaymentDB {
 	return &paymentDB{client: client}
 }
 
-// TODO 这里是直接传token去查询，还是要把token解析出来？
 func (db *paymentDB) GetOrderByToken(ctx context.Context, paramToken string) (int64, error) {
 	var paymentOrder PaymentOrder
 	err := db.client.WithContext(ctx).Where("token = ?", paramToken).First(&paymentOrder).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return paymentStatus.PaymentOrderNotExist, nil
+			return paymentStatus.OrderNotExist, nil
 		}
 		// 这里报错了就不是业务错误了, 而是服务级别的错误
-		return paymentStatus.PaymentOrderNotExist, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment token: %v", err)
+		return paymentStatus.OrderNotExist, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment token: %v", err)
 	}
 	return paymentOrder.OrderID, nil // 查询成功，返回 order_id
 }

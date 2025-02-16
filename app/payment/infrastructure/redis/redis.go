@@ -37,6 +37,6 @@ func (p *paymentRedis) SetPaymentToken(ctx context.Context, key string, value in
 	return p.client.Set(ctx, key, value, expiration).Err()
 }
 
-func (p *paymentRedis) GetPaymentToken(ctx context.Context, key string) (string, error) {
-	return p.client.Get(ctx, key).Result()
-}
+// func (p *paymentRedis) GetPaymentToken(ctx context.Context, key string) (string, error) {
+// 	   return p.client.Get(ctx, key).Result()
+// }

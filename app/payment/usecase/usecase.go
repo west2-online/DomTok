@@ -24,10 +24,10 @@ import (
 	"github.com/west2-online/DomTok/app/payment/domain/service"
 )
 
+// PaymentUseCase 这里写的是最大的大方法内的中等方法
 type PaymentUseCase interface {
 	CreatePayment(ctx context.Context, orderID int64) (*model.PaymentOrder, error)
-	GetPaymentToken(ctx context.Context, paramToken string) (string, int64, error)
-	GetParamToken(ctx context.Context) (string, error)
+	GetPaymentToken(ctx context.Context, orderID int64) (string, int64, error)
 	// ProcessRefund
 	// RequestRefundToken
 }

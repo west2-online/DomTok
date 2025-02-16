@@ -16,14 +16,4 @@ limitations under the License.
 
 package pack
 
-import (
-	domainModel "github.com/west2-online/DomTok/app/payment/domain/model"
-	"github.com/west2-online/DomTok/kitex_gen/model"
-)
-
 // BuildPaymentOrder BuildUser 将 entities 定义的 User 实体转换成 idl 定义的 RPC 交流实体，类似 dto
-func BuildPaymentOrder(u *domainModel.PaymentOrder) *model.OrderGoods {
-	return &model.OrderGoods{
-		// TODO
-	}
-}

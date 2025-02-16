@@ -48,12 +48,8 @@ func (handler *PaymentHandler) RequestPaymentToken(ctx context.Context, req *pay
 	r = new(payment.PaymentTokenResponse)
 	var token string
 	var expTime int64
-	var paramToken string
-	paramToken, err = handler.useCase.GetParamToken(ctx)
-	if err != nil {
-		return
-	}
-	token, expTime, err = handler.useCase.GetPaymentToken(ctx, paramToken)
+	// 传入ctx（包含uid）和orderID,获取令牌和令牌过期时间
+	token, expTime, err = handler.useCase.GetPaymentToken(ctx, req.OrderID)
 	if err != nil {
 		return
 	}
