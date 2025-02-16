@@ -39,7 +39,7 @@ func Entrypoint(ctx context.Context, c *app.RequestContext) {
 		// in this case, we need to log in to check some args is properly set
 		err := service.Service.Login(ctx)
 		if err != nil {
-			c.JSON(consts.StatusInternalServerError, err)
+			_ = conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
 			return
 		}
 		// start to accept the message
@@ -55,7 +55,7 @@ func Entrypoint(ctx context.Context, c *app.RequestContext) {
 		// in order to avoid the over-accumulation of memory
 		err = service.Service.Logout(ctx)
 		if err != nil {
-			c.JSON(consts.StatusInternalServerError, err)
+			_ = conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
 			return
 		}
 	})

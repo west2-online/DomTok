@@ -27,7 +27,7 @@ import (
 
 func TestToolRepeat_InvokableRun(t *testing.T) {
 	f := Repeat()
-	argsFmt := _RepeatArgs{Message: "hello"}
+	argsFmt := ToolRepeatArgs{Message: "hello"}
 	argsByte, _ := json.Marshal(argsFmt)
 	argsStr := string(argsByte)
 	PatchConvey("TestToolRepeat_InvokableRun", t, func() {

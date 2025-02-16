@@ -22,7 +22,7 @@ import (
 )
 
 // Login logs in the user
-func (s _Service) Login(ctx context.Context) error {
+func (s Core) Login(ctx context.Context) error {
 	_, ok := ctx.Value(CtxKeyID).(string)
 	if !ok {
 		return fmt.Errorf("unexpected or unset id ")

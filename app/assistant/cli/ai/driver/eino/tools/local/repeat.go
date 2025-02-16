@@ -22,6 +22,8 @@ import (
 
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/schema"
+
+	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/tools"
 )
 
 // Tips: This function should not be used in the future
@@ -35,16 +37,18 @@ const (
 	ToolRepeatDesc = "重复用户的输入"
 )
 
-type _RepeatArgs struct {
-	Message string `json:"message"`
+type ToolRepeatArgs struct {
+	Message string `json:"message" yaml:"message" desc:"要重复的消息" required:"true"`
 }
+
+var ToolRepeatRequestBody = schema.NewParamsOneOfByParams(*tools.Reflect(ToolRepeatArgs{}))
 
 func Repeat() *ToolRepeat {
 	return &ToolRepeat{}
 }
 
 func (t *ToolRepeat) InvokableRun(ctx context.Context, argumentsInJSON string, opts ...tool.Option) (string, error) {
-	args := &_RepeatArgs{}
+	args := &ToolRepeatArgs{}
 	err := json.Unmarshal([]byte(argumentsInJSON), args)
 	if err != nil {
 		return "", err
@@ -54,14 +58,8 @@ func (t *ToolRepeat) InvokableRun(ctx context.Context, argumentsInJSON string, o
 
 func (t *ToolRepeat) Info(_ context.Context) (*schema.ToolInfo, error) {
 	return &schema.ToolInfo{
-		Name: ToolRepeatName,
-		Desc: ToolRepeatDesc,
-		ParamsOneOf: schema.NewParamsOneOfByParams(map[string]*schema.ParameterInfo{
-			"message": {
-				Type:     schema.String,
-				Desc:     "要重复的消息",
-				Required: true,
-			},
-		}),
+		Name:        ToolRepeatName,
+		Desc:        ToolRepeatDesc,
+		ParamsOneOf: ToolRepeatRequestBody,
 	}, nil
 }

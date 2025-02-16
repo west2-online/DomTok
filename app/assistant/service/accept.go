@@ -30,7 +30,7 @@ import (
 var busy = sync.Map{}
 
 // Accept accepts a websocket message.
-func (s _Service) Accept(conn *websocket.Conn, ctx context.Context) (err error) {
+func (s Core) Accept(conn *websocket.Conn, ctx context.Context) (err error) {
 	// read the message from the websocket connection
 	t, m, err := conn.ReadMessage()
 	if err != nil {

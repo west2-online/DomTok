@@ -18,11 +18,11 @@ package service
 
 import "github.com/west2-online/DomTok/app/assistant/cli/ai/adapter"
 
-type _Service struct {
+type Core struct {
 	ai adapter.AIClient
 }
 
-var Service _Service
+var Service Core
 
 // CtxKey 先把service的ctx key定义在这里
 type CtxKey string

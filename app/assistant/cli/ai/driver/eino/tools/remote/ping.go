@@ -23,21 +23,28 @@ import (
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/schema"
 
+	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/tools"
 	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
 )
 
 // Tips: This function should not be used in the future
+
+const (
+	ToolPingName = "ping"
+	ToolPingDesc = "当用户想知道服务器是否在线时，可以使用此工具"
+)
+
+type ToolPingArgs struct {
+	Argument string `json:"argument" yaml:"argument" desc:"填入角色设定名" required:"true"`
+}
+
+var ToolPingRequestBody = schema.NewParamsOneOfByParams(*tools.Reflect(ToolPingArgs{}))
 
 type ToolPing struct {
 	tool.InvokableTool
 
 	server adapter.ServerCaller
 }
-
-const (
-	ToolPingName = "ping"
-	ToolPingDesc = "当用户想知道服务器是否在线时，可以使用此工具"
-)
 
 func Ping(server adapter.ServerCaller) *ToolPing {
 	return &ToolPing{
@@ -59,14 +66,8 @@ func (t *ToolPing) InvokableRun(ctx context.Context, argumentsInJSON string, opt
 
 func (t *ToolPing) Info(_ context.Context) (*schema.ToolInfo, error) {
 	return &schema.ToolInfo{
-		Name: ToolPingName,
-		Desc: ToolPingDesc,
-		ParamsOneOf: schema.NewParamsOneOfByParams(map[string]*schema.ParameterInfo{
-			"argument": {
-				Type:     schema.String,
-				Desc:     "填入角色设定名",
-				Required: true,
-			},
-		}),
+		Name:        ToolPingName,
+		Desc:        ToolPingDesc,
+		ParamsOneOf: ToolPingRequestBody,
 	}, nil
 }

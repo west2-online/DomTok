@@ -33,7 +33,6 @@ import (
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/adapter"
 	strategy "github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/model"
 	"github.com/west2-online/DomTok/app/assistant/model"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // Client is a client struct for calling the AI
@@ -54,14 +53,14 @@ type Client struct {
 func NewClient() *Client {
 	cli := &Client{}
 	cli.persona = GetPersona()
-	callbacks.InitCallbackHandlers([]callbacks.Handler{agentLogger})
+	callbacks.InitCallbackHandlers([]callbacks.Handler{&LoggerCallback{}})
 	return cli
 }
 
-// SetServerCategory sets the server category
-func (c *Client) SetServerStrategy(category strategy.GetServerCaller) {
-	c.caller = category
-	c.tools = *GetTools(category)
+// SetServerStrategy sets the server strategy
+func (c *Client) SetServerStrategy(strategy strategy.GetServerCaller) {
+	c.caller = strategy
+	c.tools = *GetTools(strategy)
 }
 
 // SetBuilder sets the build chat model
@@ -77,12 +76,9 @@ func (c *Client) BuildChatModel(ctx context.Context) (components.ChatModel, erro
 func (c *Client) Call(ctx context.Context, dialog model.IDialog) (err error) {
 	defer dialog.Close()
 
-	if c.caller == nil {
-		return fmt.Errorf("server category is not set")
-	}
-
-	if c.builder == nil {
-		return fmt.Errorf("build chat model is not set")
+	err = c.checkCallerAndBuilder()
+	if err != nil {
+		return fmt.Errorf("failed to continue: %w", err)
 	}
 
 	c.markDialog(dialog)
@@ -98,43 +94,34 @@ func (c *Client) Call(ctx context.Context, dialog model.IDialog) (err error) {
 	}
 
 	ra, err := react.NewAgent(ctx, &react.AgentConfig{
-		Model: chatModel,
-		ToolsConfig: compose.ToolsNodeConfig{
-			Tools: c.tools,
-		},
-		MessageModifier: func(ctx context.Context, input []*schema.Message) []*schema.Message {
-			return append(history, input...)
-		},
+		Model:           chatModel,
+		ToolsConfig:     compose.ToolsNodeConfig{Tools: c.tools},
+		MessageModifier: func(_ context.Context, input []*schema.Message) []*schema.Message { return append(history, input...) },
 	})
 	if err != nil {
 		return fmt.Errorf("create agent failed: %w", err)
 	}
 
-	history = append(history, schema.UserMessage(dialog.Message()))
-	stream, err := ra.Stream(ctx, []*schema.Message{schema.UserMessage(dialog.Message())})
+	out, err := c.readStreamWithDialog(ctx, ra, dialog)
 	if err != nil {
-		return fmt.Errorf("stream failed: %w", err)
-	}
-	defer stream.Close()
-
-	out := ""
-	for {
-		frame, err := stream.Recv()
-		if errors.Is(err, io.EOF) {
-			break
-		}
-		if err != nil {
-			return fmt.Errorf("stream recv failed: %w", err)
-		}
-
-		if len(frame.Content) != 0 {
-			dialog.Send(frame.Content)
-			out += frame.Content
-		}
+		return fmt.Errorf("read stream failed: %w", err)
 	}
 
-	history = append(history, schema.AssistantMessage(out, nil))
+	history = append(history, schema.UserMessage(dialog.Message()), schema.AssistantMessage(out, nil))
 	c.storeMarkedDialog(dialog, history)
+
+	return nil
+}
+
+// checkCallerAndBuilder checks if the caller and builder are set
+func (c *Client) checkCallerAndBuilder() error {
+	if c.caller == nil {
+		return fmt.Errorf("server category is not set")
+	}
+
+	if c.builder == nil {
+		return fmt.Errorf("build chat model is not set")
+	}
 
 	return nil
 }
@@ -180,56 +167,31 @@ func (c *Client) readHistory(key string) ([]*schema.Message, error) {
 	return history, nil
 }
 
-var agentLogger = &LoggerCallback{}
+func (c *Client) readStreamWithDialog(
+	ctx context.Context,
+	ra *react.Agent,
+	dialog model.IDialog,
+) (string, error) {
+	stream, err := ra.Stream(ctx, []*schema.Message{schema.UserMessage(dialog.Message())})
+	if err != nil {
+		return "", fmt.Errorf("stream failed: %w", err)
+	}
+	defer stream.Close()
 
-type LoggerCallback struct {
-	callbacks.HandlerBuilder
-}
-
-func (cb *LoggerCallback) OnStart(ctx context.Context, info *callbacks.RunInfo, input callbacks.CallbackInput) context.Context {
-	logger.Infof("[AI-Agent] input: %#v", input)
-	return ctx
-}
-
-func (cb *LoggerCallback) OnEnd(ctx context.Context, info *callbacks.RunInfo, output callbacks.CallbackOutput) context.Context {
-	logger.Infof("[AI-Agent] output: %#v", output)
-	return ctx
-}
-
-func (cb *LoggerCallback) OnError(ctx context.Context, info *callbacks.RunInfo, err error) context.Context {
-	logger.Errorf("[AI-Agent Stream] error: %v", err)
-	return ctx
-}
-
-func (cb *LoggerCallback) OnEndWithStreamOutput(ctx context.Context, info *callbacks.RunInfo,
-	output *schema.StreamReader[callbacks.CallbackOutput],
-) context.Context {
-	go func() {
-		defer func() {
-			if err := recover(); err != nil {
-				logger.Errorf("internal error: %v", err)
-			}
-		}()
-
-		defer output.Close() // remember to close the stream in defer
-
-		for {
-			_, err := output.Recv()
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			if err != nil {
-				logger.Errorf("[AI-Agent Stream] error: %v", err)
-				return
-			}
+	out := ""
+	for {
+		frame, err := stream.Recv()
+		if errors.Is(err, io.EOF) {
+			break
 		}
-	}()
-	return ctx
-}
+		if err != nil {
+			return "", fmt.Errorf("stream recv failed: %w", err)
+		}
 
-func (cb *LoggerCallback) OnStartWithStreamInput(ctx context.Context, info *callbacks.RunInfo,
-	input *schema.StreamReader[callbacks.CallbackInput],
-) context.Context {
-	defer input.Close()
-	return ctx
+		if len(frame.Content) != 0 {
+			dialog.Send(frame.Content)
+			out += frame.Content
+		}
+	}
+	return out, nil
 }
