@@ -112,7 +112,6 @@ struct UseUserCouponResp {
 * @Param name 名称
 * @Param description 描述
 * @Param categoryID 类型ID
-* @Param goodsHeadDrawingName 款式头图名
 * @Param price 价格
 * @Param forSale 是否出售
 * @Param shipping 运费
@@ -120,17 +119,14 @@ struct UseUserCouponResp {
 * @Param spu展示图数据
 */
 struct CreateSpuReq {
-    1: optional list<string> spuImageName;
-    2: required string name;
-    3: optional list<binary> spuImage;
-    4: required string description;
-    5: required i64 categoryID;
-    6: required string goodsHeadDrawingName;
-    7: required double price;
-    8: required i32 forSale;
-    9: required double shipping;
-    10: required binary goodsHeadDrawing;
-
+    1: required string name;
+    2: required string description;
+    3: required i64 categoryID;
+    4: required binary goodsHeadDrawing;
+    5: required double price;
+    6: required i32 forSale;
+    7: required double shipping;
+    8: required i64 bufferCount;
 }
 
 struct CreateSpuResp {
@@ -151,19 +147,15 @@ struct CreateSpuResp {
 * @Param spuID spu的ID
 */
 struct UpdateSpuReq {
-    1: optional string spuImageName;
-    2: optional string name;
-    3: optional i64 spuImageId;
-    4: optional string description;
-    5: optional i64 categoryID;
-    6: optional string goodsHeadDrawingName;
-    7: optional double price;
-    8: optional i32 forSale;
-    9: optional double shipping;
-    10: required i64 spuID;
-    11: required binary goodsHeadDrawing;
-    12: optional binary spuImage;
-
+    1: optional string name;
+    2: optional string description;
+    3: optional i64 categoryID;
+    4: optional binary goodsHeadDrawing;
+    5: optional double price;
+    6: optional i32 forSale;
+    7: optional double shipping;
+    8: required i64 spuID;
+    9: optional i64 bufferCount;
 }
 
 struct UpdateSpuResp {
@@ -472,6 +464,14 @@ struct ViewHistoryPriceResp {
     2: required list<model.PriceHistory> records;
 }
 
+struct UploadImageReq {
+
+}
+
+struct UploadImageResp {
+
+}
+
 service CommodityService {
     // 优惠券
     CreateCouponResp CreateCoupon(1: CreateCouponReq req);
@@ -482,11 +482,13 @@ service CommodityService {
     UseUserCouponResp UseUserCoupon(1: UseUserCouponReq req);
 
     // SPU
-    CreateSpuResp CreateSpu(1: CreateSpuReq req);
-    UpdateSpuResp UpdateSpu(1: UpdateSkuReq req);
+    CreateSpuResp CreateSpu(1: CreateSpuReq req) (streaming.mode="client");
+    UpdateSpuResp UpdateSpu(1: UpdateSpuReq req) (streaming.mode="client");
     ViewSpuResp ViewSpu(1: ViewSpuReq req);
     DeleteSpuResp DeleteSpu(1: DeleteSpuReq req);
     ViewSpuImageResp ViewSpuImage(1: ViewSpuImageReq req);
+//    UploadImageResp UploadImageClient(1: UploadImageReq req) (streaming.mode="client");
+
 
     //SKU
     CreateSkuResp CreateSku(1: CreateSkuReq req);

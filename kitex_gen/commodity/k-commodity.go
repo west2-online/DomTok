@@ -2193,11 +2193,11 @@ func (p *CreateSpuReq) FastRead(buf []byte) (int, error) {
 	var issetName bool = false
 	var issetDescription bool = false
 	var issetCategoryID bool = false
-	var issetGoodsHeadDrawingName bool = false
+	var issetGoodsHeadDrawing bool = false
 	var issetPrice bool = false
 	var issetForSale bool = false
 	var issetShipping bool = false
-	var issetGoodsHeadDrawing bool = false
+	var issetBufferCount bool = false
 	for {
 		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
 		offset += l
@@ -2209,12 +2209,13 @@ func (p *CreateSpuReq) FastRead(buf []byte) (int, error) {
 		}
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.LIST {
+			if fieldTypeId == thrift.STRING {
 				l, err = p.FastReadField1(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
 				}
+				issetName = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -2229,7 +2230,7 @@ func (p *CreateSpuReq) FastRead(buf []byte) (int, error) {
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetName = true
+				issetDescription = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -2238,12 +2239,13 @@ func (p *CreateSpuReq) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 3:
-			if fieldTypeId == thrift.LIST {
+			if fieldTypeId == thrift.I64 {
 				l, err = p.FastReadField3(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
 				}
+				issetCategoryID = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -2258,7 +2260,7 @@ func (p *CreateSpuReq) FastRead(buf []byte) (int, error) {
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetDescription = true
+				issetGoodsHeadDrawing = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -2267,13 +2269,13 @@ func (p *CreateSpuReq) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 5:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.DOUBLE {
 				l, err = p.FastReadField5(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetCategoryID = true
+				issetPrice = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -2282,13 +2284,13 @@ func (p *CreateSpuReq) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 6:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				l, err = p.FastReadField6(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetGoodsHeadDrawingName = true
+				issetForSale = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -2303,36 +2305,6 @@ func (p *CreateSpuReq) FastRead(buf []byte) (int, error) {
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetPrice = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 8:
-			if fieldTypeId == thrift.I32 {
-				l, err = p.FastReadField8(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetForSale = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 9:
-			if fieldTypeId == thrift.DOUBLE {
-				l, err = p.FastReadField9(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
 				issetShipping = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
@@ -2341,14 +2313,14 @@ func (p *CreateSpuReq) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
-		case 10:
-			if fieldTypeId == thrift.STRING {
-				l, err = p.FastReadField10(buf[offset:])
+		case 8:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField8(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetGoodsHeadDrawing = true
+				issetBufferCount = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -2366,42 +2338,42 @@ func (p *CreateSpuReq) FastRead(buf []byte) (int, error) {
 	}
 
 	if !issetName {
-		fieldId = 2
+		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
 
 	if !issetDescription {
-		fieldId = 4
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 
 	if !issetCategoryID {
-		fieldId = 5
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetGoodsHeadDrawingName {
-		fieldId = 6
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetPrice {
-		fieldId = 7
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetForSale {
-		fieldId = 8
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetShipping {
-		fieldId = 9
+		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
 
 	if !issetGoodsHeadDrawing {
-		fieldId = 10
+		fieldId = 4
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetPrice {
+		fieldId = 5
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetForSale {
+		fieldId = 6
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetShipping {
+		fieldId = 7
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetBufferCount {
+		fieldId = 8
 		goto RequiredFieldNotSetError
 	}
 	return offset, nil
@@ -2418,24 +2390,14 @@ RequiredFieldNotSetError:
 func (p *CreateSpuReq) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
-	_, size, l, err := thrift.Binary.ReadListBegin(buf[offset:])
-	offset += l
-	if err != nil {
+	var _field string
+	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
 		return offset, err
+	} else {
+		offset += l
+		_field = v
 	}
-	_field := make([]string, 0, size)
-	for i := 0; i < size; i++ {
-		var _elem string
-		if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
-			return offset, err
-		} else {
-			offset += l
-			_elem = v
-		}
-
-		_field = append(_field, _elem)
-	}
-	p.SpuImageName = _field
+	p.Name = _field
 	return offset, nil
 }
 
@@ -2449,50 +2411,11 @@ func (p *CreateSpuReq) FastReadField2(buf []byte) (int, error) {
 		offset += l
 		_field = v
 	}
-	p.Name = _field
-	return offset, nil
-}
-
-func (p *CreateSpuReq) FastReadField3(buf []byte) (int, error) {
-	offset := 0
-
-	_, size, l, err := thrift.Binary.ReadListBegin(buf[offset:])
-	offset += l
-	if err != nil {
-		return offset, err
-	}
-	_field := make([][]byte, 0, size)
-	for i := 0; i < size; i++ {
-		var _elem []byte
-		if v, l, err := thrift.Binary.ReadBinary(buf[offset:]); err != nil {
-			return offset, err
-		} else {
-			offset += l
-
-			_elem = []byte(v)
-		}
-
-		_field = append(_field, _elem)
-	}
-	p.SpuImage = _field
-	return offset, nil
-}
-
-func (p *CreateSpuReq) FastReadField4(buf []byte) (int, error) {
-	offset := 0
-
-	var _field string
-	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
 	p.Description = _field
 	return offset, nil
 }
 
-func (p *CreateSpuReq) FastReadField5(buf []byte) (int, error) {
+func (p *CreateSpuReq) FastReadField3(buf []byte) (int, error) {
 	offset := 0
 
 	var _field int64
@@ -2506,63 +2429,7 @@ func (p *CreateSpuReq) FastReadField5(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *CreateSpuReq) FastReadField6(buf []byte) (int, error) {
-	offset := 0
-
-	var _field string
-	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.GoodsHeadDrawingName = _field
-	return offset, nil
-}
-
-func (p *CreateSpuReq) FastReadField7(buf []byte) (int, error) {
-	offset := 0
-
-	var _field float64
-	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.Price = _field
-	return offset, nil
-}
-
-func (p *CreateSpuReq) FastReadField8(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int32
-	if v, l, err := thrift.Binary.ReadI32(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.ForSale = _field
-	return offset, nil
-}
-
-func (p *CreateSpuReq) FastReadField9(buf []byte) (int, error) {
-	offset := 0
-
-	var _field float64
-	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.Shipping = _field
-	return offset, nil
-}
-
-func (p *CreateSpuReq) FastReadField10(buf []byte) (int, error) {
+func (p *CreateSpuReq) FastReadField4(buf []byte) (int, error) {
 	offset := 0
 
 	var _field []byte
@@ -2577,6 +2444,62 @@ func (p *CreateSpuReq) FastReadField10(buf []byte) (int, error) {
 	return offset, nil
 }
 
+func (p *CreateSpuReq) FastReadField5(buf []byte) (int, error) {
+	offset := 0
+
+	var _field float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.Price = _field
+	return offset, nil
+}
+
+func (p *CreateSpuReq) FastReadField6(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int32
+	if v, l, err := thrift.Binary.ReadI32(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.ForSale = _field
+	return offset, nil
+}
+
+func (p *CreateSpuReq) FastReadField7(buf []byte) (int, error) {
+	offset := 0
+
+	var _field float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.Shipping = _field
+	return offset, nil
+}
+
+func (p *CreateSpuReq) FastReadField8(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.BufferCount = _field
+	return offset, nil
+}
+
 func (p *CreateSpuReq) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
@@ -2584,16 +2507,14 @@ func (p *CreateSpuReq) FastWrite(buf []byte) int {
 func (p *CreateSpuReq) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
+		offset += p.fastWriteField3(buf[offset:], w)
 		offset += p.fastWriteField5(buf[offset:], w)
+		offset += p.fastWriteField6(buf[offset:], w)
 		offset += p.fastWriteField7(buf[offset:], w)
 		offset += p.fastWriteField8(buf[offset:], w)
-		offset += p.fastWriteField9(buf[offset:], w)
 		offset += p.fastWriteField1(buf[offset:], w)
 		offset += p.fastWriteField2(buf[offset:], w)
-		offset += p.fastWriteField3(buf[offset:], w)
 		offset += p.fastWriteField4(buf[offset:], w)
-		offset += p.fastWriteField6(buf[offset:], w)
-		offset += p.fastWriteField10(buf[offset:], w)
 	}
 	offset += thrift.Binary.WriteFieldStop(buf[offset:])
 	return offset
@@ -2610,8 +2531,6 @@ func (p *CreateSpuReq) BLength() int {
 		l += p.field6Length()
 		l += p.field7Length()
 		l += p.field8Length()
-		l += p.field9Length()
-		l += p.field10Length()
 	}
 	l += thrift.Binary.FieldStopLength()
 	return l
@@ -2619,143 +2538,99 @@ func (p *CreateSpuReq) BLength() int {
 
 func (p *CreateSpuReq) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	if p.IsSetSpuImageName() {
-		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.LIST, 1)
-		listBeginOffset := offset
-		offset += thrift.Binary.ListBeginLength()
-		var length int
-		for _, v := range p.SpuImageName {
-			length++
-			offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, v)
-		}
-		thrift.Binary.WriteListBegin(buf[listBeginOffset:], thrift.STRING, length)
-	}
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 1)
+	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.Name)
 	return offset
 }
 
 func (p *CreateSpuReq) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 2)
-	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.Name)
+	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.Description)
 	return offset
 }
 
 func (p *CreateSpuReq) fastWriteField3(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	if p.IsSetSpuImage() {
-		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.LIST, 3)
-		listBeginOffset := offset
-		offset += thrift.Binary.ListBeginLength()
-		var length int
-		for _, v := range p.SpuImage {
-			length++
-			offset += thrift.Binary.WriteBinaryNocopy(buf[offset:], w, []byte(v))
-		}
-		thrift.Binary.WriteListBegin(buf[listBeginOffset:], thrift.STRING, length)
-	}
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 3)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.CategoryID)
 	return offset
 }
 
 func (p *CreateSpuReq) fastWriteField4(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 4)
-	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.Description)
+	offset += thrift.Binary.WriteBinaryNocopy(buf[offset:], w, []byte(p.GoodsHeadDrawing))
 	return offset
 }
 
 func (p *CreateSpuReq) fastWriteField5(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 5)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.CategoryID)
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 5)
+	offset += thrift.Binary.WriteDouble(buf[offset:], p.Price)
 	return offset
 }
 
 func (p *CreateSpuReq) fastWriteField6(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 6)
-	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.GoodsHeadDrawingName)
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I32, 6)
+	offset += thrift.Binary.WriteI32(buf[offset:], p.ForSale)
 	return offset
 }
 
 func (p *CreateSpuReq) fastWriteField7(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 7)
-	offset += thrift.Binary.WriteDouble(buf[offset:], p.Price)
+	offset += thrift.Binary.WriteDouble(buf[offset:], p.Shipping)
 	return offset
 }
 
 func (p *CreateSpuReq) fastWriteField8(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I32, 8)
-	offset += thrift.Binary.WriteI32(buf[offset:], p.ForSale)
-	return offset
-}
-
-func (p *CreateSpuReq) fastWriteField9(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 9)
-	offset += thrift.Binary.WriteDouble(buf[offset:], p.Shipping)
-	return offset
-}
-
-func (p *CreateSpuReq) fastWriteField10(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 10)
-	offset += thrift.Binary.WriteBinaryNocopy(buf[offset:], w, []byte(p.GoodsHeadDrawing))
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 8)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.BufferCount)
 	return offset
 }
 
 func (p *CreateSpuReq) field1Length() int {
-	l := 0
-	if p.IsSetSpuImageName() {
-		l += thrift.Binary.FieldBeginLength()
-		l += thrift.Binary.ListBeginLength()
-		for _, v := range p.SpuImageName {
-			_ = v
-			l += thrift.Binary.StringLengthNocopy(v)
-		}
-	}
-	return l
-}
-
-func (p *CreateSpuReq) field2Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.StringLengthNocopy(p.Name)
 	return l
 }
 
-func (p *CreateSpuReq) field3Length() int {
-	l := 0
-	if p.IsSetSpuImage() {
-		l += thrift.Binary.FieldBeginLength()
-		l += thrift.Binary.ListBeginLength()
-		for _, v := range p.SpuImage {
-			_ = v
-			l += thrift.Binary.BinaryLengthNocopy([]byte(v))
-		}
-	}
-	return l
-}
-
-func (p *CreateSpuReq) field4Length() int {
+func (p *CreateSpuReq) field2Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.StringLengthNocopy(p.Description)
 	return l
 }
 
-func (p *CreateSpuReq) field5Length() int {
+func (p *CreateSpuReq) field3Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.I64Length()
 	return l
 }
 
+func (p *CreateSpuReq) field4Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.BinaryLengthNocopy([]byte(p.GoodsHeadDrawing))
+	return l
+}
+
+func (p *CreateSpuReq) field5Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.DoubleLength()
+	return l
+}
+
 func (p *CreateSpuReq) field6Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.StringLengthNocopy(p.GoodsHeadDrawingName)
+	l += thrift.Binary.I32Length()
 	return l
 }
 
@@ -2769,21 +2644,7 @@ func (p *CreateSpuReq) field7Length() int {
 func (p *CreateSpuReq) field8Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I32Length()
-	return l
-}
-
-func (p *CreateSpuReq) field9Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.DoubleLength()
-	return l
-}
-
-func (p *CreateSpuReq) field10Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.BinaryLengthNocopy([]byte(p.GoodsHeadDrawing))
+	l += thrift.Binary.I64Length()
 	return l
 }
 
@@ -2951,7 +2812,6 @@ func (p *UpdateSpuReq) FastRead(buf []byte) (int, error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetSpuID bool = false
-	var issetGoodsHeadDrawing bool = false
 	for {
 		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
 		offset += l
@@ -3019,7 +2879,7 @@ func (p *UpdateSpuReq) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 5:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.DOUBLE {
 				l, err = p.FastReadField5(buf[offset:])
 				offset += l
 				if err != nil {
@@ -3033,7 +2893,7 @@ func (p *UpdateSpuReq) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 6:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				l, err = p.FastReadField6(buf[offset:])
 				offset += l
 				if err != nil {
@@ -3061,36 +2921,8 @@ func (p *UpdateSpuReq) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 8:
-			if fieldTypeId == thrift.I32 {
-				l, err = p.FastReadField8(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 9:
-			if fieldTypeId == thrift.DOUBLE {
-				l, err = p.FastReadField9(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 10:
 			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField10(buf[offset:])
+				l, err = p.FastReadField8(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -3103,24 +2935,9 @@ func (p *UpdateSpuReq) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
-		case 11:
-			if fieldTypeId == thrift.STRING {
-				l, err = p.FastReadField11(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetGoodsHeadDrawing = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 12:
-			if fieldTypeId == thrift.STRING {
-				l, err = p.FastReadField12(buf[offset:])
+		case 9:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField9(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -3142,12 +2959,7 @@ func (p *UpdateSpuReq) FastRead(buf []byte) (int, error) {
 	}
 
 	if !issetSpuID {
-		fieldId = 10
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetGoodsHeadDrawing {
-		fieldId = 11
+		fieldId = 8
 		goto RequiredFieldNotSetError
 	}
 	return offset, nil
@@ -3171,7 +2983,7 @@ func (p *UpdateSpuReq) FastReadField1(buf []byte) (int, error) {
 		offset += l
 		_field = &v
 	}
-	p.SpuImageName = _field
+	p.Name = _field
 	return offset, nil
 }
 
@@ -3185,7 +2997,7 @@ func (p *UpdateSpuReq) FastReadField2(buf []byte) (int, error) {
 		offset += l
 		_field = &v
 	}
-	p.Name = _field
+	p.Description = _field
 	return offset, nil
 }
 
@@ -3199,109 +3011,11 @@ func (p *UpdateSpuReq) FastReadField3(buf []byte) (int, error) {
 		offset += l
 		_field = &v
 	}
-	p.SpuImageId = _field
-	return offset, nil
-}
-
-func (p *UpdateSpuReq) FastReadField4(buf []byte) (int, error) {
-	offset := 0
-
-	var _field *string
-	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = &v
-	}
-	p.Description = _field
-	return offset, nil
-}
-
-func (p *UpdateSpuReq) FastReadField5(buf []byte) (int, error) {
-	offset := 0
-
-	var _field *int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = &v
-	}
 	p.CategoryID = _field
 	return offset, nil
 }
 
-func (p *UpdateSpuReq) FastReadField6(buf []byte) (int, error) {
-	offset := 0
-
-	var _field *string
-	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = &v
-	}
-	p.GoodsHeadDrawingName = _field
-	return offset, nil
-}
-
-func (p *UpdateSpuReq) FastReadField7(buf []byte) (int, error) {
-	offset := 0
-
-	var _field *float64
-	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = &v
-	}
-	p.Price = _field
-	return offset, nil
-}
-
-func (p *UpdateSpuReq) FastReadField8(buf []byte) (int, error) {
-	offset := 0
-
-	var _field *int32
-	if v, l, err := thrift.Binary.ReadI32(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = &v
-	}
-	p.ForSale = _field
-	return offset, nil
-}
-
-func (p *UpdateSpuReq) FastReadField9(buf []byte) (int, error) {
-	offset := 0
-
-	var _field *float64
-	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = &v
-	}
-	p.Shipping = _field
-	return offset, nil
-}
-
-func (p *UpdateSpuReq) FastReadField10(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.SpuID = _field
-	return offset, nil
-}
-
-func (p *UpdateSpuReq) FastReadField11(buf []byte) (int, error) {
+func (p *UpdateSpuReq) FastReadField4(buf []byte) (int, error) {
 	offset := 0
 
 	var _field []byte
@@ -3316,18 +3030,73 @@ func (p *UpdateSpuReq) FastReadField11(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *UpdateSpuReq) FastReadField12(buf []byte) (int, error) {
+func (p *UpdateSpuReq) FastReadField5(buf []byte) (int, error) {
 	offset := 0
 
-	var _field []byte
-	if v, l, err := thrift.Binary.ReadBinary(buf[offset:]); err != nil {
+	var _field *float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
 		return offset, err
 	} else {
 		offset += l
-
-		_field = []byte(v)
+		_field = &v
 	}
-	p.SpuImage = _field
+	p.Price = _field
+	return offset, nil
+}
+
+func (p *UpdateSpuReq) FastReadField6(buf []byte) (int, error) {
+	offset := 0
+
+	var _field *int32
+	if v, l, err := thrift.Binary.ReadI32(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = &v
+	}
+	p.ForSale = _field
+	return offset, nil
+}
+
+func (p *UpdateSpuReq) FastReadField7(buf []byte) (int, error) {
+	offset := 0
+
+	var _field *float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = &v
+	}
+	p.Shipping = _field
+	return offset, nil
+}
+
+func (p *UpdateSpuReq) FastReadField8(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.SpuID = _field
+	return offset, nil
+}
+
+func (p *UpdateSpuReq) FastReadField9(buf []byte) (int, error) {
+	offset := 0
+
+	var _field *int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = &v
+	}
+	p.BufferCount = _field
 	return offset, nil
 }
 
@@ -3340,16 +3109,13 @@ func (p *UpdateSpuReq) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	if p != nil {
 		offset += p.fastWriteField3(buf[offset:], w)
 		offset += p.fastWriteField5(buf[offset:], w)
+		offset += p.fastWriteField6(buf[offset:], w)
 		offset += p.fastWriteField7(buf[offset:], w)
 		offset += p.fastWriteField8(buf[offset:], w)
 		offset += p.fastWriteField9(buf[offset:], w)
-		offset += p.fastWriteField10(buf[offset:], w)
 		offset += p.fastWriteField1(buf[offset:], w)
 		offset += p.fastWriteField2(buf[offset:], w)
 		offset += p.fastWriteField4(buf[offset:], w)
-		offset += p.fastWriteField6(buf[offset:], w)
-		offset += p.fastWriteField11(buf[offset:], w)
-		offset += p.fastWriteField12(buf[offset:], w)
 	}
 	offset += thrift.Binary.WriteFieldStop(buf[offset:])
 	return offset
@@ -3367,9 +3133,6 @@ func (p *UpdateSpuReq) BLength() int {
 		l += p.field7Length()
 		l += p.field8Length()
 		l += p.field9Length()
-		l += p.field10Length()
-		l += p.field11Length()
-		l += p.field12Length()
 	}
 	l += thrift.Binary.FieldStopLength()
 	return l
@@ -3377,118 +3140,84 @@ func (p *UpdateSpuReq) BLength() int {
 
 func (p *UpdateSpuReq) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	if p.IsSetSpuImageName() {
+	if p.IsSetName() {
 		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 1)
-		offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, *p.SpuImageName)
+		offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, *p.Name)
 	}
 	return offset
 }
 
 func (p *UpdateSpuReq) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	if p.IsSetName() {
+	if p.IsSetDescription() {
 		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 2)
-		offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, *p.Name)
+		offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, *p.Description)
 	}
 	return offset
 }
 
 func (p *UpdateSpuReq) fastWriteField3(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	if p.IsSetSpuImageId() {
+	if p.IsSetCategoryID() {
 		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 3)
-		offset += thrift.Binary.WriteI64(buf[offset:], *p.SpuImageId)
+		offset += thrift.Binary.WriteI64(buf[offset:], *p.CategoryID)
 	}
 	return offset
 }
 
 func (p *UpdateSpuReq) fastWriteField4(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	if p.IsSetDescription() {
+	if p.IsSetGoodsHeadDrawing() {
 		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 4)
-		offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, *p.Description)
+		offset += thrift.Binary.WriteBinaryNocopy(buf[offset:], w, []byte(p.GoodsHeadDrawing))
 	}
 	return offset
 }
 
 func (p *UpdateSpuReq) fastWriteField5(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	if p.IsSetCategoryID() {
-		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 5)
-		offset += thrift.Binary.WriteI64(buf[offset:], *p.CategoryID)
+	if p.IsSetPrice() {
+		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 5)
+		offset += thrift.Binary.WriteDouble(buf[offset:], *p.Price)
 	}
 	return offset
 }
 
 func (p *UpdateSpuReq) fastWriteField6(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	if p.IsSetGoodsHeadDrawingName() {
-		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 6)
-		offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, *p.GoodsHeadDrawingName)
+	if p.IsSetForSale() {
+		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I32, 6)
+		offset += thrift.Binary.WriteI32(buf[offset:], *p.ForSale)
 	}
 	return offset
 }
 
 func (p *UpdateSpuReq) fastWriteField7(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	if p.IsSetPrice() {
+	if p.IsSetShipping() {
 		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 7)
-		offset += thrift.Binary.WriteDouble(buf[offset:], *p.Price)
+		offset += thrift.Binary.WriteDouble(buf[offset:], *p.Shipping)
 	}
 	return offset
 }
 
 func (p *UpdateSpuReq) fastWriteField8(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	if p.IsSetForSale() {
-		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I32, 8)
-		offset += thrift.Binary.WriteI32(buf[offset:], *p.ForSale)
-	}
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 8)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.SpuID)
 	return offset
 }
 
 func (p *UpdateSpuReq) fastWriteField9(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	if p.IsSetShipping() {
-		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 9)
-		offset += thrift.Binary.WriteDouble(buf[offset:], *p.Shipping)
-	}
-	return offset
-}
-
-func (p *UpdateSpuReq) fastWriteField10(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 10)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.SpuID)
-	return offset
-}
-
-func (p *UpdateSpuReq) fastWriteField11(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 11)
-	offset += thrift.Binary.WriteBinaryNocopy(buf[offset:], w, []byte(p.GoodsHeadDrawing))
-	return offset
-}
-
-func (p *UpdateSpuReq) fastWriteField12(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	if p.IsSetSpuImage() {
-		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 12)
-		offset += thrift.Binary.WriteBinaryNocopy(buf[offset:], w, []byte(p.SpuImage))
+	if p.IsSetBufferCount() {
+		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 9)
+		offset += thrift.Binary.WriteI64(buf[offset:], *p.BufferCount)
 	}
 	return offset
 }
 
 func (p *UpdateSpuReq) field1Length() int {
-	l := 0
-	if p.IsSetSpuImageName() {
-		l += thrift.Binary.FieldBeginLength()
-		l += thrift.Binary.StringLengthNocopy(*p.SpuImageName)
-	}
-	return l
-}
-
-func (p *UpdateSpuReq) field2Length() int {
 	l := 0
 	if p.IsSetName() {
 		l += thrift.Binary.FieldBeginLength()
@@ -3497,16 +3226,7 @@ func (p *UpdateSpuReq) field2Length() int {
 	return l
 }
 
-func (p *UpdateSpuReq) field3Length() int {
-	l := 0
-	if p.IsSetSpuImageId() {
-		l += thrift.Binary.FieldBeginLength()
-		l += thrift.Binary.I64Length()
-	}
-	return l
-}
-
-func (p *UpdateSpuReq) field4Length() int {
+func (p *UpdateSpuReq) field2Length() int {
 	l := 0
 	if p.IsSetDescription() {
 		l += thrift.Binary.FieldBeginLength()
@@ -3515,7 +3235,7 @@ func (p *UpdateSpuReq) field4Length() int {
 	return l
 }
 
-func (p *UpdateSpuReq) field5Length() int {
+func (p *UpdateSpuReq) field3Length() int {
 	l := 0
 	if p.IsSetCategoryID() {
 		l += thrift.Binary.FieldBeginLength()
@@ -3524,16 +3244,16 @@ func (p *UpdateSpuReq) field5Length() int {
 	return l
 }
 
-func (p *UpdateSpuReq) field6Length() int {
+func (p *UpdateSpuReq) field4Length() int {
 	l := 0
-	if p.IsSetGoodsHeadDrawingName() {
+	if p.IsSetGoodsHeadDrawing() {
 		l += thrift.Binary.FieldBeginLength()
-		l += thrift.Binary.StringLengthNocopy(*p.GoodsHeadDrawingName)
+		l += thrift.Binary.BinaryLengthNocopy([]byte(p.GoodsHeadDrawing))
 	}
 	return l
 }
 
-func (p *UpdateSpuReq) field7Length() int {
+func (p *UpdateSpuReq) field5Length() int {
 	l := 0
 	if p.IsSetPrice() {
 		l += thrift.Binary.FieldBeginLength()
@@ -3542,7 +3262,7 @@ func (p *UpdateSpuReq) field7Length() int {
 	return l
 }
 
-func (p *UpdateSpuReq) field8Length() int {
+func (p *UpdateSpuReq) field6Length() int {
 	l := 0
 	if p.IsSetForSale() {
 		l += thrift.Binary.FieldBeginLength()
@@ -3551,7 +3271,7 @@ func (p *UpdateSpuReq) field8Length() int {
 	return l
 }
 
-func (p *UpdateSpuReq) field9Length() int {
+func (p *UpdateSpuReq) field7Length() int {
 	l := 0
 	if p.IsSetShipping() {
 		l += thrift.Binary.FieldBeginLength()
@@ -3560,25 +3280,18 @@ func (p *UpdateSpuReq) field9Length() int {
 	return l
 }
 
-func (p *UpdateSpuReq) field10Length() int {
+func (p *UpdateSpuReq) field8Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.I64Length()
 	return l
 }
 
-func (p *UpdateSpuReq) field11Length() int {
+func (p *UpdateSpuReq) field9Length() int {
 	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.BinaryLengthNocopy([]byte(p.GoodsHeadDrawing))
-	return l
-}
-
-func (p *UpdateSpuReq) field12Length() int {
-	l := 0
-	if p.IsSetSpuImage() {
+	if p.IsSetBufferCount() {
 		l += thrift.Binary.FieldBeginLength()
-		l += thrift.Binary.BinaryLengthNocopy([]byte(p.SpuImage))
+		l += thrift.Binary.I64Length()
 	}
 	return l
 }
@@ -4895,6 +4608,218 @@ func (p *ViewSpuImageResp) field2Length() int {
 		_ = v
 		l += v.BLength()
 	}
+	return l
+}
+
+func (p *DeleteSpuImageReq) FastRead(buf []byte) (int, error) {
+
+	var err error
+	var offset int
+	var l int
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetSpuImageID bool = false
+	for {
+		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
+		offset += l
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField1(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetSpuImageID = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+			offset += l
+			if err != nil {
+				goto SkipFieldError
+			}
+		}
+	}
+
+	if !issetSpuImageID {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+	return offset, nil
+ReadFieldBeginError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_DeleteSpuImageReq[fieldId]), err)
+SkipFieldError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+RequiredFieldNotSetError:
+	return offset, thrift.NewProtocolException(thrift.INVALID_DATA, fmt.Sprintf("required field %s is not set", fieldIDToName_DeleteSpuImageReq[fieldId]))
+}
+
+func (p *DeleteSpuImageReq) FastReadField1(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.SpuImageID = _field
+	return offset, nil
+}
+
+func (p *DeleteSpuImageReq) FastWrite(buf []byte) int {
+	return p.FastWriteNocopy(buf, nil)
+}
+
+func (p *DeleteSpuImageReq) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	if p != nil {
+		offset += p.fastWriteField1(buf[offset:], w)
+	}
+	offset += thrift.Binary.WriteFieldStop(buf[offset:])
+	return offset
+}
+
+func (p *DeleteSpuImageReq) BLength() int {
+	l := 0
+	if p != nil {
+		l += p.field1Length()
+	}
+	l += thrift.Binary.FieldStopLength()
+	return l
+}
+
+func (p *DeleteSpuImageReq) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 1)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.SpuImageID)
+	return offset
+}
+
+func (p *DeleteSpuImageReq) field1Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *DeleteSpuImageResp) FastRead(buf []byte) (int, error) {
+
+	var err error
+	var offset int
+	var l int
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetBase bool = false
+	for {
+		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
+		offset += l
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				l, err = p.FastReadField1(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetBase = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+			offset += l
+			if err != nil {
+				goto SkipFieldError
+			}
+		}
+	}
+
+	if !issetBase {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+	return offset, nil
+ReadFieldBeginError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_DeleteSpuImageResp[fieldId]), err)
+SkipFieldError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+RequiredFieldNotSetError:
+	return offset, thrift.NewProtocolException(thrift.INVALID_DATA, fmt.Sprintf("required field %s is not set", fieldIDToName_DeleteSpuImageResp[fieldId]))
+}
+
+func (p *DeleteSpuImageResp) FastReadField1(buf []byte) (int, error) {
+	offset := 0
+	_field := model.NewBaseResp()
+	if l, err := _field.FastRead(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+	}
+	p.Base = _field
+	return offset, nil
+}
+
+func (p *DeleteSpuImageResp) FastWrite(buf []byte) int {
+	return p.FastWriteNocopy(buf, nil)
+}
+
+func (p *DeleteSpuImageResp) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	if p != nil {
+		offset += p.fastWriteField1(buf[offset:], w)
+	}
+	offset += thrift.Binary.WriteFieldStop(buf[offset:])
+	return offset
+}
+
+func (p *DeleteSpuImageResp) BLength() int {
+	l := 0
+	if p != nil {
+		l += p.field1Length()
+	}
+	l += thrift.Binary.FieldStopLength()
+	return l
+}
+
+func (p *DeleteSpuImageResp) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 1)
+	offset += p.Base.FastWriteNocopy(buf[offset:], w)
+	return offset
+}
+
+func (p *DeleteSpuImageResp) field1Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += p.Base.BLength()
 	return l
 }
 
@@ -10088,6 +10013,106 @@ func (p *ViewHistoryPriceResp) field2Length() int {
 	return l
 }
 
+func (p *UploadImageReq) FastRead(buf []byte) (int, error) {
+
+	var err error
+	var offset int
+	var l int
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	for {
+		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
+		offset += l
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+		offset += l
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+
+	return offset, nil
+ReadFieldBeginError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+SkipFieldError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+}
+
+func (p *UploadImageReq) FastWrite(buf []byte) int {
+	return p.FastWriteNocopy(buf, nil)
+}
+
+func (p *UploadImageReq) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	if p != nil {
+	}
+	offset += thrift.Binary.WriteFieldStop(buf[offset:])
+	return offset
+}
+
+func (p *UploadImageReq) BLength() int {
+	l := 0
+	if p != nil {
+	}
+	l += thrift.Binary.FieldStopLength()
+	return l
+}
+
+func (p *UploadImageResp) FastRead(buf []byte) (int, error) {
+
+	var err error
+	var offset int
+	var l int
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	for {
+		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
+		offset += l
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+		offset += l
+		if err != nil {
+			goto SkipFieldError
+		}
+	}
+
+	return offset, nil
+ReadFieldBeginError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+SkipFieldError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+}
+
+func (p *UploadImageResp) FastWrite(buf []byte) int {
+	return p.FastWriteNocopy(buf, nil)
+}
+
+func (p *UploadImageResp) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	if p != nil {
+	}
+	offset += thrift.Binary.WriteFieldStop(buf[offset:])
+	return offset
+}
+
+func (p *UploadImageResp) BLength() int {
+	l := 0
+	if p != nil {
+	}
+	l += thrift.Binary.FieldStopLength()
+	return l
+}
+
 func (p *CommodityServiceCreateCouponArgs) FastRead(buf []byte) (int, error) {
 
 	var err error
@@ -11525,7 +11550,7 @@ SkipFieldError:
 
 func (p *CommodityServiceUpdateSpuArgs) FastReadField1(buf []byte) (int, error) {
 	offset := 0
-	_field := NewUpdateSkuReq()
+	_field := NewUpdateSpuReq()
 	if l, err := _field.FastRead(buf[offset:]); err != nil {
 		return offset, err
 	} else {

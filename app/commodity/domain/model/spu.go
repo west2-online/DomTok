@@ -17,19 +17,17 @@ limitations under the License.
 package model
 
 type Spu struct {
-	SpuId                int64
-	Name                 string
-	CreatorId            int64
-	Description          string
-	CategoryId           int64
-	GoodsHeadDrawingName string
-	GoodsHeadDrawing     []byte
-	Price                float64
-	ForSale              int
-	Shipping             float64
-	CreatedAt            int64
-	UpdatedAt            int64
-	DeletedAt            int64
-	SpuImageName         []string
-	SpuImage             [][]byte
+	SpuId               int64
+	Name                string
+	CreatorId           int64
+	Description         string
+	CategoryId          int64
+	GoodsHeadDrawing    []byte
+	Price               float64
+	ForSale             int
+	Shipping            float64
+	CreatedAt           int64
+	UpdatedAt           int64
+	DeletedAt           int64
+	GoodsHeadDrawingUrl string
 }

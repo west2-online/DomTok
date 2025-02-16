@@ -21,9 +21,11 @@ package commodityservice
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	client "github.com/cloudwego/kitex/client"
 	kitex "github.com/cloudwego/kitex/pkg/serviceinfo"
+	streaming "github.com/cloudwego/kitex/pkg/streaming"
 
 	commodity "github.com/west2-online/DomTok/kitex_gen/commodity"
 )
@@ -78,14 +80,14 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		newCommodityServiceCreateSpuArgs,
 		newCommodityServiceCreateSpuResult,
 		false,
-		kitex.WithStreamingMode(kitex.StreamingNone),
+		kitex.WithStreamingMode(kitex.StreamingClient),
 	),
 	"UpdateSpu": kitex.NewMethodInfo(
 		updateSpuHandler,
 		newCommodityServiceUpdateSpuArgs,
 		newCommodityServiceUpdateSpuResult,
 		false,
-		kitex.WithStreamingMode(kitex.StreamingNone),
+		kitex.WithStreamingMode(kitex.StreamingClient),
 	),
 	"ViewSpu": kitex.NewMethodInfo(
 		viewSpuHandler,
@@ -238,7 +240,7 @@ func serviceInfoForClient() *kitex.ServiceInfo {
 
 // NewServiceInfo creates a new ServiceInfo containing all methods
 func NewServiceInfo() *kitex.ServiceInfo {
-	return newServiceInfo(false, true, true)
+	return newServiceInfo(true, true, true)
 }
 
 // NewServiceInfo creates a new ServiceInfo containing non-streaming methods
@@ -388,15 +390,49 @@ func newCommodityServiceUseUserCouponResult() interface{} {
 }
 
 func createSpuHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*commodity.CommodityServiceCreateSpuArgs)
-	realResult := result.(*commodity.CommodityServiceCreateSpuResult)
-	success, err := handler.(commodity.CommodityService).CreateSpu(ctx, realArg.Req)
-	if err != nil {
-		return err
+	st, ok := arg.(*streaming.Args)
+	if !ok {
+		return errors.New("CommodityService.CreateSpu is a thrift streaming method, please call with Kitex StreamClient")
 	}
-	realResult.Success = success
-	return nil
+	stream := &commodityServiceCreateSpuServer{st.Stream}
+	return handler.(commodity.CommodityService).CreateSpu(stream)
 }
+
+type commodityServiceCreateSpuClient struct {
+	streaming.Stream
+}
+
+func (x *commodityServiceCreateSpuClient) DoFinish(err error) {
+	if finisher, ok := x.Stream.(streaming.WithDoFinish); ok {
+		finisher.DoFinish(err)
+	} else {
+		panic(fmt.Sprintf("streaming.WithDoFinish is not implemented by %T", x.Stream))
+	}
+}
+func (x *commodityServiceCreateSpuClient) Send(m *commodity.CreateSpuReq) error {
+	return x.Stream.SendMsg(m)
+}
+func (x *commodityServiceCreateSpuClient) CloseAndRecv() (*commodity.CreateSpuResp, error) {
+	if err := x.Stream.Close(); err != nil {
+		return nil, err
+	}
+	m := new(commodity.CreateSpuResp)
+	return m, x.Stream.RecvMsg(m)
+}
+
+type commodityServiceCreateSpuServer struct {
+	streaming.Stream
+}
+
+func (x *commodityServiceCreateSpuServer) SendAndClose(m *commodity.CreateSpuResp) error {
+	return x.Stream.SendMsg(m)
+}
+
+func (x *commodityServiceCreateSpuServer) Recv() (*commodity.CreateSpuReq, error) {
+	m := new(commodity.CreateSpuReq)
+	return m, x.Stream.RecvMsg(m)
+}
+
 func newCommodityServiceCreateSpuArgs() interface{} {
 	return commodity.NewCommodityServiceCreateSpuArgs()
 }
@@ -406,15 +442,49 @@ func newCommodityServiceCreateSpuResult() interface{} {
 }
 
 func updateSpuHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*commodity.CommodityServiceUpdateSpuArgs)
-	realResult := result.(*commodity.CommodityServiceUpdateSpuResult)
-	success, err := handler.(commodity.CommodityService).UpdateSpu(ctx, realArg.Req)
-	if err != nil {
-		return err
+	st, ok := arg.(*streaming.Args)
+	if !ok {
+		return errors.New("CommodityService.UpdateSpu is a thrift streaming method, please call with Kitex StreamClient")
 	}
-	realResult.Success = success
-	return nil
+	stream := &commodityServiceUpdateSpuServer{st.Stream}
+	return handler.(commodity.CommodityService).UpdateSpu(stream)
 }
+
+type commodityServiceUpdateSpuClient struct {
+	streaming.Stream
+}
+
+func (x *commodityServiceUpdateSpuClient) DoFinish(err error) {
+	if finisher, ok := x.Stream.(streaming.WithDoFinish); ok {
+		finisher.DoFinish(err)
+	} else {
+		panic(fmt.Sprintf("streaming.WithDoFinish is not implemented by %T", x.Stream))
+	}
+}
+func (x *commodityServiceUpdateSpuClient) Send(m *commodity.UpdateSpuReq) error {
+	return x.Stream.SendMsg(m)
+}
+func (x *commodityServiceUpdateSpuClient) CloseAndRecv() (*commodity.UpdateSpuResp, error) {
+	if err := x.Stream.Close(); err != nil {
+		return nil, err
+	}
+	m := new(commodity.UpdateSpuResp)
+	return m, x.Stream.RecvMsg(m)
+}
+
+type commodityServiceUpdateSpuServer struct {
+	streaming.Stream
+}
+
+func (x *commodityServiceUpdateSpuServer) SendAndClose(m *commodity.UpdateSpuResp) error {
+	return x.Stream.SendMsg(m)
+}
+
+func (x *commodityServiceUpdateSpuServer) Recv() (*commodity.UpdateSpuReq, error) {
+	m := new(commodity.UpdateSpuReq)
+	return m, x.Stream.RecvMsg(m)
+}
+
 func newCommodityServiceUpdateSpuArgs() interface{} {
 	return commodity.NewCommodityServiceUpdateSpuArgs()
 }
@@ -817,24 +887,32 @@ func (p *kClient) UseUserCoupon(ctx context.Context, req *commodity.UseUserCoupo
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) CreateSpu(ctx context.Context, req *commodity.CreateSpuReq) (r *commodity.CreateSpuResp, err error) {
-	var _args commodity.CommodityServiceCreateSpuArgs
-	_args.Req = req
-	var _result commodity.CommodityServiceCreateSpuResult
-	if err = p.c.Call(ctx, "CreateSpu", &_args, &_result); err != nil {
-		return
+func (p *kClient) CreateSpu(ctx context.Context) (CommodityService_CreateSpuClient, error) {
+	streamClient, ok := p.c.(client.Streaming)
+	if !ok {
+		return nil, fmt.Errorf("client not support streaming")
 	}
-	return _result.GetSuccess(), nil
+	res := new(streaming.Result)
+	err := streamClient.Stream(ctx, "CreateSpu", nil, res)
+	if err != nil {
+		return nil, err
+	}
+	stream := &commodityServiceCreateSpuClient{res.Stream}
+	return stream, nil
 }
 
-func (p *kClient) UpdateSpu(ctx context.Context, req *commodity.UpdateSkuReq) (r *commodity.UpdateSpuResp, err error) {
-	var _args commodity.CommodityServiceUpdateSpuArgs
-	_args.Req = req
-	var _result commodity.CommodityServiceUpdateSpuResult
-	if err = p.c.Call(ctx, "UpdateSpu", &_args, &_result); err != nil {
-		return
+func (p *kClient) UpdateSpu(ctx context.Context) (CommodityService_UpdateSpuClient, error) {
+	streamClient, ok := p.c.(client.Streaming)
+	if !ok {
+		return nil, fmt.Errorf("client not support streaming")
 	}
-	return _result.GetSuccess(), nil
+	res := new(streaming.Result)
+	err := streamClient.Stream(ctx, "UpdateSpu", nil, res)
+	if err != nil {
+		return nil, err
+	}
+	stream := &commodityServiceUpdateSpuClient{res.Stream}
+	return stream, nil
 }
 
 func (p *kClient) ViewSpu(ctx context.Context, req *commodity.ViewSpuReq) (r *commodity.ViewSpuResp, err error) {

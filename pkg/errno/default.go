@@ -33,4 +33,6 @@ var (
 	InternalServiceError = NewErrNo(InternalServiceErrorCode, "internal server error")
 	OSOperationError     = NewErrNo(OSOperateErrorCode, "os operation failed")
 	IOOperationError     = NewErrNo(IOOperateErrorCode, "io operation failed")
+
+	UpYunFileError = NewErrNo(UpYunFileErrorCode, "upyun operation failed")
 )

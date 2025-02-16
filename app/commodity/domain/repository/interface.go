@@ -18,9 +18,9 @@ package repository
 
 import (
 	"context"
-	"github.com/west2-online/DomTok/pkg/kafka"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	"github.com/west2-online/DomTok/pkg/kafka"
 )
 
 type CommodityDB interface {
@@ -41,7 +41,5 @@ type CommodityDB interface {
 type CommodityCache interface{}
 
 type CommodityMQ interface {
-	SendSaveImage(ctx context.Context, image *model.Image) error
-	ConsumeSaveImage(ctx context.Context) <-chan *kafka.Message
 	Send(ctx context.Context, topic string, message []*kafka.Message) error
 }

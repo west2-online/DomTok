@@ -29,7 +29,6 @@ import (
 	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
-	"github.com/west2-online/DomTok/pkg/upyun"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
@@ -41,7 +40,6 @@ var (
 func init() {
 	config.Init(serviceName)
 	logger.Init(serviceName, config.GetLoggerLevel())
-	upyun.NewUpYun()
 }
 
 func main() {
@@ -63,7 +61,7 @@ func main() {
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
 			ServiceName: serviceName,
 		}),
-		server.WithMuxTransport(),
+
 		server.WithServiceAddr(addr),
 		server.WithRegistry(r),
 		server.WithLimit(&limit.Option{

@@ -20,10 +20,16 @@ package api
 
 import (
 	"context"
+	"errors"
+	"log"
 
-	"github.com/west2-online/DomTok/app/gateway/pack"
+	"github.com/cloudwego/hertz/pkg/protocol"
+
 	"github.com/west2-online/DomTok/app/gateway/rpc"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
+	"github.com/west2-online/DomTok/pkg/utils"
+
+	"github.com/west2-online/DomTok/app/gateway/pack"
 	"github.com/west2-online/DomTok/pkg/errno"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -139,52 +145,33 @@ func CreateSpu(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	files, err := c.MultipartForm()
+	file, err := c.FormFile("goodsHeadDrawing")
 	if err != nil {
-		pack.RespError(c, errno.ParamMissingError.WithError(err))
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	goodsHeadDrawing := files.File["goodsHeadDrawing"]
-	if len(goodsHeadDrawing) == 0 {
-		pack.RespError(c, errno.ParamMissingError.WithError(err))
+	_, ok := utils.CheckImageFileType(file)
+	if !ok {
+		pack.RespError(c, errno.ParamVerifyError)
 		return
 	}
 
-	spuImagesBytes := make([][]byte, 0)
-	spuImagesName := make([]string, 0)
-	spuImages := files.File["spuImage"]
-	if len(spuImages) > 0 {
-		for _, img := range spuImages {
-			b := make([]byte, 0)
-			b, err = pack.BuildFileDataBytes(img)
-			if err != nil {
-				pack.RespError(c, err)
-				return
-			}
-			spuImagesBytes = append(spuImagesBytes, b)
-			spuImagesName = append(spuImagesName, img.Filename)
-		}
-	}
-
-	goodsHeadDrawingBytes, err := pack.BuildFileDataBytes(goodsHeadDrawing[0])
+	datas, err := utils.FileToBytes(file)
 	if err != nil {
 		pack.RespError(c, err)
 		return
 	}
 
 	res, err := rpc.CreateSpuRPC(ctx, &commodity.CreateSpuReq{
-		Name:                 req.Name,
-		Description:          req.Description,
-		CategoryID:           req.CategoryID,
-		GoodsHeadDrawingName: goodsHeadDrawing[0].Filename,
-		GoodsHeadDrawing:     goodsHeadDrawingBytes,
-		Price:                req.Price,
-		ForSale:              req.ForSale,
-		Shipping:             req.Shipping,
-		SpuImage:             spuImagesBytes,
-		SpuImageName:         spuImagesName,
-	})
+		Name:        req.Name,
+		Description: req.Description,
+		CategoryID:  req.CategoryID,
+		Price:       req.Price,
+		ForSale:     req.ForSale,
+		Shipping:    req.Shipping,
+		BufferCount: int64(len(datas)),
+	}, datas)
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -200,13 +187,50 @@ func UpdateSpu(ctx context.Context, c *app.RequestContext) {
 	var req api.UpdateSpuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+	var l int64
+	var datas [][]byte
+
+	file, err := c.FormFile("goodsHeadDrawing")
+	if err != nil {
+		log.Println(err)
+		log.Println(protocol.ErrMissingFile)
+		if !errors.Is(err, protocol.ErrMissingFile) {
+			pack.RespError(c, errno.ParamVerifyError.WithError(err))
+			return
+		}
+	} else {
+		_, ok := utils.CheckImageFileType(file)
+		if !ok {
+			pack.RespError(c, errno.ParamVerifyError)
+			return
+		}
+		datas, err = utils.FileToBytes(file)
+		if err != nil {
+			pack.RespError(c, err)
+			return
+		}
+		l = int64(len(datas))
+	}
+
+	err = rpc.UpdateSpuRPC(ctx, &commodity.UpdateSpuReq{
+		SpuID:       req.SpuID,
+		Name:        req.Name,
+		Description: req.Description,
+		CategoryID:  req.CategoryID,
+		Price:       req.Price,
+		ForSale:     req.ForSale,
+		Shipping:    req.Shipping,
+		BufferCount: &l,
+	}, datas)
+	if err != nil {
+		pack.RespError(c, err)
 		return
 	}
 
-	resp := new(api.UpdateSpuResp)
-
-	c.JSON(consts.StatusOK, resp)
+	pack.RespSuccess(c)
 }
 
 // ViewSpu .

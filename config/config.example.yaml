@@ -47,7 +47,7 @@ kafka:
 
 upyuns:
     bucket: "w2-domtok"
-    operator: ""
+    operator: "penqee"
     password: ""
     token-secret: ""
     token-timeout: 60

@@ -56,3 +56,7 @@ const (
 	OSOperateErrorCode
 	IOOperateErrorCode
 )
+
+const (
+	UpYunFileErrorCode = 60000 + iota
+)

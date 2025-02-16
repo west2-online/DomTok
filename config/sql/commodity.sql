@@ -7,7 +7,7 @@ CREATE TABLE `category` (
                             `creator_id` BIGINT NOT NULL COMMENT '创建者ID',
                             `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                             `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                            `deleted_at` TIMESTAMP COMMENT '删除时间',
+                            `deleted_at` TIMESTAMP COMMENT '删除时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -56,7 +56,7 @@ CREATE TABLE `sku_info` (
                             `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                             `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                             `deleted_at` TIMESTAMP COMMENT '删除时间',
-                            INDEX `idx_user_delete_forSale` (`uid`, `deleted_at`, `for_sale`)
+                            INDEX `idx_user_delete_forSale` (`creator_id`, `deleted_at`, `for_sale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- sku 属性表
@@ -97,7 +97,7 @@ CREATE TABLE `spu_info` (
                             `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                             `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                             `deleted_at` TIMESTAMP COMMENT '删除时间',
-                            INDEX `idx_user_delete_forSale` (`uid`, `deleted_at`, `for_sale`)
+                            INDEX `idx_user_delete_forSale` (`creator_id`, `deleted_at`, `for_sale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 

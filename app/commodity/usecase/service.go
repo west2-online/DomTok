@@ -19,10 +19,12 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"github.com/west2-online/DomTok/pkg/errno"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
+	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 func (us *useCase) CreateCategory(ctx context.Context, category *model.Category) (id int64, err error) {
@@ -30,10 +32,6 @@ func (us *useCase) CreateCategory(ctx context.Context, category *model.Category)
 }
 
 func (us *useCase) CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err error) {
-	if err = us.svc.Verify(us.svc.VerifyFileType(spu.GoodsHeadDrawingName)); err != nil {
-		return 0, fmt.Errorf("usecase.CreateSpu failed: %w", err)
-	}
-
 	loginData, err := contextLogin.GetLoginData(ctx)
 	if err != nil {
 		return 0, fmt.Errorf("usecase.CreateSpu failed: %w", err)
@@ -48,10 +46,6 @@ func (us *useCase) CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err
 }
 
 func (us *useCase) CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) (int64, error) {
-	if err := us.svc.Verify(us.svc.VerifyFileType(spuImage.Url)); err != nil {
-		return 0, fmt.Errorf("usecase.CreateSpuImage failed: %w", err)
-	}
-
 	id, err := us.svc.CreateSpuImage(ctx, spuImage)
 	if err != nil {
 		return 0, fmt.Errorf("usecase.CreateSpuImage failed: %w", err)
@@ -94,30 +88,28 @@ func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
 	if err != nil {
 		return fmt.Errorf("usecase.UpdateSpu failed: %w", err)
 	}
+
 	loginData, err := contextLogin.GetLoginData(ctx)
 	if err != nil {
 		return fmt.Errorf("usecase.UpdateSpu failed: %w", err)
 	}
+
 	if loginData.UserId != ret.CreatorId {
 		return errno.AuthNoOperatePermission
 	}
-	if err = us.svc.UpdateSpu(ctx, spu); err != nil {
+
+	spu.GoodsHeadDrawingUrl = utils.GenerateFileName(constants.SpuDirDest, spu.SpuId)
+	if err = us.svc.UpdateSpu(ctx, spu, ret); err != nil {
 		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
 	}
 	return nil
 }
 
 func (us *useCase) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
-	image, err := us.db.GetSpuImage(ctx, spuImage.ImageID)
+	spu, err := us.svc.GetSpuFromImageId(ctx, spuImage.ImageID)
 	if err != nil {
-		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
+		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
 	}
-
-	spu, err := us.db.GetSpuBySpuId(ctx, image.SpuID)
-	if err != nil {
-		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
-	}
-	// 上面这部分封装一下
 	loginData, err := contextLogin.GetLoginData(ctx)
 	if err != nil {
 		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
@@ -125,8 +117,27 @@ func (us *useCase) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage)
 	if loginData.UserId != spu.CreatorId {
 		return errno.AuthNoOperatePermission
 	}
-	if err = us.svc.UpdateSpuImage(ctx, image); err != nil {
+	if err = us.svc.UpdateSpuImage(ctx, spuImage); err != nil {
 		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
+	}
+	return nil
+}
+
+func (us *useCase) DeleteSpuImage(ctx context.Context, imageId int64) error {
+	spu, err := us.svc.GetSpuFromImageId(ctx, imageId)
+	if err != nil {
+		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
+	}
+
+	loginData, err := contextLogin.GetLoginData(ctx)
+	if err != nil {
+		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
+	}
+	if loginData.UserId != spu.CreatorId {
+		return errno.AuthNoOperatePermission
+	}
+	if err = us.svc.DeleteSpuImage(ctx, imageId); err != nil {
+		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
 	}
 	return nil
 }

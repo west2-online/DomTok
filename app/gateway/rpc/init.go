@@ -22,11 +22,13 @@ import (
 )
 
 var (
-	userClient      userservice.Client
-	commodityClient commodityservice.Client
+	userClient            userservice.Client
+	commodityClient       commodityservice.Client
+	commodityStreamClient commodityservice.StreamClient
 )
 
 func Init() {
 	InitUserRPC()
 	InitCommodityRPC()
+	InitCommodityStreamClientRPC()
 }

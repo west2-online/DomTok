@@ -16,13 +16,7 @@ limitations under the License.
 
 package constants
 
-import "time"
-
 const (
-	SpuDirDest          = "spu/"
-	SpuImageDirDest     = "spu_image/"
-	TempSpuStorage      = "tmp_spu/"
-	TempSpuImageStorage = "tmp_spu_image/"
-
-	TickerTimer = 10 * time.Second
+	SpuDirDest      = "/spu/"
+	SpuImageDirDest = "/spu_image/"
 )
