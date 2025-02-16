@@ -46,7 +46,6 @@ func (handler *PaymentHandler) ProcessPayment(ctx context.Context, req *payment.
 
 func (handler *PaymentHandler) RequestPaymentToken(ctx context.Context, req *payment.PaymentTokenRequest) (r *payment.PaymentTokenResponse, err error) {
 	r = new(payment.PaymentTokenResponse)
-	// 我需要token和expTime，这里一次返回三个数值很不优雅，但我不知道要怎么优化
 	var token string
 	var expTime int64
 	var paramToken string

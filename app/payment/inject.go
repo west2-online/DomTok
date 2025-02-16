@@ -43,7 +43,6 @@ func InjectPaymentHandler() payment.PaymentService {
 	// 封装 Redis 存储对象
 	redisRepo := redis.NewPaymentRedis(redisClient)
 
-	// 这个地方要补充一下
 	sf, err := utils.NewSnowflake(0, 0)
 	if err != nil {
 		panic(err)

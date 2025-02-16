@@ -39,7 +39,6 @@ func (uc *paymentUseCase) GetParamToken(ctx context.Context) (token string, err 
 func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, paramToken string) (token string, expTime int64, err error) {
 	// 1. 检查订单是否存在
 	pid, err := uc.db.GetOrderByToken(ctx, paramToken)
-	// 这里直接return就可以吗？
 	if err != nil {
 		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime, fmt.Errorf("check payment order existed failed:%w", err)
 	}
@@ -58,7 +57,6 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, paramToken string
 	}
 
 	// 3. 检查订单支付信息
-	// 这里用int还是int8？
 	var paymentInfo int
 	paymentInfo, err = uc.db.GetPaymentInfo(ctx, paramToken)
 	if err != nil {
@@ -76,8 +74,6 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, paramToken string
 	}
 
 	// 4. HMAC生成支付令牌
-
-	// 感觉这里一次返回三个值非常非常非常不优雅，但是不知道要怎么写得更优雅
 	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, paramToken)
 	if err != nil {
 		return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("generate payment token failed:%w", err)
@@ -90,11 +86,3 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, paramToken string
 	}
 	return token, expTime, nil
 }
-
-// 这里没有直接调用 db.CreateUser 是因为 svc.CreateUser 包含了一点业务逻辑, 这些细节不需要被 useCase 知道
-// if err = uc.svc.CreateUser(ctx, u); err != nil {
-// return
-// }
-
-// return u.Uid, nil
-// }

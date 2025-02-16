@@ -22,13 +22,9 @@ import (
 )
 
 type PaymentService struct {
-	db repository.PaymentDB
-	sf *utils.Snowflake
-	// 是不是还要把redis的加进去
-	// redisClient *redis.Client
-	// TODO
+	db    repository.PaymentDB
+	sf    *utils.Snowflake
 	redis repository.PaymentRedis
-	// emailRe *regexp.Regexp
 }
 
 func NewPaymentService(db repository.PaymentDB, sf *utils.Snowflake, redis repository.PaymentRedis) *PaymentService {
@@ -46,7 +42,5 @@ func NewPaymentService(db repository.PaymentDB, sf *utils.Snowflake, redis repos
 		sf:    sf,
 		redis: redis,
 	}
-	// TODO redis的初始化放在哪里？
-	// svc.init() 我需要写这个吗？
 	return svc
 }

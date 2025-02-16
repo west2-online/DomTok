@@ -26,7 +26,6 @@ import (
 
 type PaymentUseCase interface {
 	CreatePayment(ctx context.Context, orderID int64) (*model.PaymentOrder, error)
-	// GetPaymentToken 这里一次返回三个参数很不优雅但我不知道要怎么搞>_<
 	GetPaymentToken(ctx context.Context, paramToken string) (string, int64, error)
 	GetParamToken(ctx context.Context) (string, error)
 	// ProcessRefund
@@ -41,9 +40,8 @@ type paymentUseCase struct {
 
 func NewPaymentCase(db repository.PaymentDB, svc *service.PaymentService, redis repository.PaymentRedis) PaymentUseCase {
 	return &paymentUseCase{
-		db:  db,
-		svc: svc,
-		// TODO redis加在这里吗
+		db:    db,
+		svc:   svc,
 		redis: redis,
 	}
 }
