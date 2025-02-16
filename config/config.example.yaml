@@ -69,3 +69,9 @@ services:
     load-balance: false
     addr:
       - 0.0.0.0:20003
+
+  payment:
+    name: payment
+    load-balance: false
+    addr:
+      - 0.0.0.0:20004
