@@ -85,6 +85,13 @@ type defaultUser struct {
 	Password string `mapstructure:"password"`
 }
 
+type volcengine struct {
+	ApiKey  string `mapstructure:"api-key"`
+	BaseUrl string `mapstructure:"base-url"`
+	Region  string `mapstructure:"region"`
+	Model   string `mapstructure:"model"`
+}
+
 type config struct {
 	Server        server
 	Snowflake     snowflake
@@ -97,4 +104,5 @@ type config struct {
 	Elasticsearch elasticsearch
 	Kafka         kafka
 	DefaultUser   defaultUser
+	Volcengine    volcengine
 }
