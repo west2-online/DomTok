@@ -22,17 +22,21 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/west2-online/DomTok/app/cart/domain/model"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 // GetCartByUserId 查询购物车
-func (c *DBAdapter) GetCartByUserId(ctx context.Context, uid int64) (bool, *Cart, error) {
-	model := new(Cart)
-	if err := c.client.WithContext(ctx).Where("user_id=?", uid).First(model).Error; err != nil {
+func (c *DBAdapter) GetCartByUserId(ctx context.Context, uid int64) (bool, *model.Cart, error) {
+	dbModel := new(Cart)
+	if err := c.client.WithContext(ctx).Where("user_id=?", uid).First(dbModel).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, nil, nil
 		}
 		return false, nil, errno.Errorf(errno.InternalDatabaseErrorCode, "db.GetCartByUserId error: %v", err)
 	}
-	return true, model, nil
+	return true, &model.Cart{
+		UserId:  uid,
+		SkuJson: dbModel.SkuJson,
+	}, nil
 }
