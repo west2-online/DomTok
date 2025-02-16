@@ -13,7 +13,7 @@ CREATE TABLE `payment_orders` (
                                   `description` VARCHAR(255) COMMENT '订单描述信息',
                                   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '订单创建时间',
                                   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '订单最后更新时间',
-                                  `deleted_at` TIMESTAMP NULL COMMENT '订单删除时间',
+                                  `deleted_at` TIMESTAMP NULL COMMENT '订单删除时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 退款表
@@ -29,7 +29,7 @@ CREATE TABLE `payment_refunds` (
                                    `credit_card_expiration_month` INT COMMENT '信用卡到期月',
                                    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '退款申请时间',
                                    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '退款最后更新时间',
-                                   `deleted_at` TIMESTAMP NULL COMMENT '退款记录删除时间',
+                                   `deleted_at` TIMESTAMP NULL COMMENT '退款记录删除时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 流水信息表
