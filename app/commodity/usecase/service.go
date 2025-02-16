@@ -23,7 +23,6 @@ import (
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
-	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
@@ -67,13 +66,9 @@ func (us *useCase) DeleteSpu(ctx context.Context, spuId int64) error {
 		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
 	}
 
-	loginData, err := contextLogin.GetLoginData(ctx)
+	err = us.svc.IdentifyUser(ctx, ret.CreatorId)
 	if err != nil {
-		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
-	}
-
-	if loginData.UserId != ret.CreatorId {
-		return errno.AuthNoOperatePermission
+		return fmt.Errorf("usecase.DeleteSpu identify user failed: %w", err)
 	}
 
 	if err = us.db.DeleteSpu(ctx, spuId); err != nil {
@@ -89,13 +84,9 @@ func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
 		return fmt.Errorf("usecase.UpdateSpu failed: %w", err)
 	}
 
-	loginData, err := contextLogin.GetLoginData(ctx)
+	err = us.svc.IdentifyUser(ctx, ret.CreatorId)
 	if err != nil {
-		return fmt.Errorf("usecase.UpdateSpu failed: %w", err)
-	}
-
-	if loginData.UserId != ret.CreatorId {
-		return errno.AuthNoOperatePermission
+		return fmt.Errorf("usecase.UpdateSpu identify user failed: %w", err)
 	}
 
 	spu.GoodsHeadDrawingUrl = utils.GenerateFileName(constants.SpuDirDest, spu.SpuId)
@@ -110,13 +101,12 @@ func (us *useCase) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage)
 	if err != nil {
 		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
 	}
-	loginData, err := contextLogin.GetLoginData(ctx)
+
+	err = us.svc.IdentifyUser(ctx, spu.CreatorId)
 	if err != nil {
-		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
+		return fmt.Errorf("usecase.UpdateSpuImage identify user failed: %w", err)
 	}
-	if loginData.UserId != spu.CreatorId {
-		return errno.AuthNoOperatePermission
-	}
+
 	if err = us.svc.UpdateSpuImage(ctx, spuImage); err != nil {
 		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
 	}
@@ -129,13 +119,11 @@ func (us *useCase) DeleteSpuImage(ctx context.Context, imageId int64) error {
 		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
 	}
 
-	loginData, err := contextLogin.GetLoginData(ctx)
+	err = us.svc.IdentifyUser(ctx, spu.CreatorId)
 	if err != nil {
-		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
+		return fmt.Errorf("usecase.DeleteSpuImage identify user failed: %w", err)
 	}
-	if loginData.UserId != spu.CreatorId {
-		return errno.AuthNoOperatePermission
-	}
+
 	if err = us.svc.DeleteSpuImage(ctx, imageId); err != nil {
 		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
 	}

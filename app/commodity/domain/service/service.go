@@ -19,6 +19,7 @@ package service
 import (
 	"context"
 	"fmt"
+	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
 
 	"golang.org/x/sync/errgroup"
 
@@ -140,4 +141,16 @@ func (svc *CommodityService) GetSpuFromImageId(ctx context.Context, imageId int6
 		return nil, fmt.Errorf("service.GetSpuFromImageId: get spu info failed: %w", err)
 	}
 	return ret, nil
+}
+
+func (svc *CommodityService) IdentifyUser(ctx context.Context, uid int64) error {
+	loginData, err := contextLogin.GetLoginData(ctx)
+	if err != nil {
+		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
+	}
+
+	if loginData.UserId != uid {
+		return errno.AuthNoOperatePermission
+	}
+	return nil
 }

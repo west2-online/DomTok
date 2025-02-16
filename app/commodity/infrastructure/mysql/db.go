@@ -132,7 +132,12 @@ func (db *commodityDB) UpdateSpu(ctx context.Context, spu *model.Spu) error {
 }
 
 func (db *commodityDB) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
-	if err := db.client.WithContext(ctx).Table(constants.SpuImageTableName).Updates(spuImage).Error; err != nil {
+	img := SpuImage{
+		Id:    spuImage.ImageID,
+		SpuId: spuImage.SpuID,
+		Url:   spuImage.Url,
+	}
+	if err := db.client.WithContext(ctx).Table(constants.SpuImageTableName).Updates(&img).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update spu image: %v", err)
 	}
 	return nil
