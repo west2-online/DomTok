@@ -66,7 +66,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	if paymentInfo == paymentStatus.PaymentNotExist {
 		// 创建支付订单
 		// TODO 待完善
-		err := uc.svc.CreatePaymentInfo(ctx, orderID)
+		_, err := uc.svc.CreatePaymentInfo(ctx, orderID)
 		// TODO 为什么这里的err是绿色的？？？
 		if err != nil {
 			return "", 0, fmt.Errorf("create payment info failed:%w", err)

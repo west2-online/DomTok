@@ -24,21 +24,43 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/west2-online/DomTok/app/payment/domain/model"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 )
 
 // sf可以生成id,详见user/domain/service/service.go
 // TODO 这个函数的逻辑不知道要怎么写，我只知道大概要包括生成订单信息、往sql里存信息、返回支付id这三步
-func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64) error {
-	return nil
+func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64) (paymentID int64, err error) {
+	// TODO 2025.02.17 00：22 先来解决你
+	// 1. 生成支付 ID（雪花算法）
+	paymentID, err = svc.sf.NextVal()
+	if err != nil {
+		return 0, fmt.Errorf("failed to create payment information order: %w", err)
+	}
+
+	// 2. 构造支付订单对象
+	paymentOrder := &model.PaymentOrder{
+		ID:      paymentID,
+		OrderID: orderID,
+		Status:  paymentStatus.PaymentStatusPending, // 设定初始状态
+	}
+
+	// 3. 存入数据库
+	err = svc.db.CreatePayment(ctx, paymentOrder)
+	if err != nil {
+		return 0, fmt.Errorf("failed to create payment order: %w", err)
+	}
+
+	// 4. 返回支付 ID
+	return paymentID, nil
 }
 
-// TODO 这个也要向user模块发起数据库查询申请
+// TODO 这个也要向User模块发起数据库查询申请
 func (svc *PaymentService) CheckUserExist(ctx context.Context, uid int64) (userInfo interface{}, err error) {
 	return nil, nil
 }
 
-// TODO 等Sser模块完成了再写这个，从ctx里获取userID
+// TODO 等User模块完成了再写这个，从ctx里获取userID
 func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error) {
 	return 0, nil
 }

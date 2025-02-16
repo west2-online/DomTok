@@ -19,12 +19,15 @@ package repository
 import (
 	"context"
 	"time"
+
+	"github.com/west2-online/DomTok/app/payment/domain/model"
 )
 
 type PaymentDB interface {
 	// CheckPaymentExist CheckUserExist(ctx context.Context, uid int64) (userInfo interface{}, err error)
 	CheckPaymentExist(ctx context.Context, orderID int64) (paymentInfo interface{}, err error)
 	GetPaymentInfo(ctx context.Context, orderID int64) (payStatus interface{}, err error)
+	CreatePayment(ctx context.Context, order *model.PaymentOrder) error
 }
 type PaymentRedis interface {
 	SetPaymentToken(ctx context.Context, key string, value interface{}, expiration time.Duration) error
