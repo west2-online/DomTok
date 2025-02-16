@@ -14,19 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package rpc
+package mq
 
 import (
-	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
-	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
+	"context"
+	"fmt"
+	"strings"
+
+	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/kafka"
 )
 
-var (
-	userClient userservice.Client
-	cartClient cartservice.Client
-)
-
-func Init() {
-	InitUserRPC()
-	InitCartRPC()
+func (c *KafkaAdapter) send(ctx context.Context, msg []*kafka.Message) (err error) {
+	errs := c.mq.Send(ctx, constants.KafkaCartTopic, msg)
+	if len(errs) != 0 {
+		var errMsg string
+		for _, e := range errs {
+			errMsg = strings.Join([]string{errMsg, e.Error(), ";"}, "")
+		}
+		err = fmt.Errorf("mq.Send: send msg failed, errs: %v", errMsg)
+		return err
+	}
+	return nil
 }

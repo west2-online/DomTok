@@ -29,3 +29,11 @@ const (
 	DefaultKafkaNumPartitions     = -1
 	DefaultKafkaReplicationFactor = -1
 )
+
+// CartService
+const (
+	KafkaCartTopic                = "cart"           // Kafka的话题
+	KafkaCartAddGoodsPartitionNum = 10               // Kafka的分区数
+	KafkaCartAddGoodsConsumerNum  = 10               // Kafka的并发消费者数
+	KafkaCartAddGoodsGroupId      = "cart_add_goods" // Kafka的订阅组id
+)
