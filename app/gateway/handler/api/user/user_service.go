@@ -21,8 +21,8 @@ package api
 import (
 	"context"
 
-	"github.com/west2-online/DomTok/kitex_gen/model"
-	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
+	"github.com/west2-online/DomTok/app/gateway/mw"
+	"github.com/west2-online/DomTok/pkg/constants"
 
 	"github.com/cloudwego/hertz/pkg/app"
 
@@ -75,9 +75,13 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	ctx = metainfoContext.WithLoginData(ctx, &model.LoginData{
-		UserId: resp.UserId,
-	})
+	access, refresh, err := mw.CreateAllToken()
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	c.Header(constants.AccessTokenHeader, access)
+	c.Header(constants.RefreshTokenHeader, refresh)
 
 	pack.RespData(c, resp)
 }

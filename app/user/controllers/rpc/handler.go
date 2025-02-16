@@ -19,12 +19,11 @@ package rpc
 import (
 	"context"
 
-	"github.com/west2-online/DomTok/pkg/base"
-
 	"github.com/west2-online/DomTok/app/user/controllers/rpc/pack"
 	"github.com/west2-online/DomTok/app/user/domain/model"
 	"github.com/west2-online/DomTok/app/user/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/user"
+	"github.com/west2-online/DomTok/pkg/base"
 )
 
 // UserHandler 实现 idl 中定义的 RPC 接口
