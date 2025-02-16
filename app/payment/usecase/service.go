@@ -49,7 +49,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 		return "", 0, fmt.Errorf("get user id failed:%w", err)
 	}
 	// 检查用户是否存在
-	userInfo, err := uc.db.CheckUserExist(ctx, uid)
+	userInfo, err := uc.svc.CheckUserExist(ctx, uid)
 	if err != nil {
 		return "", 0, fmt.Errorf("check user existed failed:%w", err)
 	}
@@ -74,15 +74,15 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 		// 如果订单存在
 	} else if paymentInfo == paymentStatus.PaymentExist {
 		// 获取订单的支付状态
-		payStatus, err := uc.svc.GetPaymentInfo(ctx, orderID)
+		payStatus, err := uc.db.GetPaymentInfo(ctx, orderID)
 		// 如果订单正在支付或者已经支付完成，则拒绝进行接下来的生成令牌的活动
 		if payStatus == paymentStatus.PaymentStatusSuccess || payStatus == paymentStatus.PaymentStatusProcessing {
 			return "", 0, fmt.Errorf("payment is processing or has already done:%w", err)
 		}
 		// TODO 这个else有必要保留吗？
-	} else {
-		return "", 0, fmt.Errorf("check payment existed failed:%w", err)
-	}
+	} // else {
+	// return "", 0, fmt.Errorf("check payment existed failed:%w", err)
+	// }
 
 	// 4. HMAC生成支付令牌
 	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, orderID)

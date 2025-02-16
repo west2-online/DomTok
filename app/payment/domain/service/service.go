@@ -33,6 +33,11 @@ func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64)
 	return nil
 }
 
+// TODO 这个也要向user模块发起数据库查询申请
+func (svc *PaymentService) CheckUserExist(ctx context.Context, uid int64) (userInfo interface{}, err error) {
+	return nil, nil
+}
+
 // TODO 等Sser模块完成了再写这个，从ctx里获取userID
 func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error) {
 	return 0, nil
@@ -40,11 +45,6 @@ func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error)
 
 // TODO 后面完善这个接口，要发起RPC请求向order模块申请数据库的查询，所以后面再来写
 func (svc *PaymentService) CheckOrderExist(ctx context.Context, orderID int64) (orderInfo int64, err error) {
-	return 0, nil
-}
-
-// TODO
-func (svc *PaymentService) GetPaymentInfo(ctx context.Context, orderID int64) (payStatus int64, err error) {
 	return 0, nil
 }
 
