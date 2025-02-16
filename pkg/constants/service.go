@@ -32,12 +32,32 @@ const (
 
 // OrderService
 const (
-	OrderStatusUnpaidCode = 0
-	OrderStatusPaidCode   = 1
-	OrderStatusFailCode   = 2
-
-	OrderStatusUnpaid  = "未支付"
-	OrderStatusPaid    = "待支付"
-	OrderStatusFail    = "支付失败"
-	OrderStatusUnknown = "未知状态"
+	OrderStatusUnpaidCode    int32 = 0
+	OrderStatusPaidCode      int32 = 1
+	OrderStatusCompletedCode int32 = 2
+	OrderStatusCancelledCode int32 = 3
 )
+
+// OrderService Status Messages
+const (
+	OrderStatusUnpaid    = "待支付"
+	OrderStatusPaid      = "已支付"
+	OrderStatusCompleted = "已完成"
+	OrderStatusCancelled = "已取消"
+	OrderStatusUnknown   = "未知状态"
+)
+
+func GetOrderStatusMsg(code int32) string {
+	switch code {
+	case OrderStatusUnpaidCode:
+		return OrderStatusUnpaid
+	case OrderStatusPaidCode:
+		return OrderStatusPaid
+	case OrderStatusCompletedCode:
+		return OrderStatusCompleted
+	case OrderStatusCancelledCode:
+		return OrderStatusCancelled
+	default:
+		return OrderStatusUnknown
+	}
+}

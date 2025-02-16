@@ -24,6 +24,7 @@ import (
 	etcd "github.com/kitex-contrib/registry-etcd"
 
 	"github.com/west2-online/DomTok/config"
+	"github.com/west2-online/DomTok/kitex_gen/order/orderservice"
 	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
 	"github.com/west2-online/DomTok/pkg/constants"
 )
@@ -48,4 +49,8 @@ func initRPCClient[T any](serviceName string, newClientFunc func(string, ...clie
 
 func InitUserRPC() (*userservice.Client, error) {
 	return initRPCClient("user", userservice.NewClient)
+}
+
+func InitOrderRPC() (*orderservice.Client, error) {
+	return initRPCClient(constants.OrderServiceName, orderservice.NewClient)
 }
