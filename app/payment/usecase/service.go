@@ -35,54 +35,52 @@ func (uc *paymentUseCase) GetParamToken(ctx context.Context) (token string, err 
 	return "", nil
 }
 
-// GetPaymentToken 这里要怎么让他一次只返回两个参数呢，然后为什么svc下面的方法总是识别不了呢？
 func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, paramToken string) (token string, expTime int64, err error) {
 	// 1. 检查订单是否存在
 	pid, err := uc.db.GetOrderByToken(ctx, paramToken)
 	if err != nil {
-		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime, fmt.Errorf("check payment order existed failed:%w", err)
+		return "", 0, fmt.Errorf("check payment order existed failed:%w", err)
 	}
 	if pid == paymentStatus.PaymentOrderNotExist {
-		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime,
-			errno.NewErrNo(errno.PaymentOrderNotExist, "payment order does not exist")
+		return "", 0, errno.NewErrNo(errno.PaymentOrderNotExist, "payment order does not exist")
 	}
 
 	// 2. 检查用户是否存在
 	uid, err := uc.db.GetUserByToken(ctx, paramToken)
 	if err != nil {
-		return paymentStatus.UserNotExistToken, paymentStatus.UserNotExistExpirationTime, fmt.Errorf("check user existed failed:%w", err)
+		return "", 0, fmt.Errorf("check user existed failed:%w", err)
 	}
 	if uid == paymentStatus.UserNotExist {
-		return paymentStatus.UserNotExistToken, paymentStatus.UserNotExistExpirationTime, errno.NewErrNo(errno.UserNotExist, "user does not exist")
+		return "", 0, errno.NewErrNo(errno.UserNotExist, "user does not exist")
 	}
 
 	// 3. 检查订单支付信息
 	var paymentInfo int
 	paymentInfo, err = uc.db.GetPaymentInfo(ctx, paramToken)
 	if err != nil {
-		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime, fmt.Errorf("check payment information failed:%w", err)
+		return "", 0, fmt.Errorf("check payment information failed:%w", err)
 	}
 	if paymentInfo == paymentStatus.PaymentStatusSuccess || paymentInfo == paymentStatus.PaymentStatusProcessing {
-		return paymentStatus.HavePaidToken, paymentStatus.HavePaidExpirationTime, fmt.Errorf("payment is processing or has already done:%w", err)
+		return "", 0, fmt.Errorf("payment is processing or has already done:%w", err)
 	} else {
 		// 创建支付订单
 		// TODO 这里的CreatePaymentInfo逻辑要怎么写？
 		_, err := uc.svc.CreatePaymentInfo(ctx, paramToken)
 		if err != nil {
-			return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("create payment info failed:%w", err)
+			return "", 0, fmt.Errorf("create payment info failed:%w", err)
 		}
 	}
 
 	// 4. HMAC生成支付令牌
 	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, paramToken)
 	if err != nil {
-		return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("generate payment token failed:%w", err)
+		return "", 0, fmt.Errorf("generate payment token failed:%w", err)
 	}
 	var redisStatus int
 	// 5. 存储令牌到 Redis
 	redisStatus, err = uc.svc.StorePaymentToken(ctx, paramToken, expTime)
 	if err != nil && redisStatus != paymentStatus.RedisStoreSuccess {
-		return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("store payment token failed:%w", err)
+		return "", 0, fmt.Errorf("store payment token failed:%w", err)
 	}
 	return token, expTime, nil
 }
