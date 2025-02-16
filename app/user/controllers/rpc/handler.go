@@ -61,7 +61,7 @@ func (h *UserHandler) Login(ctx context.Context, req *user.LoginRequest) (r *use
 		Password: req.Password,
 	}
 
-	ans, accessToken, refreshToken, err := h.useCase.Login(ctx, u)
+	ans, err := h.useCase.Login(ctx, u)
 	if err != nil {
 		r.Base = base.BuildBaseResp(err)
 		return
@@ -69,7 +69,5 @@ func (h *UserHandler) Login(ctx context.Context, req *user.LoginRequest) (r *use
 
 	r.Base = base.BuildBaseResp(nil)
 	r.User = pack.BuildUser(ans)
-	r.Accesstoken = accessToken
-	r.Refreshtoken = refreshToken
 	return
 }

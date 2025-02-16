@@ -22,26 +22,20 @@ import (
 
 	"github.com/west2-online/DomTok/app/user/domain/model"
 	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 // Login 用户登录
-func (uc *useCase) Login(ctx context.Context, user *model.User) (*model.User, string, string, error) {
+func (uc *useCase) Login(ctx context.Context, user *model.User) (*model.User, error) {
 	user, err := uc.db.GetUserInfo(ctx, user.UserName)
 	if err != nil {
-		return nil, "", "", fmt.Errorf("get user info failed: %w", err)
+		return nil, fmt.Errorf("get user info failed: %w", err)
 	}
 
 	if err = uc.svc.CheckPassword(user.Password, user.Password); err != nil {
-		return nil, "", "", err
+		return nil, err
 	}
 
-	accessToken, refreshToken, err := utils.CreateAllToken(user.Uid)
-	if err != nil {
-		return nil, "", "", err
-	}
-
-	return user, accessToken, refreshToken, nil
+	return user, nil
 }
 
 func (uc *useCase) RegisterUser(ctx context.Context, u *model.User) (uid int64, err error) {

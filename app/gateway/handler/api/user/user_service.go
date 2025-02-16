@@ -21,6 +21,7 @@ package api
 import (
 	"context"
 
+	"github.com/west2-online/DomTok/app/gateway/mw"
 	"github.com/west2-online/DomTok/pkg/constants"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -65,7 +66,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, accessToken, refreshToken, err := rpc.LoginRPC(ctx, &user.LoginRequest{
+	resp, err := rpc.LoginRPC(ctx, &user.LoginRequest{
 		Username: req.Name,
 		Password: req.Password,
 	})
@@ -73,6 +74,9 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
+
+	accessToken, refreshToken, err := mw.CreateAllToken(resp.UserId)
+
 	c.Header(constants.AccessTokenHeader, accessToken)
 	c.Header(constants.RefreshTokenHeader, refreshToken)
 
