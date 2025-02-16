@@ -20,7 +20,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// PaymentOrder 支付订单表
+// PaymentOrder 支付订单表（删除了三个时间）
 type PaymentOrder struct {
 	ID                        int64           `gorm:"primaryKey;autoIncrement;comment:支付订单的唯一标识"`
 	OrderID                   int64           `gorm:"not null;comment:商户订单号"`
