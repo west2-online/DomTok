@@ -27,6 +27,6 @@ type PaymentDB interface {
 	GetPaymentInfo(ctx context.Context, paramToken string) (int, error)
 }
 type PaymentRedis interface {
-	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error
-	Get(ctx context.Context, key string) (string, error)
+	SetPaymentToken(ctx context.Context, key string, value interface{}, expiration time.Duration) error
+	GetPaymentToken(ctx context.Context, key string) (string, error)
 }

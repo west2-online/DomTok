@@ -37,7 +37,7 @@ func NewPaymentHandler(useCase usecase.PaymentUseCase) *PaymentHandler {
 func (handler *PaymentHandler) ProcessPayment(ctx context.Context, req *payment.PaymentRequest) (r *payment.PaymentResponse, err error) {
 	r = new(payment.PaymentResponse)
 	p, err := handler.useCase.CreatePayment(ctx, req.GetOrderID())
-	r.Status = int64(p.Status)
+	r.Status = p.Status
 	if err != nil {
 		return r, err
 	}

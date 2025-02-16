@@ -33,12 +33,10 @@ func NewPaymentRedis(client *redis.Client) repository.PaymentRedis {
 	return &paymentRedis{client: client}
 }
 
-// Set 实现 Set 方法
-func (p *paymentRedis) Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
+func (p *paymentRedis) SetPaymentToken(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
 	return p.client.Set(ctx, key, value, expiration).Err()
 }
 
-// Get 实现 Get 方法
-func (p *paymentRedis) Get(ctx context.Context, key string) (string, error) {
+func (p *paymentRedis) GetPaymentToken(ctx context.Context, key string) (string, error) {
 	return p.client.Get(ctx, key).Result()
 }

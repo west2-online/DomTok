@@ -62,7 +62,7 @@ func (svc *PaymentService) StorePaymentToken(ctx context.Context, paramToken str
 
 	// 2. 存储到 Redis（key: "payment_token:<token>"，value: token）
 	redisKey := fmt.Sprintf("payment_token:%s", paramToken)
-	err := svc.redis.Set(ctx, redisKey, paramToken, expirationDuration)
+	err := svc.redis.SetPaymentToken(ctx, redisKey, paramToken, expirationDuration)
 	if err != nil {
 		return paymentStatus.RedisStoreFailed, fmt.Errorf("failed to store payment token in redis: %w", err)
 	}
