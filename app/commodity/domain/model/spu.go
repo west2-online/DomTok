@@ -14,14 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package model
 
-// 业务强相关, 范围是 1000-9999
-const (
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
-
-	ServiceSpuNotExist
-	ServiceImgNotExist
-)
+type Spu struct {
+	SpuId               int64
+	Name                string
+	CreatorId           int64
+	Description         string
+	CategoryId          int64
+	GoodsHeadDrawing    []byte
+	Price               float64
+	ForSale             int
+	Shipping            float64
+	CreatedAt           int64
+	UpdatedAt           int64
+	DeletedAt           int64
+	GoodsHeadDrawingUrl string
+}

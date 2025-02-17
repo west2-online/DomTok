@@ -45,6 +45,16 @@ kafka:
   user: domtok
   password: domtok-password
 
+upyuns:
+    bucket: "w2-domtok"
+    operator: "penqee"
+    password: ""
+    token-secret: ""
+    token-timeout: 60
+    uss-domain: "http://w2-domtok.test.upcdn.net" # 测试域名
+    download-domain: ""
+
+
 services:
   template:
     name: template
@@ -69,3 +79,9 @@ services:
     load-balance: false
     addr:
       - 0.0.0.0:20003
+
+  commodity:
+    name: commodity
+    load-balance: false
+    addr:
+      - 0.0.0.0:20004

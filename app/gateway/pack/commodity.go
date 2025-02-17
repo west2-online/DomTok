@@ -14,14 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package pack
 
-// 业务强相关, 范围是 1000-9999
-const (
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
+import (
+	"io/ioutil"
+	"mime/multipart"
 
-	ServiceSpuNotExist
-	ServiceImgNotExist
+	"github.com/west2-online/DomTok/pkg/errno"
 )
+
+func BuildFileDataBytes(file *multipart.FileHeader) ([]byte, error) {
+	src, err := file.Open()
+	if err != nil {
+		return nil, errno.OSOperationError.WithError(err)
+	}
+	defer src.Close()
+
+	data, err := ioutil.ReadAll(src)
+	if err != nil {
+		return nil, errno.IOOperationError.WithError(err)
+	}
+	return data, err
+}

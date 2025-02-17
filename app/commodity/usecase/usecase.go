@@ -26,18 +26,26 @@ import (
 
 type CommodityUseCase interface {
 	CreateCategory(ctx context.Context, category *model.Category) (id int64, err error)
+	CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err error)
+	CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) (int64, error)
+	DeleteSpu(ctx context.Context, spuId int64) error
+	UpdateSpu(ctx context.Context, spu *model.Spu) error
+	UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
+	DeleteSpuImage(ctx context.Context, imageId int64) error
 }
 
 type useCase struct {
 	db    repository.CommodityDB
 	svc   *service.CommodityService
 	cache repository.CommodityCache
+	mq    repository.CommodityMQ
 }
 
-func NewCommodityCase(db repository.CommodityDB, svc *service.CommodityService, cache repository.CommodityCache) *useCase {
+func NewCommodityCase(db repository.CommodityDB, svc *service.CommodityService, cache repository.CommodityCache, mq repository.CommodityMQ) *useCase {
 	return &useCase{
 		db:    db,
 		svc:   svc,
 		cache: cache,
+		mq:    mq,
 	}
 }

@@ -53,4 +53,10 @@ const (
 	InternalNetworkErrorCode                 // 网络错误
 	InternalESErrorCode                      // ES错误
 	InternalKafkaErrorCode                   // kafka 错误
+	OSOperateErrorCode
+	IOOperateErrorCode
+)
+
+const (
+	UpYunFileErrorCode = 60000 + iota
 )

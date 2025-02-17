@@ -18,6 +18,8 @@ package utils
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"mime/multipart"
 	"net"
 	"strings"
@@ -149,4 +151,42 @@ func GetImageFileType(fileBytes *[]byte) (string, error) {
 func GetFloat64(d *decimal.Decimal) float64 {
 	v, _ := d.Float64()
 	return v
+}
+
+func FileToBytes(file *multipart.FileHeader) (ret [][]byte, err error) {
+	if file == nil {
+		return nil, errno.ParamMissingError
+	}
+
+	fileOpen, err := file.Open()
+	if err != nil {
+		return nil, errno.OSOperationError.WithMessage(err.Error())
+	}
+	defer fileOpen.Close()
+
+	for {
+		buf := make([]byte, constants.FileStreamBufferSize)
+		_, err := fileOpen.Read(buf)
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return nil, errno.InternalServiceError.WithMessage(err.Error())
+		}
+		ret = append(ret, buf)
+	}
+	return ret, nil
+}
+
+func GenerateFileName(path string, id int64) string {
+	currentTime := time.Now()
+	// 获取年月日和小时分钟
+	year, month, day := currentTime.Date()
+	hour, minute := currentTime.Hour(), currentTime.Minute()
+	second := currentTime.Second()
+	nanoSecond := currentTime.Nanosecond()
+	return strings.Join([]string{
+		config.Upyun.UssDomain, path,
+		fmt.Sprintf("%d_%d%02d%02d_%02d%02d%02d%03d.", id, year, month, day, hour, minute, second, nanoSecond),
+	}, "")
 }
