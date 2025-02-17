@@ -23,6 +23,7 @@ import (
 	"github.com/west2-online/DomTok/app/user/domain/model"
 	"github.com/west2-online/DomTok/app/user/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/user"
+	"github.com/west2-online/DomTok/pkg/base"
 )
 
 // UserHandler 实现 idl 中定义的 RPC 接口
@@ -62,9 +63,11 @@ func (h *UserHandler) Login(ctx context.Context, req *user.LoginRequest) (r *use
 
 	ans, err := h.useCase.Login(ctx, u)
 	if err != nil {
+		r.Base = base.BuildBaseResp(err)
 		return
 	}
 
+	r.Base = base.BuildBaseResp(nil)
 	r.User = pack.BuildUser(ans)
 	return
 }
