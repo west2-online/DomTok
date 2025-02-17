@@ -19,6 +19,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+
 	"github.com/west2-online/DomTok/app/user/domain/model"
 	"github.com/west2-online/DomTok/pkg/errno"
 )

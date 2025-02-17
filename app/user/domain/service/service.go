@@ -19,6 +19,7 @@ package service
 import (
 	"context"
 	"fmt"
+
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/west2-online/DomTok/app/user/domain/model"
