@@ -26,10 +26,15 @@ const (
 )
 
 const (
-	UserTableName          = "users"
-	CategoryTableName      = "categories"
-	OrderTableName         = "orders"
-	OrderGoodsTableName    = "order_goods"
+	UserTableName       = "users"
+	CategoryTableName   = "categories"
+	OrderTableName      = "orders"
+	OrderGoodsTableName = "order_goods"
+	SpuTableName        = "spu_info"
+	SpuImageTableName   = "spu_image"
+
+	SpuSkuTableName = "spu_to_sku"
+	CartTableName   = "cart"
 	PaymentTableName       = "payments"
 	PaymentRefundTableName = "payment_refunds"
 	PaymentLedgerTableName = "payment_ledgers"

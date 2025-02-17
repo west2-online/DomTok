@@ -17,10 +17,14 @@ limitations under the License.
 package rpc
 
 import (
+	"bytes"
 	"context"
 
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
+	"github.com/west2-online/DomTok/pkg/base"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 type CommodityHandler struct {
@@ -57,14 +61,84 @@ func (c CommodityHandler) UseUserCoupon(ctx context.Context, req *commodity.UseU
 	panic("implement me")
 }
 
-func (c CommodityHandler) CreateSpu(ctx context.Context, req *commodity.CreateSpuReq) (r *commodity.CreateSpuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+func (c CommodityHandler) CreateSpu(streamServer commodity.CommodityService_CreateSpuServer) (err error) {
+	resp := new(commodity.CreateSpuResp)
+
+	req, err := streamServer.Recv()
+	if err != nil {
+		logger.Errorf("rpc.CreateSpu: receive error: %v", err)
+		resp.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(resp)
+	}
+
+	for i := 0; i < int(req.BufferCount); i++ {
+		fileData, err := streamServer.Recv()
+		if err != nil {
+			logger.Errorf("rpc.CreateSpu: receive error: %v", err)
+			resp.Base = base.BuildBaseResp(err)
+			return streamServer.SendAndClose(resp)
+		}
+		req.GoodsHeadDrawing = bytes.Join([][]byte{req.GoodsHeadDrawing, fileData.GoodsHeadDrawing}, []byte(""))
+	}
+
+	id, err := c.useCase.CreateSpu(streamServer.Context(), &model.Spu{
+		Name:             req.Name,
+		Description:      req.Description,
+		CategoryId:       req.CategoryID,
+		Price:            req.Price,
+		ForSale:          int(req.ForSale),
+		Shipping:         req.Shipping,
+		GoodsHeadDrawing: req.GoodsHeadDrawing,
+	})
+	if err != nil {
+		logger.Errorf("rpc.CreateSpu: create spu error: %v", err)
+		resp.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(resp)
+	}
+
+	resp.Base = base.BuildBaseResp(nil)
+	resp.SpuID = id
+	return streamServer.SendAndClose(resp)
 }
 
-func (c CommodityHandler) UpdateSpu(ctx context.Context, req *commodity.UpdateSkuReq) (r *commodity.UpdateSpuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+func (c CommodityHandler) UpdateSpu(streamServer commodity.CommodityService_UpdateSpuServer) (err error) {
+	resp := new(commodity.UpdateSpuResp)
+
+	req, err := streamServer.Recv()
+	if err != nil {
+		logger.Errorf("rpc.UpdateSpu: receive error: %v", err)
+		resp.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(resp)
+	}
+
+	for i := 0; i < int(*req.BufferCount); i++ {
+		fileData, err := streamServer.Recv()
+		if err != nil {
+			logger.Errorf("rpc.UpdateSpu: receive error: %v", err)
+			resp.Base = base.BuildBaseResp(err)
+			return streamServer.SendAndClose(resp)
+		}
+		req.GoodsHeadDrawing = bytes.Join([][]byte{req.GoodsHeadDrawing, fileData.GoodsHeadDrawing}, []byte(""))
+	}
+
+	err = c.useCase.UpdateSpu(streamServer.Context(), &model.Spu{
+		SpuId:            req.SpuID,
+		Name:             req.GetName(),
+		Description:      req.GetDescription(),
+		CategoryId:       req.GetCategoryID(),
+		Price:            req.GetPrice(),
+		ForSale:          int(req.GetForSale()),
+		Shipping:         req.GetShipping(),
+		GoodsHeadDrawing: req.GetGoodsHeadDrawing(),
+	})
+	if err != nil {
+		logger.Errorf("rpc.UpdateSpu: update spu error: %v", err)
+		resp.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(resp)
+	}
+
+	resp.Base = base.BuildBaseResp(nil)
+	return streamServer.SendAndClose(resp)
 }
 
 func (c CommodityHandler) ViewSpu(ctx context.Context, req *commodity.ViewSpuReq) (r *commodity.ViewSpuResp, err error) {
