@@ -62,6 +62,7 @@ func (svc *PaymentService) CheckUserExist(ctx context.Context, uid int64) (userI
 
 // TODO 等User模块完成了再写这个，从ctx里获取userID
 func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error) {
+
 	return 0, nil
 }
 
