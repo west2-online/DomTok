@@ -14,14 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package mq
 
-// 业务强相关, 范围是 1000-9999
-const (
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
-
-	ServiceSpuNotExist
-	ServiceImgNotExist
+import (
+	"github.com/west2-online/DomTok/app/commodity/domain/repository"
+	"github.com/west2-online/DomTok/pkg/kafka"
 )
+
+type CommodityMQ struct {
+	client *kafka.Kafka
+}
+
+func NewCommodityMQ(client *kafka.Kafka) repository.CommodityMQ {
+	return &CommodityMQ{client: client}
+}

@@ -30,6 +30,13 @@ const (
 	DefaultKafkaReplicationFactor = -1
 )
 
+// Commodity Service
+const (
+	KafkaImageTopic   = "ImageTopic"
+	KafkaPartitionNum = 3
+	KafkaImageGroupId = "ImageGroupId"
+)
+
 // CartService
 const (
 	KafkaCartTopic                = "cart"           // Kafka的话题

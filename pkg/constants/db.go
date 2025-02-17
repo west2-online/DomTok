@@ -30,5 +30,9 @@ const (
 	CategoryTableName   = "categories"
 	OrderTableName      = "orders"
 	OrderGoodsTableName = "order_goods"
-	CartTableName       = "cart"
+	SpuTableName        = "spu_info"
+	SpuImageTableName   = "spu_image"
+
+	SpuSkuTableName = "spu_to_sku"
+	CartTableName   = "cart"
 )
