@@ -18,10 +18,10 @@ package constants
 
 // Service Name
 const (
-	GatewayServiceName = "gateway"
-	OrderServiceName   = "order"
-	UserServiceName    = "user"
-	PaymentServiceName = "payment"
+	GatewayServiceName   = "gateway"
+	OrderServiceName     = "order"
+	UserServiceName      = "user"
+	PaymentServiceName   = "payment"
 	CommodityServiceName = "commodity"
 	CartServiceName      = "cart"
 )
