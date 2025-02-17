@@ -46,23 +46,42 @@ type Dialog struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
+	_buffer   chan string
 	_receiver chan string
-	_mutex    sync.Mutex
-	_done     *struct{}
+	_mutex    *sync.RWMutex
+	_done     *bool
 }
 
 // NewDialog creates a new Dialog.
 func NewDialog(id string, input string) *Dialog {
 	ctx, cancel := context.WithCancel(context.Background())
-	return &Dialog{
+	mu := &sync.RWMutex{}
+	_done := false
+	done := &_done
+	d := &Dialog{
 		ctx:       ctx,
 		cancel:    cancel,
 		unique:    id,
 		message:   input,
+		_buffer:   make(chan string, 1),
 		_receiver: make(chan string),
-		_mutex:    sync.Mutex{},
-		_done:     nil,
+		_mutex:    mu,
+		_done:     done,
 	}
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				mu.Lock()
+				*done = true
+				mu.Unlock()
+				return
+			case msg := <-d._buffer:
+				d._receiver <- msg
+			}
+		}
+	}()
+	return d
 }
 
 // Unique returns a unique string to identify the dialog.
@@ -76,22 +95,19 @@ func (d *Dialog) Message() string {
 }
 
 // Send sends a message to the dialog.
+// Producer should send message before closed, otherwise the goroutine will be blocked.
 func (d *Dialog) Send(message string) {
-	d._mutex.Lock()
-	defer d._mutex.Unlock()
-	select {
-	case done := <-d.ctx.Done():
-		d._done = &done
-	case d._receiver <- message:
-		if d._done != nil {
-			<-d._receiver
-		}
+	d._mutex.RLock()
+	if *d._done {
+		d._mutex.RUnlock()
+		return
 	}
+	d._mutex.RUnlock()
+	d._buffer <- message
 }
 
 // Close closes the dialog.
 func (d *Dialog) Close() {
-	close(d._receiver)
 	d.cancel()
 }
 

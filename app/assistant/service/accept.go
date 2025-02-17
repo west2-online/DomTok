@@ -135,8 +135,22 @@ func handleTextMessage(conn *websocket.Conn, ctx context.Context) (err error) {
 			// send the message
 			err := conn.WriteMessage(websocket.TextMessage, pack.ResponseFactory.Message(data))
 			if err != nil {
+				// if the message cannot be sent, consume the rest messages and return the error
+				// to avoid goroutine leak
+				go consumeRestMessages(*dialog)
 				return fmt.Errorf("write failed: %w", err)
 			}
+		}
+	}
+}
+
+// consumeRestMessages consumes the rest messages in the dialog.
+func consumeRestMessages(dialog model.Dialog) {
+	for {
+		select {
+		case <-dialog.NotifyOnClosed():
+			return
+		case <-dialog.NotifyOnMessage():
 		}
 	}
 }
