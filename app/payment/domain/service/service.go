@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/west2-online/DomTok/app/payment/domain/model"
+	loginData "github.com/west2-online/DomTok/pkg/base/context"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 )
 
@@ -62,8 +63,11 @@ func (svc *PaymentService) CheckUserExist(ctx context.Context, uid int64) (userI
 
 // TODO 等User模块完成了再写这个，从ctx里获取userID
 func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error) {
-
-	return 0, nil
+	uid, err = loginData.GetLoginData(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get login data: %w", err)
+	}
+	return uid, nil
 }
 
 // TODO 后面完善这个接口，要发起RPC请求向order模块申请数据库的查询，所以后面再来写
