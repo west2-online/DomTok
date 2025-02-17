@@ -1,6 +1,6 @@
-namespace go payment
+namespace go api.payment
 
-include "model.thrift"
+include "../model.thrift"
 
 /*
  * struct PaymentTokenRequest 支付令牌请求
