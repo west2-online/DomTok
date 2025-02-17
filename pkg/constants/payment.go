@@ -16,17 +16,19 @@ limitations under the License.
 
 package constants
 
+import "time"
+
 const (
-	OrderNotExist     = false
-	PaymentExist      = true
-	PaymentNotExist   = false
-	UserNotExist      = false
-	PaymentSecretKey  = "west2online"
-	RedisStoreSuccess = true  // 成功
-	RedisStoreFailed  = false // Redis 存储失败
-	// TODO 这两个常量要变
-	ExpirationTime = 15
-	PingTime       = 2
+	OrderNotExist      = false
+	PaymentExist       = true
+	PaymentNotExist    = false
+	UserNotExist       = false
+	PaymentSecretKey   = "west2online"
+	RedisStoreSuccess  = true  // 成功
+	RedisStoreFailed   = false // Redis 存储失败
+	ExpirationDuration = 15 * time.Minute
+	// TODO 这一个常量要改
+	PingTime = 2
 )
 const (
 	PaymentStatusPending    = iota // 待支付
