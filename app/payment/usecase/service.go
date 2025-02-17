@@ -33,7 +33,8 @@ func (uc *paymentUseCase) CreatePayment(ctx context.Context, orderID int64) (*mo
 func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (token string, expTime int64, err error) {
 	// 1. 检查订单是否存在
 	// TODO 这个要向order模块要一个RPC接口然后再来填充
-	orderInfo, err := uc.svc.CheckOrderExist(ctx, orderID)
+	var orderInfo bool
+	orderInfo, err = uc.svc.CheckOrderExist(ctx, orderID)
 	if err != nil {
 		return "", 0, fmt.Errorf("check order existed failed:%w", err)
 	}
@@ -43,12 +44,14 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 
 	// 2. 获取用户id,并检查用户是否存在
 	// 获取用户id
-	uid, err := uc.svc.GetUserID(ctx)
+	var uid int64
+	uid, err = uc.svc.GetUserID(ctx)
 	if err != nil {
 		return "", 0, fmt.Errorf("get user id failed:%w", err)
 	}
 	// 检查用户是否存在
-	userInfo, err := uc.svc.CheckUserExist(ctx, uid)
+	var userInfo bool
+	userInfo, err = uc.svc.CheckUserExist(ctx, uid)
 	if err != nil {
 		return "", 0, fmt.Errorf("check user existed failed:%w", err)
 	}
@@ -57,7 +60,8 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	}
 
 	// 3. 检查订单支付信息
-	paymentInfo, err := uc.db.CheckPaymentExist(ctx, orderID)
+	var paymentInfo bool
+	paymentInfo, err = uc.db.CheckPaymentExist(ctx, orderID)
 	if err != nil {
 		return "", 0, fmt.Errorf("check payment existed failed:%w", err)
 	}
@@ -78,17 +82,14 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 		if payStatus == paymentStatus.PaymentStatusSuccess || payStatus == paymentStatus.PaymentStatusProcessing {
 			return "", 0, fmt.Errorf("payment is processing or has already done:%w", err)
 		}
-		// TODO 这个else有必要保留吗？
-	} // else {
-	// return "", 0, fmt.Errorf("check payment existed failed:%w", err)
-	// }
+	}
 
 	// 4. HMAC生成支付令牌
 	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, orderID)
 	if err != nil {
 		return "", 0, fmt.Errorf("generate payment token failed:%w", err)
 	}
-	var redisStatus int
+	var redisStatus bool
 	// 5. 存储令牌到 Redis
 	redisStatus, err = uc.svc.StorePaymentToken(ctx, token, expTime, uid, orderID)
 	if err != nil && redisStatus != paymentStatus.RedisStoreSuccess {

@@ -25,11 +25,11 @@ import (
 
 type PaymentDB interface {
 	// CheckPaymentExist CheckUserExist(ctx context.Context, uid int64) (userInfo interface{}, err error)
-	CheckPaymentExist(ctx context.Context, orderID int64) (paymentInfo interface{}, err error)
+	CheckPaymentExist(ctx context.Context, orderID int64) (paymentInfo bool, err error)
 	GetPaymentInfo(ctx context.Context, orderID int64) (payStatus interface{}, err error)
 	CreatePayment(ctx context.Context, order *model.PaymentOrder) error
 }
 type PaymentRedis interface {
-	SetPaymentToken(ctx context.Context, key string, value interface{}, expiration time.Duration, userID int64, orderID int64) error
+	SetPaymentToken(ctx context.Context, key string, value interface{}, expiration time.Duration) error
 	// GetPaymentToken(ctx context.Context, key string) (string, error)
 }

@@ -57,8 +57,8 @@ func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64)
 }
 
 // TODO 这个也要向User模块发起数据库查询申请
-func (svc *PaymentService) CheckUserExist(ctx context.Context, uid int64) (userInfo interface{}, err error) {
-	return nil, nil
+func (svc *PaymentService) CheckUserExist(ctx context.Context, uid int64) (userInfo bool, err error) {
+	return paymentStatus.UserNotExist, nil
 }
 
 // GetUserID 等User模块完成了再写这个，从ctx里获取userID
@@ -71,8 +71,8 @@ func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error)
 }
 
 // TODO 后面完善这个接口，要发起RPC请求向order模块申请数据库的查询，所以后面再来写
-func (svc *PaymentService) CheckOrderExist(ctx context.Context, orderID int64) (orderInfo int64, err error) {
-	return 0, nil
+func (svc *PaymentService) CheckOrderExist(ctx context.Context, orderID int64) (orderInfo bool, err error) {
+	return paymentStatus.OrderNotExist, nil
 }
 
 // GeneratePaymentToken HMAC生成支付令牌
@@ -87,7 +87,7 @@ func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int
 	h := hmac.New(sha256.New, secretKey)
 	_, err := h.Write([]byte(fmt.Sprintf("%d:%d", orderID, expirationTime)))
 	if err != nil {
-		return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("failed to generate HMAC: %w", err)
+		return "", 0, fmt.Errorf("failed to generate HMAC: %w", err)
 	}
 
 	// 4. 生成十六进制编码的 HMAC 签名
@@ -98,7 +98,7 @@ func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int
 }
 
 // StorePaymentToken 这里的返回值还没有想好，是返回状态码还是消息字段？
-func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, expTime int64, userID int64, orderID int64) (int, error) {
+func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, expTime int64, userID int64, orderID int64) (bool, error) {
 	// 1. 计算令牌的过期时间（转换成 Duration）
 	expirationDuration := time.Until(time.Unix(expTime, 0))
 

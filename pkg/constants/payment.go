@@ -17,25 +17,20 @@ limitations under the License.
 package constants
 
 const (
-	OrderNotExist                      = -1
-	PaymentExist                       = 1
-	PaymentNotExist                    = 0
-	PaymentStatusPending               = 0 // 待支付
-	PaymentStatusProcessing            = 1 // 处理中
-	PaymentStatusSuccess               = 2 // 成功支付
-	PaymentStatusFailed                = 3 // 支付失败
-	PaymentOrderNotExistToken          = ""
-	PaymentOrderNotExistExpirationTime = 0
-	UserNotExist                       = -1
-	UserNotExistToken                  = ""
-	UserNotExistExpirationTime         = 0
-	HavePaidToken                      = ""
-	HavePaidExpirationTime             = 0
-	ErrorToken                         = ""
-	ErrorExpirationTime                = 0
-	PaymentSecretKey                   = "west2online"
-	RedisStoreSuccess                  = 0  // 成功
-	RedisStoreFailed                   = -1 // Redis 存储失败
-	ExpirationTime                     = 15
-	PingTime                           = 2
+	OrderNotExist     = false
+	PaymentExist      = true
+	PaymentNotExist   = false
+	UserNotExist      = false
+	PaymentSecretKey  = "west2online"
+	RedisStoreSuccess = true  // 成功
+	RedisStoreFailed  = false // Redis 存储失败
+	// TODO 这两个常量要变
+	ExpirationTime = 15
+	PingTime       = 2
+)
+const (
+	PaymentStatusPending    = iota // 待支付
+	PaymentStatusProcessing        // 处理中
+	PaymentStatusSuccess           // 成功支付
+	PaymentStatusFailed            // 支付失败
 )
