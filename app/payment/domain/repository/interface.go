@@ -30,6 +30,6 @@ type PaymentDB interface {
 	CreatePayment(ctx context.Context, order *model.PaymentOrder) error
 }
 type PaymentRedis interface {
-	SetPaymentToken(ctx context.Context, key string, value interface{}, expiration time.Duration) error
+	SetPaymentToken(ctx context.Context, key string, value interface{}, expiration time.Duration, userID int64, orderID int64) error
 	// GetPaymentToken(ctx context.Context, key string) (string, error)
 }

@@ -43,7 +43,6 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 
 	// 2. 获取用户id,并检查用户是否存在
 	// 获取用户id
-	// TODO 这个函数要等user那边写完了才能填
 	uid, err := uc.svc.GetUserID(ctx)
 	if err != nil {
 		return "", 0, fmt.Errorf("get user id failed:%w", err)
@@ -91,7 +90,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	}
 	var redisStatus int
 	// 5. 存储令牌到 Redis
-	redisStatus, err = uc.svc.StorePaymentToken(ctx, token, expTime)
+	redisStatus, err = uc.svc.StorePaymentToken(ctx, token, expTime, uid, orderID)
 	if err != nil && redisStatus != paymentStatus.RedisStoreSuccess {
 		return "", 0, fmt.Errorf("store payment token failed:%w", err)
 	}

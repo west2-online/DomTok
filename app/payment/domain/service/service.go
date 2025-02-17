@@ -61,7 +61,7 @@ func (svc *PaymentService) CheckUserExist(ctx context.Context, uid int64) (userI
 	return nil, nil
 }
 
-// TODO 等User模块完成了再写这个，从ctx里获取userID
+// GetUserID 等User模块完成了再写这个，从ctx里获取userID
 func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error) {
 	uid, err = loginData.GetLoginData(ctx)
 	if err != nil {
@@ -98,12 +98,11 @@ func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int
 }
 
 // StorePaymentToken 这里的返回值还没有想好，是返回状态码还是消息字段？
-func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, expTime int64) (int, error) {
+func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, expTime int64, userID int64, orderID int64) (int, error) {
 	// 1. 计算令牌的过期时间（转换成 Duration）
 	expirationDuration := time.Until(time.Unix(expTime, 0))
 
-	// 2. 存储到 Redis（key: "payment_token:<token>"，value: token）
-	redisKey := fmt.Sprintf("payment_token:%s", token)
+	redisKey := fmt.Sprintf("payment_token:%d:%d", userID, orderID)
 	err := svc.redis.SetPaymentToken(ctx, redisKey, token, expirationDuration)
 	if err != nil {
 		return paymentStatus.RedisStoreFailed, fmt.Errorf("failed to store payment token in redis: %w", err)
