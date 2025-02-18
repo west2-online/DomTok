@@ -14,16 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package pack
 
-// 业务强相关, 范围是 1000-9999
-const (
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
-
-	ServiceSpuNotExist
-	ServiceImgNotExist
-	PaymentOrderNotExist
-	UserNotExist
-)
+// BuildPaymentOrder BuildUser 将 entities 定义的 User 实体转换成 idl 定义的 RPC 交流实体，类似 dto

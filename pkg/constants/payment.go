@@ -14,16 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package constants
 
-// 业务强相关, 范围是 1000-9999
+import "time"
+
 const (
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
+	OrderNotExist      = false
+	PaymentExist       = true
+	PaymentNotExist    = false
+	UserNotExist       = false
+	PaymentSecretKey   = "west2online"
+	RedisStoreSuccess  = true  // 成功
+	RedisStoreFailed   = false // Redis 存储失败
+	ExpirationDuration = 15 * time.Minute
+	// TODO 这一个常量要改
+	PingTime = 2
+)
 
-	ServiceSpuNotExist
-	ServiceImgNotExist
-	PaymentOrderNotExist
-	UserNotExist
+const (
+	PaymentStatusPending    = iota // 待支付
+	PaymentStatusProcessing        // 处理中
+	PaymentStatusSuccess           // 成功支付
+	PaymentStatusFailed            // 支付失败
 )

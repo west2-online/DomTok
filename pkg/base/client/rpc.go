@@ -20,6 +20,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/west2-online/DomTok/kitex_gen/payment/paymentservice"
+
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/client/streamclient"
 	etcd "github.com/kitex-contrib/registry-etcd"
@@ -71,4 +73,8 @@ func InitCommodityStreamClientRPC() (*commodityservice.StreamClient, error) {
 
 func InitCartRPC() (*cartservice.Client, error) {
 	return initRPCClient(constants.CartServiceName, cartservice.NewClient)
+}
+
+func InitPaymentRPC() (*paymentservice.Client, error) {
+	return initRPCClient(constants.PaymentServiceName, paymentservice.NewClient)
 }
