@@ -41,7 +41,6 @@ func (h *UserHandler) Register(ctx context.Context, req *user.RegisterRequest) (
 		UserName: req.Username,
 		Password: req.Password,
 		Email:    req.Email,
-		Phone:    req.Phone,
 	}
 
 	var uid int64

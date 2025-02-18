@@ -39,13 +39,13 @@ func NewUserDB(client *gorm.DB) repository.UserDB {
 func (db *userDB) CreateUser(ctx context.Context, u *model.User) error {
 	// 将 entity 转换成 mysql 这边的 model
 	// TODO 可以考虑整一个函数统一转化, 放在这里占了太多行, 而且这不是这个方法该做的. 这个方法应该做的是创建用户
-	model := User{
+	user := User{
 		UserName: u.UserName,
 		Password: u.Password,
 		Email:    u.Email,
 	}
 
-	if err := db.client.WithContext(ctx).Create(model).Error; err != nil {
+	if err := db.client.WithContext(ctx).Create(user).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create user: %v", err)
 	}
 	return nil
@@ -53,7 +53,7 @@ func (db *userDB) CreateUser(ctx context.Context, u *model.User) error {
 
 func (db *userDB) IsUserExist(ctx context.Context, username string) (bool, error) {
 	var user User
-	err := db.client.WithContext(ctx).Where("user_name = ?", username).First(&user).Error
+	err := db.client.WithContext(ctx).Where("username = ?", username).First(&user).Error
 	if err != nil {
 		// 这里虽然是数据库返回的 err 不为 nil,
 		// 但这显然是业务上的错误, 而不是我们服务本身的
@@ -68,7 +68,7 @@ func (db *userDB) IsUserExist(ctx context.Context, username string) (bool, error
 
 func (db *userDB) GetUserInfo(ctx context.Context, username string) (*model.User, error) {
 	var user User
-	err := db.client.WithContext(ctx).Where("user_name = ?", username).First(&user).Error
+	err := db.client.WithContext(ctx).Where("username = ?", username).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errno.Errorf(errno.ServiceUserNotExist, "mysql: user not exist")

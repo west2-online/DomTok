@@ -43,7 +43,6 @@ func (uc *useCase) RegisterUser(ctx context.Context, u *model.User) (uid int64, 
 	if err = uc.svc.Verify(uc.svc.VerifyEmail(u.Email), uc.svc.VerifyPassword(u.Password)); err != nil {
 		return
 	}
-
 	// 判断是否已经注册过
 	// 注意: 这里使用 uc 调用了 DB, 但显然这个方法其他地方也可能会用的上, 所以可以考虑包装在 service 里面
 	exist, err := uc.db.IsUserExist(ctx, u.UserName)
