@@ -35,7 +35,7 @@ func (us *useCase) CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err
 	if err != nil {
 		return 0, fmt.Errorf("usecase.CreateSpu failed: %w", err)
 	}
-	spu.CreatorId = loginData.UserId
+	spu.CreatorId = loginData
 
 	id, err = us.svc.CreateSpu(ctx, spu)
 	if err != nil {
