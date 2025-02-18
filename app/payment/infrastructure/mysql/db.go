@@ -38,7 +38,7 @@ func NewPaymentDB(client *gorm.DB) repository.PaymentDB {
 }
 
 // CheckPaymentExist 检查是否已经发起过支付，利用orderID在订单支付表里查询
-func (db *paymentDB) CheckPaymentExist(ctx context.Context, orderID int64) (paymentInfo interface{}, err error) {
+func (db *paymentDB) CheckPaymentExist(ctx context.Context, orderID int64) (paymentInfo bool, err error) {
 	var paymentOrder PaymentOrder
 	// 利用orderID在订单支付表里查询是否已经发起过支付申请了（注意是订单支付表不是订单表）
 	err = db.client.WithContext(ctx).Where("order_id = ?", orderID).First(&paymentOrder).Error

@@ -20,9 +20,11 @@ import (
 	"context"
 	"fmt"
 
+	"go.uber.org/zap"
+
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
-	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // CreatePayment 这里定义一些具体的方法和函数，比如校验密码，加密密码，创建用户之类的
@@ -32,8 +34,9 @@ func (uc *paymentUseCase) CreatePayment(ctx context.Context, orderID int64) (*mo
 
 func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (token string, expTime int64, err error) {
 	// 1. 检查订单是否存在
+	fmt.Println("GetPaymentToken")
 	// TODO 这个要向order模块要一个RPC接口然后再来填充
-	var orderInfo bool
+	/*var orderInfo bool
 	orderInfo, err = uc.svc.CheckOrderExist(ctx, orderID)
 	if err != nil {
 		return "", 0, fmt.Errorf("check order existed failed:%w", err)
@@ -48,15 +51,6 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	uid, err = uc.svc.GetUserID(ctx)
 	if err != nil {
 		return "", 0, fmt.Errorf("get user id failed:%w", err)
-	}
-	// 检查用户是否存在
-	var userInfo bool
-	userInfo, err = uc.svc.CheckUserExist(ctx, uid)
-	if err != nil {
-		return "", 0, fmt.Errorf("check user existed failed:%w", err)
-	}
-	if userInfo == paymentStatus.UserNotExist {
-		return "", 0, errno.NewErrNo(errno.UserNotExist, "user does not exist")
 	}
 
 	// 3. 检查订单支付信息
@@ -80,17 +74,49 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 			return "", 0, fmt.Errorf("payment is processing or has already done:%w", err)
 		}
 	}
-
+	*/
 	// 4. HMAC生成支付令牌
+	//log.Println("GetPaymentToken called with orderID:", orderID)
+	logger.Info("GetPaymentToken called", zap.Int64("orderID", orderID))
 	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, orderID)
 	if err != nil {
+		//log.Printf("Error generating payment token: %v", err)
+		logger.Error("Error generating payment token",
+			zap.Int64("orderID", orderID),
+			zap.Error(err),
+		)
 		return "", 0, fmt.Errorf("generate payment token failed:%w", err)
 	}
+	//log.Printf("Generated token: %s, expires at: %d", token, expTime)
+	logger.Info("Generated payment token",
+		zap.String("token", token),
+		zap.Int64("expTime", expTime),
+	)
+
 	var redisStatus bool
 	// 5. 存储令牌到 Redis
+	// TODO
+	uid := int64(123)
+	logger.Info("Storing token in Redis",
+		zap.Int64("userID", uid),
+		zap.Int64("orderID", orderID),
+	)
+
+	//log.Printf("Storing token in Redis for userID: %d, orderID: %d", uid, orderID)
 	redisStatus, err = uc.svc.StorePaymentToken(ctx, token, expTime, uid, orderID)
 	if err != nil && redisStatus != paymentStatus.RedisStoreSuccess {
+		//log.Printf("Error storing payment token in Redis: %v", err)
+		logger.Error("Error storing payment token in Redis",
+			zap.Int64("orderID", orderID),
+			zap.Int64("userID", uid),
+			zap.Error(err),
+		)
 		return "", 0, fmt.Errorf("store payment token failed:%w", err)
 	}
+	//log.Println("Payment token stored successfully")
+	logger.Info("Payment token stored successfully",
+		zap.Int64("orderID", orderID),
+		zap.Int64("userID", uid),
+	)
 	return token, expTime, nil
 }
