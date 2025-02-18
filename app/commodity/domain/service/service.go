@@ -149,7 +149,7 @@ func (svc *CommodityService) IdentifyUser(ctx context.Context, uid int64) error 
 		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
 	}
 
-	if loginData.UserId != uid {
+	if loginData != uid {
 		return errno.AuthNoOperatePermission
 	}
 	return nil
