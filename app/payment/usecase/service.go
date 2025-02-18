@@ -80,14 +80,14 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	logger.Info("GetPaymentToken called", zap.Int64("orderID", orderID))
 	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, orderID)
 	if err != nil {
-		//log.Printf("Error generating payment token: %v", err)
+		// log.Printf("Error generating payment token: %v", err)
 		logger.Error("Error generating payment token",
 			zap.Int64("orderID", orderID),
 			zap.Error(err),
 		)
 		return "", 0, fmt.Errorf("generate payment token failed:%w", err)
 	}
-	//log.Printf("Generated token: %s, expires at: %d", token, expTime)
+	// log.Printf("Generated token: %s, expires at: %d", token, expTime)
 	logger.Info("Generated payment token",
 		zap.String("token", token),
 		zap.Int64("expTime", expTime),
@@ -102,10 +102,10 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 		zap.Int64("orderID", orderID),
 	)
 
-	//log.Printf("Storing token in Redis for userID: %d, orderID: %d", uid, orderID)
+	// log.Printf("Storing token in Redis for userID: %d, orderID: %d", uid, orderID)
 	redisStatus, err = uc.svc.StorePaymentToken(ctx, token, expTime, uid, orderID)
 	if err != nil && redisStatus != paymentStatus.RedisStoreSuccess {
-		//log.Printf("Error storing payment token in Redis: %v", err)
+		// log.Printf("Error storing payment token in Redis: %v", err)
 		logger.Error("Error storing payment token in Redis",
 			zap.Int64("orderID", orderID),
 			zap.Int64("userID", uid),
@@ -113,7 +113,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 		)
 		return "", 0, fmt.Errorf("store payment token failed:%w", err)
 	}
-	//log.Println("Payment token stored successfully")
+	// log.Println("Payment token stored successfully")
 	logger.Info("Payment token stored successfully",
 		zap.Int64("orderID", orderID),
 		zap.Int64("userID", uid),

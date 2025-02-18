@@ -30,6 +30,7 @@ const (
 	// TODO 这一个常量要改
 	PingTime = 2
 )
+
 const (
 	PaymentStatusPending    = iota // 待支付
 	PaymentStatusProcessing        // 处理中

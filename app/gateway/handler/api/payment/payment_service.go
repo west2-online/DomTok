@@ -20,8 +20,10 @@ package payment
 
 import (
 	"context"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
 	"github.com/west2-online/DomTok/app/gateway/pack"
 	"github.com/west2-online/DomTok/app/gateway/rpc"
 	"github.com/west2-online/DomTok/kitex_gen/payment"
@@ -84,7 +86,6 @@ func ProcessRefund(ctx context.Context, c *app.RequestContext) {
 	resp := new(payment.RefundResponse)
 
 	c.JSON(consts.StatusOK, resp)
-
 }
 
 // RequestRefundToken .
