@@ -721,5 +721,26 @@ func TestReflect(t *testing.T) {
 				},
 			})
 		})
+
+		PatchConvey("A pointer of struct", func(c C) {
+			type Args struct {
+				Value int `json:"value" desc:"value" required:"true"`
+			}
+			p1 := &Args{}
+			p2 := &p1
+			p3 := &p2
+			p4 := &p3
+			reflectRes := map[string]*schema.ParameterInfo{
+				"value": {
+					Type:     schema.Integer,
+					Desc:     "value",
+					Required: true,
+				},
+			}
+			So(*Reflect(p1), ShouldResemble, reflectRes)
+			So(*Reflect(p2), ShouldResemble, reflectRes)
+			So(*Reflect(p3), ShouldResemble, reflectRes)
+			So(*Reflect(p4), ShouldResemble, reflectRes)
+		})
 	})
 }

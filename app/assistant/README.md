@@ -59,9 +59,9 @@ type ToolXXXArgs struct {
 } // 你的工具函数的参数，对于tag的解释，请查看cli/ai/driver/eino/tools/README.md
 
 // 建立一个映射关系，用于描述你的工具函数的参数
-// 注意，tool.Reflect的参数是一个结构体本身，而不是结构体的指针
-// 你可以通过tool.Reflect(ToolXXXArgs{})来得到这个映射关系
-// 但tool.Reflect(&ToolXXXArgs{})是错误的，tool.Reflect会认为其是一个reflect.Ptr类型[运行时错误]
+// 注意，tool.Reflect的参数既可以是一个结构体本身，也可以是结构体的指针
+// 你可以通过tool.Reflect(ToolXXXArgs{})或tool.Reflect(&ToolXXXArgs{})来得到这个映射关系
+// 参数是一个指针时，tool.Reflect会认为尽可能展开这个指针，直到找到一个非指针的结构体
 var ToolXXXRequestBody = schema.NewParamsOneOfByParams(*tools.Reflect(ToolXXXArgs{}))
 
 // 工具构建函数，用于导出你的工具函数
