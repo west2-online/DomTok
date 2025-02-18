@@ -30,7 +30,7 @@ func TestToolRepeat_InvokableRun(t *testing.T) {
 	argsFmt := ToolRepeatArgs{Message: "hello"}
 	argsByte, _ := json.Marshal(argsFmt)
 	argsStr := string(argsByte)
-	PatchConvey("TestToolRepeat_InvokableRun", t, func() {
+	PatchConvey("Test ToolRepeat.InvokableRun", t, func() {
 		PatchConvey("success", func() {
 			resp, err := f.InvokableRun(context.Background(), argsStr)
 			So(err, ShouldBeNil)

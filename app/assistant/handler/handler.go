@@ -18,22 +18,35 @@ package handler
 
 import (
 	"context"
+	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/hertz-contrib/websocket"
 
+	"github.com/west2-online/DomTok/app/assistant/model"
 	"github.com/west2-online/DomTok/app/assistant/pack"
 	"github.com/west2-online/DomTok/app/assistant/service"
+	"github.com/west2-online/DomTok/pkg/constants"
 )
 
 var upgrader = websocket.HertzUpgrader{}
 
 func Entrypoint(ctx context.Context, c *app.RequestContext) {
+	token := string(c.GetHeader(constants.AccessTokenHeader))
 	// upgrade the protocol to websocket
 	err := upgrader.Upgrade(c, func(conn *websocket.Conn) {
-		// assign id to ctx
-		ctx = context.WithValue(ctx, service.CtxKeyID, pack.GenerateUUID())
+		if token == "" {
+			_ = conn.WriteMessage(websocket.TextMessage, []byte("missing token in header"))
+			return
+		}
+
+		// generate a uuid
+		id := pack.GenerateUUID()
+
+		// assign user info to ctx
+		ctx = context.WithValue(ctx, service.CtxKeyID, id)
+		ctx = context.WithValue(ctx, service.CtxKeyAccessToken, token)
 
 		// although the service is like a non-stateful service, we still need to log in
 		// in this case, we need to log in to check some args is properly set
@@ -42,13 +55,31 @@ func Entrypoint(ctx context.Context, c *app.RequestContext) {
 			_ = conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
 			return
 		}
+
+		// assign turn to ctx
+		turn := int64(0)
+		ctx = context.WithValue(ctx, service.CtxKeyTurn, turn)
+
+		// test if the connection is valid to send the message
+		err = conn.WriteMessage(websocket.TextMessage,
+			pack.ResponseFactory.ConnectSuccess(model.NewConnectSuccess(id, time.Now().Local().String())))
+		if err != nil {
+			_ = conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+			return
+		}
+
 		// start to accept the message
 		for {
+			// accept the message
 			errOnAccept := service.Service.Accept(conn, ctx)
 			if errOnAccept != nil {
 				_ = conn.WriteMessage(websocket.TextMessage, []byte(errOnAccept.Error()))
 				break
 			}
+
+			// increase the turn
+			turn += 1
+			ctx = context.WithValue(ctx, service.CtxKeyTurn, turn)
 		}
 		// although the service is like a non-stateful service, we still need to log out
 		// in this case, we need to log out to clean up the dialog

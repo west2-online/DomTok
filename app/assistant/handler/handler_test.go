@@ -60,7 +60,7 @@ func CatchErrInRequestCtx() error {
 }
 
 func TestEntrypoint(t *testing.T) {
-	PatchConvey("Test Handler.Entrypoint", t, func() {
+	PatchConvey("Test Entrypoint", t, func() {
 		EntryPointNormalize()
 
 		PatchConvey("on success", func() {

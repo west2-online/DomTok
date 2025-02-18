@@ -33,7 +33,7 @@ func TestToolPing_InvokableRun(t *testing.T) {
 		adapter.ServerCaller
 	}
 	fakeServerCaller := &MockServerCaller{}
-	PatchConvey("TestToolPing_InvokableRun", t, func() {
+	PatchConvey("Test ToolPing.InvokableRun", t, func() {
 		PatchConvey("success", func() {
 			MockValue(&f.server).To(fakeServerCaller)
 			Mock((*MockServerCaller).Ping).Return([]byte("pong"), nil).Build()

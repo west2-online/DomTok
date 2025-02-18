@@ -38,7 +38,7 @@ const (
 )
 
 type ToolRepeatArgs struct {
-	Message string `json:"message" yaml:"message" desc:"要重复的消息" required:"true"`
+	Message string `json:"message" desc:"要重复的消息" required:"true"`
 }
 
 var ToolRepeatRequestBody = schema.NewParamsOneOfByParams(*tools.Reflect(ToolRepeatArgs{}))

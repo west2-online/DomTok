@@ -18,14 +18,19 @@ package service
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 // Login logs in the user
 func (s Core) Login(ctx context.Context) error {
 	_, ok := ctx.Value(CtxKeyID).(string)
 	if !ok {
-		return fmt.Errorf("unexpected or unset id ")
+		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, "missing id in context")
+	}
+	_, ok = ctx.Value(CtxKeyAccessToken).(string)
+	if !ok {
+		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, "missing access token in context")
 	}
 
 	return nil

@@ -17,22 +17,22 @@ limitations under the License.
 package service
 
 import (
+	"testing"
+
+	. "github.com/bytedance/mockey"
+	. "github.com/smartystreets/goconvey/convey"
+
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/adapter"
-	"github.com/west2-online/DomTok/pkg/constants"
 )
 
-type Core struct {
-	ai adapter.AIClient
+func TestUse(t *testing.T) {
+	PatchConvey("Test Core.Use", t, func() {
+		type EmptyAIClient struct {
+			adapter.AIClient
+		}
+		cli := EmptyAIClient{}
+		Service.ai = nil
+		Use(&cli)
+		So(Service.ai, ShouldEqual, &cli)
+	})
 }
-
-var Service Core
-
-// CtxKey 先把service的ctx key定义在这里
-type CtxKey string
-
-const (
-	CtxKeyID          CtxKey = "id"
-	CtxKeyInput       CtxKey = "input"
-	CtxKeyTurn        CtxKey = "turn"
-	CtxKeyAccessToken CtxKey = constants.AccessTokenHeader
-)

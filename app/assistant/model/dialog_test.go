@@ -26,7 +26,7 @@ import (
 )
 
 func TestDialog(t *testing.T) {
-	PatchConvey("Test model.Dialog", t, func() {
+	PatchConvey("Test Dialog", t, func() {
 		PatchConvey("Test IDialog Impl", func() {
 			d := NewDialog("1", "Hello")
 			So(d.Unique(), ShouldEqual, "1")

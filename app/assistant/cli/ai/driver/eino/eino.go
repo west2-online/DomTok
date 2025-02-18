@@ -19,7 +19,6 @@ package eino
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"sync"
 
@@ -33,6 +32,7 @@ import (
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/adapter"
 	strategy "github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/model"
 	"github.com/west2-online/DomTok/app/assistant/model"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 // Client is a client struct for calling the AI
@@ -78,19 +78,19 @@ func (c *Client) Call(ctx context.Context, dialog model.IDialog) (err error) {
 
 	err = c.checkCallerAndBuilder()
 	if err != nil {
-		return fmt.Errorf("failed to continue: %w", err)
+		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, err.Error())
 	}
 
 	c.markDialog(dialog)
 
 	history, err := c.readHistory(dialog.Unique())
 	if err != nil {
-		return fmt.Errorf("read history failed: %w", err)
+		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, err.Error())
 	}
 
 	chatModel, err := c.BuildChatModel(ctx)
 	if err != nil {
-		return fmt.Errorf("build chat model failed: %w", err)
+		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, err.Error())
 	}
 
 	ra, err := react.NewAgent(ctx, &react.AgentConfig{
@@ -99,12 +99,12 @@ func (c *Client) Call(ctx context.Context, dialog model.IDialog) (err error) {
 		MessageModifier: func(_ context.Context, input []*schema.Message) []*schema.Message { return append(history, input...) },
 	})
 	if err != nil {
-		return fmt.Errorf("create agent failed: %w", err)
+		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, err.Error())
 	}
 
 	out, err := c.readStreamWithDialog(ctx, ra, dialog)
 	if err != nil {
-		return fmt.Errorf("read stream failed: %w", err)
+		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, err.Error())
 	}
 
 	history = append(history, schema.UserMessage(dialog.Message()), schema.AssistantMessage(out, nil))
@@ -116,11 +116,11 @@ func (c *Client) Call(ctx context.Context, dialog model.IDialog) (err error) {
 // checkCallerAndBuilder checks if the caller and builder are set
 func (c *Client) checkCallerAndBuilder() error {
 	if c.caller == nil {
-		return fmt.Errorf("server category is not set")
+		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, "server strategy is not set")
 	}
 
 	if c.builder == nil {
-		return fmt.Errorf("build chat model is not set")
+		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, "builder is not set")
 	}
 
 	return nil
@@ -158,7 +158,7 @@ func (c *Client) readHistory(key string) ([]*schema.Message, error) {
 
 	history, ok := v.([]*schema.Message)
 	if !ok {
-		return nil, fmt.Errorf("unexpected type transition")
+		return nil, errno.NewErrNoWithStack(errno.InternalServiceErrorCode, "unexpected type transition")
 	}
 
 	if len(history) == 0 {
@@ -174,7 +174,7 @@ func (c *Client) readStreamWithDialog(
 ) (string, error) {
 	stream, err := ra.Stream(ctx, []*schema.Message{schema.UserMessage(dialog.Message())})
 	if err != nil {
-		return "", fmt.Errorf("stream failed: %w", err)
+		return "", errno.NewErrNoWithStack(errno.InternalServiceErrorCode, err.Error())
 	}
 	defer stream.Close()
 
@@ -185,7 +185,7 @@ func (c *Client) readStreamWithDialog(
 			break
 		}
 		if err != nil {
-			return "", fmt.Errorf("stream recv failed: %w", err)
+			return "", errno.NewErrNoWithStack(errno.InternalServiceErrorCode, err.Error())
 		}
 
 		if len(frame.Content) != 0 {

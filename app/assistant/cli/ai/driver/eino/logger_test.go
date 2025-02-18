@@ -58,7 +58,7 @@ func TestLoggerCallback(t *testing.T) {
 	output := struct{ callbacks.CallbackOutput }{}
 	outputStream := schema.StreamReader[callbacks.CallbackOutput]{}
 
-	PatchConvey("Test the eino logger callback", t, func() {
+	PatchConvey("Test LoggerCallback", t, func() {
 		Mock(logger.Infof).To(func(string, ...interface{}) {}).Build()
 		Mock(logger.Errorf).To(func(string, ...interface{}) {}).Build()
 		Mock(logger.Fatalf).To(func(string, ...interface{}) {}).Build()

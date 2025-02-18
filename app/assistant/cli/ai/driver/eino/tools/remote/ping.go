@@ -18,13 +18,13 @@ package remote
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/schema"
 
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/tools"
 	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 // Tips: This function should not be used in the future
@@ -35,7 +35,7 @@ const (
 )
 
 type ToolPingArgs struct {
-	Argument string `json:"argument" yaml:"argument" desc:"填入角色设定名" required:"true"`
+	Argument string `json:"argument" desc:"填入角色设定名" required:"true"`
 }
 
 var ToolPingRequestBody = schema.NewParamsOneOfByParams(*tools.Reflect(ToolPingArgs{}))
@@ -54,7 +54,7 @@ func Ping(server adapter.ServerCaller) *ToolPing {
 
 func (t *ToolPing) InvokableRun(ctx context.Context, argumentsInJSON string, opts ...tool.Option) (string, error) {
 	if t.server == nil {
-		return "", fmt.Errorf("tool ping: server caller is not set")
+		return "", errno.NewErrNoWithStack(errno.InternalServiceErrorCode, "server is nil")
 	}
 	resp, err := t.server.Ping(ctx)
 	if err != nil {
