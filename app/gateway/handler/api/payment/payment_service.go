@@ -21,6 +21,10 @@ package payment
 import (
 	"context"
 
+	"github.com/west2-online/DomTok/app/gateway/pack"
+	"github.com/west2-online/DomTok/app/payment/controllers/rpc"
+	"github.com/west2-online/DomTok/pkg/errno"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
@@ -50,13 +54,22 @@ func RequestPaymentToken(ctx context.Context, c *app.RequestContext) {
 	var req payment.PaymentTokenRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(payment.PaymentTokenResponse)
+	// 调用 RPC 获取支付令牌
+	resp, err := rpc.RequestPaymentTokenRPC(ctx, &payment.PaymentTokenRequest{
+		OrderID: req.OrderID,
+		// TODO
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	// 返回成功的响应
+	pack.RespData(c, resp)
 }
 
 // ProcessRefund .
@@ -73,6 +86,7 @@ func ProcessRefund(ctx context.Context, c *app.RequestContext) {
 	resp := new(payment.RefundResponse)
 
 	c.JSON(consts.StatusOK, resp)
+
 }
 
 // RequestRefundToken .
