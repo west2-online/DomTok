@@ -24,20 +24,21 @@ import (
 	"github.com/west2-online/DomTok/app/gateway/pack"
 	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 // Auth 负责校验用户身份，会提取 token 并做处理，Next 时会携带 token 类型
 func Auth() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
 		token := string(c.GetHeader(constants.AuthHeader))
-		_, uid, err := CheckToken(token)
+		_, uid, err := utils.CheckToken(token)
 		if err != nil {
 			pack.RespError(c, err)
 			c.Abort()
 			return
 		}
 
-		access, refresh, err := CreateAllToken(uid)
+		access, refresh, err := utils.CreateAllToken(uid)
 		if err != nil {
 			pack.RespError(c, err)
 			c.Abort()

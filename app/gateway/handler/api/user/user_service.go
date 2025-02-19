@@ -21,20 +21,19 @@ package api
 import (
 	"context"
 
-	"github.com/west2-online/DomTok/app/gateway/mw"
-	"github.com/west2-online/DomTok/pkg/constants"
-
 	"github.com/cloudwego/hertz/pkg/app"
 
 	api "github.com/west2-online/DomTok/app/gateway/model/api/user"
 	"github.com/west2-online/DomTok/app/gateway/pack"
 	"github.com/west2-online/DomTok/app/gateway/rpc"
 	"github.com/west2-online/DomTok/kitex_gen/user"
+	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 // Register .
-// @router api/v1/user/register [GET]
+// @router api/v1/user/register [POST]
 func Register(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.RegisterRequest
@@ -43,7 +42,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
-	uid, err := rpc.RegisterRPC(ctx, &user.RegisterRequest{
+	resp, err := rpc.RegisterRPC(ctx, &user.RegisterRequest{
 		Username: req.Name,
 		Password: req.Password,
 		Email:    req.Email,
@@ -52,7 +51,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	pack.RespData(c, uid)
+	pack.RespData(c, resp)
 }
 
 // Login .
@@ -75,7 +74,10 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	accessToken, refreshToken, err := mw.CreateAllToken(resp.UserId)
+	accessToken, refreshToken, err := utils.CreateAllToken(resp.User.UserId)
+	if err != nil {
+		pack.RespError(c, err)
+	}
 
 	c.Header(constants.AccessTokenHeader, accessToken)
 	c.Header(constants.RefreshTokenHeader, refreshToken)

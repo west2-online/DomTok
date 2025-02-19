@@ -22,7 +22,7 @@ import "github.com/west2-online/DomTok/pkg/constants"
 type User struct {
 	// model    gorm.Model
 	ID       int64
-	UserName string
+	Username string
 	Password string
 	Email    string
 	Phone    string

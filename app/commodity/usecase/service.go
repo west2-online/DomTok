@@ -31,7 +31,6 @@ func (us *useCase) CreateCategory(ctx context.Context, category *model.Category)
 }
 
 func (us *useCase) CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err error) {
-	ctx = contextLogin.WithLoginData(ctx, 1) //TODO: delete
 
 	loginData, err := contextLogin.GetLoginData(ctx)
 	if err != nil {
@@ -51,7 +50,7 @@ func (us *useCase) CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err
 }
 
 func (us *useCase) CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) (int64, error) {
-	ctx = contextLogin.WithLoginData(ctx, 1) //TODO: delete
+
 	id, err := us.svc.CreateSpuImage(ctx, spuImage)
 	if err != nil {
 		return 0, fmt.Errorf("usecase.CreateSpuImage failed: %w", err)
@@ -60,7 +59,7 @@ func (us *useCase) CreateSpuImage(ctx context.Context, spuImage *model.SpuImage)
 }
 
 func (us *useCase) DeleteSpu(ctx context.Context, spuId int64) error {
-	ctx = contextLogin.WithLoginData(ctx, 1) //TODO: delete
+
 	ret, err := us.svc.MatchDeleteSpuCondition(ctx, spuId)
 	if err != nil {
 		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
@@ -83,7 +82,7 @@ func (us *useCase) DeleteSpu(ctx context.Context, spuId int64) error {
 }
 
 func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
-	ctx = contextLogin.WithLoginData(ctx, 1) //TODO: delete
+
 	ret, err := us.db.GetSpuBySpuId(ctx, spu.SpuId)
 	if err != nil {
 		return fmt.Errorf("usecase.UpdateSpu failed: %w", err)
@@ -106,7 +105,7 @@ func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
 }
 
 func (us *useCase) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
-	ctx = contextLogin.WithLoginData(ctx, 1) //TODO: delete
+
 	spu, img, err := us.svc.GetSpuFromImageId(ctx, spuImage.ImageID)
 	if err != nil {
 		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
@@ -125,7 +124,7 @@ func (us *useCase) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage)
 }
 
 func (us *useCase) DeleteSpuImage(ctx context.Context, imageId int64) error {
-	ctx = contextLogin.WithLoginData(ctx, 1) //TODO: delete
+
 	spu, img, err := us.svc.GetSpuFromImageId(ctx, imageId)
 	if err != nil {
 		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)

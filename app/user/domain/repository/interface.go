@@ -27,6 +27,6 @@ import (
 // UserDB 表示持久化存储接口 (或者也可以叫做 DBPort)
 type UserDB interface {
 	IsUserExist(ctx context.Context, username string) (bool, error)
-	CreateUser(ctx context.Context, user *model.User) error
+	CreateUser(ctx context.Context, user *model.User) (int64, error)
 	GetUserInfo(ctx context.Context, username string) (*model.User, error)
 }
