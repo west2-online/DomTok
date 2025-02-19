@@ -19,7 +19,6 @@ package service
 import (
 	"context"
 	"fmt"
-
 	"golang.org/x/sync/errgroup"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"

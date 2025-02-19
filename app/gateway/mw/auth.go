@@ -18,9 +18,7 @@ package mw
 
 import (
 	"context"
-
 	"github.com/cloudwego/hertz/pkg/app"
-
 	"github.com/west2-online/DomTok/app/gateway/pack"
 	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"

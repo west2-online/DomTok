@@ -35,7 +35,7 @@ func (uc *useCase) Login(ctx context.Context, user *model.User) (*model.User, er
 		return nil, err
 	}
 
-	return user, nil
+	return u, nil
 }
 
 func (uc *useCase) RegisterUser(ctx context.Context, u *model.User) (uid int64, err error) {

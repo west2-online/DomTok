@@ -19,11 +19,14 @@ package rpc
 import (
 	"bytes"
 	"context"
+	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/metadata"
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	"github.com/west2-online/DomTok/pkg/base"
+	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
+	"log"
 )
 
 type CommodityHandler struct {
@@ -149,7 +152,14 @@ func (c CommodityHandler) CreateSpu(streamServer commodity.CommodityService_Crea
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
-
+	ctx := streamServer.Context()
+	md, success := metadata.FromIncomingContext(ctx)
+	if !success {
+		logger.Errorf("rpc.CreateSpu: receive metadata error: %v", md)
+		return
+	}
+	log.Println(md.Get(constants.LoginDataKey))
+	//log.Println(metadata.FromIncomingContext(ctx))
 	for i := 0; i < int(req.BufferCount); i++ {
 		fileData, err := streamServer.Recv()
 		if err != nil {
