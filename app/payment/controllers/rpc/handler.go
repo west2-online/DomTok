@@ -18,8 +18,6 @@ package rpc
 
 import (
 	"context"
-	"github.com/west2-online/DomTok/pkg/base"
-
 	"go.uber.org/zap"
 
 	"github.com/west2-online/DomTok/pkg/logger"
@@ -57,7 +55,6 @@ func (handler *PaymentHandler) RequestPaymentToken(ctx context.Context, req *pay
 	// 传入ctx（包含uid）和orderID,获取令牌和令牌过期时间
 	token, expTime, err = handler.useCase.GetPaymentToken(ctx, req.OrderID)
 	if err != nil {
-		r.Base = base.BuildBaseResp(err)
 		return
 	}
 	r.PaymentToken = token
