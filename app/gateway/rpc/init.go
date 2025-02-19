@@ -36,4 +36,5 @@ func Init() {
 	InitCommodityRPC()
 	InitCommodityStreamClientRPC()
 	InitCartRPC()
+	InitPaymentRPC()
 }

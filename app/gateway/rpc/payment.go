@@ -18,7 +18,7 @@ package rpc
 
 import (
 	"context"
-
+	"fmt"
 	"github.com/west2-online/DomTok/kitex_gen/payment"
 	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/errno"
@@ -34,17 +34,34 @@ func InitPaymentRPC() {
 	paymentClient = *c
 }
 
-func RequestPaymentTokenRPC(ctx context.Context, req *payment.PaymentTokenRequest) (token string, err error) {
+func RequestPaymentTokenRPC(ctx context.Context, req *payment.PaymentTokenRequest) (token string, expTime int64, err error) {
+	logger.Info("RequestPaymentTokenRPC called") // 这里打印一下，看看是否调用到了
+	fmt.Println("RequestPaymentTokenRPC: called with OrderID:", req.OrderID, "UserID:", req.UserID)
+
 	resp, err := paymentClient.RequestPaymentToken(ctx, req)
+	/*if err != nil {
+		logger.Error("RequestPaymentTokenRPC: RPC call failed", zap.Error(err))
+		return "", errno.InternalServiceError.WithError(err)
+	}
+
+	if resp == nil {
+		logger.Error("RequestPaymentTokenRPC: RPC returned nil response")
+		return "", errno.InternalServiceError.WithMessage("RPC response is nil")
+	}
+
+	if !utils.IsSuccess(resp.Base) {
+		logger.Error("RequestPaymentTokenRPC: RPC call business failure", zap.String("message", resp.Base.Msg))
+		return "", errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}*/
 	// 这里的 err 是属于 RPC 间调用的错误，例如 network error
 	// 而业务错误则是封装在 resp.base 当中的
 	if err != nil {
 		logger.Errorf("RequestPaymentTokenRPC: RPC called failed: %v", err.Error())
-		return "", errno.InternalServiceError.WithError(err)
+		return "", 0, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsSuccess(resp.Base) {
 		// TODO
-		return "", errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return "", 0, errno.InternalServiceError.WithMessage(resp.Base.Msg)
 	}
-	return resp.PaymentToken, nil
+	return resp.PaymentToken, resp.ExpirationTime, nil
 }

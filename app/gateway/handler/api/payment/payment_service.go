@@ -20,6 +20,8 @@ package payment
 
 import (
 	"context"
+	"github.com/west2-online/DomTok/pkg/logger"
+	"go.uber.org/zap"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -42,7 +44,6 @@ func ProcessPayment(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(payment.PaymentResponse)
-
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -53,12 +54,13 @@ func RequestPaymentToken(ctx context.Context, c *app.RequestContext) {
 	var req payment.PaymentTokenRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
+		logger.Error("RequestPaymentTokenRPC failed", zap.Error(err)) // 打印错误日志
 		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
 	// 调用 RPC 获取支付令牌
-	token, err := rpc.RequestPaymentTokenRPC(ctx, &payment.PaymentTokenRequest{
+	token, expTime, err := rpc.RequestPaymentTokenRPC(ctx, &payment.PaymentTokenRequest{
 		OrderID: req.OrderID,
 		UserID:  req.UserID,
 		// TODO
@@ -67,9 +69,18 @@ func RequestPaymentToken(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
+	// 封装数据到 Data 结构体
+	type Data struct {
+		Token   string `json:"token"`
+		ExpTime int64  `json:"expiration_time"`
+	}
 
+	data := Data{
+		Token:   token,
+		ExpTime: expTime,
+	}
 	// 返回成功的响应
-	pack.RespData(c, token)
+	pack.RespData(c, data)
 }
 
 // ProcessRefund .

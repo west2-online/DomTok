@@ -38,6 +38,8 @@ var serviceName = constants.PaymentServiceName
 func init() {
 	config.Init(serviceName)
 	logger.Init(serviceName, config.GetLoggerLevel())
+	// logger.Info("Logger initialized successfully")
+	logger.Info("Logger initialized successfully")
 }
 
 func main() {
