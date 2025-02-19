@@ -46,7 +46,6 @@ type Dialog struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
-	_buffer   chan string
 	_receiver chan string
 	_mutex    *sync.RWMutex
 	_done     *bool
@@ -63,23 +62,15 @@ func NewDialog(id string, input string) *Dialog {
 		cancel:    cancel,
 		unique:    id,
 		message:   input,
-		_buffer:   make(chan string, 1),
 		_receiver: make(chan string),
 		_mutex:    mu,
 		_done:     done,
 	}
 	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				mu.Lock()
-				*done = true
-				mu.Unlock()
-				return
-			case msg := <-d._buffer:
-				d._receiver <- msg
-			}
-		}
+		<-ctx.Done()
+		mu.Lock()
+		*done = true
+		mu.Unlock()
 	}()
 	return d
 }
@@ -94,8 +85,7 @@ func (d *Dialog) Message() string {
 	return d.message
 }
 
-// Send sends a message to the dialog.
-// Producer should send message before closed, otherwise the goroutine will be blocked.
+// Send sends a message to the dialog, if the dialog is closed, it will return immediately.
 func (d *Dialog) Send(message string) {
 	d._mutex.RLock()
 	if *d._done {
@@ -103,7 +93,7 @@ func (d *Dialog) Send(message string) {
 		return
 	}
 	d._mutex.RUnlock()
-	d._buffer <- message
+	d._receiver <- message
 }
 
 // Close closes the dialog.

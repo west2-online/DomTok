@@ -121,6 +121,7 @@ func TestCore_Accept(t *testing.T) {
 func TestHandleMessage(t *testing.T) {
 	ctx := context.Background()
 	Normalize := func() {
+		ctx = context.Background()
 		ctx = context.WithValue(ctx, CtxKeyID, "test")
 		ctx = context.WithValue(ctx, CtxKeyInput, "input")
 		ctx = context.WithValue(ctx, CtxKeyTurn, 1)
@@ -164,7 +165,7 @@ func TestHandleMessage(t *testing.T) {
 			Mock(writeMessage).Return(errors.New("write msg err")).Build()
 			d := model.NewDialog("test", "input")
 			Mock(model.NewDialog).Return(d).Build()
-			d.Send("msg")
+			go d.Send("msg")
 			err := handleTextMessage(nil, ctx)
 			So(err, ShouldNotBeNil)
 		})

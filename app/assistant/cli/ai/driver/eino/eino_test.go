@@ -106,10 +106,10 @@ func TestClient_Call(t *testing.T) {
 	PatchConvey("Test Call", t, func() {
 		ClientCallNormalize(c, stream)
 		PatchConvey("Test when no error occurs", func() {
-			// too fast finished test made an uncompleted message
-			err1, err, _ := RunCallTest(c)
+			err1, err, msg := RunCallTest(c)
 			So(err1, ShouldBeNil)
 			So(err, ShouldBeNil)
+			So(msg, ShouldEqual, "completion")
 		})
 
 		PatchConvey("Test when stream delta contents", func() {
@@ -123,9 +123,10 @@ func TestClient_Call(t *testing.T) {
 				return &schema.Message{Content: "completion"}, io.EOF
 			}).Build()
 
-			err1, err, _ := RunCallTest(c)
+			err1, err, msg := RunCallTest(c)
 			So(err1, ShouldBeNil)
 			So(err, ShouldBeNil)
+			So(msg, ShouldEqual, helloWorld)
 		})
 
 		PatchConvey("Test when server category is not set", func() {
