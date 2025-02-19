@@ -19,12 +19,11 @@ package rpc
 import (
 	"context"
 
-	idlmodel "github.com/west2-online/DomTok/kitex_gen/model"
-	"github.com/west2-online/DomTok/pkg/errno"
-
 	"github.com/west2-online/DomTok/app/order/controllers/rpc/pack"
 	"github.com/west2-online/DomTok/app/order/usecase"
+	idlmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/kitex_gen/order"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 type OrderHandler struct {

@@ -20,20 +20,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
-	"github.com/west2-online/DomTok/app/order/domain/service"
-	"github.com/west2-online/DomTok/pkg/logger"
+	"strconv"
 
 	"gorm.io/gorm"
 
 	"github.com/west2-online/DomTok/app/order/domain/model"
 	"github.com/west2-online/DomTok/app/order/domain/repository"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 type orderDB struct {
 	client *gorm.DB
-	svc    *service.OrderService
 }
 
 func NewOrderDB(client *gorm.DB) repository.OrderDB {
@@ -180,7 +178,6 @@ func (db *orderDB) GetOrderWithGoods(ctx context.Context, orderID int64) (*model
 
 		return nil
 	})
-
 	if err != nil {
 		return nil, nil, err
 	}
@@ -220,7 +217,7 @@ func (db *orderDB) convertOrder(order *Order) *model.Order {
 		TotalAmountOfFreight:  order.TotalAmountOfFreight,
 		TotalAmountOfDiscount: order.TotalAmountOfDiscount,
 		PaymentAmount:         order.PaymentAmount,
-		PaymentStatus:         string(order.PaymentStatus),
+		PaymentStatus:         strconv.Itoa(int(order.PaymentStatus)),
 		PaymentAt:             order.PaymentAt,
 		PaymentStyle:          order.PaymentStyle,
 		OrderedAt:             order.OrderedAt,
