@@ -47,7 +47,7 @@ func Auth() app.HandlerFunc {
 
 		// 实现规范化服务透传，不需要中间进行编解码
 		ctx = metainfoContext.WithLoginData(ctx, uid)
-
+		ctx = metainfoContext.SetStreamLoginData(ctx, uid)
 		c.Header(constants.AccessTokenHeader, access)
 		c.Header(constants.RefreshTokenHeader, refresh)
 		c.Next(ctx)
