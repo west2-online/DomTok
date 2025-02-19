@@ -36,7 +36,7 @@ func NewUserDB(client *gorm.DB) repository.UserDB {
 	return &userDB{client: client}
 }
 
-func (db *userDB) CreateUser(ctx context.Context, u *model.User) error {
+func (db *userDB) CreateUser(ctx context.Context, u *model.User) (int64, error) {
 	// 将 entity 转换成 mysql 这边的 model
 	// TODO 可以考虑整一个函数统一转化, 放在这里占了太多行, 而且这不是这个方法该做的. 这个方法应该做的是创建用户
 	user := User{
@@ -45,10 +45,11 @@ func (db *userDB) CreateUser(ctx context.Context, u *model.User) error {
 		Email:    u.Email,
 	}
 
-	if err := db.client.WithContext(ctx).Create(user).Error; err != nil {
-		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create user: %v", err)
+	if err := db.client.WithContext(ctx).Create(&user).Error; err != nil {
+		return -1, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create user: %v", err)
 	}
-	return nil
+
+	return user.ID, nil
 }
 
 func (db *userDB) IsUserExist(ctx context.Context, username string) (bool, error) {

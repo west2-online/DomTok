@@ -42,14 +42,12 @@ func (svc *UserService) CheckPassword(passwordDigest, password string) error {
 	return nil
 }
 
-func (svc *UserService) CreateUser(ctx context.Context, u *model.User) error {
-	u.Uid = svc.nextID()
-
-	if err := svc.db.CreateUser(ctx, u); err != nil {
-		return fmt.Errorf("create user failed: %w", err)
+func (svc *UserService) CreateUser(ctx context.Context, u *model.User) (int64, error) {
+	uid, err := svc.db.CreateUser(ctx, u)
+	if err != nil {
+		return 0, fmt.Errorf("create user failed: %w", err)
 	}
-
-	return nil
+	return uid, nil
 }
 
 func (svc *UserService) nextID() int64 {
