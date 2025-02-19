@@ -18,6 +18,7 @@ package context
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/bytedance/sonic"
 
@@ -47,4 +48,24 @@ func GetLoginData(ctx context.Context) (int64, error) {
 		return -1, errno.NewErrNo(errno.InternalServiceErrorCode, "Failed to get header in context when unmarshalling loginData")
 	}
 	return value, nil
+}
+
+// GetStreamLoginData 流式传输传递ctx, 获取loginData
+func GetStreamLoginData(ctx context.Context) (int64, error) {
+	uid, success := streamFromContext(ctx, constants.LoginDataKey)
+	if !success {
+		return -1, errno.NewErrNo(errno.ParamMissingErrorCode, "Failed to get info in context")
+	}
+
+	value, err := strconv.ParseInt(uid, 10, 64)
+	if err != nil {
+		return -1, errno.NewErrNo(errno.InternalServiceErrorCode, "Failed to get info in context when parse loginData")
+	}
+	return value, nil
+}
+
+// SetStreamLoginData 流式传输传递ctx, 设置ctx值
+func SetStreamLoginData(ctx context.Context, uid int64) context.Context {
+	value := strconv.FormatInt(uid, 10)
+	return streamAppendContext(ctx, constants.LoginDataKey, value)
 }
