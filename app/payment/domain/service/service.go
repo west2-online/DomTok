@@ -82,13 +82,11 @@ func (svc *PaymentService) CheckOrderExist(ctx context.Context, orderID int64) (
 // GeneratePaymentToken HMAC生成支付令牌
 func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int64) (string, int64, error) {
 	// 1. 设定过期时间为15分钟后, 即现在时间加上15分钟之后的秒级时间戳
-	// log.Println("Generating payment token for orderID:", orderID)
 	expirationTime := time.Now().Add(paymentStatus.ExpirationDuration).Unix()
 	logger.Info("Generating payment token",
 		zap.Int64("orderID", orderID),
 		zap.Int64("expirationTime", expirationTime),
 	)
-	// log.Printf("Token expiration time: %d", expirationTime)
 	// 2. 获取 HMAC 密钥（可以从环境变量或配置文件获取）
 	secretKey := []byte(paymentStatus.PaymentSecretKey)
 
@@ -110,10 +108,7 @@ func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int
 		zap.String("token", token),
 		zap.Int64("expirationTime", expirationTime),
 	)
-	// log.Printf("Generated HMAC token: %s", token)
-
 	// 5. 返回令牌和过期时间
-	// TODO
 	return token, expirationTime, nil
 }
 
@@ -124,11 +119,8 @@ func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, 
 	// 这样可以防止“直接用paymentStatus.ExpirationTime存redis的参数的话，
 	// 如果StorePaymentToken执行时expTime早就过期了，仍然会存15min”的bug
 	// TODO 我不知道是不是这样的，因为我感觉两个函数执行时间基本上只差几十毫秒，不可能出现这样的情况吧，但想想又有道理
-	// log.Printf("Storing token in Redis: userID=%d, orderID=%d, token=%s", userID, orderID, token)
-
 	expirationDuration := time.Until(time.Unix(expTime, 0))
 	if expirationDuration <= 0 {
-		// log.Println("Cannot store token: expiration time has already passed")
 		logger.Warn("Token expiration time has already passed",
 			zap.Int64("orderID", orderID),
 			zap.Int64("userID", userID),
@@ -143,11 +135,9 @@ func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, 
 		zap.Int64("userID", userID),
 		zap.Duration("expiration", expirationDuration),
 	)
-	// log.Printf("Redis key: %s", redisKey)
 	// 3. 存储到 Redis
 	err := svc.redis.SetPaymentToken(ctx, redisKey, token, expirationDuration)
 	if err != nil {
-		// log.Printf("Failed to store payment token in Redis: %v", err)
 		logger.Error("Failed to store payment token in Redis",
 			zap.String("redisKey", redisKey),
 			zap.Int64("orderID", orderID),
@@ -157,7 +147,6 @@ func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, 
 		return paymentStatus.RedisStoreFailed, fmt.Errorf("failed to store payment token in redis: %w", err)
 	}
 	// 4. 返回成功状态码
-	// log.Println("Payment token successfully stored in Redis")
 	logger.Info("Payment token stored successfully in Redis",
 		zap.String("redisKey", redisKey),
 		zap.Int64("orderID", orderID),
