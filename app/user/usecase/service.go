@@ -24,9 +24,18 @@ import (
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-// Login 用户登录 TODO: 考虑留给新登
+// Login 用户登录
 func (uc *useCase) Login(ctx context.Context, user *model.User) (*model.User, error) {
-	return nil, nil
+	user, err := uc.db.GetUserInfo(ctx, user.UserName)
+	if err != nil {
+		return nil, fmt.Errorf("get user info failed: %w", err)
+	}
+
+	if err = uc.svc.CheckPassword(user.Password, user.Password); err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (uc *useCase) RegisterUser(ctx context.Context, u *model.User) (uid int64, err error) {

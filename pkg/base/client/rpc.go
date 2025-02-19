@@ -21,9 +21,12 @@ import (
 	"fmt"
 
 	"github.com/cloudwego/kitex/client"
+	"github.com/cloudwego/kitex/client/streamclient"
 	etcd "github.com/kitex-contrib/registry-etcd"
 
 	"github.com/west2-online/DomTok/config"
+	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
+	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
 	"github.com/west2-online/DomTok/kitex_gen/order/orderservice"
 	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
 	"github.com/west2-online/DomTok/pkg/constants"
@@ -53,4 +56,24 @@ func InitUserRPC() (*userservice.Client, error) {
 
 func InitOrderRPC() (*orderservice.Client, error) {
 	return initRPCClient(constants.OrderServiceName, orderservice.NewClient)
+}
+
+func InitCommodityRPC() (*commodityservice.Client, error) {
+	return initRPCClient(constants.CommodityServiceName, commodityservice.NewClient)
+}
+
+func InitCommodityStreamClientRPC() (*commodityservice.StreamClient, error) {
+	if config.Etcd == nil || config.Etcd.Addr == "" {
+		return nil, errors.New("config.Etcd.Addr is nil")
+	}
+	r, err := etcd.NewEtcdResolver([]string{config.Etcd.Addr})
+	if err != nil {
+		return nil, fmt.Errorf("initRPCClient etcd.NewEtcdResolver failed: %w", err)
+	}
+	cli := commodityservice.MustNewStreamClient(constants.CommodityServiceName, streamclient.WithResolver(r))
+	return &cli, nil
+}
+
+func InitCartRPC() (*cartservice.Client, error) {
+	return initRPCClient(constants.CartServiceName, cartservice.NewClient)
 }

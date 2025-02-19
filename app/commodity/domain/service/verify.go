@@ -15,3 +15,14 @@ limitations under the License.
 */
 
 package service
+
+type CommodityVerifyOps func() error
+
+func (svc *CommodityService) Verify(opts ...CommodityVerifyOps) error {
+	for _, opt := range opts {
+		if err := opt(); err != nil {
+			return err
+		}
+	}
+	return nil
+}

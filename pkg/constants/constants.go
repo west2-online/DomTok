@@ -18,4 +18,5 @@ package constants
 
 const (
 	CheckFileTypeBufferSize = 512 // 适用于判断文件类型，需要读取前512个字节
+	FileStreamBufferSize    = 1024
 )

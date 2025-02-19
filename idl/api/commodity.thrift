@@ -65,15 +65,15 @@ struct UseUserCouponResp {
     1: required model.BaseResp base;
 }
 
+// 文件表单直接formFile获取即可
 struct CreateSpuReq {
-    1: optional list<binary> spuImages;
-    2: required string name;
-    3: required string description;
-    4: required i64 categoryID;
-    5: required string goodsHeadDrawing;
-    6: required double price;
-    7: required i32 forSale;
-    8: required double shipping;
+
+    1: required string name;
+    2: required string description;
+    3: required i64 categoryID;
+    4: required double price;
+    5: required i32 forSale;
+    6: required double shipping;
 }
 
 struct CreateSpuResp {
@@ -81,16 +81,17 @@ struct CreateSpuResp {
     2: required i64 spuID;
 }
 
+// 文件表单直接formFile获取即可
 struct UpdateSpuReq {
-    1: optional list<binary> spuImages;
-    2: optional string name;
-    3: required i64 spuID;
-    4: optional string description;
-    5: optional i64 categoryID;
-    6: optional string goodsHeadDrawing;
-    7: optional double price;
-    8: optional i32 forSale;
-    9: optional double shipping;
+
+    1: optional string name;
+    2: required i64 spuID;
+    3: optional string description;
+    4: optional i64 categoryID;
+    5: optional double price;
+    6: optional i32 forSale;
+    7: optional double shipping;
+    8: optional i64 spuImageId;
 }
 
 struct UpdateSpuResp {
@@ -130,6 +131,14 @@ struct ViewSpuImageReq {
 struct ViewSpuImageResp {
     1: required model.BaseResp base;
     2: required list<model.SpuImage> images;
+}
+
+struct DeleteSpuImageReq {
+    1: required i64 spuImageID;
+}
+
+struct DeleteSpuImageResp {
+    1: required model.BaseResp base;
 }
 
 struct CreateSkuReq {

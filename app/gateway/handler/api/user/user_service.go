@@ -21,6 +21,9 @@ package api
 import (
 	"context"
 
+	"github.com/west2-online/DomTok/app/gateway/mw"
+	"github.com/west2-online/DomTok/pkg/constants"
+
 	"github.com/cloudwego/hertz/pkg/app"
 
 	api "github.com/west2-online/DomTok/app/gateway/model/api/user"
@@ -50,4 +53,32 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	pack.RespData(c, uid)
+}
+
+// Login .
+// @router api/v1/user/login [POST]
+func Login(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.LoginRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	resp, err := rpc.LoginRPC(ctx, &user.LoginRequest{
+		Username: req.Name,
+		Password: req.Password,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	accessToken, refreshToken, err := mw.CreateAllToken(resp.UserId)
+
+	c.Header(constants.AccessTokenHeader, accessToken)
+	c.Header(constants.RefreshTokenHeader, refreshToken)
+
+	pack.RespData(c, resp)
 }

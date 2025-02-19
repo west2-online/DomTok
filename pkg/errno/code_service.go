@@ -25,4 +25,6 @@ const (
 
 	// order
 	ServiceOrderNotFound
+	ServiceSpuNotExist
+	ServiceImgNotExist
 )
