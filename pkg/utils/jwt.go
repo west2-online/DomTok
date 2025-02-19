@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package mw
+package utils
 
 import (
 	"errors"
@@ -82,6 +82,9 @@ func CreateToken(tokenType int64, uid int64) (string, error) {
 
 // CheckToken 检查 token 是否有效，并返回 token 类型和用户 ID
 func CheckToken(token string) (int64, int64, error) {
+	if config.Server == nil {
+		return 0, 0, errno.NewErrNo(errno.AuthInvalidCode, "server config not found")
+	}
 	if token == "" {
 		return -1, 0, errno.NewErrNo(errno.AuthMissingTokenCode, "token is empty")
 	}
@@ -91,7 +94,7 @@ func CheckToken(token string) (int64, int64, error) {
 		return -1, 0, fmt.Errorf("failed to parse unverified claims: %w", err)
 	}
 
-	secret, err := parsePublicKey(constants.PublicKey)
+	secret, err := parsePublicKey(config.Server.PublicKey)
 	if err != nil {
 		return -1, 0, fmt.Errorf("failed to parse public key: %w", err)
 	}

@@ -26,12 +26,12 @@ import (
 
 // Login 用户登录
 func (uc *useCase) Login(ctx context.Context, user *model.User) (*model.User, error) {
-	user, err := uc.db.GetUserInfo(ctx, user.UserName)
+	u, err := uc.db.GetUserInfo(ctx, user.UserName)
 	if err != nil {
 		return nil, fmt.Errorf("get user info failed: %w", err)
 	}
 
-	if err = uc.svc.CheckPassword(user.Password, user.Password); err != nil {
+	if err = uc.svc.CheckPassword(u.Password, user.Password); err != nil {
 		return nil, err
 	}
 
@@ -43,7 +43,6 @@ func (uc *useCase) RegisterUser(ctx context.Context, u *model.User) (uid int64, 
 	if err = uc.svc.Verify(uc.svc.VerifyEmail(u.Email), uc.svc.VerifyPassword(u.Password)); err != nil {
 		return
 	}
-
 	// 判断是否已经注册过
 	// 注意: 这里使用 uc 调用了 DB, 但显然这个方法其他地方也可能会用的上, 所以可以考虑包装在 service 里面
 	exist, err := uc.db.IsUserExist(ctx, u.UserName)
@@ -61,9 +60,10 @@ func (uc *useCase) RegisterUser(ctx context.Context, u *model.User) (uid int64, 
 	}
 
 	// 这里没有直接调用 db.CreateUser 是因为 svc.CreateUser 包含了一点业务逻辑, 这些细节不需要被 useCase 知道
-	if err = uc.svc.CreateUser(ctx, u); err != nil {
+	uid, err = uc.svc.CreateUser(ctx, u)
+	if err != nil {
 		return
 	}
 
-	return u.Uid, nil
+	return uid, nil
 }
