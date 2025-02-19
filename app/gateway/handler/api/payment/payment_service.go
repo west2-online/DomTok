@@ -63,21 +63,10 @@ func RequestPaymentToken(ctx context.Context, c *app.RequestContext) {
 	token, expTime, err := rpc.RequestPaymentTokenRPC(ctx, &payment.PaymentTokenRequest{
 		OrderID: req.OrderID,
 		UserID:  req.UserID,
-		// TODO
 	})
 	if err != nil {
 		pack.RespError(c, err)
 		return
-	}
-	// 封装数据到 Data 结构体
-	type Data struct {
-		Token   string `json:"token"`
-		ExpTime int64  `json:"expiration_time"`
-	}
-
-	data := Data{
-		Token:   token,
-		ExpTime: expTime,
 	}
 	// 返回成功的响应
 	pack.RespData(c, data)

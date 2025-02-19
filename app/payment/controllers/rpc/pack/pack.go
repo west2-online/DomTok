@@ -16,4 +16,15 @@ limitations under the License.
 
 package pack
 
-// BuildPaymentOrder BuildUser 将 entities 定义的 User 实体转换成 idl 定义的 RPC 交流实体，类似 dto
+import (
+	"github.com/west2-online/DomTok/kitex_gen/model"
+)
+
+// BuildPaymentOrder BuildUser 将 entities 定义的 Payment 实体转换成 idl 定义的 RPC 交流实体，类似 dto
+
+func BuildTokenInfo(token string, expTime int64) *model.PaymentTokenInfo {
+	return &model.PaymentTokenInfo{
+		PaymentToken:               token,
+		PaymentTokenExpirationTime: expTime,
+	}
+}

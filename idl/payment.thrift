@@ -19,8 +19,7 @@ struct PaymentTokenRequest {
  */
 struct PaymentTokenResponse {
     1: model.BaseResp base,
-    2: required string paymentToken
-    3: required i64 expirationTime
+    2: model.BuildTokenInfo tokenInfo,
 }
 /*
  * struct PaymentRequest 订单结算请求

@@ -63,5 +63,5 @@ func RequestPaymentTokenRPC(ctx context.Context, req *payment.PaymentTokenReques
 		// TODO
 		return "", 0, errno.InternalServiceError.WithMessage(resp.Base.Msg)
 	}
-	return resp.PaymentToken, resp.ExpirationTime, nil
+	return resp.TokenInfo.PaymentToken, resp.TokenInfo.PaymentTokenExpirationTime, nil
 }

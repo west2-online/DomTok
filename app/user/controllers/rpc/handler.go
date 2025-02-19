@@ -66,7 +66,6 @@ func (h *UserHandler) Login(ctx context.Context, req *user.LoginRequest) (r *use
 		r.Base = base.BuildBaseResp(err)
 		return
 	}
-
 	r.Base = base.BuildBaseResp(nil)
 	r.User = pack.BuildUser(ans)
 	return
