@@ -33,11 +33,23 @@ import (
 var upgrader = websocket.HertzUpgrader{}
 
 func Entrypoint(ctx context.Context, c *app.RequestContext) {
-	token := string(c.GetHeader(constants.AccessTokenHeader))
 	// upgrade the protocol to websocket
-	err := upgrader.Upgrade(c, func(conn *websocket.Conn) {
+	err := upgrader.Upgrade(c, buildWebsocketHandler(ctx, c))
+	// handle the error of upgrading the protocol
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, err)
+		return
+	}
+}
+
+func buildWebsocketHandler(
+	ctx context.Context,
+	c *app.RequestContext,
+) func(conn *websocket.Conn) {
+	return func(conn *websocket.Conn) {
+		token := string(c.GetHeader(constants.AccessTokenHeader))
 		if token == "" {
-			_ = conn.WriteMessage(websocket.TextMessage, []byte("missing token in header"))
+			writeTokenError(conn)
 			return
 		}
 
@@ -52,7 +64,7 @@ func Entrypoint(ctx context.Context, c *app.RequestContext) {
 		// in this case, we need to log in to check some args is properly set
 		err := service.Service.Login(ctx)
 		if err != nil {
-			_ = conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+			writeError(conn, err)
 			return
 		}
 
@@ -61,10 +73,9 @@ func Entrypoint(ctx context.Context, c *app.RequestContext) {
 		ctx = context.WithValue(ctx, service.CtxKeyTurn, turn)
 
 		// test if the connection is valid to send the message
-		err = conn.WriteMessage(websocket.TextMessage,
-			pack.ResponseFactory.ConnectSuccess(model.NewConnectSuccess(id, time.Now().Local().String())))
+		err = writePingMessage(conn, id)
 		if err != nil {
-			_ = conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+			writeError(conn, err)
 			return
 		}
 
@@ -73,7 +84,7 @@ func Entrypoint(ctx context.Context, c *app.RequestContext) {
 			// accept the message
 			errOnAccept := service.Service.Accept(conn, ctx)
 			if errOnAccept != nil {
-				_ = conn.WriteMessage(websocket.TextMessage, []byte(errOnAccept.Error()))
+				writeError(conn, errOnAccept)
 				break
 			}
 
@@ -86,13 +97,21 @@ func Entrypoint(ctx context.Context, c *app.RequestContext) {
 		// in order to avoid the over-accumulation of memory
 		err = service.Service.Logout(ctx)
 		if err != nil {
-			_ = conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+			writeError(conn, err)
 			return
 		}
-	})
-	// handle the error of upgrading the protocol
-	if err != nil {
-		c.JSON(consts.StatusInternalServerError, err)
-		return
 	}
+}
+
+func writeError(conn *websocket.Conn, err error) {
+	_ = conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+}
+
+func writeTokenError(conn *websocket.Conn) {
+	_ = conn.WriteMessage(websocket.TextMessage, []byte("missing token in header"))
+}
+
+func writePingMessage(conn *websocket.Conn, id string) error {
+	return conn.WriteMessage(websocket.TextMessage,
+		pack.ResponseFactory.ConnectSuccess(model.NewConnectSuccess(id, time.Now().Local().String())))
 }
