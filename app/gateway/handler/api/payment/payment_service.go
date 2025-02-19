@@ -26,6 +26,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
+	payment "github.com/west2-online/DomTok/app/gateway/model/api/payment"
 	"github.com/west2-online/DomTok/app/gateway/pack"
 	"github.com/west2-online/DomTok/app/gateway/rpc"
 	"github.com/west2-online/DomTok/kitex_gen/payment"

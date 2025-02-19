@@ -19,9 +19,6 @@ struct PaymentTokenRequest {
  * @Param status 请求状态
  */
 struct PaymentTokenResponse {
-    1: model.BaseResp base,
-    2: required string paymentToken
-    3: required i64 expirationTime
 }
 
 /*
@@ -46,9 +43,7 @@ struct PaymentRequest {
  * @Param status 请求状态
  */
 struct PaymentResponse {
-    1: model.BaseResp base,
-    2: required i64 paymentID
-    3: required i64 status
+
 }
 
 /*
@@ -68,9 +63,6 @@ struct RefundTokenRequest {
  * @Param status 请求状态
  */
 struct RefundTokenResponse {
-    1: model.BaseResp base,
-    2: required string refundToken,
-    3: required i64 expirationTime
 }
 
 /*
@@ -93,9 +85,7 @@ struct RefundRequest {
  * @Param status 请求状态
  */
 struct RefundResponse {
-    1: model.BaseResp base,
-    2: required i64 refundID
-    3: required i64 status
+
 }
 
 /*
