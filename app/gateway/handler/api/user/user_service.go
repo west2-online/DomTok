@@ -77,6 +77,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	accessToken, refreshToken, err := utils.CreateAllToken(resp.User.UserId)
 	if err != nil {
 		pack.RespError(c, err)
+		return
 	}
 
 	c.Header(constants.AccessTokenHeader, accessToken)
