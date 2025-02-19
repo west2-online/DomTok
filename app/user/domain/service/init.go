@@ -38,7 +38,10 @@ func NewUserService(db repository.UserDB, sf *utils.Snowflake) *UserService {
 		panic("userService`s sf should not be nil")
 	}
 
-	svc := &UserService{db: db}
+	svc := &UserService{
+		db: db,
+		sf: sf,
+	}
 	svc.init()
 
 	return svc

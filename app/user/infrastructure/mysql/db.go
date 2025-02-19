@@ -40,7 +40,7 @@ func (db *userDB) CreateUser(ctx context.Context, u *model.User) error {
 	// 将 entity 转换成 mysql 这边的 model
 	// TODO 可以考虑整一个函数统一转化, 放在这里占了太多行, 而且这不是这个方法该做的. 这个方法应该做的是创建用户
 	user := User{
-		UserName: u.UserName,
+		Username: u.UserName,
 		Password: u.Password,
 		Email:    u.Email,
 	}
@@ -78,7 +78,7 @@ func (db *userDB) GetUserInfo(ctx context.Context, username string) (*model.User
 
 	resp := &model.User{
 		Uid:      user.ID,
-		UserName: user.UserName,
+		UserName: user.Username,
 		Password: user.Password,
 		Email:    user.Email,
 		Phone:    user.Phone,

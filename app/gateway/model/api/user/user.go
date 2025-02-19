@@ -59,7 +59,6 @@ var fieldIDToName_RegisterRequest = map[int16]string{
 }
 
 func (p *RegisterRequest) Read(iprot thrift.TProtocol) (err error) {
-
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetName bool = false
@@ -187,7 +186,6 @@ func (p *RegisterRequest) ReadField3(iprot thrift.TProtocol) error {
 }
 
 func (p *RegisterRequest) Write(oprot thrift.TProtocol) (err error) {
-
 	var fieldId int16
 	if err = oprot.WriteStructBegin("RegisterRequest"); err != nil {
 		goto WriteStructBeginError
@@ -239,7 +237,6 @@ WriteFieldBeginError:
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
-
 func (p *RegisterRequest) writeField2(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("password", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
@@ -256,7 +253,6 @@ WriteFieldBeginError:
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
-
 func (p *RegisterRequest) writeField3(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("email", thrift.STRING, 3); err != nil {
 		goto WriteFieldBeginError
@@ -295,7 +291,6 @@ func (p *RegisterResponse) InitDefault() {
 var fieldIDToName_RegisterResponse = map[int16]string{}
 
 func (p *RegisterResponse) Read(iprot thrift.TProtocol) (err error) {
-
 	var fieldTypeId thrift.TType
 	var fieldId int16
 
@@ -337,7 +332,6 @@ ReadStructEndError:
 }
 
 func (p *RegisterResponse) Write(oprot thrift.TProtocol) (err error) {
-
 	if err = oprot.WriteStructBegin("RegisterResponse"); err != nil {
 		goto WriteStructBeginError
 	}
@@ -794,7 +788,6 @@ var fieldIDToName_AddGoodsIntoCartRequest = map[int16]string{
 }
 
 func (p *AddGoodsIntoCartRequest) Read(iprot thrift.TProtocol) (err error) {
-
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetSkuId bool = false
@@ -922,7 +915,6 @@ func (p *AddGoodsIntoCartRequest) ReadField3(iprot thrift.TProtocol) error {
 }
 
 func (p *AddGoodsIntoCartRequest) Write(oprot thrift.TProtocol) (err error) {
-
 	var fieldId int16
 	if err = oprot.WriteStructBegin("AddGoodsIntoCartRequest"); err != nil {
 		goto WriteStructBeginError
@@ -974,7 +966,6 @@ WriteFieldBeginError:
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
-
 func (p *AddGoodsIntoCartRequest) writeField2(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("shop_id", thrift.I64, 2); err != nil {
 		goto WriteFieldBeginError
@@ -991,7 +982,6 @@ WriteFieldBeginError:
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
-
 func (p *AddGoodsIntoCartRequest) writeField3(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("count", thrift.I64, 3); err != nil {
 		goto WriteFieldBeginError
@@ -1046,7 +1036,6 @@ func (p *AddGoodsIntoCartResponse) IsSetBase() bool {
 }
 
 func (p *AddGoodsIntoCartResponse) Read(iprot thrift.TProtocol) (err error) {
-
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetBase bool = false
@@ -1119,7 +1108,6 @@ func (p *AddGoodsIntoCartResponse) ReadField1(iprot thrift.TProtocol) error {
 }
 
 func (p *AddGoodsIntoCartResponse) Write(oprot thrift.TProtocol) (err error) {
-
 	var fieldId int16
 	if err = oprot.WriteStructBegin("AddGoodsIntoCartResponse"); err != nil {
 		goto WriteStructBeginError
@@ -1430,7 +1418,6 @@ func (p *UserServiceRegisterArgs) IsSetReq() bool {
 }
 
 func (p *UserServiceRegisterArgs) Read(iprot thrift.TProtocol) (err error) {
-
 	var fieldTypeId thrift.TType
 	var fieldId int16
 
@@ -1495,7 +1482,6 @@ func (p *UserServiceRegisterArgs) ReadField1(iprot thrift.TProtocol) error {
 }
 
 func (p *UserServiceRegisterArgs) Write(oprot thrift.TProtocol) (err error) {
-
 	var fieldId int16
 	if err = oprot.WriteStructBegin("Register_args"); err != nil {
 		goto WriteStructBeginError
@@ -1577,7 +1563,6 @@ func (p *UserServiceRegisterResult) IsSetSuccess() bool {
 }
 
 func (p *UserServiceRegisterResult) Read(iprot thrift.TProtocol) (err error) {
-
 	var fieldTypeId thrift.TType
 	var fieldId int16
 
@@ -1642,7 +1627,6 @@ func (p *UserServiceRegisterResult) ReadField0(iprot thrift.TProtocol) error {
 }
 
 func (p *UserServiceRegisterResult) Write(oprot thrift.TProtocol) (err error) {
-
 	var fieldId int16
 	if err = oprot.WriteStructBegin("Register_result"); err != nil {
 		goto WriteStructBeginError
@@ -2107,7 +2091,6 @@ func (p *CartServiceAddGoodsIntoCartArgs) IsSetReq() bool {
 }
 
 func (p *CartServiceAddGoodsIntoCartArgs) Read(iprot thrift.TProtocol) (err error) {
-
 	var fieldTypeId thrift.TType
 	var fieldId int16
 
@@ -2172,7 +2155,6 @@ func (p *CartServiceAddGoodsIntoCartArgs) ReadField1(iprot thrift.TProtocol) err
 }
 
 func (p *CartServiceAddGoodsIntoCartArgs) Write(oprot thrift.TProtocol) (err error) {
-
 	var fieldId int16
 	if err = oprot.WriteStructBegin("AddGoodsIntoCart_args"); err != nil {
 		goto WriteStructBeginError
@@ -2254,7 +2236,6 @@ func (p *CartServiceAddGoodsIntoCartResult) IsSetSuccess() bool {
 }
 
 func (p *CartServiceAddGoodsIntoCartResult) Read(iprot thrift.TProtocol) (err error) {
-
 	var fieldTypeId thrift.TType
 	var fieldId int16
 
@@ -2319,7 +2300,6 @@ func (p *CartServiceAddGoodsIntoCartResult) ReadField0(iprot thrift.TProtocol) e
 }
 
 func (p *CartServiceAddGoodsIntoCartResult) Write(oprot thrift.TProtocol) (err error) {
-
 	var fieldId int16
 	if err = oprot.WriteStructBegin("AddGoodsIntoCart_result"); err != nil {
 		goto WriteStructBeginError

@@ -23,7 +23,7 @@ struct LoginResponse {
 
 
 service UserService {
-    RegisterResponse Register(1: RegisterRequest req)(api.get = "api/v1/user/register"),
+    RegisterResponse Register(1: RegisterRequest req)(api.post = "api/v1/user/register"),
     LoginResponse Login(1: LoginRequest req)(api.post = "api/v1/user/login")
 }
 
