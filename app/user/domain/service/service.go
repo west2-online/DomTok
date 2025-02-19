@@ -49,8 +49,3 @@ func (svc *UserService) CreateUser(ctx context.Context, u *model.User) (int64, e
 	}
 	return uid, nil
 }
-
-func (svc *UserService) nextID() int64 {
-	id, _ := svc.sf.NextVal()
-	return id
-}
