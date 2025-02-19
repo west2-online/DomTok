@@ -283,6 +283,7 @@ func (p *RegisterRequest) String() string {
 }
 
 type RegisterResponse struct {
+	UID int64 `thrift:"uid,1,required" form:"uid,required" json:"uid,required" query:"uid,required"`
 }
 
 func NewRegisterResponse() *RegisterResponse {
@@ -292,12 +293,19 @@ func NewRegisterResponse() *RegisterResponse {
 func (p *RegisterResponse) InitDefault() {
 }
 
-var fieldIDToName_RegisterResponse = map[int16]string{}
+func (p *RegisterResponse) GetUID() (v int64) {
+	return p.UID
+}
+
+var fieldIDToName_RegisterResponse = map[int16]string{
+	1: "uid",
+}
 
 func (p *RegisterResponse) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
+	var issetUID bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -311,8 +319,21 @@ func (p *RegisterResponse) Read(iprot thrift.TProtocol) (err error) {
 		if fieldTypeId == thrift.STOP {
 			break
 		}
-		if err = iprot.Skip(fieldTypeId); err != nil {
-			goto SkipFieldTypeError
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetUID = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
 		}
 		if err = iprot.ReadFieldEnd(); err != nil {
 			goto ReadFieldEndError
@@ -322,26 +343,51 @@ func (p *RegisterResponse) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
+	if !issetUID {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
 	return nil
 ReadStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-SkipFieldTypeError:
-	return thrift.PrependError(fmt.Sprintf("%T skip field type %d error", p, fieldTypeId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RegisterResponse[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
 ReadFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_RegisterResponse[fieldId]))
+}
+
+func (p *RegisterResponse) ReadField1(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.UID = _field
+	return nil
 }
 
 func (p *RegisterResponse) Write(oprot thrift.TProtocol) (err error) {
 
+	var fieldId int16
 	if err = oprot.WriteStructBegin("RegisterResponse"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
 	}
 	if err = oprot.WriteFieldStop(); err != nil {
 		goto WriteFieldStopError
@@ -352,10 +398,29 @@ func (p *RegisterResponse) Write(oprot thrift.TProtocol) (err error) {
 	return nil
 WriteStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
 WriteFieldStopError:
 	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
 WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *RegisterResponse) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("uid", thrift.I64, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.UID); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
 func (p *RegisterResponse) String() string {
@@ -569,7 +634,6 @@ func (p *LoginRequest) String() string {
 }
 
 type LoginResponse struct {
-	Base *model.BaseResp `thrift:"base,1" form:"base" json:"base" query:"base"`
 	User *model.UserInfo `thrift:"user,2" form:"user" json:"user" query:"user"`
 }
 
@@ -578,15 +642,6 @@ func NewLoginResponse() *LoginResponse {
 }
 
 func (p *LoginResponse) InitDefault() {
-}
-
-var LoginResponse_Base_DEFAULT *model.BaseResp
-
-func (p *LoginResponse) GetBase() (v *model.BaseResp) {
-	if !p.IsSetBase() {
-		return LoginResponse_Base_DEFAULT
-	}
-	return p.Base
 }
 
 var LoginResponse_User_DEFAULT *model.UserInfo
@@ -599,12 +654,7 @@ func (p *LoginResponse) GetUser() (v *model.UserInfo) {
 }
 
 var fieldIDToName_LoginResponse = map[int16]string{
-	1: "base",
 	2: "user",
-}
-
-func (p *LoginResponse) IsSetBase() bool {
-	return p.Base != nil
 }
 
 func (p *LoginResponse) IsSetUser() bool {
@@ -630,14 +680,6 @@ func (p *LoginResponse) Read(iprot thrift.TProtocol) (err error) {
 		}
 
 		switch fieldId {
-		case 1:
-			if fieldTypeId == thrift.STRUCT {
-				if err = p.ReadField1(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
 		case 2:
 			if fieldTypeId == thrift.STRUCT {
 				if err = p.ReadField2(iprot); err != nil {
@@ -675,14 +717,6 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *LoginResponse) ReadField1(iprot thrift.TProtocol) error {
-	_field := model.NewBaseResp()
-	if err := _field.Read(iprot); err != nil {
-		return err
-	}
-	p.Base = _field
-	return nil
-}
 func (p *LoginResponse) ReadField2(iprot thrift.TProtocol) error {
 	_field := model.NewUserInfo()
 	if err := _field.Read(iprot); err != nil {
@@ -699,10 +733,6 @@ func (p *LoginResponse) Write(oprot thrift.TProtocol) (err error) {
 		goto WriteStructBeginError
 	}
 	if p != nil {
-		if err = p.writeField1(oprot); err != nil {
-			fieldId = 1
-			goto WriteFieldError
-		}
 		if err = p.writeField2(oprot); err != nil {
 			fieldId = 2
 			goto WriteFieldError
@@ -723,23 +753,6 @@ WriteFieldStopError:
 	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
 WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
-}
-
-func (p *LoginResponse) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("base", thrift.STRUCT, 1); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := p.Base.Write(oprot); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
 func (p *LoginResponse) writeField2(oprot thrift.TProtocol) (err error) {

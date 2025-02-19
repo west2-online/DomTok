@@ -42,7 +42,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
-	uid, err := rpc.RegisterRPC(ctx, &user.RegisterRequest{
+	resp, err := rpc.RegisterRPC(ctx, &user.RegisterRequest{
 		Username: req.Name,
 		Password: req.Password,
 		Email:    req.Email,
@@ -51,7 +51,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	pack.RespData(c, uid)
+	pack.RespData(c, resp)
 }
 
 // Login .
@@ -74,7 +74,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	accessToken, refreshToken, err := utils.CreateAllToken(resp.UserId)
+	accessToken, refreshToken, err := utils.CreateAllToken(resp.User.UserId)
 	if err != nil {
 		pack.RespError(c, err)
 	}

@@ -9,6 +9,7 @@ struct RegisterRequest {
 }
 
 struct RegisterResponse {
+    1: required i64 uid;
 }
 
 struct LoginRequest {
@@ -17,7 +18,6 @@ struct LoginRequest {
 }
 
 struct LoginResponse {
-    1: model.BaseResp base,
     2: model.UserInfo user,
 }
 
