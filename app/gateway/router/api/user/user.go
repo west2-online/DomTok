@@ -21,7 +21,6 @@ package user
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 
-	"github.com/west2-online/DomTok/app/gateway/handler/api/cart"
 	user "github.com/west2-online/DomTok/app/gateway/handler/api/user"
 )
 
@@ -37,13 +36,6 @@ func Register(r *server.Hertz) {
 	root := r.Group("/", rootMw()...)
 	{
 		_api := root.Group("/api", _apiMw()...)
-		{
-			_cart := _api.Group("/cart", _cartMw()...)
-			{
-				_sku := _cart.Group("/sku", _skuMw()...)
-				_sku.POST("/add", append(_addgoodsintocartMw(), cart.AddGoodsIntoCart)...)
-			}
-		}
 		{
 			_v1 := _api.Group("/v1", _v1Mw()...)
 			{
