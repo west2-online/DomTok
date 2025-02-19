@@ -21,16 +21,13 @@ package order
 import (
 	"context"
 
+	"github.com/west2-online/DomTok/app/gateway/pack"
+
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
 	api "github.com/west2-online/DomTok/app/gateway/model/api/order"
-	"github.com/west2-online/DomTok/app/gateway/model/model"
 	"github.com/west2-online/DomTok/app/gateway/rpc"
-	module2 "github.com/west2-online/DomTok/kitex_gen/model"
 	orderrpc "github.com/west2-online/DomTok/kitex_gen/order"
-	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // CreateOrder .
@@ -40,45 +37,19 @@ func CreateOrder(ctx context.Context, c *app.RequestContext) {
 	var req api.CreateOrderReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, &model.BaseResp{
-			Code: errno.ParamVerifyErrorCode,
-			Msg:  err.Error(),
-		})
+		pack.RespError(c, err)
 		return
 	}
 
-	// 先准备商品列表
-	goods := make([]*module2.BaseOrderGoods, 0, len(req.BaseOrderGoods))
-	for _, g := range req.BaseOrderGoods {
-		goods = append(goods, &module2.BaseOrderGoods{
-			GoodsID:          g.GoodsID,
-			PurchaseQuantity: g.PurchaseQuantity,
-		})
-	}
+	// todo: 未实现
 
-	rpcReq := &orderrpc.CreateOrderReq{
-		AddressID:      req.AddressID,
-		AddressInfo:    req.AddressInfo,
-		BaseOrderGoods: goods,
-	}
-
-	orderID, err := rpc.CreateOrderRPC(ctx, rpcReq)
+	resp, err := rpc.CreateOrderRPC(ctx, nil)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &model.BaseResp{
-			Code: errno.ServiceError,
-			Msg:  err.Error(),
-		})
+		pack.RespError(c, err)
 		return
 	}
 
-	resp := &api.CreateOrderResp{
-		Base: &model.BaseResp{
-			Code: errno.SuccessCode,
-			Msg:  "success",
-		},
-		OrderID: orderID,
-	}
-	c.JSON(consts.StatusOK, resp)
+	pack.RespData(c, resp)
 }
 
 // ViewOrderList .
@@ -86,35 +57,24 @@ func CreateOrder(ctx context.Context, c *app.RequestContext) {
 func ViewOrderList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.ViewOrderListReq
-
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		logger.Errorf("[ViewOrderList] bind and validate failed: %v", err)
-		c.JSON(consts.StatusBadRequest, &model.BaseResp{
-			Code: errno.ParamVerifyErrorCode,
-			Msg:  err.Error(),
-		})
+		pack.RespError(c, err)
 		return
 	}
 
-	// 转换请求
 	rpcReq := &orderrpc.ViewOrderListReq{
 		Page: req.Page,
 		Size: req.Size,
 	}
 
-	logger.Infof("[ViewOrderList] calling RPC")
 	resp, err := rpc.ViewOrderListRPC(ctx, rpcReq)
 	if err != nil {
-		logger.Errorf("[ViewOrderList] RPC call failed: %v", err)
-		c.JSON(consts.StatusInternalServerError, &model.BaseResp{
-			Code: errno.ServiceError,
-			Msg:  err.Error(),
-		})
+		pack.RespError(c, err)
 		return
 	}
 
-	c.JSON(consts.StatusOK, resp)
+	pack.RespData(c, resp)
 }
 
 // ViewOrder .
@@ -124,10 +84,7 @@ func ViewOrder(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewOrderReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, &model.BaseResp{
-			Code: errno.ParamVerifyErrorCode,
-			Msg:  err.Error(),
-		})
+		pack.RespError(c, err)
 		return
 	}
 
@@ -138,14 +95,11 @@ func ViewOrder(ctx context.Context, c *app.RequestContext) {
 
 	resp, err := rpc.ViewOrderRPC(ctx, rpcReq)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &model.BaseResp{
-			Code: errno.ServiceError,
-			Msg:  err.Error(),
-		})
+		pack.RespError(c, err)
 		return
 	}
 
-	c.JSON(consts.StatusOK, resp)
+	pack.RespData(c, resp)
 }
 
 // CancelOrder .
@@ -155,34 +109,21 @@ func CancelOrder(ctx context.Context, c *app.RequestContext) {
 	var req api.CancelOrderReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, &model.BaseResp{
-			Code: errno.ParamVerifyErrorCode,
-			Msg:  err.Error(),
-		})
+		pack.RespError(c, err)
 		return
 	}
 
-	// 转换请求
 	rpcReq := &orderrpc.CancelOrderReq{
 		OrderID: req.OrderID,
 	}
 
 	err = rpc.CancelOrderRPC(ctx, rpcReq)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &model.BaseResp{
-			Code: errno.ServiceError,
-			Msg:  err.Error(),
-		})
+		pack.RespError(c, err)
 		return
 	}
 
-	resp := &api.CancelOrderResp{
-		Base: &model.BaseResp{
-			Code: errno.SuccessCode,
-			Msg:  "success",
-		},
-	}
-	c.JSON(consts.StatusOK, resp)
+	pack.RespSuccess(c)
 }
 
 // ChangeDeliverAddress .
@@ -192,14 +133,10 @@ func ChangeDeliverAddress(ctx context.Context, c *app.RequestContext) {
 	var req api.ChangeDeliverAddressReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, &model.BaseResp{
-			Code: errno.ParamVerifyErrorCode,
-			Msg:  err.Error(),
-		})
+		pack.RespError(c, err)
 		return
 	}
 
-	// 转换请求
 	rpcReq := &orderrpc.ChangeDeliverAddressReq{
 		OrderID:     req.OrderID,
 		AddressID:   req.AddressID,
@@ -208,17 +145,11 @@ func ChangeDeliverAddress(ctx context.Context, c *app.RequestContext) {
 
 	err = rpc.ChangeDeliverAddressRPC(ctx, rpcReq)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &model.BaseResp{
-			Code: errno.ServiceError,
-			Msg:  err.Error(),
-		})
+		pack.RespError(c, err)
 		return
 	}
 
-	c.JSON(consts.StatusOK, &model.BaseResp{
-		Code: errno.SuccessCode,
-		Msg:  "success",
-	})
+	pack.RespSuccess(c)
 }
 
 // DeleteOrder .
@@ -228,29 +159,19 @@ func DeleteOrder(ctx context.Context, c *app.RequestContext) {
 	var req api.DeleteOrderReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, &model.BaseResp{
-			Code: errno.ParamVerifyErrorCode,
-			Msg:  err.Error(),
-		})
+		pack.RespError(c, err)
 		return
 	}
 
-	// 转换请求
 	rpcReq := &orderrpc.DeleteOrderReq{
 		OrderID: req.OrderID,
 	}
 
 	err = rpc.DeleteOrderRPC(ctx, rpcReq)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, &model.BaseResp{
-			Code: errno.ServiceError,
-			Msg:  err.Error(),
-		})
+		pack.RespError(c, err)
 		return
 	}
 
-	c.JSON(consts.StatusOK, &model.BaseResp{
-		Code: errno.SuccessCode,
-		Msg:  "success",
-	})
+	pack.RespSuccess(c)
 }

@@ -42,3 +42,5 @@ CREATE TABLE `order_goods` (
                                `coupon_id` BIGINT NOT NULL DEFAULT 0 COMMENT '优惠券ID',
                                PRIMARY KEY (`order_id`, `goods_id`, `style_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+

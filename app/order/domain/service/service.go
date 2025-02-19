@@ -35,47 +35,35 @@ func NewOrderService(db repository.OrderDB, sf *utils.Snowflake) *OrderService {
 	return &OrderService{db: db, sf: sf}
 }
 
-// Verify 验证多个条件
-func (s *OrderService) Verify(errs ...error) error {
-	for _, err := range errs {
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// VerifyOrderStatus 验证订单状态
-func (s *OrderService) VerifyOrderStatus(status int32) error {
-	if status < 0 || status > 4 {
-		return errno.NewErrNo(errno.ServiceError, "invalid order status")
-	}
-	return nil
-}
-
 // IsOrderExist 检查订单是否存在
-func (s *OrderService) IsOrderExist(ctx context.Context, orderID int64) (bool, error) {
-	return s.db.IsOrderExist(ctx, orderID)
+func (svc *OrderService) IsOrderExist(ctx context.Context, orderID int64) (bool, error) {
+	return svc.db.IsOrderExist(ctx, orderID)
+}
+
+// OrderExist 检查订单是否存在
+func (svc *OrderService) OrderExist(ctx context.Context, orderID int64) error {
+	exist, err := svc.db.IsOrderExist(ctx, orderID)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return errno.NewErrNo(errno.ServiceOrderNotFound, "order not exist")
+	}
+	return nil
 }
 
 // CreateOrder 创建订单，包含业务逻辑
-func (s *OrderService) CreateOrder(ctx context.Context, order *model.Order, goods []*model.OrderGoods) (int64, error) {
-	// 1. 生成订单ID
-	orderID := s.nextID()
-	order.ID = orderID
+func (svc *OrderService) CreateOrder(ctx context.Context, order *model.Order, goods []*model.OrderGoods) (int64, error) {
+	orderID := svc.nextID()
+	order.Id = orderID
 
-	// 2. 创建订单
-	if err := s.db.CreateOrder(ctx, order); err != nil {
+	if err := svc.db.CreateOrder(ctx, order); err != nil {
 		return 0, err
 	}
 
-	// 3. 设置订单商品的订单ID
-	for _, g := range goods {
-		g.OrderID = orderID
-	}
+	// todo: 未实现
 
-	// 4. 创建订单商品
-	if err := s.db.CreateOrderGoods(ctx, goods); err != nil {
+	if err := svc.db.CreateOrderGoods(ctx, goods); err != nil {
 		return 0, err
 	}
 
@@ -83,9 +71,9 @@ func (s *OrderService) CreateOrder(ctx context.Context, order *model.Order, good
 }
 
 // CancelOrder 取消订单，包含状态检查
-func (s *OrderService) CancelOrder(ctx context.Context, orderID int64) error {
+func (svc *OrderService) CancelOrder(ctx context.Context, orderID int64) error {
 	// 1. 检查订单是否存在
-	exist, err := s.db.IsOrderExist(ctx, orderID)
+	exist, err := svc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -94,7 +82,7 @@ func (s *OrderService) CancelOrder(ctx context.Context, orderID int64) error {
 	}
 
 	// 2. 获取订单信息检查状态
-	order, err := s.db.GetOrderByID(ctx, orderID)
+	order, err := svc.db.GetOrderByID(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -105,13 +93,13 @@ func (s *OrderService) CancelOrder(ctx context.Context, orderID int64) error {
 	}
 
 	// 4. 更新订单状态为已取消
-	return s.db.UpdateOrderStatus(ctx, orderID, constants.OrderStatusCancelledCode)
+	return svc.db.UpdateOrderStatus(ctx, orderID, constants.OrderStatusCancelledCode)
 }
 
 // UpdateOrderAddress 更新订单地址
-func (s *OrderService) UpdateOrderAddress(ctx context.Context, orderID int64, addressID int64, addressInfo string) error {
+func (svc *OrderService) UpdateOrderAddress(ctx context.Context, orderID int64, addressID int64, addressInfo string) error {
 	// 1. 检查订单是否存在
-	exist, err := s.IsOrderExist(ctx, orderID)
+	exist, err := svc.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -120,7 +108,7 @@ func (s *OrderService) UpdateOrderAddress(ctx context.Context, orderID int64, ad
 	}
 
 	// 2. 获取订单信息检查状态
-	order, err := s.db.GetOrderByID(ctx, orderID)
+	order, err := svc.db.GetOrderByID(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -132,18 +120,18 @@ func (s *OrderService) UpdateOrderAddress(ctx context.Context, orderID int64, ad
 	}
 
 	// 4. 更新地址
-	return s.db.UpdateOrderAddress(ctx, orderID, addressID, addressInfo)
+	return svc.db.UpdateOrderAddress(ctx, orderID, addressID, addressInfo)
 }
 
-func (s *OrderService) nextID() int64 {
-	id, _ := s.sf.NextVal()
+func (svc *OrderService) nextID() int64 {
+	id, _ := svc.sf.NextVal()
 	return id
 }
 
 // ViewOrderList 获取订单列表
-func (s *OrderService) ViewOrderList(ctx context.Context, userID int64, page, size int32) ([]*model.Order, []*model.OrderGoods, int32, error) {
+func (svc *OrderService) ViewOrderList(ctx context.Context, userID int64, page, size int32) ([]*model.Order, []*model.OrderGoods, int32, error) {
 	// 1. 获取订单列表
-	orders, total, err := s.db.GetOrdersByUserID(ctx, userID, page, size)
+	orders, total, err := svc.db.GetOrdersByUserID(ctx, userID, page, size)
 	if err != nil {
 		return nil, nil, 0, err
 	}
@@ -156,7 +144,7 @@ func (s *OrderService) ViewOrderList(ctx context.Context, userID int64, page, si
 	// 3. 获取所有订单的商品信息
 	var allGoods []*model.OrderGoods
 	for _, order := range orders {
-		goods, err := s.db.GetOrderGoodsByOrderID(ctx, order.ID)
+		goods, err := svc.db.GetOrderGoodsByOrderID(ctx, order.Id)
 		if err != nil {
 			return nil, nil, 0, err
 		}
@@ -167,9 +155,9 @@ func (s *OrderService) ViewOrderList(ctx context.Context, userID int64, page, si
 }
 
 // ViewOrder 获取订单详情
-func (s *OrderService) ViewOrder(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error) {
+func (svc *OrderService) ViewOrder(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error) {
 	// 1. 检查订单是否存在
-	exist, err := s.db.IsOrderExist(ctx, orderID)
+	exist, err := svc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -178,13 +166,13 @@ func (s *OrderService) ViewOrder(ctx context.Context, orderID int64) (*model.Ord
 	}
 
 	// 2. 获取订单信息
-	order, err := s.db.GetOrderByID(ctx, orderID)
+	order, err := svc.db.GetOrderByID(ctx, orderID)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	// 3. 获取订单商品信息
-	goods, err := s.db.GetOrderGoodsByOrderID(ctx, orderID)
+	goods, err := svc.db.GetOrderGoodsByOrderID(ctx, orderID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -193,9 +181,9 @@ func (s *OrderService) ViewOrder(ctx context.Context, orderID int64) (*model.Ord
 }
 
 // ChangeDeliverAddress 更改配送地址
-func (s *OrderService) ChangeDeliverAddress(ctx context.Context, orderID, addressID int64, addressInfo string) error {
+func (svc *OrderService) ChangeDeliverAddress(ctx context.Context, orderID, addressID int64, addressInfo string) error {
 	// 1. 检查订单是否存在
-	exist, err := s.db.IsOrderExist(ctx, orderID)
+	exist, err := svc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -204,7 +192,7 @@ func (s *OrderService) ChangeDeliverAddress(ctx context.Context, orderID, addres
 	}
 
 	// 2. 获取订单信息检查状态
-	order, err := s.db.GetOrderByID(ctx, orderID)
+	order, err := svc.db.GetOrderByID(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -215,13 +203,13 @@ func (s *OrderService) ChangeDeliverAddress(ctx context.Context, orderID, addres
 	}
 
 	// 4. 更新地址信息
-	return s.db.UpdateOrderAddress(ctx, orderID, addressID, addressInfo)
+	return svc.db.UpdateOrderAddress(ctx, orderID, addressID, addressInfo)
 }
 
 // DeleteOrder 删除订单
-func (s *OrderService) DeleteOrder(ctx context.Context, orderID int64) error {
+func (svc *OrderService) DeleteOrder(ctx context.Context, orderID int64) error {
 	// 1. 检查订单是否存在
-	exist, err := s.db.IsOrderExist(ctx, orderID)
+	exist, err := svc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -230,7 +218,7 @@ func (s *OrderService) DeleteOrder(ctx context.Context, orderID int64) error {
 	}
 
 	// 2. 获取订单信息检查状态
-	order, err := s.db.GetOrderByID(ctx, orderID)
+	order, err := svc.db.GetOrderByID(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -241,5 +229,20 @@ func (s *OrderService) DeleteOrder(ctx context.Context, orderID int64) error {
 	}
 
 	// 4. 删除订单（包含订单商品）
-	return s.db.DeleteOrder(ctx, orderID)
+	return svc.db.DeleteOrder(ctx, orderID)
+}
+
+func (svc *OrderService) GetOrderStatusMsg(code int8) string {
+	switch code {
+	case constants.OrderStatusUnpaidCode:
+		return constants.OrderStatusUnpaid
+	case constants.OrderStatusPaidCode:
+		return constants.OrderStatusPaid
+	case constants.OrderStatusCompletedCode:
+		return constants.OrderStatusCompleted
+	case constants.OrderStatusCancelledCode:
+		return constants.OrderStatusCancelled
+	default:
+		return constants.OrderStatusUnknown
+	}
 }

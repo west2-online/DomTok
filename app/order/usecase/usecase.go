@@ -19,19 +19,20 @@ package usecase
 import (
 	"context"
 
+	"github.com/west2-online/DomTok/app/order/domain/model"
+
 	"github.com/west2-online/DomTok/app/order/domain/repository"
 	"github.com/west2-online/DomTok/app/order/domain/service"
-	"github.com/west2-online/DomTok/kitex_gen/order"
 )
 
 // OrderUseCase 定义在 usecase 层的接口
 type OrderUseCase interface {
-	CreateOrder(ctx context.Context, req *order.CreateOrderReq) (*order.CreateOrderResp, error)
-	ViewOrderList(ctx context.Context, req *order.ViewOrderListReq) (*order.ViewOrderListResp, error)
-	ViewOrder(ctx context.Context, req *order.ViewOrderReq) (*order.ViewOrderResp, error)
-	CancelOrder(ctx context.Context, req *order.CancelOrderReq) (*order.CancelOrderResp, error)
-	ChangeDeliverAddress(ctx context.Context, req *order.ChangeDeliverAddressReq) (*order.ChangeDeliverAddressResp, error)
-	DeleteOrder(ctx context.Context, req *order.DeleteOrderReq) (*order.DeleteOrderResp, error)
+	//todo：createOrder
+	ViewOrderList(ctx context.Context, page, size int32) ([]*model.Order, []*model.OrderGoods, int32, error)
+	ViewOrder(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error)
+	CancelOrder(ctx context.Context, orderID int64) error
+	ChangeDeliverAddress(ctx context.Context, orderID, addressID int64, addressInfo string) error
+	DeleteOrder(ctx context.Context, orderID int64) error
 }
 
 // useCase 实现了 OrderUseCase 接口

@@ -33,4 +33,5 @@ type OrderDB interface {
 	UpdateOrderStatus(ctx context.Context, orderID int64, status int32) error
 	UpdateOrderAddress(ctx context.Context, orderID int64, addressID int64, addressInfo string) error
 	DeleteOrder(ctx context.Context, orderID int64) error
+	GetOrderWithGoods(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error)
 }

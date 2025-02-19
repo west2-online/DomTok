@@ -49,7 +49,6 @@ func CreateOrderRPC(ctx context.Context, req *order.CreateOrderReq) (orderID int
 
 // ViewOrderListRPC 查看订单列表RPC调用
 func ViewOrderListRPC(ctx context.Context, req *order.ViewOrderListReq) (*order.ViewOrderListResp, error) {
-	logger.Infof("[ViewOrderListRPC] 开始调用RPC服务")
 	resp, err := orderClient.ViewOrderList(ctx, req)
 	if err != nil {
 		logger.Errorf("ViewOrderListRPC: RPC called failed: %v", err.Error())

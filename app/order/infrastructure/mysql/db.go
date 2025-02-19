@@ -19,6 +19,10 @@ package mysql
 import (
 	"context"
 	"errors"
+	"fmt"
+
+	"github.com/west2-online/DomTok/app/order/domain/service"
+	"github.com/west2-online/DomTok/pkg/logger"
 
 	"gorm.io/gorm"
 
@@ -29,6 +33,7 @@ import (
 
 type orderDB struct {
 	client *gorm.DB
+	svc    *service.OrderService
 }
 
 func NewOrderDB(client *gorm.DB) repository.OrderDB {
@@ -145,4 +150,83 @@ func (db *orderDB) DeleteOrder(ctx context.Context, orderID int64) error {
 
 		return nil
 	})
+}
+
+func (db *orderDB) GetOrderWithGoods(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error) {
+	var order Order
+	var goods []OrderGoods
+
+	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var err error
+		defer func() {
+			if err != nil {
+				if e := tx.Rollback().Error; e != nil {
+					logger.Errorf("tx rollback failed,please check")
+				}
+			}
+		}()
+
+		if err = tx.Model(&order).Where("id=?", orderID).Find(&order).Error; err != nil {
+			return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("can`t find order by id: %d", orderID))
+		}
+
+		if err = tx.Model(&OrderGoods{}).Where("order_id=?", orderID).Find(&goods).Error; err != nil {
+			return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("can`t find order_goods by order_id: %d", orderID))
+		}
+
+		if err = tx.Commit().Error; err != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "tx commit failed,please check")
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// 转换 goods 切片
+	modelGoods := make([]*model.OrderGoods, len(goods))
+	for i, g := range goods {
+		modelGoods[i] = &model.OrderGoods{
+			MerchantID:       g.MerchantID,
+			GoodsID:          g.GoodsID,
+			GoodsName:        g.GoodsName,
+			GoodsHeadDrawing: g.GoodsHeadDrawing,
+			StyleID:          int64(g.StyleID),
+			StyleName:        g.StyleName,
+			StyleHeadDrawing: g.StyleHeadDrawing,
+			OriginCast:       g.OriginCast,
+			SaleCast:         g.SaleCast,
+			PurchaseQuantity: g.PurchaseQuantity,
+			PaymentAmount:    g.PaymentAmount,
+			FreightAmount:    g.FreightAmount,
+			SettlementAmount: g.SettlementAmount,
+			DiscountAmount:   g.DiscountAmount,
+			SingleCast:       g.SingleCast,
+			CouponID:         g.CouponID,
+		}
+	}
+
+	return db.convertOrder(&order), modelGoods, nil
+}
+
+func (db *orderDB) convertOrder(order *Order) *model.Order {
+	return &model.Order{
+		Id:                    order.Id,
+		Status:                order.Status,
+		Uid:                   order.Uid,
+		TotalAmountOfGoods:    order.TotalAmountOfGoods,
+		TotalAmountOfFreight:  order.TotalAmountOfFreight,
+		TotalAmountOfDiscount: order.TotalAmountOfDiscount,
+		PaymentAmount:         order.PaymentAmount,
+		PaymentStatus:         string(order.PaymentStatus),
+		PaymentAt:             order.PaymentAt,
+		PaymentStyle:          order.PaymentStyle,
+		OrderedAt:             order.OrderedAt,
+		DeletedAt:             order.DeletedAt,
+		DeliveryAt:            order.DeliveryAt,
+		AddressID:             order.AddressID,
+		AddressInfo:           order.AddressInfo,
+	}
 }
