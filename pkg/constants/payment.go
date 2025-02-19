@@ -37,3 +37,7 @@ const (
 	PaymentStatusSuccess           // 成功支付
 	PaymentStatusFailed            // 支付失败
 )
+
+const (
+	TestUserID = 123
+)

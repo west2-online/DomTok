@@ -19,6 +19,7 @@ package rpc
 import (
 	"context"
 	"fmt"
+
 	"github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/kitex_gen/payment"
 	"github.com/west2-online/DomTok/pkg/base/client"
@@ -53,8 +54,7 @@ func RequestPaymentTokenRPC(ctx context.Context, req *payment.PaymentTokenReques
 	if !utils.IsSuccess(resp.Base) {
 		logger.Error("RequestPaymentTokenRPC: RPC call business failure", zap.String("message", resp.Base.Msg))
 		return "", errno.InternalServiceError.WithMessage(resp.Base.Msg)
-	}*/
-	// 这里的 err 是属于 RPC 间调用的错误，例如 network error
+	}*/ // 这里的 err 是属于 RPC 间调用的错误，例如 network error
 	// 而业务错误则是封装在 resp.base 当中的
 	if err != nil {
 		logger.Errorf("RequestPaymentTokenRPC: RPC called failed: %v", err.Error())

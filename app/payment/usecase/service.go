@@ -90,8 +90,8 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 
 	var redisStatus bool
 	// 5. 存储令牌到 Redis
-	// TODO
-	uid := int64(123)
+	// TODO 记得删除这个测试数值
+	uid := int64(paymentStatus.TestUserID)
 	logger.Info("Storing token in Redis",
 		zap.Int64("userID", uid),
 		zap.Int64("orderID", orderID),

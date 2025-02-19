@@ -20,13 +20,15 @@ package payment
 
 import (
 	"context"
-	"github.com/west2-online/DomTok/pkg/logger"
+
 	"go.uber.org/zap"
+
+	"github.com/west2-online/DomTok/pkg/logger"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
-	payment "github.com/west2-online/DomTok/app/gateway/model/api/payment"
+	api "github.com/west2-online/DomTok/app/gateway/model/api/payment"
 	"github.com/west2-online/DomTok/app/gateway/pack"
 	"github.com/west2-online/DomTok/app/gateway/rpc"
 	"github.com/west2-online/DomTok/kitex_gen/payment"
@@ -37,14 +39,14 @@ import (
 // @router /api/payment/process [POST]
 func ProcessPayment(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req payment.PaymentRequest
+	var req api.PaymentRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
-	resp := new(payment.PaymentResponse)
+	// TODO 这鬼地方是api. 还是 payment.
+	resp := new(api.PaymentResponse)
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -52,7 +54,7 @@ func ProcessPayment(ctx context.Context, c *app.RequestContext) {
 // @router /api/payment/token [GET]
 func RequestPaymentToken(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req payment.PaymentTokenRequest
+	var req api.PaymentTokenRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		logger.Error("RequestPaymentTokenRPC failed", zap.Error(err)) // 打印错误日志
@@ -77,13 +79,13 @@ func RequestPaymentToken(ctx context.Context, c *app.RequestContext) {
 // @router /api/payment/refund [POST]
 func ProcessRefund(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req payment.RefundRequest
+	var req api.RefundRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	// TODO 这鬼地方是api. 还是 payment.？
 	resp := new(payment.RefundResponse)
 
 	c.JSON(consts.StatusOK, resp)
@@ -93,13 +95,13 @@ func ProcessRefund(ctx context.Context, c *app.RequestContext) {
 // @router /api/payment/refund-token [GET]
 func RequestRefundToken(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req payment.RefundTokenRequest
+	var req api.RefundTokenRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	// TODO 这鬼地方是api. 还是 payment.
 	resp := new(payment.RefundTokenResponse)
 
 	c.JSON(consts.StatusOK, resp)

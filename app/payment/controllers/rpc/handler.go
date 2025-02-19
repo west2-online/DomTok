@@ -18,14 +18,11 @@ package rpc
 
 import (
 	"context"
+
 	"github.com/west2-online/DomTok/app/payment/controllers/rpc/pack"
-	"github.com/west2-online/DomTok/pkg/base"
-	"go.uber.org/zap"
-
-	"github.com/west2-online/DomTok/pkg/logger"
-
 	"github.com/west2-online/DomTok/app/payment/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/payment"
+	"github.com/west2-online/DomTok/pkg/base"
 )
 
 type PaymentHandler struct {
@@ -51,7 +48,7 @@ func (handler *PaymentHandler) ProcessPayment(ctx context.Context, req *payment.
 
 func (handler *PaymentHandler) RequestPaymentToken(ctx context.Context, req *payment.PaymentTokenRequest) (r *payment.PaymentTokenResponse, err error) {
 	r = new(payment.PaymentTokenResponse)
-	logger.Info("GetPaymentToken called", zap.Int64("RequestPaymentToken", 123))
+	// logger.Info("GetPaymentToken called", zap.Int64("RequestPaymentToken", 123))
 	var token string
 	var expTime int64
 	// 传入ctx（包含uid）和orderID,获取令牌和令牌过期时间

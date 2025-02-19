@@ -20,8 +20,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/west2-online/DomTok/kitex_gen/payment/paymentservice"
-
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/client/streamclient"
 	etcd "github.com/kitex-contrib/registry-etcd"
@@ -29,6 +27,7 @@ import (
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
 	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
+	"github.com/west2-online/DomTok/kitex_gen/payment/paymentservice"
 	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
 	"github.com/west2-online/DomTok/pkg/constants"
 )

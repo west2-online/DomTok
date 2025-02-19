@@ -26,17 +26,14 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/west2-online/DomTok/pkg/logger"
-
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	loginData "github.com/west2-online/DomTok/pkg/base/context"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
-// sf可以生成id,详见user/domain/service/service.go
-// TODO 这个函数的逻辑不知道要怎么写，我只知道大概要包括生成订单信息、往sql里存信息、返回支付id这三步
+// CreatePaymentInfo sf可以生成id,详见user/domain/service/service.go
 func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64) (paymentID int64, err error) {
-	// TODO 2025.02.17 00：22 先来解决你
 	// 1. 生成支付 ID（雪花算法）
 	paymentID, err = svc.sf.NextVal()
 	if err != nil {
