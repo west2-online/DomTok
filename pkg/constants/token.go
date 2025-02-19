@@ -17,7 +17,6 @@ limitations under the License.
 package constants
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -33,7 +32,3 @@ const (
 	AccessTokenHeader  = "Access-Token"  // 响应时的访问令牌头
 	RefreshTokenHeader = "Refresh-Token" // 响应时的刷新令牌头
 )
-
-var PublicKey = fmt.Sprintf("%v\n%v\n%v", "-----BEGIN PUBLIC KEY-----",
-	"MCowBQYDK2VwAyEAT+ypuz7wIltf8HoFUEI/rDBrQNhZShqLv88j4aAWnT0=",
-	"-----END PUBLIC KEY-----")
