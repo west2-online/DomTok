@@ -15,8 +15,7 @@ struct CreateCouponReq {
 }
 
 struct CreateCouponResp {
-    1: required model.BaseResp base;
-    2: required i64 couponID;
+    1: required i64 couponID;
 }
 
 struct DeleteCouponReq {
@@ -24,7 +23,7 @@ struct DeleteCouponReq {
 }
 
 struct DeleteCouponResp {
-    1: required model.BaseResp base;
+
 }
 
 struct CreateUserCouponReq {
@@ -32,7 +31,7 @@ struct CreateUserCouponReq {
 }
 
 struct CreateUserCouponResp {
-    1: required model.BaseResp base;
+
 }
 
 struct ViewCouponReq {
@@ -42,8 +41,7 @@ struct ViewCouponReq {
 }
 
 struct ViewCouponResp {
-    1: required model.BaseResp base;
-    2: required model.Coupon couponInfo;
+    1: required model.Coupon couponInfo;
 }
 
 struct ViewUserAllCouponReq {
@@ -53,8 +51,7 @@ struct ViewUserAllCouponReq {
 }
 
 struct ViewUserAllCouponResp {
-    1: required model.BaseResp base;
-    2: required list<model.UserCoupon> coupons;
+    1: required list<model.UserCoupon> coupons;
 }
 
 struct UseUserCouponReq {
@@ -62,7 +59,7 @@ struct UseUserCouponReq {
 }
 
 struct UseUserCouponResp {
-    1: required model.BaseResp base;
+
 }
 
 // 文件表单直接formFile获取即可
@@ -77,8 +74,7 @@ struct CreateSpuReq {
 }
 
 struct CreateSpuResp {
-    1: required model.BaseResp base;
-    2: required i64 spuID;
+    1: required i64 spuID;
 }
 
 // 文件表单直接formFile获取即可
@@ -95,7 +91,6 @@ struct UpdateSpuReq {
 }
 
 struct UpdateSpuResp {
-    1: required model.BaseResp base;
 }
 
 struct ViewSpuReq {
@@ -110,8 +105,7 @@ struct ViewSpuReq {
 }
 
 struct ViewSpuResp {
-    1: required model.BaseResp base;
-    2: required list<model.Spu> spus;
+    1: required list<model.Spu> spus;
 }
 
 struct DeleteSpuReq {
@@ -119,7 +113,21 @@ struct DeleteSpuReq {
 }
 
 struct DeleteSpuResp {
-    1: required model.BaseResp base;
+}
+
+struct CreateSpuImageReq {
+    1: required i64 spuID;
+}
+
+struct CreateSpuImageResp {
+    1: required i64 imageID;
+}
+
+struct UpdateSpuImageReq {
+    1: required i64 imageID;
+}
+
+struct UpdateSpuImageResp {
 }
 
 struct ViewSpuImageReq {
@@ -129,8 +137,7 @@ struct ViewSpuImageReq {
 }
 
 struct ViewSpuImageResp {
-    1: required model.BaseResp base;
-    2: required list<model.SpuImage> images;
+    1: required list<model.SpuImage> images;
 }
 
 struct DeleteSpuImageReq {
@@ -138,7 +145,6 @@ struct DeleteSpuImageReq {
 }
 
 struct DeleteSpuImageResp {
-    1: required model.BaseResp base;
 }
 
 struct CreateSkuReq {
@@ -155,8 +161,7 @@ struct CreateSkuReq {
 }
 
 struct CreateSkuResp {
-    1: required model.BaseResp base;
-    2: required i64 skuID;
+    1: required i64 skuID;
 }
 
 struct UpdateSkuReq {
@@ -172,7 +177,7 @@ struct UpdateSkuReq {
 }
 
 struct UpdateSkuResp {
-    1: required model.BaseResp base;
+
 }
 
 
@@ -181,7 +186,7 @@ struct DeleteSkuReq {
 }
 
 struct DeleteSkuResp {
-    1: required model.BaseResp base;
+
 }
 
 struct ViewSkuImageReq {
@@ -191,8 +196,7 @@ struct ViewSkuImageReq {
 }
 
 struct ViewSkuImageResp {
-    1: required model.BaseResp base;
-    2: required list<model.SkuImage> images;
+    1: required list<model.SkuImage> images;
 }
 
 struct ViewSkuReq {
@@ -203,8 +207,7 @@ struct ViewSkuReq {
 }
 
 struct ViewSkuResp {
-    1: required model.BaseResp base;
-    2: required list<model.Sku> skus;
+    1: required list<model.Sku> skus;
 }
 
 struct UploadSkuAttrReq {
@@ -214,7 +217,7 @@ struct UploadSkuAttrReq {
 }
 
 struct UploadSkuAttrResp {
-    1: required model.BaseResp base;
+
 }
 
 struct CreateCategoryReq {
@@ -222,8 +225,7 @@ struct CreateCategoryReq {
 }
 
 struct CreateCategoryResp {
-    1: required model.BaseResp base;
-    2: required i64 categoryID;
+    1: required i64 categoryID;
 }
 
 struct DeleteCategoryReq {
@@ -231,7 +233,6 @@ struct DeleteCategoryReq {
 }
 
 struct DeleteCategoryResp {
-    1: required model.BaseResp base;
 }
 
 struct ViewCategoryReq {
@@ -240,8 +241,7 @@ struct ViewCategoryReq {
 }
 
 struct ViewCategoryResp {
-    1: required model.BaseResp base;
-    2: list<model.CategoryInfo> categoryInfo;
+    1: list<model.CategoryInfo> categoryInfo;
 }
 
  struct UpdateCategoryReq {
@@ -250,7 +250,7 @@ struct ViewCategoryResp {
  }
 
  struct UpdateCategoryResp {
-    1: required model.BaseResp base;
+
  }
 
 struct ListSkuInfoReq {
@@ -260,8 +260,7 @@ struct ListSkuInfoReq {
 }
 
 struct ListSkuInfoResp {
-    1: required model.BaseResp base;
-    2: required list<model.SkuInfo> skuInfos;
+    1: required list<model.SkuInfo> skuInfos;
 }
 
 struct ViewHistoryPriceReq {
@@ -272,8 +271,7 @@ struct ViewHistoryPriceReq {
 }
 
 struct ViewHistoryPriceResp {
-    1: required model.BaseResp base;
-    2: required list<model.PriceHistory> records;
+    1: required list<model.PriceHistory> records;
 }
 
 service CommodityService {
@@ -290,7 +288,11 @@ service CommodityService {
     UpdateSpuResp UpdateSpu(1: UpdateSpuReq req) (api.post="/api/v1/commodity/spu/update");
     ViewSpuResp ViewSpu(1: ViewSpuReq req) (api.get="/api/v1/commodity/spu/search");
     DeleteSpuResp DeleteSpu(1: DeleteSpuReq req) (api.delete="/api/v1/commodity/spu/delete");
-    ViewSpuImageResp ViewSpuImage(1: ViewSpuImageReq req) (api.get="/api/v1/commodity/spu/image");
+    ViewSpuImageResp ViewSpuImage(1: ViewSpuImageReq req) (api.get="/api/v1/commodity/spu/image/search");
+    CreateSpuImageResp CreateSpuImage(1: CreateSpuImageReq req) (api.post = "/api/v1/commodity/spu/image/create");
+    UpdateSpuImageResp UpdateSpuImage(1: UpdateSpuImageReq req) (api.post = "/api/v1/commodity/spu/image/update");
+    DeleteSpuImageResp DeleteSpuImage(1: DeleteSpuImageReq req) (api.delete="/api/v1/commodity/spu/image/delete");
+
 
     //SKU
     CreateSkuResp CreateSku(1: CreateSkuReq req) (api.post="/api/v1/commodity/sku/create");

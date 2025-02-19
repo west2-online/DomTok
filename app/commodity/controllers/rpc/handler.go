@@ -19,7 +19,6 @@ package rpc
 import (
 	"bytes"
 	"context"
-
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
@@ -29,6 +28,86 @@ import (
 
 type CommodityHandler struct {
 	useCase usecase.CommodityUseCase
+}
+
+func (c CommodityHandler) CreateSpuImage(streamServer commodity.CommodityService_CreateSpuImageServer) (err error) {
+	resp := new(commodity.CreateSpuImageResp)
+	req, err := streamServer.Recv()
+	if err != nil {
+		logger.Errorf("rpc.CreateSpuImage: receive error: %v", err)
+		resp.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(resp)
+	}
+
+	for i := 0; i < int(req.BufferCount); i++ {
+		data, err := streamServer.Recv()
+		if err != nil {
+			logger.Errorf("rpc.CreateSpuImage: receive error: %v", err)
+			resp.Base = base.BuildBaseResp(err)
+			return streamServer.SendAndClose(resp)
+		}
+		req.Data = bytes.Join([][]byte{req.Data, data.Data}, []byte(""))
+	}
+
+	id, err := c.useCase.CreateSpuImage(streamServer.Context(), &model.SpuImage{
+		Data:  req.Data,
+		SpuID: req.SpuID,
+	})
+	if err != nil {
+		logger.Errorf("rpc.CreateSpuImage: create spu image error: %v", err)
+		resp.Base = base.BuildBaseResp(nil)
+		return streamServer.SendAndClose(resp)
+	}
+
+	resp.Base = base.BuildBaseResp(nil)
+	resp.ImageID = id
+	return streamServer.SendAndClose(resp)
+}
+
+func (c CommodityHandler) UpdateSpuImage(streamServer commodity.CommodityService_UpdateSpuImageServer) (err error) {
+	resp := new(commodity.UpdateSpuImageResp)
+	req, err := streamServer.Recv()
+	if err != nil {
+		logger.Errorf("rpc.UpdateSpuImage: receive error: %v", err)
+		resp.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(resp)
+	}
+
+	for i := 0; i < int(req.BufferCount); i++ {
+		data, err := streamServer.Recv()
+		if err != nil {
+			logger.Errorf("rpc.UpdateSpuImage: receive error: %v", err)
+			resp.Base = base.BuildBaseResp(err)
+			return streamServer.SendAndClose(resp)
+		}
+		req.Data = bytes.Join([][]byte{req.Data, data.Data}, []byte(""))
+	}
+
+	err = c.useCase.UpdateSpuImage(streamServer.Context(), &model.SpuImage{
+		Data:    req.Data,
+		ImageID: req.ImageID,
+	})
+	if err != nil {
+		logger.Errorf("rpc.UpdateSpuImage: update spu image error: %v", err)
+		resp.Base = base.BuildBaseResp(nil)
+		return streamServer.SendAndClose(resp)
+	}
+
+	resp.Base = base.BuildBaseResp(nil)
+	return streamServer.SendAndClose(resp)
+}
+
+func (c CommodityHandler) DeleteSpuImage(ctx context.Context, req *commodity.DeleteSpuImageReq) (r *commodity.DeleteSpuImageResp, err error) {
+	resp := new(commodity.DeleteSpuImageResp)
+	err = c.useCase.DeleteSpuImage(ctx, req.GetSpuImageID())
+	if err != nil {
+		logger.Errorf("rpc.DeleteSpuImage: delete spu image error: %v", err)
+		resp.Base = base.BuildBaseResp(err)
+		return resp, nil
+	}
+
+	resp.Base = base.BuildBaseResp(nil)
+	return resp, nil
 }
 
 func (c CommodityHandler) CreateCoupon(ctx context.Context, req *commodity.CreateCouponReq) (r *commodity.CreateCouponResp, err error) {
@@ -147,8 +226,15 @@ func (c CommodityHandler) ViewSpu(ctx context.Context, req *commodity.ViewSpuReq
 }
 
 func (c CommodityHandler) DeleteSpu(ctx context.Context, req *commodity.DeleteSpuReq) (r *commodity.DeleteSpuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+
+	err = c.useCase.DeleteSpu(ctx, req.GetSpuID())
+	if err != nil {
+		logger.Errorf("rpc.DeleteSpu: delete spu error: %v", err)
+		r.Base = base.BuildBaseResp(err)
+		return r, nil
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return r, nil
 }
 
 func (c CommodityHandler) ViewSpuImage(ctx context.Context, req *commodity.ViewSpuImageReq) (r *commodity.ViewSpuImageResp, err error) {

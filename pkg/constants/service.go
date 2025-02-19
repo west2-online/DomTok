@@ -44,3 +44,9 @@ const (
 	OrderStatusFail    = "支付失败"
 	OrderStatusUnknown = "未知状态"
 )
+
+// CommodityService
+const (
+	CommodityAllowedForSale    = 1
+	CommodityNotAllowedForSale = 2
+)

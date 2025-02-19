@@ -198,6 +198,27 @@ struct DeleteSpuResp {
     1: required model.BaseResp base;
 }
 
+struct CreateSpuImageReq {
+    1: required binary data;
+    2: required i64 spuID;
+    3: required i64 bufferCount;
+}
+
+struct CreateSpuImageResp {
+    1: required model.BaseResp base;
+    2: required i64 imageID;
+}
+
+struct UpdateSpuImageReq {
+    1: required binary data;
+    2: required i64 imageID;
+    3: required i64 bufferCount;
+}
+
+struct UpdateSpuImageResp {
+    1: required model.BaseResp base;
+}
+
 /*
 * struct ViewSpuImageReq 查看spu具体介绍图片
 * @Param spuID spuID
@@ -487,8 +508,9 @@ service CommodityService {
     ViewSpuResp ViewSpu(1: ViewSpuReq req);
     DeleteSpuResp DeleteSpu(1: DeleteSpuReq req);
     ViewSpuImageResp ViewSpuImage(1: ViewSpuImageReq req);
-//    UploadImageResp UploadImageClient(1: UploadImageReq req) (streaming.mode="client");
-
+    CreateSpuImageResp CreateSpuImage(1: CreateSpuImageReq req) (streaming.mode="client");
+    UpdateSpuImageResp UpdateSpuImage(1: UpdateSpuImageReq req) (streaming.mode="client");
+    DeleteSpuImageResp DeleteSpuImage(1: DeleteSpuImageReq req);
 
     //SKU
     CreateSkuResp CreateSku(1: CreateSkuReq req);

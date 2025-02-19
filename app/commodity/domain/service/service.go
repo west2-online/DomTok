@@ -87,7 +87,34 @@ func (svc *CommodityService) CreateSpuImage(ctx context.Context, spuImage *model
 	return spuImage.ImageID, nil
 }
 
-func (svc *CommodityService) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
+// TODO
+func (svc *CommodityService) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage, originSpuImage *model.SpuImage) error {
+	err := svc.db.UpdateSpuImage(ctx, spuImage)
+	if err != nil {
+		return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
+	}
+
+	var eg errgroup.Group
+	eg.Go(func() error {
+		err = upyun.UploadImg(spuImage.Data, spuImage.Url)
+		if err != nil {
+			return fmt.Errorf("service.UpdateSpuImage: upload spuImage failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		err = upyun.DeleteImg(originSpuImage.Url)
+		if err != nil {
+			return fmt.Errorf("service.UpdateSpuImage: delete spuImage failed: %w", err)
+		}
+		return nil
+	})
+
+	if err = eg.Wait(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -102,7 +129,7 @@ func (svc *CommodityService) UpdateSpu(ctx context.Context, spu *model.Spu, orig
 		eg.Go(func() error {
 			err = upyun.UploadImg(spu.GoodsHeadDrawing, spu.GoodsHeadDrawingUrl)
 			if err != nil {
-				return errno.UpYunFileError.WithMessage(err.Error())
+				return fmt.Errorf("service.UpdateSpu: upload spuImage failed: %w", err)
 			}
 			return nil
 		})
@@ -110,37 +137,94 @@ func (svc *CommodityService) UpdateSpu(ctx context.Context, spu *model.Spu, orig
 		eg.Go(func() error {
 			err = upyun.DeleteImg(originSpu.GoodsHeadDrawingUrl)
 			if err != nil {
-				return errno.UpYunFileError.WithMessage(err.Error())
+				return fmt.Errorf("service.UpdateSpu: delete spuImage failed: %w", err)
 			}
 			return nil
 		})
 
 		if err = eg.Wait(); err != nil {
-			return err
+			return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
 		}
 	}
 	return nil
 }
 
-func (svc *CommodityService) DeleteSpuImage(ctx context.Context, imageId int64) error {
+func (svc *CommodityService) DeleteSpuImage(ctx context.Context, imageId int64, url string) error {
+	var eg errgroup.Group
+	eg.Go(func() error {
+		if err := svc.db.DeleteSpuImage(ctx, imageId); err != nil {
+			return fmt.Errorf("service.DeleteSpuImage: delete spuImage failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		if err := upyun.DeleteImg(upyun.GetImageUrl(url)); err != nil {
+			return fmt.Errorf("service.DeleteSpuImage: delete spuImage failed: %w", err)
+		}
+		return nil
+	})
+	if err := eg.Wait(); err != nil {
+		return err
+	}
 	return nil
 }
 
-func (svc *CommodityService) DeleteSpu(ctx context.Context, spuId int64) error {
+func (svc *CommodityService) DeleteSpu(ctx context.Context, spuId int64, url string) error {
+	var eg errgroup.Group
+	eg.Go(func() error {
+		if err := svc.db.DeleteSpu(ctx, spuId); err != nil {
+			return fmt.Errorf("service.DeleteSpu: delete spu failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		if err := upyun.DeleteImg(upyun.GetImageUrl(url)); err != nil {
+			return fmt.Errorf("service.DeleteSpu: delete spuImage failed: %w", err)
+		}
+		return nil
+	})
+	if err := eg.Wait(); err != nil {
+		return err
+	}
 	return nil
 }
 
-func (svc *CommodityService) GetSpuFromImageId(ctx context.Context, imageId int64) (*model.Spu, error) {
+func (svc *CommodityService) DeleteAllSpuImages(ctx context.Context, spuId int64) error {
+
+	var eg errgroup.Group
+
+	ids, urls, err := svc.db.DeleteSpuImagesBySpuId(ctx, spuId)
+	if err != nil {
+		return fmt.Errorf("service.DeleteAllSpuImages: delete spuImages failed: %w", err)
+	}
+
+	for i := 0; i < len(ids); i++ {
+		eg.Go(func() error {
+			if err = upyun.DeleteImg(upyun.GetImageUrl(urls[i])); err != nil {
+				return fmt.Errorf("service.DeleteAllSpuImages: delete spuImages failed: %w", err)
+			}
+			return nil
+		})
+	}
+	if err = eg.Wait(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (svc *CommodityService) GetSpuFromImageId(ctx context.Context, imageId int64) (*model.Spu, *model.SpuImage, error) {
 	img, err := svc.db.GetSpuImage(ctx, imageId)
 	if err != nil {
-		return nil, fmt.Errorf("service.GetSpuFromImageId: get image info failed: %w", err)
+		return nil, nil, fmt.Errorf("service.GetSpuFromImageId: get image info failed: %w", err)
 	}
 
 	ret, err := svc.db.GetSpuBySpuId(ctx, img.SpuID)
 	if err != nil {
-		return nil, fmt.Errorf("service.GetSpuFromImageId: get spu info failed: %w", err)
+		return nil, nil, fmt.Errorf("service.GetSpuFromImageId: get spu info failed: %w", err)
 	}
-	return ret, nil
+	return ret, img, nil
 }
 
 func (svc *CommodityService) IdentifyUser(ctx context.Context, uid int64) error {
@@ -153,4 +237,20 @@ func (svc *CommodityService) IdentifyUser(ctx context.Context, uid int64) error 
 		return errno.AuthNoOperatePermission
 	}
 	return nil
+}
+
+func (svc *CommodityService) MatchDeleteSpuCondition(ctx context.Context, spuId int64) (*model.Spu, error) {
+	exists, err := svc.db.IsExistSku(ctx, spuId)
+	if err != nil {
+		return nil, fmt.Errorf("usecase.DeleteSpu failed: %w", err)
+	}
+	if exists {
+		return nil, errno.Errorf(errno.ServiceSkuExist, "usecase.DeleteSpu failed: spu-%d‘s sku already exists", spuId)
+	}
+
+	ret, err := svc.db.GetSpuBySpuId(ctx, spuId)
+	if err != nil {
+		return nil, fmt.Errorf("usecase.DeleteSpu failed: %w", err)
+	}
+	return ret, nil
 }

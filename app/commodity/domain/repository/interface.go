@@ -36,6 +36,7 @@ type CommodityDB interface {
 	UpdateSpu(ctx context.Context, spu *model.Spu) error
 	UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
 	DeleteSpuImage(ctx context.Context, spuImageId int64) error
+	DeleteSpuImagesBySpuId(ctx context.Context, spuId int64) (ids []int64, url []string, err error)
 }
 
 type CommodityCache interface{}

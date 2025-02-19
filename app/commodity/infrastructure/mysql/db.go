@@ -159,3 +159,18 @@ func (db *commodityDB) GetSpuImage(ctx context.Context, spuImageId int64) (*mode
 	// TODO implement me
 	panic("implement me")
 }
+
+func (db *commodityDB) DeleteSpuImagesBySpuId(ctx context.Context, spuId int64) (ids []int64, url []string, err error) {
+	ids = make([]int64, 0)
+	url = make([]string, 0)
+	imgs := make([]*SpuImage, 0)
+
+	if err = db.client.WithContext(ctx).Table(constants.SpuImageTableName).Delete(imgs).Error; err != nil {
+		return nil, nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete images: %v", err)
+	}
+	for _, img := range imgs {
+		ids = append(ids, img.SpuId)
+		url = append(url, img.Url)
+	}
+	return ids, url, nil
+}

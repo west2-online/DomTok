@@ -24,4 +24,5 @@ const (
 
 	ServiceSpuNotExist
 	ServiceImgNotExist
+	ServiceSkuExist
 )

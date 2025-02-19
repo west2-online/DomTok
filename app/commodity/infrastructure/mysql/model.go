@@ -17,23 +17,24 @@ limitations under the License.
 package mysql
 
 import (
+	"gorm.io/gorm"
 	"time"
 
 	"github.com/west2-online/DomTok/pkg/constants"
 )
 
 type Category struct {
-	Id        int64
+	Id        int64 `gorm:"primary_key"`
 	Name      string
 	CreatorId int64
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt *time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 	// gorm.Model
 }
 
 type Spu struct {
-	Id               int64
+	Id               int64 `gorm:"primary_key"`
 	Name             string
 	CreatorId        int64
 	Description      string
@@ -44,17 +45,16 @@ type Spu struct {
 	Shipping         float64
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
-	DeletedAt        *time.Time
-	// gorm.Model
+	DeletedAt        gorm.DeletedAt `gorm:"index"`
 }
 
 type SpuImage struct {
-	Id        int64
+	Id        int64 `gorm:"primary_key"`
 	Url       string
 	SpuId     int64
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt *time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 	//	gorm.Model
 }
 
@@ -63,7 +63,7 @@ type SpuToSku struct {
 	SpuId     int64
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt *time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
 // 对应表名
