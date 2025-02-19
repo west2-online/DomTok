@@ -19,6 +19,7 @@ package rpc
 import (
 	"context"
 	"fmt"
+	"github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/kitex_gen/payment"
 	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/errno"
@@ -34,7 +35,7 @@ func InitPaymentRPC() {
 	paymentClient = *c
 }
 
-func RequestPaymentTokenRPC(ctx context.Context, req *payment.PaymentTokenRequest) (token string, expTime int64, err error) {
+func RequestPaymentTokenRPC(ctx context.Context, req *payment.PaymentTokenRequest) (response *model.PaymentTokenInfo, err error) {
 	logger.Info("RequestPaymentTokenRPC called") // 这里打印一下，看看是否调用到了
 	fmt.Println("RequestPaymentTokenRPC: called with OrderID:", req.OrderID, "UserID:", req.UserID)
 
@@ -57,11 +58,11 @@ func RequestPaymentTokenRPC(ctx context.Context, req *payment.PaymentTokenReques
 	// 而业务错误则是封装在 resp.base 当中的
 	if err != nil {
 		logger.Errorf("RequestPaymentTokenRPC: RPC called failed: %v", err.Error())
-		return "", 0, errno.InternalServiceError.WithError(err)
+		return nil, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsSuccess(resp.Base) {
 		// TODO
-		return "", 0, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
 	}
-	return resp.TokenInfo.PaymentToken, resp.TokenInfo.PaymentTokenExpirationTime, nil
+	return resp.TokenInfo, nil
 }

@@ -19,7 +19,7 @@ struct PaymentTokenRequest {
  */
 struct PaymentTokenResponse {
     1: model.BaseResp base,
-    2: model.BuildTokenInfo tokenInfo,
+    2: model.PaymentTokenInfo tokenInfo,
 }
 /*
  * struct PaymentRequest 订单结算请求

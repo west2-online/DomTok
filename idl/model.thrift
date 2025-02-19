@@ -169,7 +169,7 @@ struct CreditCardInfo {
     4: required i64 creditCardCvv
 }
 
-struct BuildTokenInfo{
+struct PaymentTokenInfo{
     1:required string paymentToken
     2:required i64 paymentTokenExpirationTime
 }

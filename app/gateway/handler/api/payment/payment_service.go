@@ -60,7 +60,7 @@ func RequestPaymentToken(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用 RPC 获取支付令牌
-	token, expTime, err := rpc.RequestPaymentTokenRPC(ctx, &payment.PaymentTokenRequest{
+	resp, err := rpc.RequestPaymentTokenRPC(ctx, &payment.PaymentTokenRequest{
 		OrderID: req.OrderID,
 		UserID:  req.UserID,
 	})
@@ -69,7 +69,7 @@ func RequestPaymentToken(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	// 返回成功的响应
-	pack.RespData(c, data)
+	pack.RespData(c, resp)
 }
 
 // ProcessRefund .
