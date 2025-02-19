@@ -288,13 +288,26 @@ func CreateSku(ctx context.Context, c *app.RequestContext) {
 	var req api.CreateSkuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.CreateSkuResp)
+	skuID, err := rpc.CreateSkuRPC(ctx, &commodity.CreateSkuReq{
+		SkuImages:        req.SkuImages,
+		Name:             req.Name,
+		Description:      req.Description,
+		StyleHeadDrawing: req.StyleHeadDrawing,
+		Price:            req.Price,
+		ForSale:          req.ForSale,
+		SpuID:            req.SpuID,
+		Stock:            req.Stock,
+	})
 
-	c.JSON(consts.StatusOK, resp)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, skuID)
 }
 
 // UpdateSku .
@@ -304,13 +317,25 @@ func UpdateSku(ctx context.Context, c *app.RequestContext) {
 	var req api.UpdateSkuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.UpdateSkuResp)
+	err = rpc.UpdateSkuRPC(ctx, &commodity.UpdateSkuReq{
+		SkuID:            req.SkuID,
+		SkuImages:        req.SkuImages,
+		Description:      req.Description,
+		StyleHeadDrawing: req.StyleHeadDrawing,
+		Price:            req.Price,
+		ForSale:          req.ForSale,
+		Stock:            req.Stock,
+	})
 
-	c.JSON(consts.StatusOK, resp)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, nil)
 }
 
 // DeleteSku .
@@ -320,13 +345,19 @@ func DeleteSku(ctx context.Context, c *app.RequestContext) {
 	var req api.DeleteSkuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.DeleteSkuResp)
+	err = rpc.DeleteSkuRPC(ctx, &commodity.DeleteSkuReq{
+		SkuID: req.SkuID,
+	})
 
-	c.JSON(consts.StatusOK, resp)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, nil)
 }
 
 // ViewSkuImage .
@@ -336,13 +367,21 @@ func ViewSkuImage(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewSkuImageReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.ViewSkuImageResp)
+	images, err := rpc.ViewSkuImageRPC(ctx, &commodity.ViewSkuImageReq{
+		SkuID:    req.SkuID,
+		PageNum:  req.PageNum,
+		PageSize: req.PageSize,
+	})
 
-	c.JSON(consts.StatusOK, resp)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, images)
 }
 
 // ViewSku .
@@ -352,13 +391,22 @@ func ViewSku(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewSkuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.ViewSkuResp)
+	skus, err := rpc.ViewSkuRPC(ctx, &commodity.ViewSkuReq{
+		SkuID:    req.SkuID,
+		SpuID:    req.SpuID,
+		PageNum:  req.PageNum,
+		PageSize: req.PageSize,
+	})
 
-	c.JSON(consts.StatusOK, resp)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, skus)
 }
 
 // UploadSkuAttr .
@@ -368,13 +416,21 @@ func UploadSkuAttr(ctx context.Context, c *app.RequestContext) {
 	var req api.UploadSkuAttrReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.UploadSkuAttrResp)
+	err = rpc.UploadSkuAttrRPC(ctx, &commodity.UploadSkuAttrReq{
+		SkuID:     req.SkuID,
+		SaleAttr:  req.SaleAttr,
+		SaleValue: req.SaleValue,
+	})
 
-	c.JSON(consts.StatusOK, resp)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, nil)
 }
 
 // ListSkuInfo .
@@ -384,13 +440,21 @@ func ListSkuInfo(ctx context.Context, c *app.RequestContext) {
 	var req api.ListSkuInfoReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.ListSkuInfoResp)
+	resp, err := rpc.ListSkuInfo(ctx, &commodity.ListSkuInfoReq{
+		SkuIDs:   req.SkuIDs,
+		PageNum:  req.PageNum,
+		PageSize: req.PageSize,
+	})
 
-	c.JSON(consts.StatusOK, resp)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, resp)
 }
 
 // ViewHistory .
