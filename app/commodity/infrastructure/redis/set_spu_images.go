@@ -14,29 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package service
+package redis
 
 import (
+	"context"
+
+	"github.com/bytedance/sonic"
+
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/pkg/constants"
-	"github.com/west2-online/DomTok/pkg/errno"
+	_ "github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
-type CommodityVerifyOps func() error
-
-func (svc *CommodityService) Verify(opts ...CommodityVerifyOps) error {
-	for _, opt := range opts {
-		if err := opt(); err != nil {
-			return err
-		}
+func (c commodityCache) SetSpuImages(ctx context.Context, key string, images *model.SpuImages) {
+	dataJSON, err := sonic.Marshal(images)
+	if err != nil {
+		logger.Errorf("commodityCache.SetSpuImages marshal data failed: %v", err)
 	}
-	return nil
-}
 
-func (svc *CommodityService) VerifyForSaleStatus(status int) CommodityVerifyOps {
-	return func() error {
-		if status != constants.CommodityAllowedForSale && status != constants.CommodityNotAllowedForSale {
-			return errno.ParamVerifyError
-		}
-		return nil
+	err = c.client.Set(ctx, key, dataJSON, constants.RedisSpuImageExpireTime).Err()
+	if err != nil {
+		logger.Errorf("commodity.SetSpuImages set data failed: %v", err)
 	}
 }

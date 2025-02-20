@@ -14,19 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package model
+package pack
 
-type SpuImage struct {
-	ImageID   int64
-	SpuID     int64
-	Url       string
-	CreatedAt int64
-	UpdatedAt int64
-	DeletedAt int64
-	Data      []byte
+import (
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	model2 "github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/pkg/base"
+)
+
+func BuildImage(img *model.SpuImage) *model2.SpuImage {
+	return &model2.SpuImage{
+		ImageID:   img.ImageID,
+		SpuID:     img.SpuID,
+		Url:       img.Url,
+		CreatedAt: img.CreatedAt,
+		UpdatedAt: img.UpdatedAt,
+	}
 }
 
-type SpuImages struct {
-	Images []*SpuImage
-	Total  int64
+func BuildImages(imgs []*model.SpuImage) []*model2.SpuImage {
+	return base.BuildTypeList(imgs, BuildImage)
 }

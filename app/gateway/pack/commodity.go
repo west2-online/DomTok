@@ -20,7 +20,11 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 
+	"github.com/west2-online/DomTok/app/gateway/model/model"
+	model2 "github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/pkg/base"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/upyun"
 )
 
 func BuildFileDataBytes(file *multipart.FileHeader) ([]byte, error) {
@@ -35,4 +39,18 @@ func BuildFileDataBytes(file *multipart.FileHeader) ([]byte, error) {
 		return nil, errno.IOOperationError.WithError(err)
 	}
 	return data, err
+}
+
+func BuildSpuImage(img *model2.SpuImage) *model.SpuImage {
+	return &model.SpuImage{
+		ImageID:   img.ImageID,
+		SpuID:     img.SpuID,
+		URL:       upyun.GetImageUrl(img.Url),
+		CreatedAt: img.CreatedAt,
+		UpdatedAt: img.UpdatedAt,
+	}
+}
+
+func BuildSpuImages(imgs []*model2.SpuImage) []*model.SpuImage {
+	return base.BuildTypeList(imgs, BuildSpuImage)
 }

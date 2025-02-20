@@ -185,3 +185,23 @@ func _updatespuMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _imageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createspuimageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deletespuimageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updatespuimageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

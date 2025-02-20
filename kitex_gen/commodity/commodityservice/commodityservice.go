@@ -110,6 +110,27 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"CreateSpuImage": kitex.NewMethodInfo(
+		createSpuImageHandler,
+		newCommodityServiceCreateSpuImageArgs,
+		newCommodityServiceCreateSpuImageResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingClient),
+	),
+	"UpdateSpuImage": kitex.NewMethodInfo(
+		updateSpuImageHandler,
+		newCommodityServiceUpdateSpuImageArgs,
+		newCommodityServiceUpdateSpuImageResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingClient),
+	),
+	"DeleteSpuImage": kitex.NewMethodInfo(
+		deleteSpuImageHandler,
+		newCommodityServiceDeleteSpuImageArgs,
+		newCommodityServiceDeleteSpuImageResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 	"CreateSku": kitex.NewMethodInfo(
 		createSkuHandler,
 		newCommodityServiceCreateSkuArgs,
@@ -547,6 +568,128 @@ func newCommodityServiceViewSpuImageResult() interface{} {
 	return commodity.NewCommodityServiceViewSpuImageResult()
 }
 
+func createSpuImageHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	st, ok := arg.(*streaming.Args)
+	if !ok {
+		return errors.New("CommodityService.CreateSpuImage is a thrift streaming method, please call with Kitex StreamClient")
+	}
+	stream := &commodityServiceCreateSpuImageServer{st.Stream}
+	return handler.(commodity.CommodityService).CreateSpuImage(stream)
+}
+
+type commodityServiceCreateSpuImageClient struct {
+	streaming.Stream
+}
+
+func (x *commodityServiceCreateSpuImageClient) DoFinish(err error) {
+	if finisher, ok := x.Stream.(streaming.WithDoFinish); ok {
+		finisher.DoFinish(err)
+	} else {
+		panic(fmt.Sprintf("streaming.WithDoFinish is not implemented by %T", x.Stream))
+	}
+}
+func (x *commodityServiceCreateSpuImageClient) Send(m *commodity.CreateSpuImageReq) error {
+	return x.Stream.SendMsg(m)
+}
+func (x *commodityServiceCreateSpuImageClient) CloseAndRecv() (*commodity.CreateSpuImageResp, error) {
+	if err := x.Stream.Close(); err != nil {
+		return nil, err
+	}
+	m := new(commodity.CreateSpuImageResp)
+	return m, x.Stream.RecvMsg(m)
+}
+
+type commodityServiceCreateSpuImageServer struct {
+	streaming.Stream
+}
+
+func (x *commodityServiceCreateSpuImageServer) SendAndClose(m *commodity.CreateSpuImageResp) error {
+	return x.Stream.SendMsg(m)
+}
+
+func (x *commodityServiceCreateSpuImageServer) Recv() (*commodity.CreateSpuImageReq, error) {
+	m := new(commodity.CreateSpuImageReq)
+	return m, x.Stream.RecvMsg(m)
+}
+
+func newCommodityServiceCreateSpuImageArgs() interface{} {
+	return commodity.NewCommodityServiceCreateSpuImageArgs()
+}
+
+func newCommodityServiceCreateSpuImageResult() interface{} {
+	return commodity.NewCommodityServiceCreateSpuImageResult()
+}
+
+func updateSpuImageHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	st, ok := arg.(*streaming.Args)
+	if !ok {
+		return errors.New("CommodityService.UpdateSpuImage is a thrift streaming method, please call with Kitex StreamClient")
+	}
+	stream := &commodityServiceUpdateSpuImageServer{st.Stream}
+	return handler.(commodity.CommodityService).UpdateSpuImage(stream)
+}
+
+type commodityServiceUpdateSpuImageClient struct {
+	streaming.Stream
+}
+
+func (x *commodityServiceUpdateSpuImageClient) DoFinish(err error) {
+	if finisher, ok := x.Stream.(streaming.WithDoFinish); ok {
+		finisher.DoFinish(err)
+	} else {
+		panic(fmt.Sprintf("streaming.WithDoFinish is not implemented by %T", x.Stream))
+	}
+}
+func (x *commodityServiceUpdateSpuImageClient) Send(m *commodity.UpdateSpuImageReq) error {
+	return x.Stream.SendMsg(m)
+}
+func (x *commodityServiceUpdateSpuImageClient) CloseAndRecv() (*commodity.UpdateSpuImageResp, error) {
+	if err := x.Stream.Close(); err != nil {
+		return nil, err
+	}
+	m := new(commodity.UpdateSpuImageResp)
+	return m, x.Stream.RecvMsg(m)
+}
+
+type commodityServiceUpdateSpuImageServer struct {
+	streaming.Stream
+}
+
+func (x *commodityServiceUpdateSpuImageServer) SendAndClose(m *commodity.UpdateSpuImageResp) error {
+	return x.Stream.SendMsg(m)
+}
+
+func (x *commodityServiceUpdateSpuImageServer) Recv() (*commodity.UpdateSpuImageReq, error) {
+	m := new(commodity.UpdateSpuImageReq)
+	return m, x.Stream.RecvMsg(m)
+}
+
+func newCommodityServiceUpdateSpuImageArgs() interface{} {
+	return commodity.NewCommodityServiceUpdateSpuImageArgs()
+}
+
+func newCommodityServiceUpdateSpuImageResult() interface{} {
+	return commodity.NewCommodityServiceUpdateSpuImageResult()
+}
+
+func deleteSpuImageHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*commodity.CommodityServiceDeleteSpuImageArgs)
+	realResult := result.(*commodity.CommodityServiceDeleteSpuImageResult)
+	success, err := handler.(commodity.CommodityService).DeleteSpuImage(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newCommodityServiceDeleteSpuImageArgs() interface{} {
+	return commodity.NewCommodityServiceDeleteSpuImageArgs()
+}
+
+func newCommodityServiceDeleteSpuImageResult() interface{} {
+	return commodity.NewCommodityServiceDeleteSpuImageResult()
+}
+
 func createSkuHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
 	realArg := arg.(*commodity.CommodityServiceCreateSkuArgs)
 	realResult := result.(*commodity.CommodityServiceCreateSkuResult)
@@ -940,6 +1083,44 @@ func (p *kClient) ViewSpuImage(ctx context.Context, req *commodity.ViewSpuImageR
 	_args.Req = req
 	var _result commodity.CommodityServiceViewSpuImageResult
 	if err = p.c.Call(ctx, "ViewSpuImage", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) CreateSpuImage(ctx context.Context) (CommodityService_CreateSpuImageClient, error) {
+	streamClient, ok := p.c.(client.Streaming)
+	if !ok {
+		return nil, fmt.Errorf("client not support streaming")
+	}
+	res := new(streaming.Result)
+	err := streamClient.Stream(ctx, "CreateSpuImage", nil, res)
+	if err != nil {
+		return nil, err
+	}
+	stream := &commodityServiceCreateSpuImageClient{res.Stream}
+	return stream, nil
+}
+
+func (p *kClient) UpdateSpuImage(ctx context.Context) (CommodityService_UpdateSpuImageClient, error) {
+	streamClient, ok := p.c.(client.Streaming)
+	if !ok {
+		return nil, fmt.Errorf("client not support streaming")
+	}
+	res := new(streaming.Result)
+	err := streamClient.Stream(ctx, "UpdateSpuImage", nil, res)
+	if err != nil {
+		return nil, err
+	}
+	stream := &commodityServiceUpdateSpuImageClient{res.Stream}
+	return stream, nil
+}
+
+func (p *kClient) DeleteSpuImage(ctx context.Context, req *commodity.DeleteSpuImageReq) (r *commodity.DeleteSpuImageResp, err error) {
+	var _args commodity.CommodityServiceDeleteSpuImageArgs
+	_args.Req = req
+	var _result commodity.CommodityServiceDeleteSpuImageResult
+	if err = p.c.Call(ctx, "DeleteSpuImage", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

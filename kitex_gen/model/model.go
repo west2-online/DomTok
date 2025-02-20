@@ -1045,6 +1045,7 @@ type SpuImage struct {
 	Url       string `thrift:"url,3,required" frugal:"3,required,string" json:"url"`
 	CreatedAt int64  `thrift:"createdAt,4,required" frugal:"4,required,i64" json:"createdAt"`
 	DeletedAt *int64 `thrift:"deletedAt,5,optional" frugal:"5,optional,i64" json:"deletedAt,omitempty"`
+	UpdatedAt int64  `thrift:"updatedAt,6,required" frugal:"6,required,i64" json:"updatedAt"`
 }
 
 func NewSpuImage() *SpuImage {
@@ -1078,6 +1079,10 @@ func (p *SpuImage) GetDeletedAt() (v int64) {
 	}
 	return *p.DeletedAt
 }
+
+func (p *SpuImage) GetUpdatedAt() (v int64) {
+	return p.UpdatedAt
+}
 func (p *SpuImage) SetImageID(val int64) {
 	p.ImageID = val
 }
@@ -1092,6 +1097,9 @@ func (p *SpuImage) SetCreatedAt(val int64) {
 }
 func (p *SpuImage) SetDeletedAt(val *int64) {
 	p.DeletedAt = val
+}
+func (p *SpuImage) SetUpdatedAt(val int64) {
+	p.UpdatedAt = val
 }
 
 func (p *SpuImage) IsSetDeletedAt() bool {
@@ -1124,6 +1132,9 @@ func (p *SpuImage) DeepEqual(ano *SpuImage) bool {
 		return false
 	}
 	if !p.Field5DeepEqual(ano.DeletedAt) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.UpdatedAt) {
 		return false
 	}
 	return true
@@ -1169,6 +1180,13 @@ func (p *SpuImage) Field5DeepEqual(src *int64) bool {
 	}
 	return true
 }
+func (p *SpuImage) Field6DeepEqual(src int64) bool {
+
+	if p.UpdatedAt != src {
+		return false
+	}
+	return true
+}
 
 var fieldIDToName_SpuImage = map[int16]string{
 	1: "imageID",
@@ -1176,6 +1194,7 @@ var fieldIDToName_SpuImage = map[int16]string{
 	3: "url",
 	4: "createdAt",
 	5: "deletedAt",
+	6: "updatedAt",
 }
 
 type SkuImage struct {

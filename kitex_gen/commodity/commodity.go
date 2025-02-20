@@ -2202,6 +2202,315 @@ var fieldIDToName_DeleteSpuResp = map[int16]string{
 	1: "base",
 }
 
+type CreateSpuImageReq struct {
+	Data        []byte `thrift:"data,1,required" frugal:"1,required,binary" json:"data"`
+	SpuID       int64  `thrift:"spuID,2,required" frugal:"2,required,i64" json:"spuID"`
+	BufferCount int64  `thrift:"bufferCount,3,required" frugal:"3,required,i64" json:"bufferCount"`
+}
+
+func NewCreateSpuImageReq() *CreateSpuImageReq {
+	return &CreateSpuImageReq{}
+}
+
+func (p *CreateSpuImageReq) InitDefault() {
+}
+
+func (p *CreateSpuImageReq) GetData() (v []byte) {
+	return p.Data
+}
+
+func (p *CreateSpuImageReq) GetSpuID() (v int64) {
+	return p.SpuID
+}
+
+func (p *CreateSpuImageReq) GetBufferCount() (v int64) {
+	return p.BufferCount
+}
+func (p *CreateSpuImageReq) SetData(val []byte) {
+	p.Data = val
+}
+func (p *CreateSpuImageReq) SetSpuID(val int64) {
+	p.SpuID = val
+}
+func (p *CreateSpuImageReq) SetBufferCount(val int64) {
+	p.BufferCount = val
+}
+
+func (p *CreateSpuImageReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("CreateSpuImageReq(%+v)", *p)
+}
+
+func (p *CreateSpuImageReq) DeepEqual(ano *CreateSpuImageReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Data) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.SpuID) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.BufferCount) {
+		return false
+	}
+	return true
+}
+
+func (p *CreateSpuImageReq) Field1DeepEqual(src []byte) bool {
+
+	if bytes.Compare(p.Data, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *CreateSpuImageReq) Field2DeepEqual(src int64) bool {
+
+	if p.SpuID != src {
+		return false
+	}
+	return true
+}
+func (p *CreateSpuImageReq) Field3DeepEqual(src int64) bool {
+
+	if p.BufferCount != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_CreateSpuImageReq = map[int16]string{
+	1: "data",
+	2: "spuID",
+	3: "bufferCount",
+}
+
+type CreateSpuImageResp struct {
+	Base    *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+	ImageID int64           `thrift:"imageID,2,required" frugal:"2,required,i64" json:"imageID"`
+}
+
+func NewCreateSpuImageResp() *CreateSpuImageResp {
+	return &CreateSpuImageResp{}
+}
+
+func (p *CreateSpuImageResp) InitDefault() {
+}
+
+var CreateSpuImageResp_Base_DEFAULT *model.BaseResp
+
+func (p *CreateSpuImageResp) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return CreateSpuImageResp_Base_DEFAULT
+	}
+	return p.Base
+}
+
+func (p *CreateSpuImageResp) GetImageID() (v int64) {
+	return p.ImageID
+}
+func (p *CreateSpuImageResp) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+func (p *CreateSpuImageResp) SetImageID(val int64) {
+	p.ImageID = val
+}
+
+func (p *CreateSpuImageResp) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *CreateSpuImageResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("CreateSpuImageResp(%+v)", *p)
+}
+
+func (p *CreateSpuImageResp) DeepEqual(ano *CreateSpuImageResp) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.ImageID) {
+		return false
+	}
+	return true
+}
+
+func (p *CreateSpuImageResp) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+func (p *CreateSpuImageResp) Field2DeepEqual(src int64) bool {
+
+	if p.ImageID != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_CreateSpuImageResp = map[int16]string{
+	1: "base",
+	2: "imageID",
+}
+
+type UpdateSpuImageReq struct {
+	Data        []byte `thrift:"data,1,required" frugal:"1,required,binary" json:"data"`
+	ImageID     int64  `thrift:"imageID,2,required" frugal:"2,required,i64" json:"imageID"`
+	BufferCount int64  `thrift:"bufferCount,3,required" frugal:"3,required,i64" json:"bufferCount"`
+}
+
+func NewUpdateSpuImageReq() *UpdateSpuImageReq {
+	return &UpdateSpuImageReq{}
+}
+
+func (p *UpdateSpuImageReq) InitDefault() {
+}
+
+func (p *UpdateSpuImageReq) GetData() (v []byte) {
+	return p.Data
+}
+
+func (p *UpdateSpuImageReq) GetImageID() (v int64) {
+	return p.ImageID
+}
+
+func (p *UpdateSpuImageReq) GetBufferCount() (v int64) {
+	return p.BufferCount
+}
+func (p *UpdateSpuImageReq) SetData(val []byte) {
+	p.Data = val
+}
+func (p *UpdateSpuImageReq) SetImageID(val int64) {
+	p.ImageID = val
+}
+func (p *UpdateSpuImageReq) SetBufferCount(val int64) {
+	p.BufferCount = val
+}
+
+func (p *UpdateSpuImageReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UpdateSpuImageReq(%+v)", *p)
+}
+
+func (p *UpdateSpuImageReq) DeepEqual(ano *UpdateSpuImageReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Data) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.ImageID) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.BufferCount) {
+		return false
+	}
+	return true
+}
+
+func (p *UpdateSpuImageReq) Field1DeepEqual(src []byte) bool {
+
+	if bytes.Compare(p.Data, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *UpdateSpuImageReq) Field2DeepEqual(src int64) bool {
+
+	if p.ImageID != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateSpuImageReq) Field3DeepEqual(src int64) bool {
+
+	if p.BufferCount != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UpdateSpuImageReq = map[int16]string{
+	1: "data",
+	2: "imageID",
+	3: "bufferCount",
+}
+
+type UpdateSpuImageResp struct {
+	Base *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+}
+
+func NewUpdateSpuImageResp() *UpdateSpuImageResp {
+	return &UpdateSpuImageResp{}
+}
+
+func (p *UpdateSpuImageResp) InitDefault() {
+}
+
+var UpdateSpuImageResp_Base_DEFAULT *model.BaseResp
+
+func (p *UpdateSpuImageResp) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return UpdateSpuImageResp_Base_DEFAULT
+	}
+	return p.Base
+}
+func (p *UpdateSpuImageResp) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+
+func (p *UpdateSpuImageResp) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *UpdateSpuImageResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UpdateSpuImageResp(%+v)", *p)
+}
+
+func (p *UpdateSpuImageResp) DeepEqual(ano *UpdateSpuImageResp) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	return true
+}
+
+func (p *UpdateSpuImageResp) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UpdateSpuImageResp = map[int16]string{
+	1: "base",
+}
+
 type ViewSpuImageReq struct {
 	SpuID    int64  `thrift:"spuID,1,required" frugal:"1,required,i64" json:"spuID"`
 	PageNum  *int64 `thrift:"pageNum,2,optional" frugal:"2,optional,i64" json:"pageNum,omitempty"`
@@ -2320,6 +2629,7 @@ var fieldIDToName_ViewSpuImageReq = map[int16]string{
 type ViewSpuImageResp struct {
 	Base   *model.BaseResp   `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
 	Images []*model.SpuImage `thrift:"images,2,required" frugal:"2,required,list<model.SpuImage>" json:"images"`
+	Total  int64             `thrift:"total,3,required" frugal:"3,required,i64" json:"total"`
 }
 
 func NewViewSpuImageResp() *ViewSpuImageResp {
@@ -2341,11 +2651,18 @@ func (p *ViewSpuImageResp) GetBase() (v *model.BaseResp) {
 func (p *ViewSpuImageResp) GetImages() (v []*model.SpuImage) {
 	return p.Images
 }
+
+func (p *ViewSpuImageResp) GetTotal() (v int64) {
+	return p.Total
+}
 func (p *ViewSpuImageResp) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
 func (p *ViewSpuImageResp) SetImages(val []*model.SpuImage) {
 	p.Images = val
+}
+func (p *ViewSpuImageResp) SetTotal(val int64) {
+	p.Total = val
 }
 
 func (p *ViewSpuImageResp) IsSetBase() bool {
@@ -2371,6 +2688,9 @@ func (p *ViewSpuImageResp) DeepEqual(ano *ViewSpuImageResp) bool {
 	if !p.Field2DeepEqual(ano.Images) {
 		return false
 	}
+	if !p.Field3DeepEqual(ano.Total) {
+		return false
+	}
 	return true
 }
 
@@ -2394,10 +2714,18 @@ func (p *ViewSpuImageResp) Field2DeepEqual(src []*model.SpuImage) bool {
 	}
 	return true
 }
+func (p *ViewSpuImageResp) Field3DeepEqual(src int64) bool {
+
+	if p.Total != src {
+		return false
+	}
+	return true
+}
 
 var fieldIDToName_ViewSpuImageResp = map[int16]string{
 	1: "base",
 	2: "images",
+	3: "total",
 }
 
 type DeleteSpuImageReq struct {
@@ -5128,6 +5456,12 @@ type CommodityService interface {
 
 	ViewSpuImage(ctx context.Context, req *ViewSpuImageReq) (r *ViewSpuImageResp, err error)
 
+	CreateSpuImage(stream CommodityService_CreateSpuImageServer) (err error)
+
+	UpdateSpuImage(stream CommodityService_UpdateSpuImageServer) (err error)
+
+	DeleteSpuImage(ctx context.Context, req *DeleteSpuImageReq) (r *DeleteSpuImageResp, err error)
+
 	CreateSku(ctx context.Context, req *CreateSkuReq) (r *CreateSkuResp, err error)
 
 	UpdateSku(ctx context.Context, req *UpdateSkuReq) (r *UpdateSkuResp, err error)
@@ -6448,6 +6782,370 @@ func (p *CommodityServiceViewSpuImageResult) Field0DeepEqual(src *ViewSpuImageRe
 }
 
 var fieldIDToName_CommodityServiceViewSpuImageResult = map[int16]string{
+	0: "success",
+}
+
+type CommodityServiceCreateSpuImageArgs struct {
+	Req *CreateSpuImageReq `thrift:"req,1" frugal:"1,default,CreateSpuImageReq" json:"req"`
+}
+
+func NewCommodityServiceCreateSpuImageArgs() *CommodityServiceCreateSpuImageArgs {
+	return &CommodityServiceCreateSpuImageArgs{}
+}
+
+func (p *CommodityServiceCreateSpuImageArgs) InitDefault() {
+}
+
+var CommodityServiceCreateSpuImageArgs_Req_DEFAULT *CreateSpuImageReq
+
+func (p *CommodityServiceCreateSpuImageArgs) GetReq() (v *CreateSpuImageReq) {
+	if !p.IsSetReq() {
+		return CommodityServiceCreateSpuImageArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *CommodityServiceCreateSpuImageArgs) SetReq(val *CreateSpuImageReq) {
+	p.Req = val
+}
+
+func (p *CommodityServiceCreateSpuImageArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *CommodityServiceCreateSpuImageArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("CommodityServiceCreateSpuImageArgs(%+v)", *p)
+}
+
+func (p *CommodityServiceCreateSpuImageArgs) DeepEqual(ano *CommodityServiceCreateSpuImageArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *CommodityServiceCreateSpuImageArgs) Field1DeepEqual(src *CreateSpuImageReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_CommodityServiceCreateSpuImageArgs = map[int16]string{
+	1: "req",
+}
+
+type CommodityServiceCreateSpuImageResult struct {
+	Success *CreateSpuImageResp `thrift:"success,0,optional" frugal:"0,optional,CreateSpuImageResp" json:"success,omitempty"`
+}
+
+func NewCommodityServiceCreateSpuImageResult() *CommodityServiceCreateSpuImageResult {
+	return &CommodityServiceCreateSpuImageResult{}
+}
+
+func (p *CommodityServiceCreateSpuImageResult) InitDefault() {
+}
+
+var CommodityServiceCreateSpuImageResult_Success_DEFAULT *CreateSpuImageResp
+
+func (p *CommodityServiceCreateSpuImageResult) GetSuccess() (v *CreateSpuImageResp) {
+	if !p.IsSetSuccess() {
+		return CommodityServiceCreateSpuImageResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *CommodityServiceCreateSpuImageResult) SetSuccess(x interface{}) {
+	p.Success = x.(*CreateSpuImageResp)
+}
+
+func (p *CommodityServiceCreateSpuImageResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *CommodityServiceCreateSpuImageResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("CommodityServiceCreateSpuImageResult(%+v)", *p)
+}
+
+func (p *CommodityServiceCreateSpuImageResult) DeepEqual(ano *CommodityServiceCreateSpuImageResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *CommodityServiceCreateSpuImageResult) Field0DeepEqual(src *CreateSpuImageResp) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_CommodityServiceCreateSpuImageResult = map[int16]string{
+	0: "success",
+}
+
+type CommodityService_CreateSpuImageServer interface {
+	streaming.Stream
+
+	Recv() (*CreateSpuImageReq, error)
+
+	SendAndClose(*CreateSpuImageResp) error
+}
+
+type CommodityServiceUpdateSpuImageArgs struct {
+	Req *UpdateSpuImageReq `thrift:"req,1" frugal:"1,default,UpdateSpuImageReq" json:"req"`
+}
+
+func NewCommodityServiceUpdateSpuImageArgs() *CommodityServiceUpdateSpuImageArgs {
+	return &CommodityServiceUpdateSpuImageArgs{}
+}
+
+func (p *CommodityServiceUpdateSpuImageArgs) InitDefault() {
+}
+
+var CommodityServiceUpdateSpuImageArgs_Req_DEFAULT *UpdateSpuImageReq
+
+func (p *CommodityServiceUpdateSpuImageArgs) GetReq() (v *UpdateSpuImageReq) {
+	if !p.IsSetReq() {
+		return CommodityServiceUpdateSpuImageArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *CommodityServiceUpdateSpuImageArgs) SetReq(val *UpdateSpuImageReq) {
+	p.Req = val
+}
+
+func (p *CommodityServiceUpdateSpuImageArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *CommodityServiceUpdateSpuImageArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("CommodityServiceUpdateSpuImageArgs(%+v)", *p)
+}
+
+func (p *CommodityServiceUpdateSpuImageArgs) DeepEqual(ano *CommodityServiceUpdateSpuImageArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *CommodityServiceUpdateSpuImageArgs) Field1DeepEqual(src *UpdateSpuImageReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_CommodityServiceUpdateSpuImageArgs = map[int16]string{
+	1: "req",
+}
+
+type CommodityServiceUpdateSpuImageResult struct {
+	Success *UpdateSpuImageResp `thrift:"success,0,optional" frugal:"0,optional,UpdateSpuImageResp" json:"success,omitempty"`
+}
+
+func NewCommodityServiceUpdateSpuImageResult() *CommodityServiceUpdateSpuImageResult {
+	return &CommodityServiceUpdateSpuImageResult{}
+}
+
+func (p *CommodityServiceUpdateSpuImageResult) InitDefault() {
+}
+
+var CommodityServiceUpdateSpuImageResult_Success_DEFAULT *UpdateSpuImageResp
+
+func (p *CommodityServiceUpdateSpuImageResult) GetSuccess() (v *UpdateSpuImageResp) {
+	if !p.IsSetSuccess() {
+		return CommodityServiceUpdateSpuImageResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *CommodityServiceUpdateSpuImageResult) SetSuccess(x interface{}) {
+	p.Success = x.(*UpdateSpuImageResp)
+}
+
+func (p *CommodityServiceUpdateSpuImageResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *CommodityServiceUpdateSpuImageResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("CommodityServiceUpdateSpuImageResult(%+v)", *p)
+}
+
+func (p *CommodityServiceUpdateSpuImageResult) DeepEqual(ano *CommodityServiceUpdateSpuImageResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *CommodityServiceUpdateSpuImageResult) Field0DeepEqual(src *UpdateSpuImageResp) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_CommodityServiceUpdateSpuImageResult = map[int16]string{
+	0: "success",
+}
+
+type CommodityService_UpdateSpuImageServer interface {
+	streaming.Stream
+
+	Recv() (*UpdateSpuImageReq, error)
+
+	SendAndClose(*UpdateSpuImageResp) error
+}
+
+type CommodityServiceDeleteSpuImageArgs struct {
+	Req *DeleteSpuImageReq `thrift:"req,1" frugal:"1,default,DeleteSpuImageReq" json:"req"`
+}
+
+func NewCommodityServiceDeleteSpuImageArgs() *CommodityServiceDeleteSpuImageArgs {
+	return &CommodityServiceDeleteSpuImageArgs{}
+}
+
+func (p *CommodityServiceDeleteSpuImageArgs) InitDefault() {
+}
+
+var CommodityServiceDeleteSpuImageArgs_Req_DEFAULT *DeleteSpuImageReq
+
+func (p *CommodityServiceDeleteSpuImageArgs) GetReq() (v *DeleteSpuImageReq) {
+	if !p.IsSetReq() {
+		return CommodityServiceDeleteSpuImageArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *CommodityServiceDeleteSpuImageArgs) SetReq(val *DeleteSpuImageReq) {
+	p.Req = val
+}
+
+func (p *CommodityServiceDeleteSpuImageArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *CommodityServiceDeleteSpuImageArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("CommodityServiceDeleteSpuImageArgs(%+v)", *p)
+}
+
+func (p *CommodityServiceDeleteSpuImageArgs) DeepEqual(ano *CommodityServiceDeleteSpuImageArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *CommodityServiceDeleteSpuImageArgs) Field1DeepEqual(src *DeleteSpuImageReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_CommodityServiceDeleteSpuImageArgs = map[int16]string{
+	1: "req",
+}
+
+type CommodityServiceDeleteSpuImageResult struct {
+	Success *DeleteSpuImageResp `thrift:"success,0,optional" frugal:"0,optional,DeleteSpuImageResp" json:"success,omitempty"`
+}
+
+func NewCommodityServiceDeleteSpuImageResult() *CommodityServiceDeleteSpuImageResult {
+	return &CommodityServiceDeleteSpuImageResult{}
+}
+
+func (p *CommodityServiceDeleteSpuImageResult) InitDefault() {
+}
+
+var CommodityServiceDeleteSpuImageResult_Success_DEFAULT *DeleteSpuImageResp
+
+func (p *CommodityServiceDeleteSpuImageResult) GetSuccess() (v *DeleteSpuImageResp) {
+	if !p.IsSetSuccess() {
+		return CommodityServiceDeleteSpuImageResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *CommodityServiceDeleteSpuImageResult) SetSuccess(x interface{}) {
+	p.Success = x.(*DeleteSpuImageResp)
+}
+
+func (p *CommodityServiceDeleteSpuImageResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *CommodityServiceDeleteSpuImageResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("CommodityServiceDeleteSpuImageResult(%+v)", *p)
+}
+
+func (p *CommodityServiceDeleteSpuImageResult) DeepEqual(ano *CommodityServiceDeleteSpuImageResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *CommodityServiceDeleteSpuImageResult) Field0DeepEqual(src *DeleteSpuImageResp) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_CommodityServiceDeleteSpuImageResult = map[int16]string{
 	0: "success",
 }
 

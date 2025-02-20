@@ -65,6 +65,7 @@ struct SpuImage {
     3: required string url;
     4: required i64 createdAt;
     5: optional i64 deletedAt;
+    6: required i64 updatedAt;
 }
 
 struct SkuImage {
