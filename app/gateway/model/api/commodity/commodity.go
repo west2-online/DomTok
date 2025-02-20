@@ -5305,6 +5305,7 @@ func (p *ViewSpuImageReq) String() string {
 
 type ViewSpuImageResp struct {
 	Images []*model.SpuImage `thrift:"images,1,required" form:"images,required" json:"images,required" query:"images,required"`
+	Total  int64             `thrift:"total,2,required" form:"total,required" json:"total,required" query:"total,required"`
 }
 
 func NewViewSpuImageResp() *ViewSpuImageResp {
@@ -5318,8 +5319,13 @@ func (p *ViewSpuImageResp) GetImages() (v []*model.SpuImage) {
 	return p.Images
 }
 
+func (p *ViewSpuImageResp) GetTotal() (v int64) {
+	return p.Total
+}
+
 var fieldIDToName_ViewSpuImageResp = map[int16]string{
 	1: "images",
+	2: "total",
 }
 
 func (p *ViewSpuImageResp) Read(iprot thrift.TProtocol) (err error) {
@@ -5327,6 +5333,7 @@ func (p *ViewSpuImageResp) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetImages bool = false
+	var issetTotal bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -5351,6 +5358,15 @@ func (p *ViewSpuImageResp) Read(iprot thrift.TProtocol) (err error) {
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetTotal = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -5366,6 +5382,11 @@ func (p *ViewSpuImageResp) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetImages {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetTotal {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -5409,6 +5430,17 @@ func (p *ViewSpuImageResp) ReadField1(iprot thrift.TProtocol) error {
 	p.Images = _field
 	return nil
 }
+func (p *ViewSpuImageResp) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Total = _field
+	return nil
+}
 
 func (p *ViewSpuImageResp) Write(oprot thrift.TProtocol) (err error) {
 
@@ -5419,6 +5451,10 @@ func (p *ViewSpuImageResp) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 	}
@@ -5462,6 +5498,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *ViewSpuImageResp) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("total", thrift.I64, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.Total); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *ViewSpuImageResp) String() string {

@@ -88,6 +88,26 @@ func (db *commodityDB) IsExistSku(ctx context.Context, spuId int64) (bool, error
 	return cnt != 0, nil
 }
 
+func (db *commodityDB) GetImagesBySpuId(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error) {
+	imgs := make([]*SpuImage, 0)
+	var cnt int64
+	if err := db.client.WithContext(ctx).Table(constants.SpuImageTableName).Where("spu_id = ?", spuId).
+		Order("created_at").Limit(limit).Offset(offset).Find(&imgs).Count(&cnt).Error; err != nil {
+		return nil, 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get images: %v", err)
+	}
+	ret := make([]*model.SpuImage, 0)
+	for _, img := range imgs {
+		ret = append(ret, &model.SpuImage{
+			ImageID:   img.Id,
+			SpuID:     img.SpuId,
+			Url:       img.Url,
+			CreatedAt: img.CreatedAt.Unix(),
+			UpdatedAt: img.UpdatedAt.Unix(),
+		})
+	}
+	return ret, cnt, nil
+}
+
 func (db *commodityDB) GetSpuBySpuId(ctx context.Context, spuId int64) (*model.Spu, error) {
 	s := Spu{}
 	if err := db.client.WithContext(ctx).Table(constants.SpuTableName).Where("id = ?", spuId).First(&s).Error; err != nil {

@@ -138,3 +138,7 @@ func (us *useCase) DeleteSpuImage(ctx context.Context, imageId int64) error {
 	}
 	return nil
 }
+
+func (us *useCase) ViewSpuImages(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error) {
+	return us.svc.GetSpuImages(ctx, spuId, offset, limit)
+}

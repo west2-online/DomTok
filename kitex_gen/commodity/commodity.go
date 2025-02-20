@@ -2629,6 +2629,7 @@ var fieldIDToName_ViewSpuImageReq = map[int16]string{
 type ViewSpuImageResp struct {
 	Base   *model.BaseResp   `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
 	Images []*model.SpuImage `thrift:"images,2,required" frugal:"2,required,list<model.SpuImage>" json:"images"`
+	Total  int64             `thrift:"total,3,required" frugal:"3,required,i64" json:"total"`
 }
 
 func NewViewSpuImageResp() *ViewSpuImageResp {
@@ -2650,11 +2651,18 @@ func (p *ViewSpuImageResp) GetBase() (v *model.BaseResp) {
 func (p *ViewSpuImageResp) GetImages() (v []*model.SpuImage) {
 	return p.Images
 }
+
+func (p *ViewSpuImageResp) GetTotal() (v int64) {
+	return p.Total
+}
 func (p *ViewSpuImageResp) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
 func (p *ViewSpuImageResp) SetImages(val []*model.SpuImage) {
 	p.Images = val
+}
+func (p *ViewSpuImageResp) SetTotal(val int64) {
+	p.Total = val
 }
 
 func (p *ViewSpuImageResp) IsSetBase() bool {
@@ -2680,6 +2688,9 @@ func (p *ViewSpuImageResp) DeepEqual(ano *ViewSpuImageResp) bool {
 	if !p.Field2DeepEqual(ano.Images) {
 		return false
 	}
+	if !p.Field3DeepEqual(ano.Total) {
+		return false
+	}
 	return true
 }
 
@@ -2703,10 +2714,18 @@ func (p *ViewSpuImageResp) Field2DeepEqual(src []*model.SpuImage) bool {
 	}
 	return true
 }
+func (p *ViewSpuImageResp) Field3DeepEqual(src int64) bool {
+
+	if p.Total != src {
+		return false
+	}
+	return true
+}
 
 var fieldIDToName_ViewSpuImageResp = map[int16]string{
 	1: "base",
 	2: "images",
+	3: "total",
 }
 
 type DeleteSpuImageReq struct {

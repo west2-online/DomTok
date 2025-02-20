@@ -138,6 +138,7 @@ struct ViewSpuImageReq {
 
 struct ViewSpuImageResp {
     1: required list<model.SpuImage> images;
+    2: required i64 total;
 }
 
 struct DeleteSpuImageReq {

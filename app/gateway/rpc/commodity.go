@@ -212,3 +212,15 @@ func UpdateSpuImageRPC(ctx context.Context, req *commodity.UpdateSpuImageReq, fi
 
 	return nil
 }
+
+func ViewSpuImagesRPC(ctx context.Context, req *commodity.ViewSpuImageReq) (*commodity.ViewSpuImageResp, error) {
+	resp, err := commodityClient.ViewSpuImage(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.ViewSpuImageRPC ViewSpuImage failed, err  %v", err)
+		return nil, errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return resp, nil
+}

@@ -277,13 +277,25 @@ func ViewSpuImage(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewSpuImageReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithMessage(err.Error()))
+		return
+	}
+
+	res, err := rpc.ViewSpuImagesRPC(ctx, &commodity.ViewSpuImageReq{
+		SpuID:    req.SpuID,
+		PageNum:  req.PageNum,
+		PageSize: req.PageSize,
+	})
+	if err != nil {
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.ViewSpuImageResp)
+	resp.Total = res.Total
+	resp.Images = pack.BuildSpuImages(res.Images)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.RespData(c, resp)
 }
 
 // CreateSku .

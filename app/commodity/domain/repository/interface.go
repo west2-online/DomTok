@@ -36,9 +36,14 @@ type CommodityDB interface {
 	UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
 	DeleteSpuImage(ctx context.Context, spuImageId int64) error
 	DeleteSpuImagesBySpuId(ctx context.Context, spuId int64) (ids []int64, url []string, err error)
+	GetImagesBySpuId(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error)
 }
 
-type CommodityCache interface{}
+type CommodityCache interface {
+	IsExist(ctx context.Context, key string) bool
+	GetSpuImages(ctx context.Context, key string) (*model.SpuImages, error)
+	SetSpuImages(ctx context.Context, key string, images *model.SpuImages)
+}
 
 type CommodityMQ interface {
 	Send(ctx context.Context, topic string, message []*kafka.Message) error

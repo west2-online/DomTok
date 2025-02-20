@@ -263,3 +263,25 @@ func (svc *CommodityService) MatchDeleteSpuCondition(ctx context.Context, spuId 
 	}
 	return ret, nil
 }
+
+func (svc *CommodityService) GetSpuImages(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error) {
+	key := fmt.Sprintf("spuImgs:%d:%d", spuId, offset)
+	if svc.cache.IsExist(ctx, key) {
+		ret, err := svc.cache.GetSpuImages(ctx, key)
+		if err != nil {
+			return nil, 0, fmt.Errorf("service.GetSpuImages failed: %w", err)
+		}
+		return ret.Images, ret.Total, nil
+	}
+	_, err := svc.db.GetSpuBySpuId(ctx, spuId)
+	if err != nil {
+		return nil, 0, fmt.Errorf("usecase.ViewSpuImages failed: %w", err)
+	}
+
+	imgs, total, err := svc.db.GetImagesBySpuId(ctx, spuId, offset, limit)
+	if err != nil {
+		return nil, 0, fmt.Errorf("usecase.ViewSpuImages get images failed: %w", err)
+	}
+	go svc.cache.SetSpuImages(ctx, key, &model.SpuImages{Images: imgs, Total: total})
+	return imgs, total, nil
+}

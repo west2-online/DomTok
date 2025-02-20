@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"context"
 
+	"github.com/west2-online/DomTok/app/commodity/controllers/rpc/pack"
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
@@ -239,8 +240,19 @@ func (c CommodityHandler) DeleteSpu(ctx context.Context, req *commodity.DeleteSp
 }
 
 func (c CommodityHandler) ViewSpuImage(ctx context.Context, req *commodity.ViewSpuImageReq) (r *commodity.ViewSpuImageResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ViewSpuImageResp)
+	offset := req.GetPageNum() * req.GetPageSize()
+	imgs, total, err := c.useCase.ViewSpuImages(ctx, req.GetSpuID(), int(offset), int(req.GetPageSize()))
+	if err != nil {
+		logger.Errorf("rpc.ViewSpuImage: view spu error: %v", err)
+		r.Base = base.BuildBaseResp(err)
+		return r, nil
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	r.Images = pack.BuildImages(imgs)
+	r.Total = total
+	return
 }
 
 func (c CommodityHandler) CreateSku(ctx context.Context, req *commodity.CreateSkuReq) (r *commodity.CreateSkuResp, err error) {
