@@ -1013,13 +1013,13 @@ func (p *RefundTokenResponse) FastReadField1(buf []byte) (int, error) {
 
 func (p *RefundTokenResponse) FastReadField2(buf []byte) (int, error) {
 	offset := 0
-	_field := model.NewPaymentTokenInfo()
+	_field := model.NewRefundTokenInfo()
 	if l, err := _field.FastRead(buf[offset:]); err != nil {
 		return offset, err
 	} else {
 		offset += l
 	}
-	p.TokenInfo = _field
+	p.RefundTokenInfo = _field
 	return offset, nil
 }
 
@@ -1057,7 +1057,7 @@ func (p *RefundTokenResponse) fastWriteField1(buf []byte, w thrift.NocopyWriter)
 func (p *RefundTokenResponse) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 2)
-	offset += p.TokenInfo.FastWriteNocopy(buf[offset:], w)
+	offset += p.RefundTokenInfo.FastWriteNocopy(buf[offset:], w)
 	return offset
 }
 
@@ -1071,7 +1071,7 @@ func (p *RefundTokenResponse) field1Length() int {
 func (p *RefundTokenResponse) field2Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
-	l += p.TokenInfo.BLength()
+	l += p.RefundTokenInfo.BLength()
 	return l
 }
 

@@ -28,6 +28,7 @@ import (
 type PaymentUseCase interface {
 	CreatePayment(ctx context.Context, orderID int64) (*model.PaymentOrder, error)
 	GetPaymentToken(ctx context.Context, orderID int64) (string, int64, error)
+	GetRefundToken(ctx context.Context, id int64) (string, int64, error)
 	// ProcessRefund
 	// RequestRefundToken
 }

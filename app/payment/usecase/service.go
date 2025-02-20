@@ -111,3 +111,8 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	)
 	return token, expTime, nil
 }
+
+// TODO
+func (uc *paymentUseCase) GetRefundToken(ctx context.Context, orderID int64) (token string, expTime int64, err error) {
+	return "", 0, nil
+}

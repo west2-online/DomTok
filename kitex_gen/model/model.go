@@ -2889,3 +2889,71 @@ var fieldIDToName_PaymentTokenInfo = map[int16]string{
 	1: "paymentToken",
 	2: "paymentTokenExpirationTime",
 }
+
+type RefundTokenInfo struct {
+	RefundToken               string `thrift:"refundToken,1,required" frugal:"1,required,string" json:"refundToken"`
+	RefundTokenExpirationTime int64  `thrift:"refundTokenExpirationTime,2,required" frugal:"2,required,i64" json:"refundTokenExpirationTime"`
+}
+
+func NewRefundTokenInfo() *RefundTokenInfo {
+	return &RefundTokenInfo{}
+}
+
+func (p *RefundTokenInfo) InitDefault() {
+}
+
+func (p *RefundTokenInfo) GetRefundToken() (v string) {
+	return p.RefundToken
+}
+
+func (p *RefundTokenInfo) GetRefundTokenExpirationTime() (v int64) {
+	return p.RefundTokenExpirationTime
+}
+func (p *RefundTokenInfo) SetRefundToken(val string) {
+	p.RefundToken = val
+}
+func (p *RefundTokenInfo) SetRefundTokenExpirationTime(val int64) {
+	p.RefundTokenExpirationTime = val
+}
+
+func (p *RefundTokenInfo) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("RefundTokenInfo(%+v)", *p)
+}
+
+func (p *RefundTokenInfo) DeepEqual(ano *RefundTokenInfo) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.RefundToken) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.RefundTokenExpirationTime) {
+		return false
+	}
+	return true
+}
+
+func (p *RefundTokenInfo) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.RefundToken, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *RefundTokenInfo) Field2DeepEqual(src int64) bool {
+
+	if p.RefundTokenExpirationTime != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_RefundTokenInfo = map[int16]string{
+	1: "refundToken",
+	2: "refundTokenExpirationTime",
+}

@@ -457,8 +457,8 @@ var fieldIDToName_RefundTokenRequest = map[int16]string{
 }
 
 type RefundTokenResponse struct {
-	Base      *model.BaseResp         `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
-	TokenInfo *model.PaymentTokenInfo `thrift:"tokenInfo,2" frugal:"2,default,model.PaymentTokenInfo" json:"tokenInfo"`
+	Base            *model.BaseResp        `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
+	RefundTokenInfo *model.RefundTokenInfo `thrift:"refundTokenInfo,2" frugal:"2,default,model.RefundTokenInfo" json:"refundTokenInfo"`
 }
 
 func NewRefundTokenResponse() *RefundTokenResponse {
@@ -477,27 +477,27 @@ func (p *RefundTokenResponse) GetBase() (v *model.BaseResp) {
 	return p.Base
 }
 
-var RefundTokenResponse_TokenInfo_DEFAULT *model.PaymentTokenInfo
+var RefundTokenResponse_RefundTokenInfo_DEFAULT *model.RefundTokenInfo
 
-func (p *RefundTokenResponse) GetTokenInfo() (v *model.PaymentTokenInfo) {
-	if !p.IsSetTokenInfo() {
-		return RefundTokenResponse_TokenInfo_DEFAULT
+func (p *RefundTokenResponse) GetRefundTokenInfo() (v *model.RefundTokenInfo) {
+	if !p.IsSetRefundTokenInfo() {
+		return RefundTokenResponse_RefundTokenInfo_DEFAULT
 	}
-	return p.TokenInfo
+	return p.RefundTokenInfo
 }
 func (p *RefundTokenResponse) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
-func (p *RefundTokenResponse) SetTokenInfo(val *model.PaymentTokenInfo) {
-	p.TokenInfo = val
+func (p *RefundTokenResponse) SetRefundTokenInfo(val *model.RefundTokenInfo) {
+	p.RefundTokenInfo = val
 }
 
 func (p *RefundTokenResponse) IsSetBase() bool {
 	return p.Base != nil
 }
 
-func (p *RefundTokenResponse) IsSetTokenInfo() bool {
-	return p.TokenInfo != nil
+func (p *RefundTokenResponse) IsSetRefundTokenInfo() bool {
+	return p.RefundTokenInfo != nil
 }
 
 func (p *RefundTokenResponse) String() string {
@@ -516,7 +516,7 @@ func (p *RefundTokenResponse) DeepEqual(ano *RefundTokenResponse) bool {
 	if !p.Field1DeepEqual(ano.Base) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.TokenInfo) {
+	if !p.Field2DeepEqual(ano.RefundTokenInfo) {
 		return false
 	}
 	return true
@@ -529,9 +529,9 @@ func (p *RefundTokenResponse) Field1DeepEqual(src *model.BaseResp) bool {
 	}
 	return true
 }
-func (p *RefundTokenResponse) Field2DeepEqual(src *model.PaymentTokenInfo) bool {
+func (p *RefundTokenResponse) Field2DeepEqual(src *model.RefundTokenInfo) bool {
 
-	if !p.TokenInfo.DeepEqual(src) {
+	if !p.RefundTokenInfo.DeepEqual(src) {
 		return false
 	}
 	return true
@@ -539,7 +539,7 @@ func (p *RefundTokenResponse) Field2DeepEqual(src *model.PaymentTokenInfo) bool 
 
 var fieldIDToName_RefundTokenResponse = map[int16]string{
 	1: "base",
-	2: "tokenInfo",
+	2: "refundTokenInfo",
 }
 
 type RefundRequest struct {

@@ -64,7 +64,7 @@ struct RefundTokenRequest {
  */
 struct RefundTokenResponse {
     1: model.BaseResp base,
-    2: model.PaymentTokenInfo tokenInfo,
+    2: model.RefundTokenInfo refundTokenInfo
 }
 
 /*
