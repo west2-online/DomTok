@@ -24,8 +24,6 @@ import (
 	"fmt"
 	"time"
 
-	"go.uber.org/zap"
-
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	loginData "github.com/west2-online/DomTok/pkg/base/context"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
@@ -57,11 +55,6 @@ func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64)
 	return paymentID, nil
 }
 
-/*
-func (svc *PaymentService) CheckUserExist(ctx context.Context, uid int64) (userInfo bool, err error) {
-	return paymentStatus.UserNotExist, nil
-}*/
-
 // GetUserID 等User模块完成了再写这个，从ctx里获取userID
 func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error) {
 	uid, err = loginData.GetLoginData(ctx)
@@ -80,10 +73,7 @@ func (svc *PaymentService) CheckOrderExist(ctx context.Context, orderID int64) (
 func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int64) (string, int64, error) {
 	// 1. 设定过期时间为15分钟后, 即现在时间加上15分钟之后的秒级时间戳
 	expirationTime := time.Now().Add(paymentStatus.ExpirationDuration).Unix()
-	logger.Info("Generating payment token",
-		zap.Int64("orderID", orderID),
-		zap.Int64("expirationTime", expirationTime),
-	)
+	logger.Infof("Generating payment token, orderID: %d, expirationTime: %d", orderID, expirationTime)
 	// 2. 获取 HMAC 密钥（可以从环境变量或配置文件获取）
 	secretKey := []byte(paymentStatus.PaymentSecretKey)
 
@@ -91,20 +81,13 @@ func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int
 	h := hmac.New(sha256.New, secretKey)
 	_, err := h.Write([]byte(fmt.Sprintf("%d:%d", orderID, expirationTime)))
 	if err != nil {
-		// log.Printf("Error generating HMAC: %v", err)
-		logger.Error("Failed to generate HMAC",
-			zap.Int64("orderID", orderID),
-			zap.Error(err),
-		)
-		return "", 0, fmt.Errorf("failed to generate HMAC: %w", err)
+		logger.Infof("failed to generate payment HMAC token, orderID: %d, expirationTime: %d", orderID, expirationTime)
+		return "", 0, fmt.Errorf("failed to generate payment HMAC token: %w", err)
 	}
 
 	// 4. 生成十六进制编码的 HMAC 签名
 	token := hex.EncodeToString(h.Sum(nil))
-	logger.Info("Payment token generated successfully",
-		zap.String("token", token),
-		zap.Int64("expirationTime", expirationTime),
-	)
+	// logger.Infof("Generated payment HAMC token successfully, orderID: %d, expirationTime: %d", orderID, expirationTime)
 	// 5. 返回令牌和过期时间
 	return token, expirationTime, nil
 }
@@ -118,36 +101,17 @@ func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, 
 	// TODO 我不知道是不是这样的，因为我感觉两个函数执行时间基本上只差几十毫秒，不可能出现这样的情况吧，但想想又有道理
 	expirationDuration := time.Until(time.Unix(expTime, 0))
 	if expirationDuration <= 0 {
-		logger.Warn("Token expiration time has already passed",
-			zap.Int64("orderID", orderID),
-			zap.Int64("userID", userID),
-		)
+		logger.Warnf("Token expiration time has already passed: orderID: %d, userID: %d", orderID, userID)
 		return paymentStatus.RedisStoreFailed, fmt.Errorf("cannot store token: expiration time has already passed")
 	}
 	// 2. 构造 Redis Key
 	redisKey := fmt.Sprintf("payment_token:%d:%d", userID, orderID)
-	logger.Info("Storing payment token in Redis",
-		zap.String("redisKey", redisKey),
-		zap.Int64("orderID", orderID),
-		zap.Int64("userID", userID),
-		zap.Duration("expiration", expirationDuration),
-	)
 	// 3. 存储到 Redis
 	err := svc.redis.SetPaymentToken(ctx, redisKey, token, expirationDuration)
 	if err != nil {
-		logger.Error("Failed to store payment token in Redis",
-			zap.String("redisKey", redisKey),
-			zap.Int64("orderID", orderID),
-			zap.Int64("userID", userID),
-			zap.Error(err),
-		)
+		logger.Infof("failed to store payment token in redis, orderID: %d, userID: %d", orderID, userID)
 		return paymentStatus.RedisStoreFailed, fmt.Errorf("failed to store payment token in redis: %w", err)
 	}
 	// 4. 返回成功状态码
-	logger.Info("Payment token stored successfully in Redis",
-		zap.String("redisKey", redisKey),
-		zap.Int64("orderID", orderID),
-		zap.Int64("userID", userID),
-	)
 	return paymentStatus.RedisStoreSuccess, nil
 }
