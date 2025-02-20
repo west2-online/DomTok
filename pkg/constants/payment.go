@@ -38,6 +38,7 @@ const (
 	PaymentStatusFailed            // 支付失败
 )
 
+// TODO 最后要删除这个东西
 const (
 	TestUserID = 123
 )
