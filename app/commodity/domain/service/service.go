@@ -88,12 +88,16 @@ func (svc *CommodityService) CreateSpuImage(ctx context.Context, spuImage *model
 }
 
 func (svc *CommodityService) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage, originSpuImage *model.SpuImage) error {
-	err := svc.db.UpdateSpuImage(ctx, spuImage)
-	if err != nil {
-		return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
-	}
-
-	var eg errgroup.Group
+	var eg errgroup.Group	
+	var err error
+	eg.Go(func() error {
+		err = svc.db.UpdateSpuImage(ctx, spuImage)
+		if err != nil {
+			return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
+		}		
+		return nil
+	})
+	
 	eg.Go(func() error {
 		err = upyun.UploadImg(spuImage.Data, spuImage.Url)
 		if err != nil {
