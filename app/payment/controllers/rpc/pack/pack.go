@@ -14,18 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-<<<<<<<< HEAD:app/payment/domain/repository/interface.go
-package repository
-
-import (
-	"context"
-)
-
-type PaymentDB interface {
-	GetOrderByToken(ctx context.Context, paramToken string) (int64, error)
-	GetUserByToken(ctx context.Context, paramToken string) (int64, error)
-	GetPaymentInfo(ctx context.Context, paramToken string) (int, error)
-========
 package pack
 
 import (
@@ -39,5 +27,4 @@ func BuildTokenInfo(token string, expTime int64) *model.PaymentTokenInfo {
 		PaymentToken:               token,
 		PaymentTokenExpirationTime: expTime,
 	}
->>>>>>>> upstream/main:app/payment/controllers/rpc/pack/pack.go
 }

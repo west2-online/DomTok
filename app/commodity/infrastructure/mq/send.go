@@ -14,23 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-<<<<<<<< HEAD:main.go
-package main
-
-import (
-	"log"
-
-	payment "github.com/west2-online/DomTok/kitex_gen/payment/paymentservice"
-)
-
-func main() {
-	svr := payment.NewServer(new(PaymentServiceImpl))
-
-	err := svr.Run()
-	if err != nil {
-		log.Println(err.Error())
-	}
-========
 package mq
 
 import (
@@ -51,5 +34,4 @@ func (c CommodityMQ) Send(ctx context.Context, topic string, message []*kafka.Me
 		}
 	}
 	return res
->>>>>>>> upstream/main:app/commodity/infrastructure/mq/send.go
 }

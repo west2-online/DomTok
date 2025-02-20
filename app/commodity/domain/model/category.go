@@ -14,10 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-<<<<<<<< HEAD:app/commodity/domain/service/service.go
-package service
-========
 package model
 
 type Category struct{}
->>>>>>>> upstream/main:app/commodity/domain/model/category.go

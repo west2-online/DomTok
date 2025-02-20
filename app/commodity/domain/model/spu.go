@@ -14,25 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-<<<<<<<< HEAD:app/commodity/infrastructure/mysql/model.go
-package mysql
-
-import (
-	"time"
-
-	"github.com/west2-online/DomTok/pkg/constants"
-)
-
-type Category struct {
-	Id        int64
-	Name      string
-	CreatorId int64
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
-	// gorm.Model
-========
 package model
+
+import "github.com/west2-online/DomTok/pkg/constants"
 
 type Spu struct {
 	SpuId               int64
@@ -48,7 +32,6 @@ type Spu struct {
 	UpdatedAt           int64
 	DeletedAt           int64
 	GoodsHeadDrawingUrl string
->>>>>>>> upstream/main:app/commodity/domain/model/spu.go
 }
 
 func (Category) TableName() string {

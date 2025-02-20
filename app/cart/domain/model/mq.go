@@ -16,11 +16,7 @@ limitations under the License.
 
 package model
 
-<<<<<<<< HEAD:app/commodity/domain/model/category.go
-type Category struct{}
-========
 type AddGoodsMsg struct {
 	Uid   int64
 	Goods *GoodInfo
 }
->>>>>>>> upstream/main:app/cart/domain/model/mq.go

@@ -14,17 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-<<<<<<<< HEAD:app/commodity/domain/repository/interface.go
-package repository
-
-import "context"
-
-type CommodityDB interface {
-	CreateCategory(ctx context.Context, name string) error
-}
-
-type CommodityCache interface{}
-========
 package mq
 
 import "github.com/west2-online/DomTok/pkg/kafka"
@@ -39,4 +28,3 @@ func NewKafkaAdapter(mq *kafka.Kafka) *KafkaAdapter {
 		mq: mq,
 	}
 }
->>>>>>>> upstream/main:app/cart/infrastructure/mq/mq.go
