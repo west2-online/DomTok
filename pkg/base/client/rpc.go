@@ -27,6 +27,7 @@ import (
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
 	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
+	"github.com/west2-online/DomTok/kitex_gen/payment/paymentservice"
 	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
 	"github.com/west2-online/DomTok/pkg/constants"
 )
@@ -71,4 +72,8 @@ func InitCommodityStreamClientRPC() (*commodityservice.StreamClient, error) {
 
 func InitCartRPC() (*cartservice.Client, error) {
 	return initRPCClient(constants.CartServiceName, cartservice.NewClient)
+}
+
+func InitPaymentRPC() (*paymentservice.Client, error) {
+	return initRPCClient(constants.PaymentServiceName, paymentservice.NewClient)
 }

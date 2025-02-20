@@ -19,25 +19,26 @@ package constants
 import "time"
 
 const (
-	RedisSlowQuery = 10 // ms redis默认的慢查询时间，适用于 logger
+	OrderNotExist      = false
+	PaymentExist       = true
+	PaymentNotExist    = false
+	UserNotExist       = false
+	PaymentSecretKey   = "west2online"
+	RedisStoreSuccess  = true  // 成功
+	RedisStoreFailed   = false // Redis 存储失败
+	ExpirationDuration = 15 * time.Minute
+	// TODO 这一个常量要改
+	PingTime = 2
 )
 
-// Redis Key and Expire Time
 const (
-	RedisCartExpireTime = 5 * 60 * time.Second
-	RedisCartStoreNum   = 30
+	PaymentStatusPending    = iota // 待支付
+	PaymentStatusProcessing        // 处理中
+	PaymentStatusSuccess           // 成功支付
+	PaymentStatusFailed            // 支付失败
 )
 
-// Redis DB Name
+// TODO 最后要删除这个东西
 const (
-	RedisDBOrder     = 0
-	RedisDBCommodity = 1
-	RedisDBCart      = 2
-)
-
-// Redis Connection Pool Configuration
-const (
-	RedisPoolSize           = 50              // 最大连接数
-	RedisMinIdleConnections = 10              // 最小空闲连接数
-	RedisDialTimeout        = 5 * time.Second // 连接超时时间
+	TestUserID = 123
 )
