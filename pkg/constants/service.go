@@ -18,9 +18,12 @@ package constants
 
 // Service Name
 const (
-	GatewayServiceName = "gateway"
-	OrderServiceName   = "order"
-	UserServiceName    = "user"
+	GatewayServiceName   = "gateway"
+	OrderServiceName     = "order"
+	UserServiceName      = "user"
+	PaymentServiceName   = "payment"
+	CommodityServiceName = "commodity"
+	CartServiceName      = "cart"
 )
 
 // UserService
@@ -28,6 +31,7 @@ const (
 	UserMaximumPasswordLength      = 72 // DO NOT EDIT (ref: bcrypt.GenerateFromPassword)
 	UserMinimumPasswordLength      = 5
 	UserDefaultEncryptPasswordCost = 10
+	UserTestId                     = 1
 )
 
 // OrderService

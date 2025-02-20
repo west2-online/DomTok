@@ -30,8 +30,10 @@ const (
 
 // 200xx: 参数错误，Param 打头
 const (
-	ParamVerifyErrorCode  = 20000 + iota // 参数校验失败
-	ParamMissingErrorCode                // 参数缺失
+	ParamVerifyErrorCode   = 20000 + iota // 参数校验失败
+	ParamMissingErrorCode                 // 参数缺失
+	ParamMissingHeaderCode                // 请求头缺失
+	ParamInvalidHeaderCode                // 请求头无效
 )
 
 // 300xx: 鉴权错误，Auth 打头
@@ -41,6 +43,7 @@ const (
 	AuthRefreshExpiredCode                     // 刷新令牌过期
 	AuthNoTokenCode                            // 没有 token
 	AuthNoOperatePermissionCode                // 没有操作权限
+	AuthMissingTokenCode                       // 缺少 token
 )
 
 // 500xx: 内部错误，Internal 打头
@@ -53,4 +56,10 @@ const (
 	InternalNetworkErrorCode                 // 网络错误
 	InternalESErrorCode                      // ES错误
 	InternalKafkaErrorCode                   // kafka 错误
+	OSOperateErrorCode
+	IOOperateErrorCode
+)
+
+const (
+	UpYunFileErrorCode = 60000 + iota
 )

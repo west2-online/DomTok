@@ -46,3 +46,24 @@ func _registerMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _loginMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _cartMw() []app.HandlerFunc {
+	// todo: add authorization
+	// your code...
+	return nil
+}
+
+func _skuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _addgoodsintocartMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

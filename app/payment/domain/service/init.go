@@ -17,37 +17,30 @@ limitations under the License.
 package service
 
 import (
-	"github.com/redis/go-redis/v9"
 	"github.com/west2-online/DomTok/app/payment/domain/repository"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 type PaymentService struct {
-	db repository.PaymentDB
-	sf *utils.Snowflake
-	// 是不是还要把redis的加进去
-	redisClient *redis.Client
-	// emailRe *regexp.Regexp
+	db    repository.PaymentDB
+	sf    *utils.Snowflake
+	redis repository.PaymentRedis
 }
 
-func NewPaymentService(db repository.PaymentDB, sf *utils.Snowflake) *PaymentService {
+func NewPaymentService(db repository.PaymentDB, sf *utils.Snowflake, redis repository.PaymentRedis) *PaymentService {
 	if db == nil {
 		panic("paymentService`s db should not be nil")
 	}
 	if sf == nil {
 		panic("paymentService`s sf should not be nil")
 	}
-	svc := &PaymentService{db: db}
-	// TODO redis的初始化放在哪里？
-	//svc.init() 我需要写这个吗？
+	if redis == nil {
+		panic("paymentService`s redis should not be nil")
+	}
+	svc := &PaymentService{
+		db:    db,
+		sf:    sf,
+		redis: redis,
+	}
 	return svc
-}
-
-func (svc *PaymentService) init() {
-	//TODO redis的初始化放在这里吗？
-	//svc.redisClient = redis.NewClient(&redis.Options{
-	//Addr: "localhost:6379", // Redis 服务器地址
-	//DB:   0,                // 默认使用 0 号数据库
-	//})
-	return
 }

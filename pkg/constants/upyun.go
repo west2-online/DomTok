@@ -14,19 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package constants
 
-import (
-	"log"
-
-	payment "github.com/west2-online/DomTok/kitex_gen/payment/paymentservice"
+const (
+	SpuDirDest      = "/spu/"
+	SpuImageDirDest = "/spu_image/"
 )
-
-func main() {
-	svr := payment.NewServer(new(PaymentServiceImpl))
-
-	err := svr.Run()
-	if err != nil {
-		log.Println(err.Error())
-	}
-}

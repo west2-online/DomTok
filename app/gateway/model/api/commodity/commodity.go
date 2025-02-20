@@ -2749,15 +2749,14 @@ func (p *UseUserCouponResp) String() string {
 
 }
 
+// 文件表单直接formFile获取即可
 type CreateSpuReq struct {
-	SpuImages        [][]byte `thrift:"spuImages,1,optional" form:"spuImages" json:"spuImages,omitempty" query:"spuImages"`
-	Name             string   `thrift:"name,2,required" form:"name,required" json:"name,required" query:"name,required"`
-	Description      string   `thrift:"description,3,required" form:"description,required" json:"description,required" query:"description,required"`
-	CategoryID       int64    `thrift:"categoryID,4,required" form:"categoryID,required" json:"categoryID,required" query:"categoryID,required"`
-	GoodsHeadDrawing string   `thrift:"goodsHeadDrawing,5,required" form:"goodsHeadDrawing,required" json:"goodsHeadDrawing,required" query:"goodsHeadDrawing,required"`
-	Price            float64  `thrift:"price,6,required" form:"price,required" json:"price,required" query:"price,required"`
-	ForSale          int32    `thrift:"forSale,7,required" form:"forSale,required" json:"forSale,required" query:"forSale,required"`
-	Shipping         float64  `thrift:"shipping,8,required" form:"shipping,required" json:"shipping,required" query:"shipping,required"`
+	Name        string  `thrift:"name,1,required" form:"name,required" json:"name,required" query:"name,required"`
+	Description string  `thrift:"description,2,required" form:"description,required" json:"description,required" query:"description,required"`
+	CategoryID  int64   `thrift:"categoryID,3,required" form:"categoryID,required" json:"categoryID,required" query:"categoryID,required"`
+	Price       float64 `thrift:"price,4,required" form:"price,required" json:"price,required" query:"price,required"`
+	ForSale     int32   `thrift:"forSale,5,required" form:"forSale,required" json:"forSale,required" query:"forSale,required"`
+	Shipping    float64 `thrift:"shipping,6,required" form:"shipping,required" json:"shipping,required" query:"shipping,required"`
 }
 
 func NewCreateSpuReq() *CreateSpuReq {
@@ -2765,15 +2764,6 @@ func NewCreateSpuReq() *CreateSpuReq {
 }
 
 func (p *CreateSpuReq) InitDefault() {
-}
-
-var CreateSpuReq_SpuImages_DEFAULT [][]byte
-
-func (p *CreateSpuReq) GetSpuImages() (v [][]byte) {
-	if !p.IsSetSpuImages() {
-		return CreateSpuReq_SpuImages_DEFAULT
-	}
-	return p.SpuImages
 }
 
 func (p *CreateSpuReq) GetName() (v string) {
@@ -2786,10 +2776,6 @@ func (p *CreateSpuReq) GetDescription() (v string) {
 
 func (p *CreateSpuReq) GetCategoryID() (v int64) {
 	return p.CategoryID
-}
-
-func (p *CreateSpuReq) GetGoodsHeadDrawing() (v string) {
-	return p.GoodsHeadDrawing
 }
 
 func (p *CreateSpuReq) GetPrice() (v float64) {
@@ -2805,18 +2791,12 @@ func (p *CreateSpuReq) GetShipping() (v float64) {
 }
 
 var fieldIDToName_CreateSpuReq = map[int16]string{
-	1: "spuImages",
-	2: "name",
-	3: "description",
-	4: "categoryID",
-	5: "goodsHeadDrawing",
-	6: "price",
-	7: "forSale",
-	8: "shipping",
-}
-
-func (p *CreateSpuReq) IsSetSpuImages() bool {
-	return p.SpuImages != nil
+	1: "name",
+	2: "description",
+	3: "categoryID",
+	4: "price",
+	5: "forSale",
+	6: "shipping",
 }
 
 func (p *CreateSpuReq) Read(iprot thrift.TProtocol) (err error) {
@@ -2826,7 +2806,6 @@ func (p *CreateSpuReq) Read(iprot thrift.TProtocol) (err error) {
 	var issetName bool = false
 	var issetDescription bool = false
 	var issetCategoryID bool = false
-	var issetGoodsHeadDrawing bool = false
 	var issetPrice bool = false
 	var issetForSale bool = false
 	var issetShipping bool = false
@@ -2846,10 +2825,11 @@ func (p *CreateSpuReq) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.LIST {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetName = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -2858,58 +2838,40 @@ func (p *CreateSpuReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetName = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 3:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField3(iprot); err != nil {
-					goto ReadFieldError
-				}
 				issetDescription = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 4:
+		case 3:
 			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField4(iprot); err != nil {
+				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetCategoryID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 5:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField5(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetGoodsHeadDrawing = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 6:
+		case 4:
 			if fieldTypeId == thrift.DOUBLE {
-				if err = p.ReadField6(iprot); err != nil {
+				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetPrice = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 7:
+		case 5:
 			if fieldTypeId == thrift.I32 {
-				if err = p.ReadField7(iprot); err != nil {
+				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetForSale = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 8:
+		case 6:
 			if fieldTypeId == thrift.DOUBLE {
-				if err = p.ReadField8(iprot); err != nil {
+				if err = p.ReadField6(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetShipping = true
@@ -2930,37 +2892,32 @@ func (p *CreateSpuReq) Read(iprot thrift.TProtocol) (err error) {
 	}
 
 	if !issetName {
-		fieldId = 2
+		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
 
 	if !issetDescription {
-		fieldId = 3
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 
 	if !issetCategoryID {
-		fieldId = 4
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetGoodsHeadDrawing {
-		fieldId = 5
+		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
 
 	if !issetPrice {
-		fieldId = 6
+		fieldId = 4
 		goto RequiredFieldNotSetError
 	}
 
 	if !issetForSale {
-		fieldId = 7
+		fieldId = 5
 		goto RequiredFieldNotSetError
 	}
 
 	if !issetShipping {
-		fieldId = 8
+		fieldId = 6
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -2982,29 +2939,6 @@ RequiredFieldNotSetError:
 }
 
 func (p *CreateSpuReq) ReadField1(iprot thrift.TProtocol) error {
-	_, size, err := iprot.ReadListBegin()
-	if err != nil {
-		return err
-	}
-	_field := make([][]byte, 0, size)
-	for i := 0; i < size; i++ {
-
-		var _elem []byte
-		if v, err := iprot.ReadBinary(); err != nil {
-			return err
-		} else {
-			_elem = []byte(v)
-		}
-
-		_field = append(_field, _elem)
-	}
-	if err := iprot.ReadListEnd(); err != nil {
-		return err
-	}
-	p.SpuImages = _field
-	return nil
-}
-func (p *CreateSpuReq) ReadField2(iprot thrift.TProtocol) error {
 
 	var _field string
 	if v, err := iprot.ReadString(); err != nil {
@@ -3015,7 +2949,7 @@ func (p *CreateSpuReq) ReadField2(iprot thrift.TProtocol) error {
 	p.Name = _field
 	return nil
 }
-func (p *CreateSpuReq) ReadField3(iprot thrift.TProtocol) error {
+func (p *CreateSpuReq) ReadField2(iprot thrift.TProtocol) error {
 
 	var _field string
 	if v, err := iprot.ReadString(); err != nil {
@@ -3026,7 +2960,7 @@ func (p *CreateSpuReq) ReadField3(iprot thrift.TProtocol) error {
 	p.Description = _field
 	return nil
 }
-func (p *CreateSpuReq) ReadField4(iprot thrift.TProtocol) error {
+func (p *CreateSpuReq) ReadField3(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -3037,18 +2971,7 @@ func (p *CreateSpuReq) ReadField4(iprot thrift.TProtocol) error {
 	p.CategoryID = _field
 	return nil
 }
-func (p *CreateSpuReq) ReadField5(iprot thrift.TProtocol) error {
-
-	var _field string
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.GoodsHeadDrawing = _field
-	return nil
-}
-func (p *CreateSpuReq) ReadField6(iprot thrift.TProtocol) error {
+func (p *CreateSpuReq) ReadField4(iprot thrift.TProtocol) error {
 
 	var _field float64
 	if v, err := iprot.ReadDouble(); err != nil {
@@ -3059,7 +2982,7 @@ func (p *CreateSpuReq) ReadField6(iprot thrift.TProtocol) error {
 	p.Price = _field
 	return nil
 }
-func (p *CreateSpuReq) ReadField7(iprot thrift.TProtocol) error {
+func (p *CreateSpuReq) ReadField5(iprot thrift.TProtocol) error {
 
 	var _field int32
 	if v, err := iprot.ReadI32(); err != nil {
@@ -3070,7 +2993,7 @@ func (p *CreateSpuReq) ReadField7(iprot thrift.TProtocol) error {
 	p.ForSale = _field
 	return nil
 }
-func (p *CreateSpuReq) ReadField8(iprot thrift.TProtocol) error {
+func (p *CreateSpuReq) ReadField6(iprot thrift.TProtocol) error {
 
 	var _field float64
 	if v, err := iprot.ReadDouble(); err != nil {
@@ -3113,14 +3036,6 @@ func (p *CreateSpuReq) Write(oprot thrift.TProtocol) (err error) {
 			fieldId = 6
 			goto WriteFieldError
 		}
-		if err = p.writeField7(oprot); err != nil {
-			fieldId = 7
-			goto WriteFieldError
-		}
-		if err = p.writeField8(oprot); err != nil {
-			fieldId = 8
-			goto WriteFieldError
-		}
 	}
 	if err = oprot.WriteFieldStop(); err != nil {
 		goto WriteFieldStopError
@@ -3140,24 +3055,14 @@ WriteStructEndError:
 }
 
 func (p *CreateSpuReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if p.IsSetSpuImages() {
-		if err = oprot.WriteFieldBegin("spuImages", thrift.LIST, 1); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteListBegin(thrift.STRING, len(p.SpuImages)); err != nil {
-			return err
-		}
-		for _, v := range p.SpuImages {
-			if err := oprot.WriteBinary([]byte(v)); err != nil {
-				return err
-			}
-		}
-		if err := oprot.WriteListEnd(); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
+	if err = oprot.WriteFieldBegin("name", thrift.STRING, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.Name); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
 	}
 	return nil
 WriteFieldBeginError:
@@ -3167,10 +3072,10 @@ WriteFieldEndError:
 }
 
 func (p *CreateSpuReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("name", thrift.STRING, 2); err != nil {
+	if err = oprot.WriteFieldBegin("description", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Name); err != nil {
+	if err := oprot.WriteString(p.Description); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3184,10 +3089,10 @@ WriteFieldEndError:
 }
 
 func (p *CreateSpuReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("description", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("categoryID", thrift.I64, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Description); err != nil {
+	if err := oprot.WriteI64(p.CategoryID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3201,10 +3106,10 @@ WriteFieldEndError:
 }
 
 func (p *CreateSpuReq) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("categoryID", thrift.I64, 4); err != nil {
+	if err = oprot.WriteFieldBegin("price", thrift.DOUBLE, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.CategoryID); err != nil {
+	if err := oprot.WriteDouble(p.Price); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3218,10 +3123,10 @@ WriteFieldEndError:
 }
 
 func (p *CreateSpuReq) writeField5(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("goodsHeadDrawing", thrift.STRING, 5); err != nil {
+	if err = oprot.WriteFieldBegin("forSale", thrift.I32, 5); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.GoodsHeadDrawing); err != nil {
+	if err := oprot.WriteI32(p.ForSale); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3235,41 +3140,7 @@ WriteFieldEndError:
 }
 
 func (p *CreateSpuReq) writeField6(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("price", thrift.DOUBLE, 6); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteDouble(p.Price); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
-}
-
-func (p *CreateSpuReq) writeField7(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("forSale", thrift.I32, 7); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI32(p.ForSale); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 7 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 7 end error: ", p), err)
-}
-
-func (p *CreateSpuReq) writeField8(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("shipping", thrift.DOUBLE, 8); err != nil {
+	if err = oprot.WriteFieldBegin("shipping", thrift.DOUBLE, 6); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteDouble(p.Shipping); err != nil {
@@ -3280,9 +3151,9 @@ func (p *CreateSpuReq) writeField8(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 8 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 8 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
 }
 
 func (p *CreateSpuReq) String() string {
@@ -3501,16 +3372,16 @@ func (p *CreateSpuResp) String() string {
 
 }
 
+// 文件表单直接formFile获取即可
 type UpdateSpuReq struct {
-	SpuImages        [][]byte `thrift:"spuImages,1,optional" form:"spuImages" json:"spuImages,omitempty" query:"spuImages"`
-	Name             *string  `thrift:"name,2,optional" form:"name" json:"name,omitempty" query:"name"`
-	SpuID            int64    `thrift:"spuID,3,required" form:"spuID,required" json:"spuID,required" query:"spuID,required"`
-	Description      *string  `thrift:"description,4,optional" form:"description" json:"description,omitempty" query:"description"`
-	CategoryID       *int64   `thrift:"categoryID,5,optional" form:"categoryID" json:"categoryID,omitempty" query:"categoryID"`
-	GoodsHeadDrawing *string  `thrift:"goodsHeadDrawing,6,optional" form:"goodsHeadDrawing" json:"goodsHeadDrawing,omitempty" query:"goodsHeadDrawing"`
-	Price            *float64 `thrift:"price,7,optional" form:"price" json:"price,omitempty" query:"price"`
-	ForSale          *int32   `thrift:"forSale,8,optional" form:"forSale" json:"forSale,omitempty" query:"forSale"`
-	Shipping         *float64 `thrift:"shipping,9,optional" form:"shipping" json:"shipping,omitempty" query:"shipping"`
+	Name        *string  `thrift:"name,1,optional" form:"name" json:"name,omitempty" query:"name"`
+	SpuID       int64    `thrift:"spuID,2,required" form:"spuID,required" json:"spuID,required" query:"spuID,required"`
+	Description *string  `thrift:"description,3,optional" form:"description" json:"description,omitempty" query:"description"`
+	CategoryID  *int64   `thrift:"categoryID,4,optional" form:"categoryID" json:"categoryID,omitempty" query:"categoryID"`
+	Price       *float64 `thrift:"price,5,optional" form:"price" json:"price,omitempty" query:"price"`
+	ForSale     *int32   `thrift:"forSale,6,optional" form:"forSale" json:"forSale,omitempty" query:"forSale"`
+	Shipping    *float64 `thrift:"shipping,7,optional" form:"shipping" json:"shipping,omitempty" query:"shipping"`
+	SpuImageId  *int64   `thrift:"spuImageId,8,optional" form:"spuImageId" json:"spuImageId,omitempty" query:"spuImageId"`
 }
 
 func NewUpdateSpuReq() *UpdateSpuReq {
@@ -3518,15 +3389,6 @@ func NewUpdateSpuReq() *UpdateSpuReq {
 }
 
 func (p *UpdateSpuReq) InitDefault() {
-}
-
-var UpdateSpuReq_SpuImages_DEFAULT [][]byte
-
-func (p *UpdateSpuReq) GetSpuImages() (v [][]byte) {
-	if !p.IsSetSpuImages() {
-		return UpdateSpuReq_SpuImages_DEFAULT
-	}
-	return p.SpuImages
 }
 
 var UpdateSpuReq_Name_DEFAULT string
@@ -3560,15 +3422,6 @@ func (p *UpdateSpuReq) GetCategoryID() (v int64) {
 	return *p.CategoryID
 }
 
-var UpdateSpuReq_GoodsHeadDrawing_DEFAULT string
-
-func (p *UpdateSpuReq) GetGoodsHeadDrawing() (v string) {
-	if !p.IsSetGoodsHeadDrawing() {
-		return UpdateSpuReq_GoodsHeadDrawing_DEFAULT
-	}
-	return *p.GoodsHeadDrawing
-}
-
 var UpdateSpuReq_Price_DEFAULT float64
 
 func (p *UpdateSpuReq) GetPrice() (v float64) {
@@ -3596,20 +3449,24 @@ func (p *UpdateSpuReq) GetShipping() (v float64) {
 	return *p.Shipping
 }
 
-var fieldIDToName_UpdateSpuReq = map[int16]string{
-	1: "spuImages",
-	2: "name",
-	3: "spuID",
-	4: "description",
-	5: "categoryID",
-	6: "goodsHeadDrawing",
-	7: "price",
-	8: "forSale",
-	9: "shipping",
+var UpdateSpuReq_SpuImageId_DEFAULT int64
+
+func (p *UpdateSpuReq) GetSpuImageId() (v int64) {
+	if !p.IsSetSpuImageId() {
+		return UpdateSpuReq_SpuImageId_DEFAULT
+	}
+	return *p.SpuImageId
 }
 
-func (p *UpdateSpuReq) IsSetSpuImages() bool {
-	return p.SpuImages != nil
+var fieldIDToName_UpdateSpuReq = map[int16]string{
+	1: "name",
+	2: "spuID",
+	3: "description",
+	4: "categoryID",
+	5: "price",
+	6: "forSale",
+	7: "shipping",
+	8: "spuImageId",
 }
 
 func (p *UpdateSpuReq) IsSetName() bool {
@@ -3624,10 +3481,6 @@ func (p *UpdateSpuReq) IsSetCategoryID() bool {
 	return p.CategoryID != nil
 }
 
-func (p *UpdateSpuReq) IsSetGoodsHeadDrawing() bool {
-	return p.GoodsHeadDrawing != nil
-}
-
 func (p *UpdateSpuReq) IsSetPrice() bool {
 	return p.Price != nil
 }
@@ -3638,6 +3491,10 @@ func (p *UpdateSpuReq) IsSetForSale() bool {
 
 func (p *UpdateSpuReq) IsSetShipping() bool {
 	return p.Shipping != nil
+}
+
+func (p *UpdateSpuReq) IsSetSpuImageId() bool {
+	return p.SpuImageId != nil
 }
 
 func (p *UpdateSpuReq) Read(iprot thrift.TProtocol) (err error) {
@@ -3661,7 +3518,7 @@ func (p *UpdateSpuReq) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.LIST {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -3669,24 +3526,24 @@ func (p *UpdateSpuReq) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 2:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 3:
 			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField3(iprot); err != nil {
+				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetSpuID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 4:
+		case 3:
 			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField3(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 4:
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -3694,7 +3551,7 @@ func (p *UpdateSpuReq) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 5:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.DOUBLE {
 				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -3702,7 +3559,7 @@ func (p *UpdateSpuReq) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 6:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField6(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -3718,16 +3575,8 @@ func (p *UpdateSpuReq) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 8:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField8(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 9:
-			if fieldTypeId == thrift.DOUBLE {
-				if err = p.ReadField9(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
@@ -3747,7 +3596,7 @@ func (p *UpdateSpuReq) Read(iprot thrift.TProtocol) (err error) {
 	}
 
 	if !issetSpuID {
-		fieldId = 3
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -3769,29 +3618,6 @@ RequiredFieldNotSetError:
 }
 
 func (p *UpdateSpuReq) ReadField1(iprot thrift.TProtocol) error {
-	_, size, err := iprot.ReadListBegin()
-	if err != nil {
-		return err
-	}
-	_field := make([][]byte, 0, size)
-	for i := 0; i < size; i++ {
-
-		var _elem []byte
-		if v, err := iprot.ReadBinary(); err != nil {
-			return err
-		} else {
-			_elem = []byte(v)
-		}
-
-		_field = append(_field, _elem)
-	}
-	if err := iprot.ReadListEnd(); err != nil {
-		return err
-	}
-	p.SpuImages = _field
-	return nil
-}
-func (p *UpdateSpuReq) ReadField2(iprot thrift.TProtocol) error {
 
 	var _field *string
 	if v, err := iprot.ReadString(); err != nil {
@@ -3802,7 +3628,7 @@ func (p *UpdateSpuReq) ReadField2(iprot thrift.TProtocol) error {
 	p.Name = _field
 	return nil
 }
-func (p *UpdateSpuReq) ReadField3(iprot thrift.TProtocol) error {
+func (p *UpdateSpuReq) ReadField2(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -3813,7 +3639,7 @@ func (p *UpdateSpuReq) ReadField3(iprot thrift.TProtocol) error {
 	p.SpuID = _field
 	return nil
 }
-func (p *UpdateSpuReq) ReadField4(iprot thrift.TProtocol) error {
+func (p *UpdateSpuReq) ReadField3(iprot thrift.TProtocol) error {
 
 	var _field *string
 	if v, err := iprot.ReadString(); err != nil {
@@ -3824,7 +3650,7 @@ func (p *UpdateSpuReq) ReadField4(iprot thrift.TProtocol) error {
 	p.Description = _field
 	return nil
 }
-func (p *UpdateSpuReq) ReadField5(iprot thrift.TProtocol) error {
+func (p *UpdateSpuReq) ReadField4(iprot thrift.TProtocol) error {
 
 	var _field *int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -3835,18 +3661,7 @@ func (p *UpdateSpuReq) ReadField5(iprot thrift.TProtocol) error {
 	p.CategoryID = _field
 	return nil
 }
-func (p *UpdateSpuReq) ReadField6(iprot thrift.TProtocol) error {
-
-	var _field *string
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		_field = &v
-	}
-	p.GoodsHeadDrawing = _field
-	return nil
-}
-func (p *UpdateSpuReq) ReadField7(iprot thrift.TProtocol) error {
+func (p *UpdateSpuReq) ReadField5(iprot thrift.TProtocol) error {
 
 	var _field *float64
 	if v, err := iprot.ReadDouble(); err != nil {
@@ -3857,7 +3672,7 @@ func (p *UpdateSpuReq) ReadField7(iprot thrift.TProtocol) error {
 	p.Price = _field
 	return nil
 }
-func (p *UpdateSpuReq) ReadField8(iprot thrift.TProtocol) error {
+func (p *UpdateSpuReq) ReadField6(iprot thrift.TProtocol) error {
 
 	var _field *int32
 	if v, err := iprot.ReadI32(); err != nil {
@@ -3868,7 +3683,7 @@ func (p *UpdateSpuReq) ReadField8(iprot thrift.TProtocol) error {
 	p.ForSale = _field
 	return nil
 }
-func (p *UpdateSpuReq) ReadField9(iprot thrift.TProtocol) error {
+func (p *UpdateSpuReq) ReadField7(iprot thrift.TProtocol) error {
 
 	var _field *float64
 	if v, err := iprot.ReadDouble(); err != nil {
@@ -3877,6 +3692,17 @@ func (p *UpdateSpuReq) ReadField9(iprot thrift.TProtocol) error {
 		_field = &v
 	}
 	p.Shipping = _field
+	return nil
+}
+func (p *UpdateSpuReq) ReadField8(iprot thrift.TProtocol) error {
+
+	var _field *int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = &v
+	}
+	p.SpuImageId = _field
 	return nil
 }
 
@@ -3919,10 +3745,6 @@ func (p *UpdateSpuReq) Write(oprot thrift.TProtocol) (err error) {
 			fieldId = 8
 			goto WriteFieldError
 		}
-		if err = p.writeField9(oprot); err != nil {
-			fieldId = 9
-			goto WriteFieldError
-		}
 	}
 	if err = oprot.WriteFieldStop(); err != nil {
 		goto WriteFieldStopError
@@ -3942,19 +3764,11 @@ WriteStructEndError:
 }
 
 func (p *UpdateSpuReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if p.IsSetSpuImages() {
-		if err = oprot.WriteFieldBegin("spuImages", thrift.LIST, 1); err != nil {
+	if p.IsSetName() {
+		if err = oprot.WriteFieldBegin("name", thrift.STRING, 1); err != nil {
 			goto WriteFieldBeginError
 		}
-		if err := oprot.WriteListBegin(thrift.STRING, len(p.SpuImages)); err != nil {
-			return err
-		}
-		for _, v := range p.SpuImages {
-			if err := oprot.WriteBinary([]byte(v)); err != nil {
-				return err
-			}
-		}
-		if err := oprot.WriteListEnd(); err != nil {
+		if err := oprot.WriteString(*p.Name); err != nil {
 			return err
 		}
 		if err = oprot.WriteFieldEnd(); err != nil {
@@ -3969,26 +3783,7 @@ WriteFieldEndError:
 }
 
 func (p *UpdateSpuReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if p.IsSetName() {
-		if err = oprot.WriteFieldBegin("name", thrift.STRING, 2); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteString(*p.Name); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *UpdateSpuReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("spuID", thrift.I64, 3); err != nil {
+	if err = oprot.WriteFieldBegin("spuID", thrift.I64, 2); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI64(p.SpuID); err != nil {
@@ -3999,17 +3794,36 @@ func (p *UpdateSpuReq) writeField3(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *UpdateSpuReq) writeField3(oprot thrift.TProtocol) (err error) {
+	if p.IsSetDescription() {
+		if err = oprot.WriteFieldBegin("description", thrift.STRING, 3); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteString(*p.Description); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
 func (p *UpdateSpuReq) writeField4(oprot thrift.TProtocol) (err error) {
-	if p.IsSetDescription() {
-		if err = oprot.WriteFieldBegin("description", thrift.STRING, 4); err != nil {
+	if p.IsSetCategoryID() {
+		if err = oprot.WriteFieldBegin("categoryID", thrift.I64, 4); err != nil {
 			goto WriteFieldBeginError
 		}
-		if err := oprot.WriteString(*p.Description); err != nil {
+		if err := oprot.WriteI64(*p.CategoryID); err != nil {
 			return err
 		}
 		if err = oprot.WriteFieldEnd(); err != nil {
@@ -4024,11 +3838,11 @@ WriteFieldEndError:
 }
 
 func (p *UpdateSpuReq) writeField5(oprot thrift.TProtocol) (err error) {
-	if p.IsSetCategoryID() {
-		if err = oprot.WriteFieldBegin("categoryID", thrift.I64, 5); err != nil {
+	if p.IsSetPrice() {
+		if err = oprot.WriteFieldBegin("price", thrift.DOUBLE, 5); err != nil {
 			goto WriteFieldBeginError
 		}
-		if err := oprot.WriteI64(*p.CategoryID); err != nil {
+		if err := oprot.WriteDouble(*p.Price); err != nil {
 			return err
 		}
 		if err = oprot.WriteFieldEnd(); err != nil {
@@ -4043,11 +3857,11 @@ WriteFieldEndError:
 }
 
 func (p *UpdateSpuReq) writeField6(oprot thrift.TProtocol) (err error) {
-	if p.IsSetGoodsHeadDrawing() {
-		if err = oprot.WriteFieldBegin("goodsHeadDrawing", thrift.STRING, 6); err != nil {
+	if p.IsSetForSale() {
+		if err = oprot.WriteFieldBegin("forSale", thrift.I32, 6); err != nil {
 			goto WriteFieldBeginError
 		}
-		if err := oprot.WriteString(*p.GoodsHeadDrawing); err != nil {
+		if err := oprot.WriteI32(*p.ForSale); err != nil {
 			return err
 		}
 		if err = oprot.WriteFieldEnd(); err != nil {
@@ -4062,11 +3876,11 @@ WriteFieldEndError:
 }
 
 func (p *UpdateSpuReq) writeField7(oprot thrift.TProtocol) (err error) {
-	if p.IsSetPrice() {
-		if err = oprot.WriteFieldBegin("price", thrift.DOUBLE, 7); err != nil {
+	if p.IsSetShipping() {
+		if err = oprot.WriteFieldBegin("shipping", thrift.DOUBLE, 7); err != nil {
 			goto WriteFieldBeginError
 		}
-		if err := oprot.WriteDouble(*p.Price); err != nil {
+		if err := oprot.WriteDouble(*p.Shipping); err != nil {
 			return err
 		}
 		if err = oprot.WriteFieldEnd(); err != nil {
@@ -4081,11 +3895,11 @@ WriteFieldEndError:
 }
 
 func (p *UpdateSpuReq) writeField8(oprot thrift.TProtocol) (err error) {
-	if p.IsSetForSale() {
-		if err = oprot.WriteFieldBegin("forSale", thrift.I32, 8); err != nil {
+	if p.IsSetSpuImageId() {
+		if err = oprot.WriteFieldBegin("spuImageId", thrift.I64, 8); err != nil {
 			goto WriteFieldBeginError
 		}
-		if err := oprot.WriteI32(*p.ForSale); err != nil {
+		if err := oprot.WriteI64(*p.SpuImageId); err != nil {
 			return err
 		}
 		if err = oprot.WriteFieldEnd(); err != nil {
@@ -4097,25 +3911,6 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 8 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 8 end error: ", p), err)
-}
-
-func (p *UpdateSpuReq) writeField9(oprot thrift.TProtocol) (err error) {
-	if p.IsSetShipping() {
-		if err = oprot.WriteFieldBegin("shipping", thrift.DOUBLE, 9); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteDouble(*p.Shipping); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 9 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 9 end error: ", p), err)
 }
 
 func (p *UpdateSpuReq) String() string {
@@ -5852,6 +5647,310 @@ func (p *ViewSpuImageResp) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("ViewSpuImageResp(%+v)", *p)
+
+}
+
+type DeleteSpuImageReq struct {
+	SpuImageID int64 `thrift:"spuImageID,1,required" form:"spuImageID,required" json:"spuImageID,required" query:"spuImageID,required"`
+}
+
+func NewDeleteSpuImageReq() *DeleteSpuImageReq {
+	return &DeleteSpuImageReq{}
+}
+
+func (p *DeleteSpuImageReq) InitDefault() {
+}
+
+func (p *DeleteSpuImageReq) GetSpuImageID() (v int64) {
+	return p.SpuImageID
+}
+
+var fieldIDToName_DeleteSpuImageReq = map[int16]string{
+	1: "spuImageID",
+}
+
+func (p *DeleteSpuImageReq) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetSpuImageID bool = false
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetSpuImageID = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	if !issetSpuImageID {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_DeleteSpuImageReq[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_DeleteSpuImageReq[fieldId]))
+}
+
+func (p *DeleteSpuImageReq) ReadField1(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.SpuImageID = _field
+	return nil
+}
+
+func (p *DeleteSpuImageReq) Write(oprot thrift.TProtocol) (err error) {
+
+	var fieldId int16
+	if err = oprot.WriteStructBegin("DeleteSpuImageReq"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *DeleteSpuImageReq) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("spuImageID", thrift.I64, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.SpuImageID); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *DeleteSpuImageReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("DeleteSpuImageReq(%+v)", *p)
+
+}
+
+type DeleteSpuImageResp struct {
+	Base *model.BaseResp `thrift:"base,1,required" form:"base,required" json:"base,required" query:"base,required"`
+}
+
+func NewDeleteSpuImageResp() *DeleteSpuImageResp {
+	return &DeleteSpuImageResp{}
+}
+
+func (p *DeleteSpuImageResp) InitDefault() {
+}
+
+var DeleteSpuImageResp_Base_DEFAULT *model.BaseResp
+
+func (p *DeleteSpuImageResp) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return DeleteSpuImageResp_Base_DEFAULT
+	}
+	return p.Base
+}
+
+var fieldIDToName_DeleteSpuImageResp = map[int16]string{
+	1: "base",
+}
+
+func (p *DeleteSpuImageResp) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *DeleteSpuImageResp) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetBase bool = false
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetBase = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	if !issetBase {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_DeleteSpuImageResp[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_DeleteSpuImageResp[fieldId]))
+}
+
+func (p *DeleteSpuImageResp) ReadField1(iprot thrift.TProtocol) error {
+	_field := model.NewBaseResp()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.Base = _field
+	return nil
+}
+
+func (p *DeleteSpuImageResp) Write(oprot thrift.TProtocol) (err error) {
+
+	var fieldId int16
+	if err = oprot.WriteStructBegin("DeleteSpuImageResp"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *DeleteSpuImageResp) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("base", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Base.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *DeleteSpuImageResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("DeleteSpuImageResp(%+v)", *p)
 
 }
 

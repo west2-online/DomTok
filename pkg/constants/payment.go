@@ -1,21 +1,44 @@
+/*
+Copyright 2024 The west2-online Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package constants
 
+import "time"
+
 const (
-	PaymentOrderNotExist               = -1
-	PaymentStatusPending               = 0 // 待支付
-	PaymentStatusProcessing            = 1 // 处理中
-	PaymentStatusSuccess               = 2 // 成功支付
-	PaymentStatusFailed                = 3 // 支付失败
-	PaymentOrderNotExistToken          = ""
-	PaymentOrderNotExistExpirationTime = 0
-	UserNotExist                       = -1
-	UserNotExistToken                  = ""
-	UserNotExistExpirationTime         = 0
-	HavePaidToken                      = ""
-	HavePaidExpirationTime             = 0
-	ErrorToken                         = ""
-	ErrorExpirationTime                = 0
-	PaymentSecretKey                   = "west2online"
-	RedisStoreSuccess                  = 0  // 成功
-	RedisStoreFailed                   = -1 // Redis 存储失败
+	OrderNotExist      = false
+	PaymentExist       = true
+	PaymentNotExist    = false
+	UserNotExist       = false
+	PaymentSecretKey   = "west2online"
+	RedisStoreSuccess  = true  // 成功
+	RedisStoreFailed   = false // Redis 存储失败
+	ExpirationDuration = 15 * time.Minute
+	// TODO 这一个常量要改
+	PingTime = 2
+)
+
+const (
+	PaymentStatusPending    = iota // 待支付
+	PaymentStatusProcessing        // 处理中
+	PaymentStatusSuccess           // 成功支付
+	PaymentStatusFailed            // 支付失败
+)
+
+// TODO 最后要删除这个东西
+const (
+	TestUserID = 123
 )

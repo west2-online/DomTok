@@ -17,12 +17,14 @@ limitations under the License.
 package payment
 
 import (
-	"github.com/west2-online/DomTok/app/user/controllers/rpc"
-	"github.com/west2-online/DomTok/app/user/domain/service"
-	"github.com/west2-online/DomTok/app/user/infrastructure/mysql"
-	"github.com/west2-online/DomTok/app/user/usecase"
+	"github.com/west2-online/DomTok/app/payment/controllers/rpc"
+	"github.com/west2-online/DomTok/app/payment/domain/service"
+	"github.com/west2-online/DomTok/app/payment/infrastructure/mysql"
+	"github.com/west2-online/DomTok/app/payment/infrastructure/redis"
+	"github.com/west2-online/DomTok/app/payment/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/payment"
 	"github.com/west2-online/DomTok/pkg/base/client"
+	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
@@ -31,15 +33,29 @@ func InjectPaymentHandler() payment.PaymentService {
 	if err != nil {
 		panic(err)
 	}
-	// 这个地方要补充一下
+
+	// 初始化 Redis 客户端
+	// 初始化 Redis，使用指定的 Redis DB
+	redisClient, err := client.InitRedis(constants.RedisDBOrder)
+	if err != nil {
+		panic(err)
+	}
+	// 封装 Redis 存储对象
+	redisRepo := redis.NewPaymentRedis(redisClient)
+
 	sf, err := utils.NewSnowflake(0, 0)
 	if err != nil {
 		panic(err)
 	}
 
+	// 初始化数据库存储
 	db := mysql.NewPaymentDB(gormDB)
-	svc := service.NewPaymentService(db, sf)
-	uc := usecase.NewPaymentCase(db, svc)
+
+	// 初始化 Service，并传入 Redis
+	svc := service.NewPaymentService(db, sf, redisRepo)
+
+	// 初始化 UseCase，并传入 Redis
+	uc := usecase.NewPaymentCase(db, svc, redisRepo)
 
 	return rpc.NewPaymentHandler(uc)
 }

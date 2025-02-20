@@ -19,6 +19,8 @@ package rpc
 import (
 	"context"
 
+	api "github.com/west2-online/DomTok/app/gateway/model/api/user"
+	"github.com/west2-online/DomTok/app/gateway/model/model"
 	"github.com/west2-online/DomTok/kitex_gen/user"
 	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/errno"
@@ -34,17 +36,38 @@ func InitUserRPC() {
 	userClient = *c
 }
 
-func RegisterRPC(ctx context.Context, req *user.RegisterRequest) (uid int64, err error) {
+func RegisterRPC(ctx context.Context, req *user.RegisterRequest) (response *api.RegisterResponse, err error) {
 	resp, err := userClient.Register(ctx, req)
 	// 这里的 err 是属于 RPC 间调用的错误，例如 network error
 	// 而业务错误则是封装在 resp.base 当中的
 	if err != nil {
 		logger.Errorf("RegisterRPC: RPC called failed: %v", err.Error())
-		return 0, errno.InternalServiceError.WithError(err)
+		return nil, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsSuccess(resp.Base) {
-		// TODO 这里先这样放在这吧, 太累了, 有兴趣的可以考虑一下怎么返回更好
-		return 0, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
 	}
-	return resp.UserID, nil
+
+	response = &api.RegisterResponse{UID: resp.UserID}
+	return response, nil
+}
+
+func LoginRPC(ctx context.Context, req *user.LoginRequest) (response *api.LoginResponse, err error) {
+	resp, err := userClient.Login(ctx, req)
+	if err != nil {
+		logger.Errorf("LoginRPC: RPC called failed: %v", err.Error())
+		return nil, errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+
+	response = &api.LoginResponse{
+		User: &model.UserInfo{
+			UserId: resp.User.UserId,
+			Name:   resp.User.Name,
+		},
+	}
+
+	return response, nil
 }

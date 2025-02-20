@@ -24,22 +24,24 @@ import (
 	"github.com/west2-online/DomTok/app/payment/domain/service"
 )
 
+// PaymentUseCase 这里写的是最大的大方法内的中等方法
 type PaymentUseCase interface {
 	CreatePayment(ctx context.Context, orderID int64) (*model.PaymentOrder, error)
-	// GetPaymentToken 这里一次返回三个参数很不优雅但我不知道要怎么搞>_<
-	GetPaymentToken(ctx context.Context, payment *model.PaymentOrder) (string, int64, error)
+	GetPaymentToken(ctx context.Context, orderID int64) (string, int64, error)
 	// ProcessRefund
 	// RequestRefundToken
 }
 
 type paymentUseCase struct {
-	db  repository.PaymentDB
-	svc *service.PaymentService
+	db    repository.PaymentDB
+	svc   *service.PaymentService
+	redis repository.PaymentRedis
 }
 
-func NewPaymentCase(db repository.PaymentDB, svc *service.PaymentService) PaymentUseCase {
+func NewPaymentCase(db repository.PaymentDB, svc *service.PaymentService, redis repository.PaymentRedis) PaymentUseCase {
 	return &paymentUseCase{
-		db:  db,
-		svc: svc,
+		db:    db,
+		svc:   svc,
+		redis: redis,
 	}
 }

@@ -1,8 +1,12 @@
 server:
   private-key: | # PKCS#8
     -----BEGIN PRIVATE KEY-----
-    {insert your private key here}
+    MC4CAQAwBQYDK2VwBCIEIJi1JE7fq4xFZTXiOWvK9PDEDVIOgsF0dMF46BMgT9jY
     -----END PRIVATE KEY-----
+  public-key: |
+    -----BEGIN PUBLIC KEY-----
+    MCowBQYDK2VwAyEAe8QtuyTwO7YgDmZegsPpPPGuMZkjg6209OoArIOVOz0=
+    -----END PUBLIC KEY-----
   version: "1.0"
   name: "DomTok"
   log-level: "INFO" # OPTIONS: TRACE, DEBUG, INFO(default), NOTICE, WARN, ERROR, FATAL
@@ -45,6 +49,16 @@ kafka:
   user: domtok
   password: domtok-password
 
+upyuns:
+    bucket: "w2-domtok"
+    operator: "penqee"
+    password: ""
+    token-secret: ""
+    token-timeout: 60
+    uss-domain: "http://w2-domtok.test.upcdn.net" # 测试域名
+    download-domain: ""
+
+
 services:
   template:
     name: template
@@ -69,3 +83,15 @@ services:
     load-balance: false
     addr:
       - 0.0.0.0:20003
+
+  commodity:
+    name: commodity
+    load-balance: false
+    addr:
+      - 0.0.0.0:20004
+
+  payment:
+    name: payment
+    load-balance: false
+    addr:
+      - 0.0.0.0:20005

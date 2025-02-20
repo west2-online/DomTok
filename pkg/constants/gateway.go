@@ -26,4 +26,5 @@ const (
 
 	SentinelThreshold        = 100
 	SentinelStatIntervalInMs = 1000
+	LoginDataKey             = "loginData"
 )

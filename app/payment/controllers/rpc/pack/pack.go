@@ -14,17 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+<<<<<<<< HEAD:app/payment/domain/repository/interface.go
+package repository
+
+import (
+	"context"
+)
+
+type PaymentDB interface {
+	GetOrderByToken(ctx context.Context, paramToken string) (int64, error)
+	GetUserByToken(ctx context.Context, paramToken string) (int64, error)
+	GetPaymentInfo(ctx context.Context, paramToken string) (int, error)
+========
 package pack
 
 import (
-	model2 "github.com/west2-online/DomTok/app/payment/domain/model"
 	"github.com/west2-online/DomTok/kitex_gen/model"
 )
 
-// BuildPaymentOrder BuildUser 将 entities 定义的 User 实体转换成 idl 定义的 RPC 交流实体，类似 dto
-func BuildPaymentOrder(u *model2.PaymentOrder) *model. {
-	return &model.UserInfo{
-		UserId: u.Uid,
-		Name:   u.UserName,
+// BuildPaymentOrder BuildUser 将 entities 定义的 Payment 实体转换成 idl 定义的 RPC 交流实体，类似 dto
+
+func BuildTokenInfo(token string, expTime int64) *model.PaymentTokenInfo {
+	return &model.PaymentTokenInfo{
+		PaymentToken:               token,
+		PaymentTokenExpirationTime: expTime,
 	}
+>>>>>>>> upstream/main:app/payment/controllers/rpc/pack/pack.go
 }

@@ -10,6 +10,7 @@ namespace go cart
 */
 struct AddGoodsIntoCartRequest{
     1: required i64 skuId,
+    2: required i64 shop_id,
     3: required i64 count,
 }
 
@@ -36,6 +37,7 @@ struct ShowCartGoodsListResponse{
 */
 struct UpdateCartGoodsRequest{
     1: required i64 skuId,
+    2: required i64 shop_id,
     3: required i64 count,
 }
 
@@ -72,4 +74,13 @@ struct PayCartGoodsRequest{
 
 struct PayCartGoodsResponse{
     1: required model.BaseResp base,
+}
+
+service CartService {
+    AddGoodsIntoCartResponse AddGoodsIntoCart(1: AddGoodsIntoCartRequest req),
+    ShowCartGoodsListResponse ShowCartGoodsList(1: ShowCartGoodsListRequest req),
+    UpdateCartGoodsResponse UpdateCartGoods(1: UpdateCartGoodsRequest req),
+    DeleteAllCartGoodsResponse DeleteCartGoods(1: DeleteAllCartGoodsRequest req),
+    DeleteAllCartGoodsResponse DeleteAllCartGoods(1:DeleteAllCartGoodsRequest req),
+    PayCartGoodsResponse PayCartGoods(1:PayCartGoodsRequest req),
 }

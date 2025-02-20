@@ -19,9 +19,12 @@ package usecase
 import (
 	"context"
 	"fmt"
+
+	"go.uber.org/zap"
+
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
-	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // CreatePayment 这里定义一些具体的方法和函数，比如校验密码，加密密码，创建用户之类的
@@ -29,65 +32,82 @@ func (uc *paymentUseCase) CreatePayment(ctx context.Context, orderID int64) (*mo
 	return nil, nil
 }
 
-// GetPaymentToken 这里要怎么让他一次只返回两个参数呢，然后为什么svc下面的方法总是识别不了呢？
-func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, paramToken string) (token string, expTime int64, err error) {
+func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (token string, expTime int64, err error) {
 	// 1. 检查订单是否存在
-	pid, err := uc.db.GetOrderByToken(ctx, paramToken)
-	// 这里直接return就可以吗？
+	// TODO 这个要向order模块要一个RPC接口然后再来填充
+	/*var orderInfo bool
+	orderInfo, err = uc.svc.CheckOrderExist(ctx, orderID)
 	if err != nil {
-		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime, fmt.Errorf("check payment order existed failed:%w", err)
+		return "", 0, fmt.Errorf("check order existed failed:%w", err)
 	}
-	if pid == paymentStatus.PaymentOrderNotExist {
-		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime, errno.NewErrNo(errno.PaymentOrderNotExist, "payment order does not exist")
+	if orderInfo == paymentStatus.OrderNotExist {
+		return "", 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
 	}
 
-	// 2. 检查用户是否存在
-	uid, err := uc.db.GetUserByToken(ctx, paramToken)
+	// 2. 获取用户id,并检查用户是否存在
+	// 获取用户id
+	var uid int64
+	uid, err = uc.svc.GetUserID(ctx)
 	if err != nil {
-		return paymentStatus.UserNotExistToken, paymentStatus.UserNotExistExpirationTime, fmt.Errorf("check user existed failed:%w", err)
-	}
-	if uid == paymentStatus.UserNotExist {
-		return paymentStatus.UserNotExistToken, paymentStatus.UserNotExistExpirationTime, errno.NewErrNo(errno.UserNotExist, "user does not exist")
+		return "", 0, fmt.Errorf("get user id failed:%w", err)
 	}
 
 	// 3. 检查订单支付信息
-	// 这里用int还是int8？
-	var paymentInfo int
-	paymentInfo, err = uc.db.GetPaymentInfo(ctx, paramToken)
+	var paymentInfo bool
+	paymentInfo, err = uc.db.CheckPaymentExist(ctx, orderID)
 	if err != nil {
-		return paymentStatus.PaymentOrderNotExistToken, paymentStatus.PaymentOrderNotExistExpirationTime, fmt.Errorf("check payment information failed:%w", err)
+		return "", 0, fmt.Errorf("check payment existed failed:%w", err)
 	}
-	if paymentInfo == paymentStatus.PaymentStatusSuccess || paymentInfo == paymentStatus.PaymentStatusProcessing {
-		return paymentStatus.HavePaidToken, paymentStatus.HavePaidExpirationTime, fmt.Errorf("payment is processing or has already done:%w", err)
-	} else {
+	if paymentInfo == paymentStatus.PaymentNotExist { // 如果订单不存在
 		// 创建支付订单
-		// TODO 这里的CreatePaymentInfo逻辑要怎么写？
-		_, err := uc.svc.CreatePaymentInfo(ctx, paramToken)
+		// TODO 待完善
+		_, err := uc.svc.CreatePaymentInfo(ctx, orderID)
 		if err != nil {
-			return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("create payment info failed:%w", err)
+			return "", 0, fmt.Errorf("create payment info failed:%w", err)
+		}
+	} else if paymentInfo == paymentStatus.PaymentExist { // 如果订单存在
+		// 获取订单的支付状态
+		payStatus, err := uc.db.GetPaymentInfo(ctx, orderID)
+		// 如果订单正在支付或者已经支付完成，则拒绝进行接下来的生成令牌的活动
+		if payStatus == paymentStatus.PaymentStatusSuccess || payStatus == paymentStatus.PaymentStatusProcessing {
+			return "", 0, fmt.Errorf("payment is processing or has already done:%w", err)
 		}
 	}
-
+	*/
 	// 4. HMAC生成支付令牌
-
-	// 感觉这里一次返回三个值非常非常非常不优雅，但是不知道要怎么写得更优雅
-	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, paramToken)
+	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, orderID)
 	if err != nil {
-		return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("generate payment token failed:%w", err)
+		logger.Error("Error generating payment token",
+			zap.Int64("orderID", orderID),
+			zap.Error(err),
+		)
+		return "", 0, fmt.Errorf("generate payment token failed:%w", err)
 	}
-	var redisStatus int
+	logger.Info("Generated payment token",
+		zap.String("token", token),
+		zap.Int64("expTime", expTime),
+	)
+
+	var redisStatus bool
 	// 5. 存储令牌到 Redis
-	redisStatus, err = uc.svc.StorePaymentToken(ctx, paramToken, expTime)
+	// TODO 记得删除这个测试数值
+	uid := int64(paymentStatus.TestUserID)
+	logger.Info("Storing token in Redis",
+		zap.Int64("userID", uid),
+		zap.Int64("orderID", orderID),
+	)
+	redisStatus, err = uc.svc.StorePaymentToken(ctx, token, expTime, uid, orderID)
 	if err != nil && redisStatus != paymentStatus.RedisStoreSuccess {
-		return paymentStatus.ErrorToken, paymentStatus.ErrorExpirationTime, fmt.Errorf("store payment token failed:%w", err)
+		logger.Error("Error storing payment token in Redis",
+			zap.Int64("orderID", orderID),
+			zap.Int64("userID", uid),
+			zap.Error(err),
+		)
+		return "", 0, fmt.Errorf("store payment token failed:%w", err)
 	}
+	logger.Info("Payment token stored successfully",
+		zap.Int64("orderID", orderID),
+		zap.Int64("userID", uid),
+	)
 	return token, expTime, nil
 }
-
-// 这里没有直接调用 db.CreateUser 是因为 svc.CreateUser 包含了一点业务逻辑, 这些细节不需要被 useCase 知道
-// if err = uc.svc.CreateUser(ctx, u); err != nil {
-// return
-// }
-
-// return u.Uid, nil
-// }

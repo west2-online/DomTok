@@ -19,11 +19,14 @@ package mysql
 import (
 	"context"
 	"errors"
+
+	"gorm.io/gorm"
+
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	"github.com/west2-online/DomTok/app/payment/domain/repository"
+	"github.com/west2-online/DomTok/pkg/constants"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
-	"gorm.io/gorm"
 )
 
 // paymentDB impl domain.PaymentDB defined domain
@@ -35,57 +38,58 @@ func NewPaymentDB(client *gorm.DB) repository.PaymentDB {
 	return &paymentDB{client: client}
 }
 
-// TODO 这里是直接传token去查询，还是要把token解析出来？
-func (db *paymentDB) GetOrderByToken(ctx context.Context, paramToken string) (int64, error) {
+// CheckPaymentExist 检查是否已经发起过支付，利用orderID在订单支付表里查询
+func (db *paymentDB) CheckPaymentExist(ctx context.Context, orderID int64) (paymentInfo bool, err error) {
 	var paymentOrder PaymentOrder
-	err := db.client.WithContext(ctx).Where("token = ?", paramToken).First(&paymentOrder).Error
+	// 利用orderID在订单支付表里查询是否已经发起过支付申请了（注意是订单支付表不是订单表）
+	err = db.client.WithContext(ctx).Table(constants.PaymentTableName).Where("order_id = ?", orderID).First(&paymentOrder).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return paymentStatus.PaymentOrderNotExist, nil
+			return paymentStatus.PaymentNotExist, nil
 		}
 		// 这里报错了就不是业务错误了, 而是服务级别的错误
-		return paymentStatus.PaymentOrderNotExist, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment token: %v", err)
+		return paymentStatus.PaymentNotExist, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment order: %v", err)
 	}
-	return paymentOrder.OrderID, nil // 查询成功，返回 order_id
+	return paymentStatus.PaymentExist, nil // 查询成功，返回支付状态
 }
 
-func (db *paymentDB) GetUserByToken(ctx context.Context, paramToken string) (int64, error) {
+// GetPaymentInfo 通过orderID查询payment的信息
+func (db *paymentDB) GetPaymentInfo(ctx context.Context, orderID int64) (interface{}, error) {
 	var paymentOrder PaymentOrder
-	err := db.client.WithContext(ctx).Where("token = ?", paramToken).First(&paymentOrder).Error
+	err := db.client.WithContext(ctx).Table(constants.PaymentTableName).Where("order_id = ?", orderID).First(&paymentOrder).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return paymentStatus.UserNotExist, nil
+			return paymentStatus.PaymentNotExist, nil
 		}
 		// 这里报错了就不是业务错误了, 而是服务级别的错误
-		return paymentStatus.UserNotExist, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment token: %v", err)
+		return paymentStatus.PaymentNotExist, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment order_id: %v", err)
 	}
-	return paymentOrder.UserID, nil // 查询成功，返回 user_id
+	return paymentOrder.Status, nil // 查询成功，返回支付状态
 }
 
-func (db *paymentDB) GetPaymentInfo(ctx context.Context, paramToken string) (int, error) {
-	var paymentOrder PaymentOrder
-	err := db.client.WithContext(ctx).Where("token = ?", paramToken).First(&paymentOrder).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return paymentStatus.UserNotExist, nil
-		}
-		// 这里报错了就不是业务错误了, 而是服务级别的错误
-		return paymentStatus.UserNotExist, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment token: %v", err)
+// ConvertToDBModel 转换函数
+func ConvertToDBModel(p *model.PaymentOrder) (*PaymentOrder, error) {
+	if p == nil {
+		// TODO 这里应该是用errno.ParamVerifyErrorCode这个错误码？
+		return nil, errno.Errorf(errno.ParamVerifyErrorCode, "ConvertToDBModel: input payment order is nil")
 	}
-	return int(paymentOrder.Status), nil // 查询成功，返回支付状态
-}
-
-// ConvertPayment TODO 后面把转换函数单独抽出来
-func (db *paymentDB) ConvertPayment(ctx context.Context, p *model.PaymentOrder) (*model.PaymentOrder, error) {
-	return nil, nil
+	return &PaymentOrder{
+		OrderID:                   p.OrderID,
+		UserID:                    p.UserID,
+		Amount:                    p.Amount,
+		Status:                    p.Status,
+		MaskedCreditCardNumber:    p.MaskedCreditCardNumber,
+		CreditCardExpirationYear:  p.CreditCardExpirationYear,
+		CreditCardExpirationMonth: p.CreditCardExpirationMonth,
+		Description:               p.Description,
+	}, nil
 }
 
 func (db *paymentDB) CreatePayment(ctx context.Context, p *model.PaymentOrder) error {
 	// 将 entity 转换成 mysql 这边的 paymentOrder
-	// TODO 可以考虑整一个函数统一转化, 放在这里占了太多行, 而且这不是这个方法该做的. 这个方法应该做的是创建用户
-	paymentOrder := PaymentOrder{
-		OrderID: p.OrderID,
-		UserID:  p.UserID,
+	paymentOrder, err := ConvertToDBModel(p)
+	if err != nil {
+		return errno.Errorf(errno.InternalServiceErrorCode, "CreatePayment: failed to convert payment order: %v", err)
 	}
 	if err := db.client.WithContext(ctx).Create(paymentOrder).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create payment: %v", err)

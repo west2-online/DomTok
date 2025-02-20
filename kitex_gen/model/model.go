@@ -2837,3 +2837,71 @@ var fieldIDToName_CreditCardInfo = map[int16]string{
 	3: "creditCardExpirationMonth",
 	4: "creditCardCvv",
 }
+
+type PaymentTokenInfo struct {
+	PaymentToken               string `thrift:"paymentToken,1,required" frugal:"1,required,string" json:"paymentToken"`
+	PaymentTokenExpirationTime int64  `thrift:"paymentTokenExpirationTime,2,required" frugal:"2,required,i64" json:"paymentTokenExpirationTime"`
+}
+
+func NewPaymentTokenInfo() *PaymentTokenInfo {
+	return &PaymentTokenInfo{}
+}
+
+func (p *PaymentTokenInfo) InitDefault() {
+}
+
+func (p *PaymentTokenInfo) GetPaymentToken() (v string) {
+	return p.PaymentToken
+}
+
+func (p *PaymentTokenInfo) GetPaymentTokenExpirationTime() (v int64) {
+	return p.PaymentTokenExpirationTime
+}
+func (p *PaymentTokenInfo) SetPaymentToken(val string) {
+	p.PaymentToken = val
+}
+func (p *PaymentTokenInfo) SetPaymentTokenExpirationTime(val int64) {
+	p.PaymentTokenExpirationTime = val
+}
+
+func (p *PaymentTokenInfo) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("PaymentTokenInfo(%+v)", *p)
+}
+
+func (p *PaymentTokenInfo) DeepEqual(ano *PaymentTokenInfo) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.PaymentToken) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.PaymentTokenExpirationTime) {
+		return false
+	}
+	return true
+}
+
+func (p *PaymentTokenInfo) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.PaymentToken, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *PaymentTokenInfo) Field2DeepEqual(src int64) bool {
+
+	if p.PaymentTokenExpirationTime != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_PaymentTokenInfo = map[int16]string{
+	1: "paymentToken",
+	2: "paymentTokenExpirationTime",
+}

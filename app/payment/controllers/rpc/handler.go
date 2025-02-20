@@ -18,11 +18,11 @@ package rpc
 
 import (
 	"context"
-	"github.com/west2-online/DomTok/app/payment/domain/model"
-	"github.com/west2-online/DomTok/app/payment/domain/service"
+
+	"github.com/west2-online/DomTok/app/payment/controllers/rpc/pack"
 	"github.com/west2-online/DomTok/app/payment/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/payment"
-	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/base"
 )
 
 type PaymentHandler struct {
@@ -39,7 +39,7 @@ func NewPaymentHandler(useCase usecase.PaymentUseCase) *PaymentHandler {
 func (handler *PaymentHandler) ProcessPayment(ctx context.Context, req *payment.PaymentRequest) (r *payment.PaymentResponse, err error) {
 	r = new(payment.PaymentResponse)
 	p, err := handler.useCase.CreatePayment(ctx, req.GetOrderID())
-	r.Status = int64(p.Status)
+	r.Status = p.Status
 	if err != nil {
 		return r, err
 	}
@@ -48,19 +48,16 @@ func (handler *PaymentHandler) ProcessPayment(ctx context.Context, req *payment.
 
 func (handler *PaymentHandler) RequestPaymentToken(ctx context.Context, req *payment.PaymentTokenRequest) (r *payment.PaymentTokenResponse, err error) {
 	r = new(payment.PaymentTokenResponse)
-	p := &model.PaymentOrder{
-		OrderID: req.OrderID,
-		UserID:  req.UserID,
-	}
-	// 我需要token和expTime，这里一次返回三个数值很不优雅，但我不知道要怎么优化
+	// logger.Info("GetPaymentToken called", zap.Int64("RequestPaymentToken", 123))
 	var token string
 	var expTime int64
-	token, expTime, err = handler.useCase.GetPaymentToken(ctx, p)
+	// 传入ctx（包含uid）和orderID,获取令牌和令牌过期时间
+	token, expTime, err = handler.useCase.GetPaymentToken(ctx, req.OrderID)
 	if err != nil {
 		return
 	}
-	r.PaymentToken = token
-	r.ExpirationTime = expTime
+	r.Base = base.BuildBaseResp(err)
+	r.TokenInfo = pack.BuildTokenInfo(token, expTime)
 	return
 }
 

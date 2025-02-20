@@ -23,6 +23,10 @@ import (
 
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
+	"github.com/cloudwego/kitex/client/callopt/streamcall"
+	"github.com/cloudwego/kitex/client/streamclient"
+	streaming "github.com/cloudwego/kitex/pkg/streaming"
+	transport "github.com/cloudwego/kitex/transport"
 
 	commodity "github.com/west2-online/DomTok/kitex_gen/commodity"
 )
@@ -35,8 +39,6 @@ type Client interface {
 	ViewCoupon(ctx context.Context, req *commodity.ViewCouponReq, callOptions ...callopt.Option) (r *commodity.ViewCouponResp, err error)
 	ViewUserAllCoupon(ctx context.Context, req *commodity.ViewCouponReq, callOptions ...callopt.Option) (r *commodity.ViewUserAllCouponResp, err error)
 	UseUserCoupon(ctx context.Context, req *commodity.UseUserCouponReq, callOptions ...callopt.Option) (r *commodity.UseUserCouponResp, err error)
-	CreateSpu(ctx context.Context, req *commodity.CreateSpuReq, callOptions ...callopt.Option) (r *commodity.CreateSpuResp, err error)
-	UpdateSpu(ctx context.Context, req *commodity.UpdateSkuReq, callOptions ...callopt.Option) (r *commodity.UpdateSpuResp, err error)
 	ViewSpu(ctx context.Context, req *commodity.ViewSpuReq, callOptions ...callopt.Option) (r *commodity.ViewSpuResp, err error)
 	DeleteSpu(ctx context.Context, req *commodity.DeleteSpuReq, callOptions ...callopt.Option) (r *commodity.DeleteSpuResp, err error)
 	ViewSpuImage(ctx context.Context, req *commodity.ViewSpuImageReq, callOptions ...callopt.Option) (r *commodity.ViewSpuImageResp, err error)
@@ -55,6 +57,24 @@ type Client interface {
 	DeleteCategory(ctx context.Context, req *commodity.DeleteCategoryReq, callOptions ...callopt.Option) (r *commodity.DeleteCategoryResp, err error)
 	ViewCategory(ctx context.Context, req *commodity.ViewCategoryReq, callOptions ...callopt.Option) (r *commodity.ViewCategoryResp, err error)
 	UpdateCategory(ctx context.Context, req *commodity.UpdateCategoryReq, callOptions ...callopt.Option) (r *commodity.UpdateCategoryResp, err error)
+}
+
+// StreamClient is designed to provide Interface for Streaming APIs.
+type StreamClient interface {
+	CreateSpu(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_CreateSpuClient, err error)
+	UpdateSpu(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_UpdateSpuClient, err error)
+}
+
+type CommodityService_CreateSpuClient interface {
+	streaming.Stream
+	Send(*commodity.CreateSpuReq) error
+	CloseAndRecv() (*commodity.CreateSpuResp, error)
+}
+
+type CommodityService_UpdateSpuClient interface {
+	streaming.Stream
+	Send(*commodity.UpdateSpuReq) error
+	CloseAndRecv() (*commodity.UpdateSpuResp, error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -114,16 +134,6 @@ func (p *kCommodityServiceClient) ViewUserAllCoupon(ctx context.Context, req *co
 func (p *kCommodityServiceClient) UseUserCoupon(ctx context.Context, req *commodity.UseUserCouponReq, callOptions ...callopt.Option) (r *commodity.UseUserCouponResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.UseUserCoupon(ctx, req)
-}
-
-func (p *kCommodityServiceClient) CreateSpu(ctx context.Context, req *commodity.CreateSpuReq, callOptions ...callopt.Option) (r *commodity.CreateSpuResp, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.CreateSpu(ctx, req)
-}
-
-func (p *kCommodityServiceClient) UpdateSpu(ctx context.Context, req *commodity.UpdateSkuReq, callOptions ...callopt.Option) (r *commodity.UpdateSpuResp, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.UpdateSpu(ctx, req)
 }
 
 func (p *kCommodityServiceClient) ViewSpu(ctx context.Context, req *commodity.ViewSpuReq, callOptions ...callopt.Option) (r *commodity.ViewSpuResp, err error) {
@@ -214,4 +224,44 @@ func (p *kCommodityServiceClient) ViewCategory(ctx context.Context, req *commodi
 func (p *kCommodityServiceClient) UpdateCategory(ctx context.Context, req *commodity.UpdateCategoryReq, callOptions ...callopt.Option) (r *commodity.UpdateCategoryResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.UpdateCategory(ctx, req)
+}
+
+// NewStreamClient creates a stream client for the service's streaming APIs defined in IDL.
+func NewStreamClient(destService string, opts ...streamclient.Option) (StreamClient, error) {
+	var options []client.Option
+	options = append(options, client.WithDestService(destService))
+	options = append(options, client.WithTransportProtocol(transport.GRPC))
+	options = append(options, streamclient.GetClientOptions(opts)...)
+
+	kc, err := client.NewClient(serviceInfoForStreamClient(), options...)
+	if err != nil {
+		return nil, err
+	}
+	return &kCommodityServiceStreamClient{
+		kClient: newServiceClient(kc),
+	}, nil
+}
+
+// MustNewStreamClient creates a stream client for the service's streaming APIs defined in IDL.
+// It panics if any error occurs.
+func MustNewStreamClient(destService string, opts ...streamclient.Option) StreamClient {
+	kc, err := NewStreamClient(destService, opts...)
+	if err != nil {
+		panic(err)
+	}
+	return kc
+}
+
+type kCommodityServiceStreamClient struct {
+	*kClient
+}
+
+func (p *kCommodityServiceStreamClient) CreateSpu(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_CreateSpuClient, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, streamcall.GetCallOptions(callOptions))
+	return p.kClient.CreateSpu(ctx)
+}
+
+func (p *kCommodityServiceStreamClient) UpdateSpu(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_UpdateSpuClient, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, streamcall.GetCallOptions(callOptions))
+	return p.kClient.UpdateSpu(ctx)
 }

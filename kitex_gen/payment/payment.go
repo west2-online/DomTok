@@ -95,9 +95,8 @@ var fieldIDToName_PaymentTokenRequest = map[int16]string{
 }
 
 type PaymentTokenResponse struct {
-	Base           *model.BaseResp `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
-	PaymentToken   string          `thrift:"paymentToken,2,required" frugal:"2,required,string" json:"paymentToken"`
-	ExpirationTime int64           `thrift:"expirationTime,3,required" frugal:"3,required,i64" json:"expirationTime"`
+	Base      *model.BaseResp         `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
+	TokenInfo *model.PaymentTokenInfo `thrift:"tokenInfo,2" frugal:"2,default,model.PaymentTokenInfo" json:"tokenInfo"`
 }
 
 func NewPaymentTokenResponse() *PaymentTokenResponse {
@@ -116,25 +115,27 @@ func (p *PaymentTokenResponse) GetBase() (v *model.BaseResp) {
 	return p.Base
 }
 
-func (p *PaymentTokenResponse) GetPaymentToken() (v string) {
-	return p.PaymentToken
-}
+var PaymentTokenResponse_TokenInfo_DEFAULT *model.PaymentTokenInfo
 
-func (p *PaymentTokenResponse) GetExpirationTime() (v int64) {
-	return p.ExpirationTime
+func (p *PaymentTokenResponse) GetTokenInfo() (v *model.PaymentTokenInfo) {
+	if !p.IsSetTokenInfo() {
+		return PaymentTokenResponse_TokenInfo_DEFAULT
+	}
+	return p.TokenInfo
 }
 func (p *PaymentTokenResponse) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
-func (p *PaymentTokenResponse) SetPaymentToken(val string) {
-	p.PaymentToken = val
-}
-func (p *PaymentTokenResponse) SetExpirationTime(val int64) {
-	p.ExpirationTime = val
+func (p *PaymentTokenResponse) SetTokenInfo(val *model.PaymentTokenInfo) {
+	p.TokenInfo = val
 }
 
 func (p *PaymentTokenResponse) IsSetBase() bool {
 	return p.Base != nil
+}
+
+func (p *PaymentTokenResponse) IsSetTokenInfo() bool {
+	return p.TokenInfo != nil
 }
 
 func (p *PaymentTokenResponse) String() string {
@@ -153,10 +154,7 @@ func (p *PaymentTokenResponse) DeepEqual(ano *PaymentTokenResponse) bool {
 	if !p.Field1DeepEqual(ano.Base) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.PaymentToken) {
-		return false
-	}
-	if !p.Field3DeepEqual(ano.ExpirationTime) {
+	if !p.Field2DeepEqual(ano.TokenInfo) {
 		return false
 	}
 	return true
@@ -169,16 +167,9 @@ func (p *PaymentTokenResponse) Field1DeepEqual(src *model.BaseResp) bool {
 	}
 	return true
 }
-func (p *PaymentTokenResponse) Field2DeepEqual(src string) bool {
+func (p *PaymentTokenResponse) Field2DeepEqual(src *model.PaymentTokenInfo) bool {
 
-	if strings.Compare(p.PaymentToken, src) != 0 {
-		return false
-	}
-	return true
-}
-func (p *PaymentTokenResponse) Field3DeepEqual(src int64) bool {
-
-	if p.ExpirationTime != src {
+	if !p.TokenInfo.DeepEqual(src) {
 		return false
 	}
 	return true
@@ -186,16 +177,14 @@ func (p *PaymentTokenResponse) Field3DeepEqual(src int64) bool {
 
 var fieldIDToName_PaymentTokenResponse = map[int16]string{
 	1: "base",
-	2: "paymentToken",
-	3: "expirationTime",
+	2: "tokenInfo",
 }
 
 type PaymentRequest struct {
-	OrderID      int64                 `thrift:"orderID,1,required" frugal:"1,required,i64" json:"orderID"`
-	UserID       int64                 `thrift:"userID,2,required" frugal:"2,required,i64" json:"userID"`
-	PaymentToken string                `thrift:"paymentToken,3,required" frugal:"3,required,string" json:"paymentToken"`
-	CreditCard   *model.CreditCardInfo `thrift:"creditCard,4,required" frugal:"4,required,model.CreditCardInfo" json:"creditCard"`
-	Description  *string               `thrift:"description,5,optional" frugal:"5,optional,string" json:"description,omitempty"`
+	OrderID     int64                 `thrift:"orderID,1,required" frugal:"1,required,i64" json:"orderID"`
+	UserID      int64                 `thrift:"userID,2,required" frugal:"2,required,i64" json:"userID"`
+	CreditCard  *model.CreditCardInfo `thrift:"creditCard,4,required" frugal:"4,required,model.CreditCardInfo" json:"creditCard"`
+	Description *string               `thrift:"description,5,optional" frugal:"5,optional,string" json:"description,omitempty"`
 }
 
 func NewPaymentRequest() *PaymentRequest {
@@ -211,10 +200,6 @@ func (p *PaymentRequest) GetOrderID() (v int64) {
 
 func (p *PaymentRequest) GetUserID() (v int64) {
 	return p.UserID
-}
-
-func (p *PaymentRequest) GetPaymentToken() (v string) {
-	return p.PaymentToken
 }
 
 var PaymentRequest_CreditCard_DEFAULT *model.CreditCardInfo
@@ -239,9 +224,6 @@ func (p *PaymentRequest) SetOrderID(val int64) {
 }
 func (p *PaymentRequest) SetUserID(val int64) {
 	p.UserID = val
-}
-func (p *PaymentRequest) SetPaymentToken(val string) {
-	p.PaymentToken = val
 }
 func (p *PaymentRequest) SetCreditCard(val *model.CreditCardInfo) {
 	p.CreditCard = val
@@ -277,9 +259,6 @@ func (p *PaymentRequest) DeepEqual(ano *PaymentRequest) bool {
 	if !p.Field2DeepEqual(ano.UserID) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.PaymentToken) {
-		return false
-	}
 	if !p.Field4DeepEqual(ano.CreditCard) {
 		return false
 	}
@@ -299,13 +278,6 @@ func (p *PaymentRequest) Field1DeepEqual(src int64) bool {
 func (p *PaymentRequest) Field2DeepEqual(src int64) bool {
 
 	if p.UserID != src {
-		return false
-	}
-	return true
-}
-func (p *PaymentRequest) Field3DeepEqual(src string) bool {
-
-	if strings.Compare(p.PaymentToken, src) != 0 {
 		return false
 	}
 	return true
@@ -333,7 +305,6 @@ func (p *PaymentRequest) Field5DeepEqual(src *string) bool {
 var fieldIDToName_PaymentRequest = map[int16]string{
 	1: "orderID",
 	2: "userID",
-	3: "paymentToken",
 	4: "creditCard",
 	5: "description",
 }

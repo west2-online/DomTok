@@ -7,7 +7,8 @@ include "../model.thrift"
 * @Param count 数量
 */
 struct AddGoodsIntoCartRequest{
-    1: required i64 skuId,
+    1: required i64 sku_id,
+    2: required i64 shop_id,
     3: required i64 count,
 }
 
@@ -19,13 +20,13 @@ struct AddGoodsIntoCartResponse{
 * @Param pageNum 页码(一页默认15个商品)
 */
 struct ShowCartGoodsListRequest{
-    1: required i64 pageNum,
+    1: required i64 page_num,
 }
 
 struct ShowCartGoodsListResponse{
     1: required model.BaseResp base,
-    2: required list<model.Sku> goodsList,
-    3: required i64 goodsCount,
+    2: required list<model.Sku> goods_list,
+    3: required i64 goods_count,
 }
 
 /* struct UpdateCartGoodsRequest 更新购物车商品，暴露
@@ -33,7 +34,8 @@ struct ShowCartGoodsListResponse{
 * @Param count 数量
 */
 struct UpdateCartGoodsRequest{
-    1: required i64 skuId,
+    1: required i64 sku_id,
+    2: required i64 shop_id,
     3: required i64 count,
 }
 
