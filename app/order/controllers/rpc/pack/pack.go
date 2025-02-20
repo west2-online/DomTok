@@ -19,12 +19,12 @@ package pack
 import (
 	"strconv"
 
-	model2 "github.com/west2-online/DomTok/app/order/domain/model"
-	"github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/app/order/domain/model"
+	idlmodel "github.com/west2-online/DomTok/kitex_gen/model"
 )
 
-func BuildOrder(o *model2.Order) *model.Order {
-	return &model.Order{
+func BuildOrder(o *model.Order) *idlmodel.Order {
+	return &idlmodel.Order{
 		Id:                    o.Id,
 		Status:                strconv.Itoa(int(o.Status)),
 		Uid:                   o.Uid,
@@ -43,8 +43,8 @@ func BuildOrder(o *model2.Order) *model.Order {
 	}
 }
 
-func BuildOrderGoods(g *model2.OrderGoods) *model.OrderGoods {
-	return &model.OrderGoods{
+func BuildOrderGoods(g *model.OrderGoods) *idlmodel.OrderGoods {
+	return &idlmodel.OrderGoods{
 		MerchantID:       g.MerchantID,
 		GoodsID:          g.GoodsID,
 		GoodsName:        g.GoodsName,
@@ -64,14 +64,14 @@ func BuildOrderGoods(g *model2.OrderGoods) *model.OrderGoods {
 	}
 }
 
-func BuildOrderWithGoods(o *model2.Order, goods []*model2.OrderGoods) *model.OrderWithGoods {
-	idlGoods := make([]*model.OrderGoods, len(goods))
+func BuildOrderWithGoods(o *model.Order, goods []*model.OrderGoods) *idlmodel.OrderWithGoods {
+	idlGoods := make([]*idlmodel.OrderGoods, len(goods))
 	for i, g := range goods {
 		idlGoods[i] = BuildOrderGoods(g)
 	}
 
-	return &model.OrderWithGoods{
-		Order: &model.Order{
+	return &idlmodel.OrderWithGoods{
+		Order: &idlmodel.Order{
 			Id:                    o.Id,
 			Status:                strconv.Itoa(int(o.Status)),
 			Uid:                   o.Uid,
@@ -92,8 +92,8 @@ func BuildOrderWithGoods(o *model2.Order, goods []*model2.OrderGoods) *model.Ord
 	}
 }
 
-func BuildBaseOrder(o *model2.Order) *model.BaseOrder {
-	return &model.BaseOrder{
+func BuildBaseOrder(o *model.Order) *idlmodel.BaseOrder {
+	return &idlmodel.BaseOrder{
 		Id:                 o.Id,
 		Status:             strconv.Itoa(int(o.Status)),
 		TotalAmountOfGoods: o.TotalAmountOfGoods,
@@ -102,8 +102,8 @@ func BuildBaseOrder(o *model2.Order) *model.BaseOrder {
 	}
 }
 
-func BuildBaseOrderGoods(g *model2.OrderGoods) *model.BaseOrderGoods {
-	return &model.BaseOrderGoods{
+func BuildBaseOrderGoods(g *model.OrderGoods) *idlmodel.BaseOrderGoods {
+	return &idlmodel.BaseOrderGoods{
 		MerchantName:     strconv.FormatInt(g.MerchantID, 10),
 		GoodsName:        g.GoodsID,
 		StyleName:        g.StyleID,
