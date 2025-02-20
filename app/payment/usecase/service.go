@@ -20,8 +20,6 @@ import (
 	"context"
 	"fmt"
 
-	"go.uber.org/zap"
-
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
@@ -77,38 +75,19 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	// 4. HMAC生成支付令牌
 	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, orderID)
 	if err != nil {
-		logger.Error("Error generating payment token",
-			zap.Int64("orderID", orderID),
-			zap.Error(err),
-		)
+		logger.Errorf("Error generating payment token: orderID:%d,err:%v", orderID, err)
 		return "", 0, fmt.Errorf("generate payment token failed:%w", err)
 	}
-	logger.Info("Generated payment token",
-		zap.String("token", token),
-		zap.Int64("expTime", expTime),
-	)
-
 	var redisStatus bool
 	// 5. 存储令牌到 Redis
 	// TODO 记得删除这个测试数值
 	uid := int64(paymentStatus.TestUserID)
-	logger.Info("Storing token in Redis",
-		zap.Int64("userID", uid),
-		zap.Int64("orderID", orderID),
-	)
 	redisStatus, err = uc.svc.StorePaymentToken(ctx, token, expTime, uid, orderID)
 	if err != nil && redisStatus != paymentStatus.RedisStoreSuccess {
-		logger.Error("Error storing payment token in Redis",
-			zap.Int64("orderID", orderID),
-			zap.Int64("userID", uid),
-			zap.Error(err),
-		)
+		logger.Errorf("Error store payment token: orderID:%d,userID:%d,err:%v", orderID, uid, err)
 		return "", 0, fmt.Errorf("store payment token failed:%w", err)
 	}
-	logger.Info("Payment token stored successfully",
-		zap.Int64("orderID", orderID),
-		zap.Int64("userID", uid),
-	)
+	logger.Infof("Success generating payment token: orderID:%d,token:%s", orderID, token)
 	return token, expTime, nil
 }
 
