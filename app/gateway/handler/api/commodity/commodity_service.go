@@ -21,7 +21,9 @@ package api
 import (
 	"context"
 	"errors"
+
 	"github.com/cloudwego/hertz/pkg/protocol"
+
 	"github.com/west2-online/DomTok/app/gateway/pack"
 	"github.com/west2-online/DomTok/app/gateway/rpc"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
@@ -571,7 +573,7 @@ func DeleteSpuImage(ctx context.Context, c *app.RequestContext) {
 	}
 
 	err = rpc.DeleteSpuImageRPC(ctx, &commodity.DeleteSpuImageReq{
-		req.SpuImageID,
+		SpuImageID: req.SpuImageID,
 	})
 	if err != nil {
 		pack.RespError(c, err)

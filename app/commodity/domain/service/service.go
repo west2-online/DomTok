@@ -19,6 +19,7 @@ package service
 import (
 	"context"
 	"fmt"
+
 	"golang.org/x/sync/errgroup"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
@@ -86,7 +87,6 @@ func (svc *CommodityService) CreateSpuImage(ctx context.Context, spuImage *model
 	return spuImage.ImageID, nil
 }
 
-// TODO
 func (svc *CommodityService) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage, originSpuImage *model.SpuImage) error {
 	err := svc.db.UpdateSpuImage(ctx, spuImage)
 	if err != nil {
@@ -158,7 +158,7 @@ func (svc *CommodityService) DeleteSpuImage(ctx context.Context, imageId int64, 
 	})
 
 	eg.Go(func() error {
-		if err := upyun.DeleteImg(upyun.GetImageUrl(url)); err != nil {
+		if err := upyun.DeleteImg(url); err != nil {
 			return fmt.Errorf("service.DeleteSpuImage: delete spuImage failed: %w", err)
 		}
 		return nil
@@ -179,7 +179,7 @@ func (svc *CommodityService) DeleteSpu(ctx context.Context, spuId int64, url str
 	})
 
 	eg.Go(func() error {
-		if err := upyun.DeleteImg(upyun.GetImageUrl(url)); err != nil {
+		if err := upyun.DeleteImg(url); err != nil {
 			return fmt.Errorf("service.DeleteSpu: delete spuImage failed: %w", err)
 		}
 		return nil
@@ -191,7 +191,6 @@ func (svc *CommodityService) DeleteSpu(ctx context.Context, spuId int64, url str
 }
 
 func (svc *CommodityService) DeleteAllSpuImages(ctx context.Context, spuId int64) error {
-
 	var eg errgroup.Group
 
 	ids, urls, err := svc.db.DeleteSpuImagesBySpuId(ctx, spuId)
@@ -201,7 +200,7 @@ func (svc *CommodityService) DeleteAllSpuImages(ctx context.Context, spuId int64
 
 	for i := 0; i < len(ids); i++ {
 		eg.Go(func() error {
-			if err = upyun.DeleteImg(upyun.GetImageUrl(urls[i])); err != nil {
+			if err = upyun.DeleteImg(urls[i]); err != nil {
 				return fmt.Errorf("service.DeleteAllSpuImages: delete spuImages failed: %w", err)
 			}
 			return nil
@@ -229,9 +228,20 @@ func (svc *CommodityService) GetSpuFromImageId(ctx context.Context, imageId int6
 func (svc *CommodityService) IdentifyUser(ctx context.Context, uid int64) error {
 	loginData, err := contextLogin.GetLoginData(ctx)
 	if err != nil {
-		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
+		return fmt.Errorf("service.IdentifyUser failed: %w", err)
 	}
 
+	if loginData != uid {
+		return errno.AuthNoOperatePermission
+	}
+	return nil
+}
+
+func (svc *CommodityService) IdentifyUserInStreamCtx(ctx context.Context, uid int64) error {
+	loginData, err := contextLogin.GetStreamLoginData(ctx)
+	if err != nil {
+		return fmt.Errorf("service.IdentifyUserInStreamCtx failed: %w", err)
+	}
 	if loginData != uid {
 		return errno.AuthNoOperatePermission
 	}
@@ -241,15 +251,15 @@ func (svc *CommodityService) IdentifyUser(ctx context.Context, uid int64) error 
 func (svc *CommodityService) MatchDeleteSpuCondition(ctx context.Context, spuId int64) (*model.Spu, error) {
 	exists, err := svc.db.IsExistSku(ctx, spuId)
 	if err != nil {
-		return nil, fmt.Errorf("usecase.DeleteSpu failed: %w", err)
+		return nil, fmt.Errorf("service.MatchDeleteSpuCondition failed: %w", err)
 	}
 	if exists {
-		return nil, errno.Errorf(errno.ServiceSkuExist, "usecase.DeleteSpu failed: spu-%d‘s sku already exists", spuId)
+		return nil, errno.Errorf(errno.ServiceSkuExist, "service.MatchDeleteSpuCondition failed: spu-%d‘s sku already exists", spuId)
 	}
 
 	ret, err := svc.db.GetSpuBySpuId(ctx, spuId)
 	if err != nil {
-		return nil, fmt.Errorf("usecase.DeleteSpu failed: %w", err)
+		return nil, fmt.Errorf("service.MatchDeleteSpuConditionu failed: %w", err)
 	}
 	return ret, nil
 }

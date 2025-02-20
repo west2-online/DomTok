@@ -29,7 +29,6 @@ type CommodityDB interface {
 	CreateSpu(ctx context.Context, spu *model.Spu) error
 	CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
 	DeleteSpu(ctx context.Context, spuId int64) error
-	DeleteSpuImageToSpu(ctx context.Context, spuImageId int64, spuId int64) error
 	IsExistSku(ctx context.Context, spuId int64) (bool, error)
 	GetSpuBySpuId(ctx context.Context, spuId int64) (*model.Spu, error)
 	GetSpuImage(ctx context.Context, spuImageId int64) (*model.SpuImage, error)

@@ -18,9 +18,9 @@ package context
 
 import (
 	"context"
-	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/metadata"
 
 	"github.com/bytedance/gopkg/cloud/metainfo"
+	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/metadata"
 )
 
 func newContext(ctx context.Context, key string, value string) context.Context {

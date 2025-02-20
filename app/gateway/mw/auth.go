@@ -18,7 +18,9 @@ package mw
 
 import (
 	"context"
+
 	"github.com/cloudwego/hertz/pkg/app"
+
 	"github.com/west2-online/DomTok/app/gateway/pack"
 	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
@@ -45,7 +47,7 @@ func Auth() app.HandlerFunc {
 
 		// 实现规范化服务透传，不需要中间进行编解码
 		ctx = metainfoContext.WithLoginData(ctx, uid)
-
+		ctx = metainfoContext.SetStreamLoginData(ctx, uid)
 		c.Header(constants.AccessTokenHeader, access)
 		c.Header(constants.RefreshTokenHeader, refresh)
 		c.Next(ctx)

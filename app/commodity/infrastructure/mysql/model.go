@@ -17,8 +17,9 @@ limitations under the License.
 package mysql
 
 import (
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 
 	"github.com/west2-online/DomTok/pkg/constants"
 )
