@@ -14,17 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package redis
+package cache
 
 import (
-<<<<<<<< HEAD:app/commodity/infrastructure/redis/ini.go
-	"github.com/redis/go-redis/v9"
-
-	"github.com/west2-online/DomTok/app/commodity/domain/repository"
-)
-
-type commodityCache struct {
-========
 	"context"
 
 	"github.com/redis/go-redis/v9"
@@ -32,12 +24,11 @@ type commodityCache struct {
 
 // CacheAdapter impl CachePort defined in use case package
 type CacheAdapter struct {
->>>>>>>> upstream/main:app/cart/infrastructure/cache/cache.go
 	client *redis.Client
 }
 
-func NewCommodityCache(client *redis.Client) repository.CommodityCache {
-	return &commodityCache{client: client}
+func NewCacheAdapter(client *redis.Client) *CacheAdapter {
+	return &CacheAdapter{client: client}
 }
 
 // IsKeyExist will check if key exist
