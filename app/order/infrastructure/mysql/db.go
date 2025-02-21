@@ -27,7 +27,6 @@ import (
 	"github.com/west2-online/DomTok/app/order/domain/model"
 	"github.com/west2-online/DomTok/app/order/domain/repository"
 	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 type orderDB struct {
@@ -155,25 +154,14 @@ func (db *orderDB) GetOrderWithGoods(ctx context.Context, orderID int64) (*model
 	var goods []OrderGoods
 
 	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		var err error
-		defer func() {
-			if err != nil {
-				if e := tx.Rollback().Error; e != nil {
-					logger.Errorf("tx rollback failed,please check")
-				}
-			}
-		}()
-
-		if err = tx.Model(&order).Where("id=?", orderID).Find(&order).Error; err != nil {
-			return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("can`t find order by id: %d", orderID))
+		// 查询订单
+		if err := tx.Model(&order).Where("id=?", orderID).Find(&order).Error; err != nil {
+			return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("can't find order by id: %d", orderID))
 		}
 
-		if err = tx.Model(&OrderGoods{}).Where("order_id=?", orderID).Find(&goods).Error; err != nil {
-			return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("can`t find order_goods by order_id: %d", orderID))
-		}
-
-		if err = tx.Commit().Error; err != nil {
-			return errno.Errorf(errno.InternalDatabaseErrorCode, "tx commit failed,please check")
+		// 查询订单商品
+		if err := tx.Model(&OrderGoods{}).Where("order_id=?", orderID).Find(&goods).Error; err != nil {
+			return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("can't find order_goods by order_id: %d", orderID))
 		}
 
 		return nil

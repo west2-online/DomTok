@@ -1,9 +1,9 @@
 -- 订单服务
 
 -- 订单表
-CREATE TABLE `orders` (
+CREATE TABLE `order` (
                           `id` BIGINT UNSIGNED NOT NULL PRIMARY KEY COMMENT '订单ID',
-                          `status` TINYINT UNSIGNED NOT NULL COMMENT '订单状态',
+                          `status` TINYINT NOT NULL COMMENT '订单状态',
                           `user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
                           `total_amount_of_goods` DECIMAL(15,4) NOT NULL COMMENT '商品总金额',
                           `total_amount_of_freight` DECIMAL(15,4) NOT NULL COMMENT '商品总运费',
