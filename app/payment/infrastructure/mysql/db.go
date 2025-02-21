@@ -19,13 +19,15 @@ package mysql
 import (
 	"context"
 	"errors"
+
+	"gorm.io/gorm"
+
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	"github.com/west2-online/DomTok/app/payment/domain/repository"
 	"github.com/west2-online/DomTok/pkg/constants"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
-	"gorm.io/gorm"
 )
 
 // paymentDB impl domain.PaymentDB defined domain
@@ -97,7 +99,7 @@ func (db *paymentDB) CreatePayment(ctx context.Context, p *model.PaymentOrder) e
 	return nil
 }
 
-// ConvertToDBModel 转换函数
+// ConvertRefundToDBModel 转换函数
 func ConvertRefundToDBModel(p *model.PaymentRefund) (*PaymentRefund, error) {
 	if p == nil {
 		// TODO 这里应该是用errno.ParamVerifyErrorCode这个错误码？
