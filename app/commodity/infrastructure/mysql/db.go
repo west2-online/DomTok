@@ -38,7 +38,7 @@ func NewCommodityDB(client *gorm.DB) repository.CommodityDB {
 }
 
 func (d *commodityDB) IsCategoryExist(ctx context.Context, Id int64) (bool, error) {
-	var category model.Category
+	var category entities.Category
 	err := d.client.WithContext(ctx).Where("id = ?", Id).First(&category).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -48,13 +48,14 @@ func (d *commodityDB) IsCategoryExist(ctx context.Context, Id int64) (bool, erro
 	}
 	return true, nil
 }
+
 func (d *commodityDB) CategoryCreatorId(ctx context.Context, Id int64) int64 {
-	var category model.Category
+	var category entities.Category
 	_ = d.client.WithContext(ctx).Where("Id = ?", Id).First(&category).Error
 	return category.CreatorId
 }
 
-func (d *commodityDB) CreateCategory(ctx context.Context, entity *model.Category) error {
+func (d *commodityDB) CreateCategory(ctx context.Context, entity *entities.Category) error {
 	model := Category{
 		Id:        entity.Id,
 		Name:      entity.Name,
@@ -69,15 +70,15 @@ func (d *commodityDB) CreateCategory(ctx context.Context, entity *model.Category
 	return nil
 }
 
-func (d *commodityDB) DeleteCategory(ctx context.Context, category *model.Category) error {
+func (d *commodityDB) DeleteCategory(ctx context.Context, category *entities.Category) error {
 	if err := d.client.WithContext(ctx).Delete(Category{Id: category.Id}).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete category: %v", err)
 	}
 	return nil
 }
 
-func (d *commodityDB) UpdateCategory(ctx context.Context, category *model.Category) error {
-	if err := d.client.WithContext(ctx).Model(&model.Category{}).Where("id = ?", category.Id).Updates(category).Error; err != nil {
+func (d *commodityDB) UpdateCategory(ctx context.Context, category *entities.Category) error {
+	if err := d.client.WithContext(ctx).Model(&entities.Category{}).Where("id = ?", category.Id).Updates(category).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update category: %v", err)
 	}
 	return nil

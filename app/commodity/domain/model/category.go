@@ -14,9 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package model
+package entities
 
-import "time"
+import (
+	"time"
+)
 
 type Category struct {
 	Id        int64
@@ -25,4 +27,5 @@ type Category struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time
+	// gorm.Model
 }

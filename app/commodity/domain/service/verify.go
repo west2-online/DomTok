@@ -15,3 +15,5 @@ limitations under the License.
 */
 
 package service
+
+type EsAdapter struct{}

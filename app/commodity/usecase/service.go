@@ -26,7 +26,7 @@ import (
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category) (int64, error) {
+func (uc *useCase) CreateCategory(ctx context.Context, category *entities.Category) (int64, error) {
 	exist, err := uc.db.IsCategoryExist(ctx, category.Id)
 	if err != nil {
 		return 0, fmt.Errorf("check category exist failed: %w", err)
@@ -42,7 +42,7 @@ func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category)
 	return category.Id, nil
 }
 
-func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category) (err error) {
+func (uc *useCase) DeleteCategory(ctx context.Context, category *entities.Category) (err error) {
 	// 判断是否存在
 	exist, err := uc.db.IsCategoryExist(ctx, category.Id)
 	if err != nil {
@@ -67,7 +67,7 @@ func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category)
 	return nil
 }
 
-func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category) (err error) {
+func (uc *useCase) UpdateCategory(ctx context.Context, category *entities.Category) (err error) {
 	// 判断是否存在
 	exist, err := uc.db.IsCategoryExist(ctx, category.Id)
 	if err != nil {

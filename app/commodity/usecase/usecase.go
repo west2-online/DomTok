@@ -19,7 +19,7 @@ package usecase
 import (
 	"context"
 
-	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	entities "github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 	"github.com/west2-online/DomTok/app/commodity/domain/service"
 	Model "github.com/west2-online/DomTok/kitex_gen/model"
@@ -27,9 +27,9 @@ import (
 
 type CommodityUseCase interface {
 	// 增删改查
-	CreateCategory(ctx context.Context, entity *model.Category) (int64, error)
-	DeleteCategory(ctx context.Context, category *model.Category) error
-	UpdateCategory(ctx context.Context, category *model.Category) error
+	CreateCategory(ctx context.Context, entity *entities.Category) (int64, error)
+	DeleteCategory(ctx context.Context, category *entities.Category) error
+	UpdateCategory(ctx context.Context, category *entities.Category) error
 	ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*Model.CategoryInfo, err error)
 }
 

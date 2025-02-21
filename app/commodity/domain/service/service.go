@@ -20,15 +20,31 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	entities "github.com/west2-online/DomTok/app/commodity/domain/model"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
+func (svc *CommodityService) DeleteCategory(ctx context.Context, category *entities.Category) (err error) {
+	// 判断是否存在
+	exist, err := svc.db.IsCategoryExist(ctx, category.Id)
+	if err != nil {
+		return fmt.Errorf("check category exist failed: %w", err)
+	}
+	if !exist {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "category does not exist")
+	}
+	err = svc.db.DeleteCategory(ctx, category)
+	if err != nil {
+		return fmt.Errorf("delete category failed: %w", err)
+	}
+	return nil
+}
 func (svc *CommodityService) nextID() int64 {
 	id, _ := svc.sf.NextVal()
 	return id
 }
 
-func (svc *CommodityService) CreateCategory(ctx context.Context, category *model.Category) error {
+func (svc *CommodityService) CreateCategory(ctx context.Context, category *entities.Category) error {
 	category.Id = svc.nextID()
 	if err := svc.db.CreateCategory(ctx, category); err != nil {
 		return fmt.Errorf("create category failed: %w", err)
