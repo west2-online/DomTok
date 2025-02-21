@@ -92,7 +92,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 }
 
 // TODO
-func (uc *paymentUseCase) GetRefundToken(ctx context.Context, orderID int64) (token string, expTime int64, err error) {
+func (uc *paymentUseCase) GetRefundToken(ctx context.Context, orderID int64) (refundID int64, err error) {
 	/*
 		// 1. 检查订单是否存在
 		orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
@@ -116,33 +116,35 @@ func (uc *paymentUseCase) GetRefundToken(ctx context.Context, orderID int64) (to
 	var timeInfo bool
 	frequencyInfo, timeInfo, err = uc.svc.CheckRedisRateLimiting(ctx, uid, orderID)
 	if err != nil {
-		return "", 0, fmt.Errorf("check redis rate limiting failed: %w", err)
+		return 0, fmt.Errorf("check redis rate limiting failed: %w", err)
 	}
 	if frequencyInfo != paymentStatus.RedisValid {
-		return "", 0, fmt.Errorf("too many refund requests in a short time")
+		return 0, fmt.Errorf("too many refund requests in a short time")
 	}
 	if timeInfo != paymentStatus.RedisValid {
-		return "", 0, fmt.Errorf("refund already requested for this order in the last 24 hours")
+		return 0, fmt.Errorf("refund already requested for this order in the last 24 hours")
 	}
 
 	// 4. 创建退款信息
-	_, err = uc.svc.CreateRefundInfo(ctx, orderID)
+	refundID, err = uc.svc.CreateRefundInfo(ctx, orderID)
 	if err != nil {
-		return "", 0, fmt.Errorf("create refund info failed: %w", err)
+		return 0, fmt.Errorf("create refund info failed: %w", err)
 	}
+	/*
+		// 5. 生成退款令牌
+		token, expTime, err = uc.svc.GenerateRefundToken(ctx, orderID)
+		if err != nil {
+			return "", 0, fmt.Errorf("generate refund token failed: %w", err)
+		}
 
-	// 5. 生成退款令牌
-	token, expTime, err = uc.svc.GenerateRefundToken(ctx, orderID)
-	if err != nil {
-		return "", 0, fmt.Errorf("generate refund token failed: %w", err)
-	}
+		// 6. 存储令牌到 Redis
+		var redisStatus bool
+		redisStatus, err = uc.svc.StoreRefundToken(ctx, token, expTime, uid, orderID)
+		if err != nil || redisStatus != paymentStatus.RedisStoreSuccess {
+			return "", 0, fmt.Errorf("store refund token failed: %w", err)
+		}
 
-	// 6. 存储令牌到 Redis
-	var redisStatus bool
-	redisStatus, err = uc.svc.StoreRefundToken(ctx, token, expTime, uid, orderID)
-	if err != nil || redisStatus != paymentStatus.RedisStoreSuccess {
-		return "", 0, fmt.Errorf("store refund token failed: %w", err)
-	}
-
-	return token, expTime, nil
+		return token, expTime, nil
+	*/
+	return refundID, nil
 }

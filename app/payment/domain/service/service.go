@@ -170,7 +170,7 @@ func (svc *PaymentService) CreateRefundInfo(ctx context.Context, orderID int64) 
 	return refundID, nil
 }
 
-func (svc *PaymentService) GenerateRefundToken(ctx context.Context, refundID int64) (string, int64, error) {
+/*func (svc *PaymentService) GenerateRefundToken(ctx context.Context, refundID int64) (string, int64, error) {
 	// 1. 设定过期时间（15 分钟后）
 	expirationTime := time.Now().Add(paymentStatus.RefundExpirationDuration).Unix()
 	logger.Infof("Generating refund token, refundID: %d, expirationTime: %d", refundID, expirationTime)
@@ -215,3 +215,4 @@ func (svc *PaymentService) StoreRefundToken(ctx context.Context, token string, e
 	// 4. 返回成功状态码
 	return paymentStatus.RedisStoreSuccess, nil
 }
+*/

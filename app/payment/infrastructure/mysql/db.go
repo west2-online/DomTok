@@ -19,6 +19,7 @@ package mysql
 import (
 	"context"
 	"errors"
+	"github.com/west2-online/DomTok/pkg/logger"
 
 	"gorm.io/gorm"
 
@@ -74,6 +75,7 @@ func ConvertToDBModel(p *model.PaymentOrder) (*PaymentOrder, error) {
 		return nil, errno.Errorf(errno.ParamVerifyErrorCode, "ConvertToDBModel: input payment order is nil")
 	}
 	return &PaymentOrder{
+		ID:                        p.ID,
 		OrderID:                   p.OrderID,
 		UserID:                    p.UserID,
 		Amount:                    p.Amount,
@@ -104,6 +106,7 @@ func ConvertRefundToDBModel(p *model.PaymentRefund) (*PaymentRefund, error) {
 		return nil, errno.Errorf(errno.ParamVerifyErrorCode, "ConvertToDBModel: input payment order is nil")
 	}
 	return &PaymentRefund{
+		ID:                        p.ID,
 		OrderID:                   p.OrderID,
 		UserID:                    p.UserID,
 		RefundAmount:              p.RefundAmount,
@@ -119,12 +122,15 @@ func (db *paymentDB) CreateRefund(ctx context.Context, p *model.PaymentRefund) e
 	// 将 entity 转换成 MySQL 需要的 refundOrder 结构
 	refundOrder, err := ConvertRefundToDBModel(p)
 	if err != nil {
+		logger.Errorf("CreateRefund: failed to convert refund order: %v", err)
 		return errno.Errorf(errno.InternalServiceErrorCode, "CreateRefund: failed to convert refund order: %v", err)
 	}
 
 	// 插入数据库
 	if err := db.client.WithContext(ctx).Create(refundOrder).Error; err != nil {
+		logger.Errorf("CreateRefund: failed to create refund order: %v", err)
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create refund: %v", err)
 	}
+	logger.Infof("CreateRefund: refund order created successfully")
 	return nil
 }
