@@ -18,10 +18,10 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/west2-online/DomTok/app/order/domain/model"
 	basecontext "github.com/west2-online/DomTok/pkg/base/context"
+	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
@@ -52,24 +52,67 @@ func (uc *useCase) ViewOrder(ctx context.Context, orderID int64) (*model.Order, 
 
 // CancelOrder 取消订单
 func (uc *useCase) CancelOrder(ctx context.Context, orderID int64) error {
-	if err := uc.svc.CancelOrder(ctx, orderID); err != nil {
-		return fmt.Errorf("cancel order failed: %w", err)
+	// 1. 检查订单是否存在
+	exist, err := uc.db.IsOrderExist(ctx, orderID)
+	if err != nil {
+		return err
 	}
-	return nil
+	if !exist {
+		return errno.NewErrNo(errno.ServiceOrderNotFound, "order not found")
+	}
+
+	// 2. 获取订单信息检查状态
+	order, err := uc.db.GetOrderByID(ctx, orderID)
+	if err != nil {
+		return err
+	}
+
+	// 3. 只有待支付的订单可以取消
+	if order.Status != constants.OrderStatusUnpaidCode {
+		return errno.NewErrNo(errno.ServiceError, "order cannot be canceled")
+	}
+
+	// 4. 更新订单状态为已取消
+	return uc.db.UpdateOrderStatus(ctx, orderID, constants.OrderStatusCancelledCode)
 }
 
 // ChangeDeliverAddress 更改配送地址
 func (uc *useCase) ChangeDeliverAddress(ctx context.Context, orderID, addressID int64, addressInfo string) error {
-	if err := uc.svc.ChangeDeliverAddress(ctx, orderID, addressID, addressInfo); err != nil {
-		return fmt.Errorf("change deliver address failed: %w", err)
+	// 1. 检查订单是否存在
+	exist, err := uc.db.IsOrderExist(ctx, orderID)
+	if err != nil {
+		return err
 	}
-	return nil
+	if !exist {
+		return errno.NewErrNo(errno.ServiceOrderNotFound, "order not found")
+	}
+
+	// 2. 获取订单信息检查状态
+	order, err := uc.db.GetOrderByID(ctx, orderID)
+	if err != nil {
+		return err
+	}
+
+	// 3. 已完成/取消的订单不能修改地址
+	if order.Status >= constants.OrderStatusCompletedCode {
+		return errno.NewErrNo(errno.ServiceError, "order cannot change address")
+	}
+
+	// 4. 更新地址信息
+	return uc.db.UpdateOrderAddress(ctx, orderID, addressID, addressInfo)
 }
 
 // DeleteOrder 删除订单
 func (uc *useCase) DeleteOrder(ctx context.Context, orderID int64) error {
-	if err := uc.svc.DeleteOrder(ctx, orderID); err != nil {
-		return fmt.Errorf("delete order failed: %w", err)
+	// 1. 检查订单是否存在
+	exist, err := uc.db.IsOrderExist(ctx, orderID)
+	if err != nil {
+		return err
 	}
-	return nil
+	if !exist {
+		return errno.NewErrNo(errno.ServiceOrderNotFound, "order not found")
+	}
+
+	// 2. 删除订单（包含订单商品）
+	return uc.db.DeleteOrder(ctx, orderID)
 }

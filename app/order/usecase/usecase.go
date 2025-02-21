@@ -26,7 +26,7 @@ import (
 
 // OrderUseCase 定义在 usecase 层的接口
 type OrderUseCase interface {
-	// todo：createOrder
+	// TODO：createOrder
 	ViewOrderList(ctx context.Context, page, size int32) ([]*model.Order, []*model.OrderGoods, int32, error)
 	ViewOrder(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error)
 	CancelOrder(ctx context.Context, orderID int64) error
