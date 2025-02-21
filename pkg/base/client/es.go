@@ -21,8 +21,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elastic/go-elasticsearch"
 	"github.com/elastic/go-elasticsearch/esapi"
+	"github.com/elastic/go-elasticsearch/v8"
 
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/pkg/errno"

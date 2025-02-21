@@ -14,6 +14,7 @@ require (
 	github.com/cloudwego/hertz v0.9.5
 	github.com/cloudwego/kitex v0.12.1
 	github.com/elastic/go-elasticsearch v0.0.0
+	github.com/elastic/go-elasticsearch/v8 v8.17.1
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/h2non/filetype v1.1.3
 	github.com/hertz-contrib/cors v0.1.0
@@ -62,6 +63,7 @@ require (
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.6.1 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect

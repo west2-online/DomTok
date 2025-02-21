@@ -14,28 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package eshook
+package es
 
 import (
-	elastic "github.com/elastic/go-elasticsearch/v8"
+	"github.com/elastic/go-elasticsearch/v8"
 
-	"github.com/west2-online/DomTok/config"
-	"github.com/west2-online/DomTok/pkg/base/client"
-	"github.com/west2-online/DomTok/pkg/logger"
+	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 )
 
-// InitLoggerWithHook 初始化带有EsHook的logger
-// index: 索引的名字
-func InitLoggerWithHook(index string, esclient *elastic.Client) {
-	if config.Elasticsearch == nil {
-		return
-	}
+type Elasticsearch struct {
+	client *elasticsearch.Client
+}
 
-	if !client.IsESConnected(esclient) {
-		logger.Warn("es not worked!")
-		return
+func NewElasticsearch(client *elasticsearch.Client) repository.CommodityES {
+	return &Elasticsearch{
+		client: client,
 	}
-
-	hook := NewElasticHook(esclient, config.Elasticsearch.Host, index)
-	logger.AddLoggerHook(hook.Fire)
 }

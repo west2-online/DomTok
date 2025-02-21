@@ -39,13 +39,17 @@ type useCase struct {
 	svc   *service.CommodityService
 	cache repository.CommodityCache
 	mq    repository.CommodityMQ
+	es    repository.CommodityES
 }
 
-func NewCommodityCase(db repository.CommodityDB, svc *service.CommodityService, cache repository.CommodityCache, mq repository.CommodityMQ) *useCase {
+func NewCommodityCase(db repository.CommodityDB, svc *service.CommodityService, cache repository.CommodityCache, mq repository.CommodityMQ,
+	es repository.CommodityES,
+) *useCase {
 	return &useCase{
 		db:    db,
 		svc:   svc,
 		cache: cache,
 		mq:    mq,
+		es:    es,
 	}
 }

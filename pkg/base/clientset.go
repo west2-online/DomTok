@@ -20,7 +20,7 @@ import (
 	"sync"
 
 	"github.com/cloudwego/hertz/pkg/app/client"
-	elastic "github.com/elastic/go-elasticsearch"
+	elastic "github.com/elastic/go-elasticsearch/v8"
 
 	"github.com/west2-online/DomTok/pkg/cache"
 	"github.com/west2-online/DomTok/pkg/db"

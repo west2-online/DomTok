@@ -14,28 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package eshook
+package es
 
 import (
-	elastic "github.com/elastic/go-elasticsearch/v8"
-
-	"github.com/west2-online/DomTok/config"
-	"github.com/west2-online/DomTok/pkg/base/client"
-	"github.com/west2-online/DomTok/pkg/logger"
+	"context"
+	"fmt"
 )
 
-// InitLoggerWithHook 初始化带有EsHook的logger
-// index: 索引的名字
-func InitLoggerWithHook(index string, esclient *elastic.Client) {
-	if config.Elasticsearch == nil {
-		return
+// DeleteSpu deletes an SPU document from Elasticsearch by ID
+func (r *Elasticsearch) DeleteSpu(ctx context.Context, indexName string, spuId int64) error {
+	resp, err := r.client.Delete(
+		indexName,
+		fmt.Sprintf("%d", spuId), // Document ID as part of the URL
+		r.client.Delete.WithContext(ctx),
+	)
+	if err != nil {
+		return fmt.Errorf("es.DeleteSpu: failed to delete document: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.IsError() {
+		return fmt.Errorf("es.DeleteSpu: delete document error, status=%s", resp.Status())
 	}
 
-	if !client.IsESConnected(esclient) {
-		logger.Warn("es not worked!")
-		return
-	}
-
-	hook := NewElasticHook(esclient, config.Elasticsearch.Host, index)
-	logger.AddLoggerHook(hook.Fire)
+	return nil
 }

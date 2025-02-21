@@ -43,3 +43,10 @@ type CommodityCache interface{}
 type CommodityMQ interface {
 	Send(ctx context.Context, topic string, message []*kafka.Message) error
 }
+
+type CommodityES interface {
+	CreateIndexForSearch(ctx context.Context, indexName string) error
+	DeleteSpu(ctx context.Context, indexName string, spuId int64) error
+	UpsertSPU(ctx context.Context, indexName string, spu *model.Spu, incWeight float64) error
+	SearchSpu(ctx context.Context, indexName string, query string, K int) ([]*model.Spu, error)
+}

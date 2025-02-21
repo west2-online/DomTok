@@ -19,6 +19,7 @@ package commodity
 import (
 	"github.com/west2-online/DomTok/app/commodity/controllers/rpc"
 	"github.com/west2-online/DomTok/app/commodity/domain/service"
+	"github.com/west2-online/DomTok/app/commodity/infrastructure/es"
 	"github.com/west2-online/DomTok/app/commodity/infrastructure/mq"
 	"github.com/west2-online/DomTok/app/commodity/infrastructure/mysql"
 	"github.com/west2-online/DomTok/app/commodity/infrastructure/redis"
@@ -46,13 +47,18 @@ func InjectCommodityHandlerr() commodity.CommodityService {
 		panic(err)
 	}
 
-	kafMQ := kafka.NewKafkaInstance()
+	esCli, err := client.NewEsClient()
+	if err != nil {
+		panic(err)
+	}
 
+	kafMQ := kafka.NewKafkaInstance()
+	e := es.NewElasticsearch(esCli)
 	db := mysql.NewCommodityDB(gormDB)
 	re := redis.NewCommodityCache(redisCache)
 	kaf := mq.NewCommodityMQ(kafMQ)
 	svc := service.NewCommodityService(db, sf, re, kaf)
-	uc := usecase.NewCommodityCase(db, svc, re, kaf)
+	uc := usecase.NewCommodityCase(db, svc, re, kaf, e)
 
 	return rpc.NewCommodityHandler(uc)
 }

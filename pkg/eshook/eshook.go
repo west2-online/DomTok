@@ -24,8 +24,8 @@ import (
 	"strings"
 	"time"
 
-	elastic "github.com/elastic/go-elasticsearch"
 	"github.com/elastic/go-elasticsearch/esapi"
+	elastic "github.com/elastic/go-elasticsearch/v8"
 	"go.uber.org/zap/zapcore"
 )
 
