@@ -35,7 +35,7 @@ func (us *useCase) CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err
 	if err != nil {
 		return 0, fmt.Errorf("usecase.CreateSpu failed: %w", err)
 	}
-	spu.CreatorId = loginData.UserId
+	spu.CreatorId = loginData
 
 	id, err = us.svc.CreateSpu(ctx, spu)
 	if err != nil {
@@ -66,7 +66,7 @@ func (us *useCase) DeleteSpu(ctx context.Context, spuId int64) error {
 		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
 	}
 
-	err = us.svc.IdentifyUser(ctx, ret.CreatorId)
+	err = us.svc.IdentifyUserInStreamCtx(ctx, ret.CreatorId)
 	if err != nil {
 		return fmt.Errorf("usecase.DeleteSpu identify user failed: %w", err)
 	}

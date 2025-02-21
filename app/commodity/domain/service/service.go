@@ -146,10 +146,21 @@ func (svc *CommodityService) GetSpuFromImageId(ctx context.Context, imageId int6
 func (svc *CommodityService) IdentifyUser(ctx context.Context, uid int64) error {
 	loginData, err := contextLogin.GetLoginData(ctx)
 	if err != nil {
-		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
+		return fmt.Errorf("usecase.IdentifyUser failed: %w", err)
 	}
 
-	if loginData.UserId != uid {
+	if loginData != uid {
+		return errno.AuthNoOperatePermission
+	}
+	return nil
+}
+
+func (svc *CommodityService) IdentifyUserInStreamCtx(ctx context.Context, uid int64) error {
+	loginData, err := contextLogin.GetLoginData(ctx)
+	if err != nil {
+		return fmt.Errorf("usecase.IdentifyUserInStreamCtx failed: %w", err)
+	}
+	if loginData != uid {
 		return errno.AuthNoOperatePermission
 	}
 	return nil

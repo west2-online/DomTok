@@ -16,6 +16,7 @@ require (
 	github.com/elastic/go-elasticsearch v0.0.0
 	github.com/elastic/go-elasticsearch/v8 v8.17.1
 	github.com/fsnotify/fsnotify v1.8.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/h2non/filetype v1.1.3
 	github.com/hertz-contrib/cors v0.1.0
 	github.com/hertz-contrib/gzip v0.0.3

@@ -9,24 +9,20 @@ struct RegisterRequest {
 }
 
 struct RegisterResponse {
+    1: required i64 uid;
+}
+
+struct LoginRequest {
+    1: required string name
+    2: required string password
+}
+
+struct LoginResponse {
+    2: model.UserInfo user,
 }
 
 
 service UserService {
-    RegisterResponse Register(1: RegisterRequest req)(api.get = "api/v1/user/register"),
-}
-
-// cart
-struct AddGoodsIntoCartRequest{
-    1: required i64 skuId,
-    2: required i64 shop_id,
-    3: required i64 count,
-}
-
-struct AddGoodsIntoCartResponse{
-    1: required model.BaseResp base,
-}
-
-service CartService {
-    AddGoodsIntoCartResponse AddGoodsIntoCart(1: AddGoodsIntoCartRequest req)(api.post = "api/cart/sku/add"),
+    RegisterResponse Register(1: RegisterRequest req)(api.post = "api/v1/user/register"),
+    LoginResponse Login(1: LoginRequest req)(api.post = "api/v1/user/login")
 }
