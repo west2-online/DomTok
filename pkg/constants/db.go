@@ -33,8 +33,11 @@ const (
 	SpuTableName        = "spu_info"
 	SpuImageTableName   = "spu_image"
 
-	SpuSkuTableName = "spu_to_sku"
-	CartTableName   = "cart"
+	SpuSkuTableName        = "spu_to_sku"
+	CartTableName          = "cart"
+	PaymentTableName       = "payments"
+	PaymentRefundTableName = "payment_refunds"
+	PaymentLedgerTableName = "payment_ledgers"
 
 	SkuTableName         = "sku_info"
 	SkuImagesTableName   = "sku_image"

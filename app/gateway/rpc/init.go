@@ -19,6 +19,7 @@ package rpc
 import (
 	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
 	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
+	"github.com/west2-online/DomTok/kitex_gen/payment/paymentservice"
 	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
 )
 
@@ -27,6 +28,7 @@ var (
 	commodityClient       commodityservice.Client
 	commodityStreamClient commodityservice.StreamClient
 	cartClient            cartservice.Client
+	paymentClient         paymentservice.Client
 )
 
 func Init() {
@@ -34,4 +36,5 @@ func Init() {
 	InitCommodityRPC()
 	InitCommodityStreamClientRPC()
 	InitCartRPC()
+	InitPaymentRPC()
 }
