@@ -92,7 +92,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 }
 
 // TODO
-func (uc *paymentUseCase) GetRefundToken(ctx context.Context, orderID int64) (refundID int64, err error) {
+func (uc *paymentUseCase) GetRefundInfo(ctx context.Context, orderID int64) (refundID int64, err error) {
 	/*
 		// 1. 检查订单是否存在
 		orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)

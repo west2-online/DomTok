@@ -106,7 +106,7 @@ func RequestRefundToken(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用 RPC 获取退款令牌
-	resp, err := rpc.RequestRefundTokenRPC(ctx, &payment.RefundTokenRequest{
+	resp, err := rpc.RequestRefundRPC(ctx, &payment.RefundTokenRequest{
 		OrderID: req.OrderID,
 		UserID:  req.UserID,
 	})
