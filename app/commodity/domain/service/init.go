@@ -26,10 +26,11 @@ type CommodityService struct {
 	sf    *utils.Snowflake
 	cache repository.CommodityCache
 	mq    repository.CommodityMQ
+	es    repository.CommodityElastic
 	// TODO
 }
 
-func NewCommodityService(db repository.CommodityDB, sf *utils.Snowflake, cache repository.CommodityCache, mq repository.CommodityMQ) *CommodityService {
+func NewCommodityService(db repository.CommodityDB, sf *utils.Snowflake, cache repository.CommodityCache, mq repository.CommodityMQ, es repository.CommodityElastic) *CommodityService {
 	if db == nil {
 		panic("commodityService's db should not be nil")
 	}
@@ -45,11 +46,16 @@ func NewCommodityService(db repository.CommodityDB, sf *utils.Snowflake, cache r
 		panic("commodityService's mq should not be nil")
 	}
 
+	if es == nil {
+		panic("commodityService's elastic should not be nil")
+	}
+
 	svc := &CommodityService{
 		db:    db,
 		sf:    sf,
 		cache: cache,
 		mq:    mq,
+		es:    es,
 	}
 	svc.init()
 	return svc

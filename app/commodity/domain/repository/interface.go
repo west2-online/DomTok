@@ -48,3 +48,6 @@ type CommodityCache interface {
 type CommodityMQ interface {
 	Send(ctx context.Context, topic string, message []*kafka.Message) error
 }
+
+type CommodityElastic interface {
+}
