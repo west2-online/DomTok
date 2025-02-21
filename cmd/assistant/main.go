@@ -42,11 +42,12 @@ func init() {
 	logger.Init(serviceName, config.GetLoggerLevel())
 
 	ai := eino.NewClient()
+	httpCli := http.NewClient(&http.ClientConfig{
+		BaseUrl: `https://localhost:8888`,
+	})
 	// TODO: BaseUrl放在哪
 	ai.SetServerStrategy(func(functionName string) adapter.ServerCaller {
-		return http.NewClient(&http.ClientConfig{
-			BaseUrl: `http://localhost:8888`,
-		})
+		return httpCli
 	})
 	ai.SetBuilder(func(ctx context.Context) (model.ChatModel, error) {
 		return ark.NewChatModel(ctx, &ark.ChatModelConfig{
