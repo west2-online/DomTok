@@ -96,3 +96,35 @@ func (db *paymentDB) CreatePayment(ctx context.Context, p *model.PaymentOrder) e
 	}
 	return nil
 }
+
+// ConvertToDBModel 转换函数
+func ConvertRefundToDBModel(p *model.PaymentRefund) (*PaymentRefund, error) {
+	if p == nil {
+		// TODO 这里应该是用errno.ParamVerifyErrorCode这个错误码？
+		return nil, errno.Errorf(errno.ParamVerifyErrorCode, "ConvertToDBModel: input payment order is nil")
+	}
+	return &PaymentRefund{
+		OrderID:                   p.OrderID,
+		UserID:                    p.UserID,
+		RefundAmount:              p.RefundAmount,
+		RefundReason:              p.RefundReason,
+		Status:                    p.Status,
+		MaskedCreditCardNumber:    p.MaskedCreditCardNumber,
+		CreditCardExpirationYear:  p.CreditCardExpirationYear,
+		CreditCardExpirationMonth: p.CreditCardExpirationMonth,
+	}, nil
+}
+
+func (db *paymentDB) CreateRefund(ctx context.Context, p *model.PaymentRefund) error {
+	// 将 entity 转换成 MySQL 需要的 refundOrder 结构
+	refundOrder, err := ConvertRefundToDBModel(p)
+	if err != nil {
+		return errno.Errorf(errno.InternalServiceErrorCode, "CreateRefund: failed to convert refund order: %v", err)
+	}
+
+	// 插入数据库
+	if err := db.client.WithContext(ctx).Create(refundOrder).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create refund: %v", err)
+	}
+	return nil
+}

@@ -19,8 +19,6 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"github.com/west2-online/DomTok/kitex_gen/payment"
-	"github.com/west2-online/DomTok/pkg/errno"
 
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
@@ -95,22 +93,24 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 
 // TODO
 func (uc *paymentUseCase) GetRefundToken(ctx context.Context, orderID int64) (token string, expTime int64, err error) {
-	// 1. 检查订单是否存在
-	orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
-	if err != nil {
-		return "", 0, fmt.Errorf("check order existence failed: %w", err)
-	}
-	if !orderExists {
-		return "", 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
-	}
+	/*
+		// 1. 检查订单是否存在
+		orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
+		if err != nil {
+			return "", 0, fmt.Errorf("check order existence failed: %w", err)
+		}
+		if !orderExists {
+			return "", 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
+		}
 
-	// 2. 获取用户ID
-	uid, err := uc.svc.GetUserID(ctx)
-	if err != nil {
-		return "", 0, fmt.Errorf("get user id failed: %w", err)
-	}
+		// 2. 获取用户ID
+		uid, err := uc.svc.GetUserID(ctx)
+		if err != nil {
+			return "", 0, fmt.Errorf("get user id failed: %w", err)
+		}
+	*/
 	// TODO 记得删除这个测试数值
-	uid = int64(paymentStatus.TestUserID)
+	uid := int64(paymentStatus.TestUserID)
 	// 3. Redis 限流检查
 	var frequencyInfo bool
 	var timeInfo bool
@@ -126,7 +126,7 @@ func (uc *paymentUseCase) GetRefundToken(ctx context.Context, orderID int64) (to
 	}
 
 	// 4. 创建退款信息
-	err = uc.svc.CreateRefundInfo(ctx, orderID)
+	_, err = uc.svc.CreateRefundInfo(ctx, orderID)
 	if err != nil {
 		return "", 0, fmt.Errorf("create refund info failed: %w", err)
 	}
@@ -138,11 +138,11 @@ func (uc *paymentUseCase) GetRefundToken(ctx context.Context, orderID int64) (to
 	}
 
 	// 6. 存储令牌到 Redis
-	redisStatus, err := uc.svc.StoreRefundToken(ctx, token, expTime, uid, orderID)
+	var redisStatus bool
+	redisStatus, err = uc.svc.StoreRefundToken(ctx, token, expTime, uid, orderID)
 	if err != nil || redisStatus != paymentStatus.RedisStoreSuccess {
 		return "", 0, fmt.Errorf("store refund token failed: %w", err)
 	}
 
 	return token, expTime, nil
-
 }

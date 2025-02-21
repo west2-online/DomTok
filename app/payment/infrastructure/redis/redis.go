@@ -82,6 +82,10 @@ func (p *paymentRedis) SetRedisDayKey(ctx context.Context, key string, value str
 	return nil
 }
 
+func (p *paymentRedis) SetRefundToken(ctx context.Context, key string, value string, expiration time.Duration) error {
+	return p.client.Set(ctx, key, value, expiration).Err()
+}
+
 // func (p *paymentRedis) GetPaymentToken(ctx context.Context, key string) (string, error) {
 // 	   return p.client.Get(ctx, key).Result()
 // }
