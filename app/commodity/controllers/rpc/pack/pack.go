@@ -18,12 +18,12 @@ package pack
 
 import (
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
-	model2 "github.com/west2-online/DomTok/kitex_gen/model"
+	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/base"
 )
 
-func BuildImage(img *model.SpuImage) *model2.SpuImage {
-	return &model2.SpuImage{
+func BuildImage(img *model.SpuImage) *modelKitex.SpuImage {
+	return &modelKitex.SpuImage{
 		ImageID:   img.ImageID,
 		SpuID:     img.SpuID,
 		Url:       img.Url,
@@ -32,6 +32,6 @@ func BuildImage(img *model.SpuImage) *model2.SpuImage {
 	}
 }
 
-func BuildImages(imgs []*model.SpuImage) []*model2.SpuImage {
+func BuildImages(imgs []*model.SpuImage) []*modelKitex.SpuImage {
 	return base.BuildTypeList(imgs, BuildImage)
 }

@@ -21,7 +21,7 @@ import (
 	"mime/multipart"
 
 	"github.com/west2-online/DomTok/app/gateway/model/model"
-	model2 "github.com/west2-online/DomTok/kitex_gen/model"
+	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/base"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/upyun"
@@ -41,7 +41,7 @@ func BuildFileDataBytes(file *multipart.FileHeader) ([]byte, error) {
 	return data, err
 }
 
-func BuildSpuImage(img *model2.SpuImage) *model.SpuImage {
+func BuildSpuImage(img *modelKitex.SpuImage) *model.SpuImage {
 	return &model.SpuImage{
 		ImageID:   img.ImageID,
 		SpuID:     img.SpuID,
@@ -51,6 +51,6 @@ func BuildSpuImage(img *model2.SpuImage) *model.SpuImage {
 	}
 }
 
-func BuildSpuImages(imgs []*model2.SpuImage) []*model.SpuImage {
+func BuildSpuImages(imgs []*modelKitex.SpuImage) []*model.SpuImage {
 	return base.BuildTypeList(imgs, BuildSpuImage)
 }
