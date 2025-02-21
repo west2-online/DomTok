@@ -35,4 +35,8 @@ const (
 
 	SpuSkuTableName = "spu_to_sku"
 	CartTableName   = "cart"
+
+	SkuTableName         = "sku_info"
+	SkuImagesTableName   = "sku_image"
+	SkuSaleAttrTableName = "sku_sale_attr"
 )

@@ -66,6 +66,43 @@ type SpuToSku struct {
 	DeletedAt *time.Time
 }
 
+type Sku struct {
+	Id               int64
+	CreatorId        int64
+	Price            float64
+	Name             string
+	Description      string
+	ForSale          int
+	Stock            int64
+	LockStock        int64
+	HistoryVersionId int64
+	StyleHeadDrawing string
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+	DeletedAt        time.Time
+	// gorm.Model
+}
+
+type SkuImages struct {
+	Id        int64
+	Url       string
+	SkuId     int64
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
+}
+
+type SkuSaleAttr struct {
+	Id               int64
+	SkuId            int64
+	HistoryVersionId int64
+	SaleAttr         string
+	SaleValue        string
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+	DeletedAt        time.Time
+}
+
 // 对应表名
 
 func (spu *Spu) TableName() string {
@@ -82,4 +119,16 @@ func (Category) TableName() string {
 
 func (s *SpuToSku) TableName() string {
 	return constants.SpuSkuTableName
+}
+
+func (Sku) TableName() string {
+	return constants.SkuTableName
+}
+
+func (SkuImages) TableName() string {
+	return constants.SkuImagesTableName
+}
+
+func (SkuSaleAttr) TableName() string {
+	return constants.SkuSaleAttrTableName
 }

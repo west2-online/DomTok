@@ -36,6 +36,16 @@ type CommodityDB interface {
 	UpdateSpu(ctx context.Context, spu *model.Spu) error
 	UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
 	DeleteSpuImage(ctx context.Context, spuImageId int64) error
+
+	CreateSku(ctx context.Context, sku *model.Sku) error
+	UpdateSku(ctx context.Context, sku *model.Sku) error
+	DeleteSku(ctx context.Context, sku *model.Sku) error
+	ViewSkuImage(ctx context.Context, sku *model.Sku, PageNum int, PageSize int) ([]*model.SkuImage, error)
+	GetSkuBySkuId(ctx context.Context, skuId int64) (*model.Sku, error)
+	ViewSku(ctx context.Context, skuIds []*int64, PageNum int, PageSize int) ([]*model.Sku, error)
+	GetSkuIdBySpuID(ctx context.Context, spuId int64, PageNum int, PageSize int) ([]*int64, error)
+	UploadSkuAttr(ctx context.Context, sku *model.Sku, attr *model.AttrValue) error
+	ListSkuInfo(ctx context.Context, skuId []int64, PageNum int, PageSize int) ([]*model.Sku, error)
 }
 
 type CommodityCache interface{}

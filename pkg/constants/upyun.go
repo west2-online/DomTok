@@ -19,4 +19,6 @@ package constants
 const (
 	SpuDirDest      = "/spu/"
 	SpuImageDirDest = "/spu_image/"
+
+	SkuDirDest = "/sku/"
 )

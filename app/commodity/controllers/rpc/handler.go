@@ -19,7 +19,9 @@ package rpc
 import (
 	"bytes"
 	"context"
+	"fmt"
 
+	"github.com/west2-online/DomTok/app/commodity/controllers/rpc/pack"
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
@@ -156,39 +158,185 @@ func (c CommodityHandler) ViewSpuImage(ctx context.Context, req *commodity.ViewS
 	panic("implement me")
 }
 
-func (c CommodityHandler) CreateSku(ctx context.Context, req *commodity.CreateSkuReq) (r *commodity.CreateSkuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+func (c CommodityHandler) CreateSku(streamServer commodity.CommodityService_CreateSkuServer) (err error) {
+	r := new(commodity.CreateSkuResp)
+
+	req, err := streamServer.Recv()
+	if err != nil {
+		logger.Errorf("rpc.CreateSpu: receive error: %v", err)
+		r.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(r)
+	}
+
+	for i := 0; i < int(req.BufferCount); i++ {
+		fileData, err := streamServer.Recv()
+		if err != nil {
+			logger.Errorf("rpc.CreateSku: receive error: %v", err)
+			r.Base = base.BuildBaseResp(err)
+			return streamServer.SendAndClose(r)
+		}
+		req.StyleHeadDrawing = bytes.Join([][]byte{req.StyleHeadDrawing, fileData.StyleHeadDrawing}, []byte(""))
+	}
+
+	id, err := c.useCase.CreateSku(streamServer.Context(), &model.Sku{
+		Name:             req.Name,
+		Stock:            req.Stock,
+		Description:      req.Description,
+		StyleHeadDrawing: req.StyleHeadDrawing,
+		Price:            req.Price,
+		ForSale:          int(req.ForSale),
+		SpuID:            req.SpuID,
+	})
+	if err != nil {
+		logger.Errorf("rpc.CreateSku: create sku error: %v", err)
+		r.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(r)
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	r.SkuID = id
+	return streamServer.SendAndClose(r)
 }
 
-func (c CommodityHandler) UpdateSku(ctx context.Context, req *commodity.UpdateSkuReq) (r *commodity.UpdateSkuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+func (c CommodityHandler) UpdateSku(streamServer commodity.CommodityService_UpdateSkuServer) (rr error) {
+	r := new(commodity.UpdateSkuResp)
+
+	req, err := streamServer.Recv()
+	if err != nil {
+		logger.Errorf("rpc.UpdateSku: receive error: %v", err)
+		r.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(r)
+	}
+
+	for i := 0; i < int(*req.BufferCount); i++ {
+		fileData, err := streamServer.Recv()
+		if err != nil {
+			logger.Errorf("rpc.UpdateSpu: receive error: %v", err)
+			r.Base = base.BuildBaseResp(err)
+			return streamServer.SendAndClose(r)
+		}
+		req.StyleHeadDrawing = bytes.Join([][]byte{req.StyleHeadDrawing, fileData.StyleHeadDrawing}, []byte(""))
+	}
+
+	err = c.useCase.UpdateSku(streamServer.Context(), &model.Sku{
+		SkuID:            req.SkuID,
+		Stock:            req.GetStock(),
+		Description:      req.GetDescription(),
+		StyleHeadDrawing: req.GetStyleHeadDrawing(),
+		Price:            req.GetPrice(),
+		ForSale:          int(req.GetForSale()),
+	})
+	if err != nil {
+		logger.Errorf("rpc.UpdateSku: update sku error: %v", err)
+		r.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(r)
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	return streamServer.SendAndClose(r)
 }
 
 func (c CommodityHandler) DeleteSku(ctx context.Context, req *commodity.DeleteSkuReq) (r *commodity.DeleteSkuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.DeleteSkuResp)
+
+	sku := &model.Sku{
+		SkuID: req.SkuID,
+	}
+
+	if err = c.useCase.DeleteSku(ctx, sku); err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	return
 }
 
 func (c CommodityHandler) ViewSkuImage(ctx context.Context, req *commodity.ViewSkuImageReq) (r *commodity.ViewSkuImageResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ViewSkuImageResp)
+
+	sku := &model.Sku{
+		SkuID: req.SkuID,
+	}
+
+	var Images []*model.SkuImage
+
+	if Images, err = c.useCase.ViewSkuImage(ctx, sku, req.PageNum, req.PageSize); err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	r.Images = pack.BuildImages(Images)
+	return
 }
 
 func (c CommodityHandler) ViewSku(ctx context.Context, req *commodity.ViewSkuReq) (r *commodity.ViewSkuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ViewSkuResp)
+
+	var (
+		isSpuId bool
+		sku     model.Sku
+	)
+
+	if req.SkuID != nil {
+		sku.SkuID = *req.SkuID
+		isSpuId = false
+	}
+	if req.SpuID != nil {
+		sku.SpuID = *req.SpuID
+		isSpuId = true
+	}
+	if req.SkuID == nil && req.SpuID == nil {
+		err = fmt.Errorf("ViewSku failed: skuID and spuID are both nil")
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+
+	Skus, err := c.useCase.ViewSku(ctx, &sku, req.PageNum, req.PageSize, isSpuId)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	r.Skus = pack.BuildSkus(Skus)
+	return
 }
 
 func (c CommodityHandler) UploadSkuAttr(ctx context.Context, req *commodity.UploadSkuAttrReq) (r *commodity.UploadSkuAttrResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.UploadSkuAttrResp)
+
+	attr := &model.AttrValue{
+		SaleAttr:  req.SaleAttr,
+		SaleValue: req.SaleValue,
+	}
+
+	sku := &model.Sku{
+		SkuID: *req.SkuID,
+	}
+
+	if err = c.useCase.UploadSkuAttr(ctx, attr, sku); err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	return
 }
 
 func (c CommodityHandler) ListSkuInfo(ctx context.Context, req *commodity.ListSkuInfoReq) (r *commodity.ListSkuInfoResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ListSkuInfoResp)
+
+	SkuInfos, err := c.useCase.ListSkuInfo(ctx, req.SkuIDs, req.PageNum, req.PageSize)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	r.SkuInfos = pack.BuildSkuInfos(SkuInfos)
+	return
 }
 
 func (c CommodityHandler) ViewHistory(ctx context.Context, req *commodity.ViewHistoryPriceReq) (r *commodity.ViewHistoryPriceResp, err error) {

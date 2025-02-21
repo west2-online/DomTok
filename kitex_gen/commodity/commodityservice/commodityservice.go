@@ -115,14 +115,14 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		newCommodityServiceCreateSkuArgs,
 		newCommodityServiceCreateSkuResult,
 		false,
-		kitex.WithStreamingMode(kitex.StreamingNone),
+		kitex.WithStreamingMode(kitex.StreamingClient),
 	),
 	"UpdateSku": kitex.NewMethodInfo(
 		updateSkuHandler,
 		newCommodityServiceUpdateSkuArgs,
 		newCommodityServiceUpdateSkuResult,
 		false,
-		kitex.WithStreamingMode(kitex.StreamingNone),
+		kitex.WithStreamingMode(kitex.StreamingClient),
 	),
 	"DeleteSku": kitex.NewMethodInfo(
 		deleteSkuHandler,
@@ -548,15 +548,49 @@ func newCommodityServiceViewSpuImageResult() interface{} {
 }
 
 func createSkuHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*commodity.CommodityServiceCreateSkuArgs)
-	realResult := result.(*commodity.CommodityServiceCreateSkuResult)
-	success, err := handler.(commodity.CommodityService).CreateSku(ctx, realArg.Req)
-	if err != nil {
-		return err
+	st, ok := arg.(*streaming.Args)
+	if !ok {
+		return errors.New("CommodityService.CreateSku is a thrift streaming method, please call with Kitex StreamClient")
 	}
-	realResult.Success = success
-	return nil
+	stream := &commodityServiceCreateSkuServer{st.Stream}
+	return handler.(commodity.CommodityService).CreateSku(stream)
 }
+
+type commodityServiceCreateSkuClient struct {
+	streaming.Stream
+}
+
+func (x *commodityServiceCreateSkuClient) DoFinish(err error) {
+	if finisher, ok := x.Stream.(streaming.WithDoFinish); ok {
+		finisher.DoFinish(err)
+	} else {
+		panic(fmt.Sprintf("streaming.WithDoFinish is not implemented by %T", x.Stream))
+	}
+}
+func (x *commodityServiceCreateSkuClient) Send(m *commodity.CreateSkuReq) error {
+	return x.Stream.SendMsg(m)
+}
+func (x *commodityServiceCreateSkuClient) CloseAndRecv() (*commodity.CreateSkuResp, error) {
+	if err := x.Stream.Close(); err != nil {
+		return nil, err
+	}
+	m := new(commodity.CreateSkuResp)
+	return m, x.Stream.RecvMsg(m)
+}
+
+type commodityServiceCreateSkuServer struct {
+	streaming.Stream
+}
+
+func (x *commodityServiceCreateSkuServer) SendAndClose(m *commodity.CreateSkuResp) error {
+	return x.Stream.SendMsg(m)
+}
+
+func (x *commodityServiceCreateSkuServer) Recv() (*commodity.CreateSkuReq, error) {
+	m := new(commodity.CreateSkuReq)
+	return m, x.Stream.RecvMsg(m)
+}
+
 func newCommodityServiceCreateSkuArgs() interface{} {
 	return commodity.NewCommodityServiceCreateSkuArgs()
 }
@@ -566,15 +600,49 @@ func newCommodityServiceCreateSkuResult() interface{} {
 }
 
 func updateSkuHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*commodity.CommodityServiceUpdateSkuArgs)
-	realResult := result.(*commodity.CommodityServiceUpdateSkuResult)
-	success, err := handler.(commodity.CommodityService).UpdateSku(ctx, realArg.Req)
-	if err != nil {
-		return err
+	st, ok := arg.(*streaming.Args)
+	if !ok {
+		return errors.New("CommodityService.UpdateSku is a thrift streaming method, please call with Kitex StreamClient")
 	}
-	realResult.Success = success
-	return nil
+	stream := &commodityServiceUpdateSkuServer{st.Stream}
+	return handler.(commodity.CommodityService).UpdateSku(stream)
 }
+
+type commodityServiceUpdateSkuClient struct {
+	streaming.Stream
+}
+
+func (x *commodityServiceUpdateSkuClient) DoFinish(err error) {
+	if finisher, ok := x.Stream.(streaming.WithDoFinish); ok {
+		finisher.DoFinish(err)
+	} else {
+		panic(fmt.Sprintf("streaming.WithDoFinish is not implemented by %T", x.Stream))
+	}
+}
+func (x *commodityServiceUpdateSkuClient) Send(m *commodity.UpdateSkuReq) error {
+	return x.Stream.SendMsg(m)
+}
+func (x *commodityServiceUpdateSkuClient) CloseAndRecv() (*commodity.UpdateSkuResp, error) {
+	if err := x.Stream.Close(); err != nil {
+		return nil, err
+	}
+	m := new(commodity.UpdateSkuResp)
+	return m, x.Stream.RecvMsg(m)
+}
+
+type commodityServiceUpdateSkuServer struct {
+	streaming.Stream
+}
+
+func (x *commodityServiceUpdateSkuServer) SendAndClose(m *commodity.UpdateSkuResp) error {
+	return x.Stream.SendMsg(m)
+}
+
+func (x *commodityServiceUpdateSkuServer) Recv() (*commodity.UpdateSkuReq, error) {
+	m := new(commodity.UpdateSkuReq)
+	return m, x.Stream.RecvMsg(m)
+}
+
 func newCommodityServiceUpdateSkuArgs() interface{} {
 	return commodity.NewCommodityServiceUpdateSkuArgs()
 }
@@ -945,24 +1013,32 @@ func (p *kClient) ViewSpuImage(ctx context.Context, req *commodity.ViewSpuImageR
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) CreateSku(ctx context.Context, req *commodity.CreateSkuReq) (r *commodity.CreateSkuResp, err error) {
-	var _args commodity.CommodityServiceCreateSkuArgs
-	_args.Req = req
-	var _result commodity.CommodityServiceCreateSkuResult
-	if err = p.c.Call(ctx, "CreateSku", &_args, &_result); err != nil {
-		return
+func (p *kClient) CreateSku(ctx context.Context) (CommodityService_CreateSkuClient, error) {
+	streamClient, ok := p.c.(client.Streaming)
+	if !ok {
+		return nil, fmt.Errorf("client not support streaming")
 	}
-	return _result.GetSuccess(), nil
+	res := new(streaming.Result)
+	err := streamClient.Stream(ctx, "CreateSku", nil, res)
+	if err != nil {
+		return nil, err
+	}
+	stream := &commodityServiceCreateSkuClient{res.Stream}
+	return stream, nil
 }
 
-func (p *kClient) UpdateSku(ctx context.Context, req *commodity.UpdateSkuReq) (r *commodity.UpdateSkuResp, err error) {
-	var _args commodity.CommodityServiceUpdateSkuArgs
-	_args.Req = req
-	var _result commodity.CommodityServiceUpdateSkuResult
-	if err = p.c.Call(ctx, "UpdateSku", &_args, &_result); err != nil {
-		return
+func (p *kClient) UpdateSku(ctx context.Context) (CommodityService_UpdateSkuClient, error) {
+	streamClient, ok := p.c.(client.Streaming)
+	if !ok {
+		return nil, fmt.Errorf("client not support streaming")
 	}
-	return _result.GetSuccess(), nil
+	res := new(streaming.Result)
+	err := streamClient.Stream(ctx, "UpdateSku", nil, res)
+	if err != nil {
+		return nil, err
+	}
+	stream := &commodityServiceUpdateSkuClient{res.Stream}
+	return stream, nil
 }
 
 func (p *kClient) DeleteSku(ctx context.Context, req *commodity.DeleteSkuReq) (r *commodity.DeleteSkuResp, err error) {

@@ -142,15 +142,13 @@ struct DeleteSpuImageResp {
 }
 
 struct CreateSkuReq {
-    1: optional list<binary> skuImages;
-    2: required string name;
-    3: required i64 stock;
-    4: required string description;
-    5: required string styleHeadDrawing;
-    6: required double price;
-    7: required i32 forSale;
-    8: required double shipping;
-    9: required i64 spuID;
+    1: required string name;
+    2: required i64 stock;
+    3: required string description;
+    5: required double price;
+    6: required i32 forSale;
+    7: required double shipping;
+    8: required i64 spuID;
 
 }
 
@@ -162,12 +160,10 @@ struct CreateSkuResp {
 struct UpdateSkuReq {
     1: required i64 skuID;
     2: optional double shipping;
-    3: optional list<binary> skuImages;
-    4: optional string description;
-    5: optional string styleHeadDrawing;
-    6: optional double price;
-    7: optional i32 forSale;
-    8: optional i64 Stock;
+    3: optional string description;
+    5: optional double price;
+    6: optional i32 forSale;
+    7: optional i64 Stock;
 
 }
 

@@ -32,6 +32,14 @@ type CommodityUseCase interface {
 	UpdateSpu(ctx context.Context, spu *model.Spu) error
 	UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
 	DeleteSpuImage(ctx context.Context, imageId int64) error
+
+	CreateSku(ctx context.Context, sku *model.Sku) (skuID int64, err error)
+	UpdateSku(ctx context.Context, sku *model.Sku) (err error)
+	DeleteSku(ctx context.Context, sku *model.Sku) (err error)
+	ViewSkuImage(ctx context.Context, sku *model.Sku, pageNum *int64, pageSize *int64) (Images []*model.SkuImage, err error)
+	ViewSku(ctx context.Context, sku *model.Sku, pageNum *int64, pageSize *int64, isSpuId bool) (Skus []*model.Sku, err error)
+	UploadSkuAttr(ctx context.Context, attr *model.AttrValue, Sku *model.Sku) (err error)
+	ListSkuInfo(ctx context.Context, Ids []int64, pageNum int64, pageSize int64) (SkuInfos []*model.Sku, err error)
 }
 
 type useCase struct {

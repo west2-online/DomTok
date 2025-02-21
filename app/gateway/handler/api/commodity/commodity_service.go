@@ -292,17 +292,33 @@ func CreateSku(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	skuID, err := rpc.CreateSkuRPC(ctx, &commodity.CreateSkuReq{
-		SkuImages:        req.SkuImages,
-		Name:             req.Name,
-		Description:      req.Description,
-		StyleHeadDrawing: req.StyleHeadDrawing,
-		Price:            req.Price,
-		ForSale:          req.ForSale,
-		SpuID:            req.SpuID,
-		Stock:            req.Stock,
-	})
+	file, err := c.FormFile("skuImage")
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
 
+	_, ok := utils.CheckImageFileType(file)
+	if !ok {
+		pack.RespError(c, errno.ParamVerifyError)
+		return
+	}
+
+	datas, err := utils.FileToBytes(file)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	skuID, err := rpc.CreateSkuRPC(ctx, &commodity.CreateSkuReq{
+		Name:        req.Name,
+		Description: req.Description,
+		Price:       req.Price,
+		ForSale:     req.ForSale,
+		SpuID:       req.SpuID,
+		Stock:       req.Stock,
+		BufferCount: int64(len(datas)),
+	}, datas)
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -321,16 +337,39 @@ func UpdateSku(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	err = rpc.UpdateSkuRPC(ctx, &commodity.UpdateSkuReq{
-		SkuID:            req.SkuID,
-		SkuImages:        req.SkuImages,
-		Description:      req.Description,
-		StyleHeadDrawing: req.StyleHeadDrawing,
-		Price:            req.Price,
-		ForSale:          req.ForSale,
-		Stock:            req.Stock,
-	})
+	var l int64
+	var datas [][]byte
 
+	file, err := c.FormFile("skuImage")
+	if err != nil {
+		log.Println(err)
+		log.Println(protocol.ErrMissingFile)
+		if !errors.Is(err, protocol.ErrMissingFile) {
+			pack.RespError(c, errno.ParamVerifyError.WithError(err))
+			return
+		}
+	} else {
+		_, ok := utils.CheckImageFileType(file)
+		if !ok {
+			pack.RespError(c, errno.ParamVerifyError)
+			return
+		}
+		datas, err = utils.FileToBytes(file)
+		if err != nil {
+			pack.RespError(c, err)
+			return
+		}
+		l = int64(len(datas))
+	}
+
+	err = rpc.UpdateSkuRPC(ctx, &commodity.UpdateSkuReq{
+		SkuID:       req.SkuID,
+		Description: req.Description,
+		Price:       req.Price,
+		ForSale:     req.ForSale,
+		Stock:       req.Stock,
+		BufferCount: &l,
+	}, datas)
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -352,7 +391,6 @@ func DeleteSku(ctx context.Context, c *app.RequestContext) {
 	err = rpc.DeleteSkuRPC(ctx, &commodity.DeleteSkuReq{
 		SkuID: req.SkuID,
 	})
-
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -376,7 +414,6 @@ func ViewSkuImage(ctx context.Context, c *app.RequestContext) {
 		PageNum:  req.PageNum,
 		PageSize: req.PageSize,
 	})
-
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -401,7 +438,6 @@ func ViewSku(ctx context.Context, c *app.RequestContext) {
 		PageNum:  req.PageNum,
 		PageSize: req.PageSize,
 	})
-
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -425,7 +461,6 @@ func UploadSkuAttr(ctx context.Context, c *app.RequestContext) {
 		SaleAttr:  req.SaleAttr,
 		SaleValue: req.SaleValue,
 	})
-
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -449,7 +484,6 @@ func ListSkuInfo(ctx context.Context, c *app.RequestContext) {
 		PageNum:  req.PageNum,
 		PageSize: req.PageSize,
 	})
-
 	if err != nil {
 		pack.RespError(c, err)
 		return

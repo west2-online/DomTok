@@ -235,14 +235,16 @@ struct DeleteSpuImageResp {
 * @Param stock 库存
 */
 struct CreateSkuReq {
-    1: optional list<binary> skuImages;
-    2: required string name;
-    3: required i64 stock;
-    4: required string description;
-    5: required string styleHeadDrawing;
-    6: required double price;
-    7: required i32 forSale;
-    8: required i64 spuID;
+
+    1: required string name;
+    2: required i64 stock;
+    3: required string description;
+    4: required binary styleHeadDrawing;
+    5: required double price;
+    6: required i32 forSale;
+    7: required i64 spuID;
+    8: required i64 bufferCount;
+
 
 }
 
@@ -264,11 +266,11 @@ struct CreateSkuResp {
 struct UpdateSkuReq {
     1: required i64 skuID;
     2: optional i64 stock;
-    3: optional list<binary> skuImages;
-    4: optional string description;
-    5: optional string styleHeadDrawing;
-    6: optional double price;
-    7: optional i32 forSale;
+    3: optional string description;
+    4: optional binary styleHeadDrawing;
+    5: optional double price;
+    6: optional i32 forSale;
+    7: optional i64 bufferCount;
 
 }
 
@@ -491,8 +493,8 @@ service CommodityService {
 
 
     //SKU
-    CreateSkuResp CreateSku(1: CreateSkuReq req);
-    UpdateSkuResp UpdateSku(1: UpdateSkuReq req);
+    CreateSkuResp CreateSku(1: CreateSkuReq req) (streaming.mode="client");
+    UpdateSkuResp UpdateSku(1: UpdateSkuReq req) (streaming.mode="client");
     DeleteSkuResp DeleteSku(1: DeleteSkuReq req);
     ViewSkuImageResp ViewSkuImage(1: ViewSkuImageReq req);
     ViewSkuResp ViewSku(1: ViewSkuReq req);

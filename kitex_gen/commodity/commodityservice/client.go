@@ -42,8 +42,6 @@ type Client interface {
 	ViewSpu(ctx context.Context, req *commodity.ViewSpuReq, callOptions ...callopt.Option) (r *commodity.ViewSpuResp, err error)
 	DeleteSpu(ctx context.Context, req *commodity.DeleteSpuReq, callOptions ...callopt.Option) (r *commodity.DeleteSpuResp, err error)
 	ViewSpuImage(ctx context.Context, req *commodity.ViewSpuImageReq, callOptions ...callopt.Option) (r *commodity.ViewSpuImageResp, err error)
-	CreateSku(ctx context.Context, req *commodity.CreateSkuReq, callOptions ...callopt.Option) (r *commodity.CreateSkuResp, err error)
-	UpdateSku(ctx context.Context, req *commodity.UpdateSkuReq, callOptions ...callopt.Option) (r *commodity.UpdateSkuResp, err error)
 	DeleteSku(ctx context.Context, req *commodity.DeleteSkuReq, callOptions ...callopt.Option) (r *commodity.DeleteSkuResp, err error)
 	ViewSkuImage(ctx context.Context, req *commodity.ViewSkuImageReq, callOptions ...callopt.Option) (r *commodity.ViewSkuImageResp, err error)
 	ViewSku(ctx context.Context, req *commodity.ViewSkuReq, callOptions ...callopt.Option) (r *commodity.ViewSkuResp, err error)
@@ -63,6 +61,8 @@ type Client interface {
 type StreamClient interface {
 	CreateSpu(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_CreateSpuClient, err error)
 	UpdateSpu(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_UpdateSpuClient, err error)
+	CreateSku(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_CreateSkuClient, err error)
+	UpdateSku(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_UpdateSkuClient, err error)
 }
 
 type CommodityService_CreateSpuClient interface {
@@ -75,6 +75,18 @@ type CommodityService_UpdateSpuClient interface {
 	streaming.Stream
 	Send(*commodity.UpdateSpuReq) error
 	CloseAndRecv() (*commodity.UpdateSpuResp, error)
+}
+
+type CommodityService_CreateSkuClient interface {
+	streaming.Stream
+	Send(*commodity.CreateSkuReq) error
+	CloseAndRecv() (*commodity.CreateSkuResp, error)
+}
+
+type CommodityService_UpdateSkuClient interface {
+	streaming.Stream
+	Send(*commodity.UpdateSkuReq) error
+	CloseAndRecv() (*commodity.UpdateSkuResp, error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -149,16 +161,6 @@ func (p *kCommodityServiceClient) DeleteSpu(ctx context.Context, req *commodity.
 func (p *kCommodityServiceClient) ViewSpuImage(ctx context.Context, req *commodity.ViewSpuImageReq, callOptions ...callopt.Option) (r *commodity.ViewSpuImageResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.ViewSpuImage(ctx, req)
-}
-
-func (p *kCommodityServiceClient) CreateSku(ctx context.Context, req *commodity.CreateSkuReq, callOptions ...callopt.Option) (r *commodity.CreateSkuResp, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.CreateSku(ctx, req)
-}
-
-func (p *kCommodityServiceClient) UpdateSku(ctx context.Context, req *commodity.UpdateSkuReq, callOptions ...callopt.Option) (r *commodity.UpdateSkuResp, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.UpdateSku(ctx, req)
 }
 
 func (p *kCommodityServiceClient) DeleteSku(ctx context.Context, req *commodity.DeleteSkuReq, callOptions ...callopt.Option) (r *commodity.DeleteSkuResp, err error) {
@@ -264,4 +266,14 @@ func (p *kCommodityServiceStreamClient) CreateSpu(ctx context.Context, callOptio
 func (p *kCommodityServiceStreamClient) UpdateSpu(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_UpdateSpuClient, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, streamcall.GetCallOptions(callOptions))
 	return p.kClient.UpdateSpu(ctx)
+}
+
+func (p *kCommodityServiceStreamClient) CreateSku(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_CreateSkuClient, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, streamcall.GetCallOptions(callOptions))
+	return p.kClient.CreateSku(ctx)
+}
+
+func (p *kCommodityServiceStreamClient) UpdateSku(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_UpdateSkuClient, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, streamcall.GetCallOptions(callOptions))
+	return p.kClient.UpdateSku(ctx)
 }

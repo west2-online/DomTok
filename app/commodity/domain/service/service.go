@@ -154,3 +154,93 @@ func (svc *CommodityService) IdentifyUser(ctx context.Context, uid int64) error 
 	}
 	return nil
 }
+
+func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku) (int64, error) {
+	sku.SkuID = svc.nextID()
+	sku.StyleHeadDrawingUrl = utils.GenerateFileName(constants.SkuDirDest, sku.SkuID)
+
+	var eg errgroup.Group
+	eg.Go(func() error {
+		if err := svc.db.CreateSku(ctx, sku); err != nil {
+			return fmt.Errorf("service.CreateSku: create sku failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		if err := upyun.UploadImg(sku.StyleHeadDrawing, sku.StyleHeadDrawingUrl); err != nil {
+			return fmt.Errorf("service.UploadImg: upload image failed: %w", err)
+		}
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		return 0, err
+	}
+
+	return sku.SkuID, nil
+}
+
+func (svc *CommodityService) UpdateSku(ctx context.Context, sku *model.Sku, originSpu *model.Sku) error {
+	if err := svc.db.UpdateSku(ctx, sku); err != nil {
+		return fmt.Errorf("service.UpdateSku: update sku failed: %w", err)
+	}
+
+	if len(sku.StyleHeadDrawing) > 0 {
+		var eg errgroup.Group
+		eg.Go(func() error {
+			err := upyun.UploadImg(sku.StyleHeadDrawing, sku.StyleHeadDrawingUrl)
+			if err != nil {
+				return errno.UpYunFileError.WithMessage(err.Error())
+			}
+			return nil
+		})
+
+		eg.Go(func() error {
+			err := upyun.DeleteImg(originSpu.StyleHeadDrawingUrl)
+			if err != nil {
+				return errno.UpYunFileError.WithMessage(err.Error())
+			}
+			return nil
+		})
+
+		if err := eg.Wait(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (svc *CommodityService) GetSkuIdBySpuID(ctx context.Context, spuID int64, pageNum int, pageSize int) ([]*int64, error) {
+	skuIds, err := svc.db.GetSkuIdBySpuID(ctx, spuID, pageNum, pageSize)
+	if err != nil {
+		return nil, fmt.Errorf("service.GetSkuIdBySpuID: get sku id by spu id failed: %w", err)
+	}
+	return skuIds, nil
+}
+
+func (svc *CommodityService) SetCreatorID(ctx context.Context, sku *model.Sku) error {
+	uid, err := contextLogin.GetLoginData(ctx)
+	if err != nil {
+		return errno.Errorf(errno.AuthNoTokenCode, "no token find")
+	}
+	sku.CreatorID = uid
+	return nil
+}
+
+func (svc *CommodityService) NormalizePagination(pageNum, pageSize *int64) (int, int) {
+	var (
+		pNum  int64
+		pSize int64
+	)
+
+	if pageNum != nil && *pageNum > 0 {
+		pNum = *pageNum
+	}
+	if pageSize != nil && *pageSize > 0 {
+		pSize = *pageSize
+	}
+
+	return int(pNum), int(pSize)
+}
