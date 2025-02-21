@@ -31,5 +31,8 @@ type PaymentDB interface {
 }
 type PaymentRedis interface {
 	SetPaymentToken(ctx context.Context, key string, value interface{}, expiration time.Duration) error
+	IncrRedisKey(ctx context.Context, key string, expiration int) (int, error)
+	CheckRedisDayKey(ctx context.Context, key string) (bool, error)
+	SetRedisDayKey(ctx context.Context, key string, value string, expiration int) error
 	// GetPaymentToken(ctx context.Context, key string) (string, error)
 }

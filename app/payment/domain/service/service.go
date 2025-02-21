@@ -115,3 +115,37 @@ func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, 
 	// 4. 返回成功状态码
 	return paymentStatus.RedisStoreSuccess, nil
 }
+
+func (svc *PaymentService) CheckRedisRateLimiting(ctx context.Context, uid int64, orderID int64) (frequencyInfo bool, timeInfo bool, err error) {
+	minuteKey := fmt.Sprintf("userID:%d:refund:minute", uid)
+	dayKey := fmt.Sprintf("orderID:%d:refund:day", orderID)
+
+	// 检查 1 分钟内的申请次数
+	count, err := svc.redis.IncrRedisKey(ctx, minuteKey, paymentStatus.RedisMinute)
+	if err != nil {
+		return false, false, fmt.Errorf("check refund request limit failed: %w", err)
+	}
+	if count > 3 {
+		return false, false, fmt.Errorf("too many refund requests in a short time")
+	}
+
+	// 检查 24 小时内是否已申请过退款
+	// TODO 这下面的返回值的全用false吗？
+	exists, err := svc.redis.CheckRedisDayKey(ctx, dayKey)
+	if err != nil {
+		return false, false, fmt.Errorf("check refund request history failed: %w", err)
+	}
+	if exists {
+		return true, false, fmt.Errorf("refund already requested for this order in the last 24 hours")
+	}
+	// 记录订单退款请求，设置 24 小时过期
+	err = svc.redis.SetRedisDayKey(ctx, dayKey, paymentStatus.RedisDayPlaceholder, paymentStatus.RedisDay)
+	if err != nil {
+		return false, false, fmt.Errorf("record refund request failed: %w", err)
+	}
+	return true, true, nil
+}
+
+func (svc *PaymentService) CreateRefundInfo(ctx context.Context, id int64) error {
+	return nil
+}

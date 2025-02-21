@@ -24,11 +24,18 @@ const (
 	PaymentNotExist    = false
 	UserNotExist       = false
 	PaymentSecretKey   = "west2online"
-	RedisStoreSuccess  = true  // 成功
-	RedisStoreFailed   = false // Redis 存储失败
 	ExpirationDuration = 15 * time.Minute
 	// TODO 这一个常量要改
 	PingTime = 2
+)
+const (
+	RedisStoreSuccess   = true  // 成功
+	RedisStoreFailed    = false // Redis 存储失败
+	RedisValid          = true
+	RedisMinute         = 60
+	RedisHour           = 3600
+	RedisDay            = 86400
+	RedisDayPlaceholder = "1"
 )
 
 const (
