@@ -165,6 +165,7 @@ func (svc *CommodityService) IdentifyUserInStreamCtx(ctx context.Context, uid in
 	}
 	return nil
 }
+
 func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku) (int64, error) {
 	sku.SkuID = svc.nextID()
 	sku.StyleHeadDrawingUrl = utils.GenerateFileName(constants.SkuDirDest, sku.SkuID)
