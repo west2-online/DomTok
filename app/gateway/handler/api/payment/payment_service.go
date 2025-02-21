@@ -96,13 +96,25 @@ func ProcessRefund(ctx context.Context, c *app.RequestContext) {
 func RequestRefundToken(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.RefundTokenRequest
+
+	// 解析并校验请求参数
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		logger.Error("RequestRefundTokenRPC failed", zap.Error(err)) // 记录错误日志
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
-	// TODO 这鬼地方是api. 还是 payment.
-	resp := new(payment.RefundTokenResponse)
 
-	c.JSON(consts.StatusOK, resp)
+	// 调用 RPC 获取退款令牌
+	resp, err := rpc.RequestRefundTokenRPC(ctx, &payment.RefundTokenRequest{
+		OrderID: req.OrderID,
+		UserID:  req.UserID,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	// 返回成功响应
+	pack.RespData(c, resp)
 }
