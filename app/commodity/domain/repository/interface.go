@@ -29,16 +29,21 @@ type CommodityDB interface {
 	CreateSpu(ctx context.Context, spu *model.Spu) error
 	CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
 	DeleteSpu(ctx context.Context, spuId int64) error
-	DeleteSpuImageToSpu(ctx context.Context, spuImageId int64, spuId int64) error
 	IsExistSku(ctx context.Context, spuId int64) (bool, error)
 	GetSpuBySpuId(ctx context.Context, spuId int64) (*model.Spu, error)
 	GetSpuImage(ctx context.Context, spuImageId int64) (*model.SpuImage, error)
 	UpdateSpu(ctx context.Context, spu *model.Spu) error
 	UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
 	DeleteSpuImage(ctx context.Context, spuImageId int64) error
+	DeleteSpuImagesBySpuId(ctx context.Context, spuId int64) (ids []int64, url []string, err error)
+	GetImagesBySpuId(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error)
 }
 
-type CommodityCache interface{}
+type CommodityCache interface {
+	IsExist(ctx context.Context, key string) bool
+	GetSpuImages(ctx context.Context, key string) (*model.SpuImages, error)
+	SetSpuImages(ctx context.Context, key string, images *model.SpuImages)
+}
 
 type CommodityMQ interface {
 	Send(ctx context.Context, topic string, message []*kafka.Message) error
