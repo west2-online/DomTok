@@ -18,7 +18,6 @@ package rpc
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/kitex_gen/payment"
@@ -37,32 +36,36 @@ func InitPaymentRPC() {
 }
 
 func RequestPaymentTokenRPC(ctx context.Context, req *payment.PaymentTokenRequest) (response *model.PaymentTokenInfo, err error) {
-	logger.Info("RequestPaymentTokenRPC called") // 这里打印一下，看看是否调用到了
-	fmt.Println("RequestPaymentTokenRPC: called with OrderID:", req.OrderID, "UserID:", req.UserID)
-
+	logger.Infof("RequestPaymentTokenRPC called") // 这里打印一下，看看是否调用到了
 	resp, err := paymentClient.RequestPaymentToken(ctx, req)
-	/*if err != nil {
-		logger.Error("RequestPaymentTokenRPC: RPC call failed", zap.Error(err))
-		return "", errno.InternalServiceError.WithError(err)
-	}
-
-	if resp == nil {
-		logger.Error("RequestPaymentTokenRPC: RPC returned nil response")
-		return "", errno.InternalServiceError.WithMessage("RPC response is nil")
-	}
-
-	if !utils.IsSuccess(resp.Base) {
-		logger.Error("RequestPaymentTokenRPC: RPC call business failure", zap.String("message", resp.Base.Msg))
-		return "", errno.InternalServiceError.WithMessage(resp.Base.Msg)
-	}*/ // 这里的 err 是属于 RPC 间调用的错误，例如 network error
+	// 这里的 err 是属于 RPC 间调用的错误，例如 network error
 	// 而业务错误则是封装在 resp.base 当中的
 	if err != nil {
 		logger.Errorf("RequestPaymentTokenRPC: RPC called failed: %v", err.Error())
 		return nil, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsSuccess(resp.Base) {
-		// TODO
+		logger.Errorf("RequestRefundRPC: Business error: %s", resp.Base.Msg)
 		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
 	}
 	return resp.TokenInfo, nil
+}
+
+func RequestRefundRPC(ctx context.Context, req *payment.RefundTokenRequest) (response int64, err error) {
+	logger.Infof("RequestRefundTokenRPC called") // 记录日志，确保调用成功
+	// 调用 RPC 获取退款令牌
+	resp, err := paymentClient.RequestRefundInfo(ctx, req)
+	if err != nil {
+		logger.Errorf("RequestRefundRPC: RPC call failed: %v", err.Error())
+		return 0, errno.InternalServiceError.WithError(err)
+	}
+
+	// 解析业务错误（即 RPC 返回的错误信息）
+	if !utils.IsSuccess(resp.Base) {
+		logger.Errorf("RequestRefundRPC: Business error: %s", resp.Base.Msg)
+		return 0, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+
+	// 返回退款令牌信息
+	return resp.RefundID, nil
 }

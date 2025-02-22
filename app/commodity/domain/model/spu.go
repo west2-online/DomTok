@@ -16,6 +16,8 @@ limitations under the License.
 
 package model
 
+import "github.com/west2-online/DomTok/pkg/constants"
+
 type Spu struct {
 	SpuId               int64
 	Name                string
@@ -30,4 +32,8 @@ type Spu struct {
 	UpdatedAt           int64
 	DeletedAt           int64
 	GoodsHeadDrawingUrl string
+}
+
+func (Category) TableName() string {
+	return constants.CategoryTableName
 }
