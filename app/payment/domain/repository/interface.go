@@ -32,7 +32,7 @@ type PaymentDB interface {
 }
 type PaymentRedis interface {
 	SetPaymentToken(ctx context.Context, key string, value interface{}, expiration time.Duration) error
-	IncrRedisKey(ctx context.Context, key string, expiration int) (int, error)
+	IncrRedisKey(ctx context.Context, key string, expiration int) (int64, error)
 	CheckRedisDayKey(ctx context.Context, key string) (bool, error)
 	SetRedisDayKey(ctx context.Context, key string, value string, expiration int) error
 	SetRefundToken(ctx context.Context, key string, token string, duration time.Duration) error
