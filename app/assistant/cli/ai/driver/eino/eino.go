@@ -94,9 +94,10 @@ func (c *Client) Call(ctx context.Context, dialog model.IDialog) (err error) {
 	}
 
 	ra, err := react.NewAgent(ctx, &react.AgentConfig{
-		Model:           chatModel,
-		ToolsConfig:     compose.ToolsNodeConfig{Tools: c.tools},
-		MessageModifier: func(_ context.Context, input []*schema.Message) []*schema.Message { return append(history, input...) },
+		Model:                 chatModel,
+		ToolsConfig:           compose.ToolsNodeConfig{Tools: c.tools},
+		MessageModifier:       func(_ context.Context, input []*schema.Message) []*schema.Message { return append(history, input...) },
+		StreamToolCallChecker: streamToolCallCheckerStrict,
 	})
 	if err != nil {
 		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, err.Error())
@@ -194,4 +195,44 @@ func (c *Client) readStreamWithDialog(
 		}
 	}
 	return out, nil
+}
+
+func streamToolCallCheckerStrict(ctx context.Context, sr *schema.StreamReader[*schema.Message]) (bool, error) {
+	defer sr.Close()
+
+	frame, err := sr.Recv()
+	if err != nil {
+		return false, err
+	}
+
+	// doubao 1.5 pro 32k:
+	// a tool call stream result can be like:
+	//   frame.toolCalls = []
+	//   frame.content = ""
+	// so default checker may not work
+	// func firstChunkStreamToolCallChecker(_ context.Context, sr *schema.StreamReader[*schema.Message]) (bool, error) {
+	//	 defer sr.Close()
+	//
+	//	 msg, err := sr.Recv()
+	//	 if err != nil {
+	//	 	 return false, err
+	//	 }
+	//
+	//	 if len(msg.ToolCalls) == 0 {
+	//		 return false, nil
+	//	 }
+	//
+	//	 return true, nil
+	// }
+	// an easy way to fix this is to check if the content is empty:
+	//   - ai always response tool calls with empty content
+	//     - if content is empty, it is a tool call stream
+	//     - if tool calls is not empty, it is a tool call stream
+	//   - ai always response message with content, so if content is not empty, it is a message stream
+	// only try with doubao 1.5 pro 32k, other models may not work or need modification
+	if len(frame.ToolCalls) != 0 || len(frame.Content) == 0 {
+		return true, nil
+	}
+
+	return false, nil
 }
