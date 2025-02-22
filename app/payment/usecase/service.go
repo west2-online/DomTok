@@ -20,8 +20,6 @@ import (
 	"context"
 	"fmt"
 
-	"go.uber.org/zap"
-
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
@@ -44,7 +42,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 		return "", 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
 	}
 
-	// 2. 获取用户id,并检查用户是否存在
+	// 2. 获取用户id,无需检查用户是否存在
 	// 获取用户id
 	var uid int64
 	uid, err = uc.svc.GetUserID(ctx)
@@ -77,37 +75,76 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	// 4. HMAC生成支付令牌
 	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, orderID)
 	if err != nil {
-		logger.Error("Error generating payment token",
-			zap.Int64("orderID", orderID),
-			zap.Error(err),
-		)
+		logger.Errorf("Error generating payment token: orderID:%d,err:%v", orderID, err)
 		return "", 0, fmt.Errorf("generate payment token failed:%w", err)
 	}
-	logger.Info("Generated payment token",
-		zap.String("token", token),
-		zap.Int64("expTime", expTime),
-	)
-
 	var redisStatus bool
 	// 5. 存储令牌到 Redis
 	// TODO 记得删除这个测试数值
 	uid := int64(paymentStatus.TestUserID)
-	logger.Info("Storing token in Redis",
-		zap.Int64("userID", uid),
-		zap.Int64("orderID", orderID),
-	)
 	redisStatus, err = uc.svc.StorePaymentToken(ctx, token, expTime, uid, orderID)
 	if err != nil && redisStatus != paymentStatus.RedisStoreSuccess {
-		logger.Error("Error storing payment token in Redis",
-			zap.Int64("orderID", orderID),
-			zap.Int64("userID", uid),
-			zap.Error(err),
-		)
+		logger.Errorf("Error store payment token: orderID:%d,userID:%d,err:%v", orderID, uid, err)
 		return "", 0, fmt.Errorf("store payment token failed:%w", err)
 	}
-	logger.Info("Payment token stored successfully",
-		zap.Int64("orderID", orderID),
-		zap.Int64("userID", uid),
-	)
+	logger.Infof("Success generating payment token: orderID:%d,token:%s", orderID, token)
 	return token, expTime, nil
+}
+
+// TODO
+func (uc *paymentUseCase) GetRefundInfo(ctx context.Context, orderID int64) (refundID int64, err error) {
+	/*
+		// 1. 检查订单是否存在
+		orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
+		if err != nil {
+			return "", 0, fmt.Errorf("check order existence failed: %w", err)
+		}
+		if !orderExists {
+			return "", 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
+		}
+
+		// 2. 获取用户ID
+		uid, err := uc.svc.GetUserID(ctx)
+		if err != nil {
+			return "", 0, fmt.Errorf("get user id failed: %w", err)
+		}
+	*/
+	// TODO 记得删除这个测试数值
+	uid := int64(paymentStatus.TestUserID)
+	// 3. Redis 限流检查
+	var frequencyInfo bool
+	var timeInfo bool
+	frequencyInfo, timeInfo, err = uc.svc.CheckRedisRateLimiting(ctx, uid, orderID)
+	if err != nil {
+		return 0, fmt.Errorf("check redis rate limiting failed: %w", err)
+	}
+	if frequencyInfo != paymentStatus.RedisValid {
+		return 0, fmt.Errorf("too many refund requests in a short time")
+	}
+	if timeInfo != paymentStatus.RedisValid {
+		return 0, fmt.Errorf("refund already requested for this order in the last 24 hours")
+	}
+
+	// 4. 创建退款信息
+	refundID, err = uc.svc.CreateRefundInfo(ctx, orderID)
+	if err != nil {
+		return 0, fmt.Errorf("create refund info failed: %w", err)
+	}
+	/*
+		// 5. 生成退款令牌
+		token, expTime, err = uc.svc.GenerateRefundToken(ctx, orderID)
+		if err != nil {
+			return "", 0, fmt.Errorf("generate refund token failed: %w", err)
+		}
+
+		// 6. 存储令牌到 Redis
+		var redisStatus bool
+		redisStatus, err = uc.svc.StoreRefundToken(ctx, token, expTime, uid, orderID)
+		if err != nil || redisStatus != paymentStatus.RedisStoreSuccess {
+			return "", 0, fmt.Errorf("store refund token failed: %w", err)
+		}
+
+		return token, expTime, nil
+	*/
+	return refundID, nil
 }

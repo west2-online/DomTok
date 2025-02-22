@@ -44,7 +44,7 @@ type PaymentOrder struct {
 // PaymentRefund 退款表
 type PaymentRefund struct {
 	ID                        int64           `gorm:"primaryKey;autoIncrement;comment:支付退款的唯一标识"`
-	OrderID                   string          `gorm:"size:64;not null;comment:关联的商户订单号"`
+	OrderID                   int64           `gorm:"size:64;not null;comment:关联的商户订单号"`
 	UserID                    int64           `gorm:"not null;comment:用户的唯一标识"`
 	RefundAmount              decimal.Decimal `gorm:"type:decimal(15,4);not null;comment:退款金额，单位为元"`
 	RefundReason              string          `gorm:"size:255;comment:退款原因"`
@@ -60,7 +60,7 @@ type PaymentRefund struct {
 // PaymentLedger 流水信息表
 type PaymentLedger struct {
 	ID                        int64           `gorm:"primaryKey;autoIncrement;comment:支付退款的唯一标识"`
-	OrderID                   string          `gorm:"size:64;not null;comment:关联的商户订单号"`
+	OrderID                   int64           `gorm:"size:64;not null;comment:关联的商户订单号"`
 	UserID                    int64           `gorm:"not null;comment:用户的唯一标识"`
 	RefundAmount              decimal.Decimal `gorm:"type:decimal(15,4);not null;comment:退款金额，单位为元"`
 	RefundReason              string          `gorm:"size:255;comment:退款原因"`
