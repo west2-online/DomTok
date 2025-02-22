@@ -1,5 +1,5 @@
 # 第一阶段：构建应用程序
-FROM golang:1.24 AS builder
+FROM golang:1.23 AS builder
 # 定义构建参数，在构建镜像的时候需要传入 SERVICE 来表示构建的模块
 ARG SERVICE
 
@@ -45,6 +45,7 @@ WORKDIR /app
 # 复制 Binary 及启动脚本，调整权限设置
 COPY --from=builder /app/output /app/output
 COPY --from=builder /app/docker/script/entrypoint.sh /app/entrypoint.sh
+RUN mkdir -p /app/config
 RUN chmod +x /app/entrypoint.sh
 
 # 需要注意的是，这个命令是在程序执行时运行，不能直接在这里填入 SERVICE 参，需要绕个弯设置为环境变量

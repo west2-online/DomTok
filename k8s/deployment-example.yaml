@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: domtok-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: domtok-gateway
+  template:
+    metadata:
+      labels:
+        app: domtok-gateway
+    spec:
+      # TODO： 应该有一系列的 initC，比如 etcd（服务发现）Mysql，等
+      #initContainers:
+      #  - name: check-mysql # 检查 MySQL 是否启动
+      #    image: busybox:1.28
+      #    command: ['sh', '-c',
+      #      'until nc -z domtok-mysql-domtok.domtok.svc.cluster.local 3306;
+      #    do echo "Waiting for MySQL..."; sleep 2; done']
+      containers:
+        - name: domtok-gateway
+          image: registry.cn-hangzhou.aliyuncs.com/west2-online/domtok:gateway
+          volumeMounts: # 将 configMap 中的内容（即 config.yaml） 挂载到/app/config 目录下（不能直接挂载容器的文件，好像只能文件夹）
+            - name: config-volume
+              mountPath: /app/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: domtok-config

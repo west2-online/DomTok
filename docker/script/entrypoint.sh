@@ -59,6 +59,7 @@ if [ ! -d "$KITEX_LOG_DIR/rpc" ]; then
 fi
 
 # 参数替换，检查 ETCD_ADDR 是否已经设置，没有将会设置默认值
+# 引入 k8s 中的 configMap 中，不再依赖 ETCD 来读取配置
 : ${ETCD_ADDR:="localhost:2379"}
 export ETCD_ADDR
 

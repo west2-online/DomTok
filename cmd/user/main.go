@@ -37,7 +37,7 @@ var serviceName = constants.UserServiceName
 
 func init() {
 	config.Init(serviceName)
-	logger.Init(serviceName, config.GetLoggerLevel())
+	// logger.Init(serviceName, config.GetLoggerLevel())
 }
 
 func main() {

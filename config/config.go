@@ -50,6 +50,27 @@ const (
 	remoteFileType = "yaml"
 )
 
+// InitFromConfigMap 用于从 k8s 的 ConfigMap 中初始化配置
+// 方式是通过 pod 去挂载 configMap，然后容器再读取本地的config.yaml来初始化配置
+// 优点：不再依赖 etcd，并且 k8s 会自动更新 ConfigMap，所以配置也会自动更新，不需要 etcd 来自定义启动脚本
+// config 默认在 /app/config/config.yaml
+func InitFromConfigMap(service string) {
+	runtimeViper.AddConfigPath("./config")
+	runtimeViper.SetConfigName("config")
+	runtimeViper.SetConfigType("yaml")
+	if err := runtimeViper.ReadInConfig(); err != nil {
+		logger.Fatalf("config.InitFromConfigMap: read config error: %v", err)
+	}
+	configMapping(service)
+	// 设置持续监听
+	runtimeViper.OnConfigChange(func(e fsnotify.Event) {
+		// 我们无法确定监听到配置变更时是否已经初始化完毕，所以此处需要做一个判断
+		logger.Infof("config: notice config changed: %v\n", e.String())
+		configMapping(service) // 重新映射配置
+	})
+	runtimeViper.WatchConfig()
+}
+
 // Init 目的是初始化并读入配置
 func Init(service string) {
 	// 从环境变量中获取 etcd 地址

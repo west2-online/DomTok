@@ -13,7 +13,7 @@
 # 检查 tmux 是否存在
 TMUX_EXISTS := $(shell command -v tmux)
 # 远程仓库
-REMOTE_REPOSITORY = registry.cn-hangzhou.aliyuncs.com/west2-online/DomTok
+REMOTE_REPOSITORY = registry.cn-hangzhou.aliyuncs.com/west2-online/domtok
 # 项目 MODULE 名
 MODULE = github.com/west2-online/DomTok
 # 当前架构
@@ -155,6 +155,10 @@ push-%:
 		echo "Service '$*' is not a valid service. Available: [$(SERVICES)]"; \
 		exit 1; \
 	fi
+## 在本地构建镜像
+.PHONY: build-%
+build-%:
+	docker build --build-arg SERVICE=$* -t $(REMOTE_REPOSITORY):$* -f docker/Dockerfile .
 ## --------------------------------------
 ## 清理与校验
 ## --------------------------------------
