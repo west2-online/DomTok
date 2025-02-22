@@ -64,7 +64,6 @@ func RequestPaymentToken(ctx context.Context, c *app.RequestContext) {
 	// 调用 RPC 获取支付令牌
 	resp, err := rpc.RequestPaymentTokenRPC(ctx, &payment.PaymentTokenRequest{
 		OrderID: req.OrderID,
-		UserID:  req.UserID,
 	})
 	if err != nil {
 		pack.RespError(c, err)
