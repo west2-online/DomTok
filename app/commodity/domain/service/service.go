@@ -292,7 +292,7 @@ func (svc *CommodityService) GetSpuImages(ctx context.Context, spuId int64, offs
 
 func (svc *CommodityService) DeleteCategory(ctx context.Context, category *model.Category) (err error) {
 	// 判断是否存在
-	exist, err := svc.db.IsCategoryExist(ctx, category.Name)
+	exist, err := svc.db.IsCategoryExistByName(ctx, category.Name)
 	if err != nil {
 		return fmt.Errorf("check category exist failed: %w", err)
 	}
