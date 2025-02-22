@@ -121,7 +121,7 @@ func reflectAny(f reflect.StructField) *schema.ParameterInfo {
 	}
 }
 
-// Reflect obj should be a struct instance and must not be a pointer
+// Reflect obj should be a struct instance or a struct pointer(pointer will be dereferenced automatically)
 func Reflect(obj interface{}) *map[string]*schema.ParameterInfo {
 	for reflect.TypeOf(obj).Kind() == reflect.Ptr {
 		obj = reflect.ValueOf(obj).Elem().Interface()
