@@ -43,9 +43,8 @@ func init() {
 
 	ai := eino.NewClient()
 	httpCli := http.NewClient(&http.ClientConfig{
-		BaseUrl: `http://localhost:8888`,
+		BaseUrl: config.Server.IntranetUrl,
 	})
-	// TODO: BaseUrl放在哪
 	ai.SetServerStrategy(func(functionName string) adapter.ServerCaller {
 		return httpCli
 	})
