@@ -18,8 +18,6 @@ package rpc
 
 import (
 	"context"
-	"fmt"
-
 	"github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/kitex_gen/payment"
 	"github.com/west2-online/DomTok/pkg/base/client"
@@ -37,9 +35,7 @@ func InitPaymentRPC() {
 }
 
 func RequestPaymentTokenRPC(ctx context.Context, req *payment.PaymentTokenRequest) (response *model.PaymentTokenInfo, err error) {
-	logger.Info("RequestPaymentTokenRPC called") // 这里打印一下，看看是否调用到了
-	fmt.Println("RequestPaymentTokenRPC: called with OrderID:", req.OrderID, "UserID:", req.UserID)
-
+	logger.Infof("RequestPaymentTokenRPC called") // 这里打印一下，看看是否调用到了
 	resp, err := paymentClient.RequestPaymentToken(ctx, req)
 	// 这里的 err 是属于 RPC 间调用的错误，例如 network error
 	// 而业务错误则是封装在 resp.base 当中的
@@ -48,7 +44,7 @@ func RequestPaymentTokenRPC(ctx context.Context, req *payment.PaymentTokenReques
 		return nil, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsSuccess(resp.Base) {
-		// TODO
+		logger.Errorf("RequestRefundRPC: Business error: %s", resp.Base.Msg)
 		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
 	}
 	return resp.TokenInfo, nil
