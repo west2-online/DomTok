@@ -27,7 +27,6 @@ import (
 
 type CommodityDB interface {
 	IsCategoryExist(ctx context.Context, name string) (bool, error)
-	CategoryCreatorId(ctx context.Context, Id int64) (int64,error)
 	CreateCategory(ctx context.Context, entity *model.Category) error
 	DeleteCategory(ctx context.Context, category *model.Category) error
 	UpdateCategory(ctx context.Context, category *model.Category) error

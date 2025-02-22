@@ -58,10 +58,6 @@ func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category)
 	if err != nil {
 		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
 	}
-	err = uc.svc.IdentifyUserInStreamCtx(ctx, category.CreatorId)
-	if err != nil {
-		return errno.NewErrNo(errno.AuthInvalidCode, " You are not authorized to delete this category")
-	}
 	err = uc.db.DeleteCategory(ctx, category)
 	if err != nil {
 		return fmt.Errorf("delete category failed: %w", err)
@@ -82,10 +78,6 @@ func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category)
 	err = uc.svc.IdentifyUser(ctx, category.CreatorId)
 	if err != nil {
 		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
-	}
-	err = uc.svc.IdentifyUserInStreamCtx(ctx, category.CreatorId)
-	if err != nil {
-		return errno.NewErrNo(errno.AuthInvalidCode, " You are not authorized to delete this category")
 	}
 	err = uc.db.UpdateCategory(ctx, category)
 	if err != nil {
