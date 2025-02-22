@@ -28,14 +28,15 @@ import (
 )
 
 // SearchSpu search by weight
-func (r *Elasticsearch) SearchSpu(ctx context.Context, indexName string, query string, k int) ([]*model.Spu, error) {
+func (r *Elasticsearch) SearchSpu(ctx context.Context, indexName string, query string, k int, pageNum int) ([]*model.Spu, error) {
 	body := map[string]interface{}{
 		"query": map[string]interface{}{
 			"match": map[string]interface{}{
 				"name": query, // 'name' field
 			},
 		},
-		"size": k, // Limit to top K results
+		"size": k,                 // K for per page
+		"from": (pageNum - 1) * k, // offset
 		"sort": []map[string]interface{}{
 			{"weight": map[string]interface{}{"order": "desc"}}, // Sort by weight descending
 		},
