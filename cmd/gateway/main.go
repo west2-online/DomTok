@@ -17,8 +17,6 @@ limitations under the License.
 package main
 
 import (
-	"time"
-
 	"github.com/cloudwego/hertz/pkg/app/server"
 
 	"github.com/west2-online/DomTok/app/gateway/mw"
@@ -37,7 +35,7 @@ func init() {
 	// logger.Init(serviceName, config.GetLoggerLevel())
 
 	// ⚠️for debug, could be removed
-	time.Sleep(10 * time.Minute)
+	// time.Sleep(10 * time.Minute)
 
 	rpc.Init()
 }
