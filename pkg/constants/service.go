@@ -36,12 +36,17 @@ const (
 
 // OrderService
 const (
-	OrderStatusUnpaidCode = 0
-	OrderStatusPaidCode   = 1
-	OrderStatusFailCode   = 2
+	OrderStatusUnpaidCode    = -1
+	OrderStatusPaidCode      = 1
+	OrderStatusCompletedCode = 2
+	OrderStatusCancelledCode = 3
+)
 
-	OrderStatusUnpaid  = "未支付"
-	OrderStatusPaid    = "待支付"
-	OrderStatusFail    = "支付失败"
-	OrderStatusUnknown = "未知状态"
+// OrderService Status Messages
+const (
+	OrderStatusUnpaid    = "待支付"
+	OrderStatusPaid      = "已支付"
+	OrderStatusCompleted = "已完成"
+	OrderStatusCancelled = "已取消"
+	OrderStatusUnknown   = "未知状态"
 )
