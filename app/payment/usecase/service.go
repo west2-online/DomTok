@@ -91,7 +91,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	return token, expTime, nil
 }
 
-// TODO
+// GetRefundToken TODO
 func (uc *paymentUseCase) GetRefundInfo(ctx context.Context, orderID int64) (refundID int64, err error) {
 	/*
 		// 1. 检查订单是否存在
