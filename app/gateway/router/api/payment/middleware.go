@@ -25,7 +25,9 @@ import (
 
 func rootMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
 }
 
 func _apiMw() []app.HandlerFunc {
@@ -40,9 +42,7 @@ func _paymentMw() []app.HandlerFunc {
 
 func _processpaymentMw() []app.HandlerFunc {
 	// your code...
-	return []app.HandlerFunc{
-		mw.Auth(),
-	}
+	return nil
 }
 
 func _processrefundMw() []app.HandlerFunc {
