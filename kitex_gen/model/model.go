@@ -1045,6 +1045,7 @@ type SpuImage struct {
 	Url       string `thrift:"url,3,required" frugal:"3,required,string" json:"url"`
 	CreatedAt int64  `thrift:"createdAt,4,required" frugal:"4,required,i64" json:"createdAt"`
 	DeletedAt *int64 `thrift:"deletedAt,5,optional" frugal:"5,optional,i64" json:"deletedAt,omitempty"`
+	UpdatedAt int64  `thrift:"updatedAt,6,required" frugal:"6,required,i64" json:"updatedAt"`
 }
 
 func NewSpuImage() *SpuImage {
@@ -1078,6 +1079,10 @@ func (p *SpuImage) GetDeletedAt() (v int64) {
 	}
 	return *p.DeletedAt
 }
+
+func (p *SpuImage) GetUpdatedAt() (v int64) {
+	return p.UpdatedAt
+}
 func (p *SpuImage) SetImageID(val int64) {
 	p.ImageID = val
 }
@@ -1092,6 +1097,9 @@ func (p *SpuImage) SetCreatedAt(val int64) {
 }
 func (p *SpuImage) SetDeletedAt(val *int64) {
 	p.DeletedAt = val
+}
+func (p *SpuImage) SetUpdatedAt(val int64) {
+	p.UpdatedAt = val
 }
 
 func (p *SpuImage) IsSetDeletedAt() bool {
@@ -1124,6 +1132,9 @@ func (p *SpuImage) DeepEqual(ano *SpuImage) bool {
 		return false
 	}
 	if !p.Field5DeepEqual(ano.DeletedAt) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.UpdatedAt) {
 		return false
 	}
 	return true
@@ -1169,6 +1180,13 @@ func (p *SpuImage) Field5DeepEqual(src *int64) bool {
 	}
 	return true
 }
+func (p *SpuImage) Field6DeepEqual(src int64) bool {
+
+	if p.UpdatedAt != src {
+		return false
+	}
+	return true
+}
 
 var fieldIDToName_SpuImage = map[int16]string{
 	1: "imageID",
@@ -1176,6 +1194,7 @@ var fieldIDToName_SpuImage = map[int16]string{
 	3: "url",
 	4: "createdAt",
 	5: "deletedAt",
+	6: "updatedAt",
 }
 
 type SkuImage struct {
@@ -2273,23 +2292,629 @@ var fieldIDToName_PriceHistory = map[int16]string{
 	5: "prevVersion",
 }
 
+type Order struct {
+	Id                    int64   `thrift:"id,1,required" frugal:"1,required,i64" json:"id"`
+	Status                string  `thrift:"status,2,required" frugal:"2,required,string" json:"status"`
+	Uid                   int64   `thrift:"uid,3,required" frugal:"3,required,i64" json:"uid"`
+	TotalAmountOfGoods    float64 `thrift:"totalAmountOfGoods,4,required" frugal:"4,required,double" json:"totalAmountOfGoods"`
+	TotalAmountOfFreight  float64 `thrift:"totalAmountOfFreight,5,required" frugal:"5,required,double" json:"totalAmountOfFreight"`
+	TotalAmountOfDiscount float64 `thrift:"totalAmountOfDiscount,6,required" frugal:"6,required,double" json:"totalAmountOfDiscount"`
+	PaymentAmount         float64 `thrift:"paymentAmount,7,required" frugal:"7,required,double" json:"paymentAmount"`
+	PaymentStatus         string  `thrift:"paymentStatus,8,required" frugal:"8,required,string" json:"paymentStatus"`
+	PaymentAt             int64   `thrift:"paymentAt,9,required" frugal:"9,required,i64" json:"paymentAt"`
+	PaymentStyle          string  `thrift:"paymentStyle,10,required" frugal:"10,required,string" json:"paymentStyle"`
+	OrderedAt             int64   `thrift:"orderedAt,11,required" frugal:"11,required,i64" json:"orderedAt"`
+	DeletedAt             int64   `thrift:"deletedAt,12,required" frugal:"12,required,i64" json:"deletedAt"`
+	DeliveryAt            int64   `thrift:"deliveryAt,13,required" frugal:"13,required,i64" json:"deliveryAt"`
+	AddressID             int64   `thrift:"addressID,14,required" frugal:"14,required,i64" json:"addressID"`
+	AddressInfo           string  `thrift:"addressInfo,15,required" frugal:"15,required,string" json:"addressInfo"`
+}
+
+func NewOrder() *Order {
+	return &Order{}
+}
+
+func (p *Order) InitDefault() {
+}
+
+func (p *Order) GetId() (v int64) {
+	return p.Id
+}
+
+func (p *Order) GetStatus() (v string) {
+	return p.Status
+}
+
+func (p *Order) GetUid() (v int64) {
+	return p.Uid
+}
+
+func (p *Order) GetTotalAmountOfGoods() (v float64) {
+	return p.TotalAmountOfGoods
+}
+
+func (p *Order) GetTotalAmountOfFreight() (v float64) {
+	return p.TotalAmountOfFreight
+}
+
+func (p *Order) GetTotalAmountOfDiscount() (v float64) {
+	return p.TotalAmountOfDiscount
+}
+
+func (p *Order) GetPaymentAmount() (v float64) {
+	return p.PaymentAmount
+}
+
+func (p *Order) GetPaymentStatus() (v string) {
+	return p.PaymentStatus
+}
+
+func (p *Order) GetPaymentAt() (v int64) {
+	return p.PaymentAt
+}
+
+func (p *Order) GetPaymentStyle() (v string) {
+	return p.PaymentStyle
+}
+
+func (p *Order) GetOrderedAt() (v int64) {
+	return p.OrderedAt
+}
+
+func (p *Order) GetDeletedAt() (v int64) {
+	return p.DeletedAt
+}
+
+func (p *Order) GetDeliveryAt() (v int64) {
+	return p.DeliveryAt
+}
+
+func (p *Order) GetAddressID() (v int64) {
+	return p.AddressID
+}
+
+func (p *Order) GetAddressInfo() (v string) {
+	return p.AddressInfo
+}
+func (p *Order) SetId(val int64) {
+	p.Id = val
+}
+func (p *Order) SetStatus(val string) {
+	p.Status = val
+}
+func (p *Order) SetUid(val int64) {
+	p.Uid = val
+}
+func (p *Order) SetTotalAmountOfGoods(val float64) {
+	p.TotalAmountOfGoods = val
+}
+func (p *Order) SetTotalAmountOfFreight(val float64) {
+	p.TotalAmountOfFreight = val
+}
+func (p *Order) SetTotalAmountOfDiscount(val float64) {
+	p.TotalAmountOfDiscount = val
+}
+func (p *Order) SetPaymentAmount(val float64) {
+	p.PaymentAmount = val
+}
+func (p *Order) SetPaymentStatus(val string) {
+	p.PaymentStatus = val
+}
+func (p *Order) SetPaymentAt(val int64) {
+	p.PaymentAt = val
+}
+func (p *Order) SetPaymentStyle(val string) {
+	p.PaymentStyle = val
+}
+func (p *Order) SetOrderedAt(val int64) {
+	p.OrderedAt = val
+}
+func (p *Order) SetDeletedAt(val int64) {
+	p.DeletedAt = val
+}
+func (p *Order) SetDeliveryAt(val int64) {
+	p.DeliveryAt = val
+}
+func (p *Order) SetAddressID(val int64) {
+	p.AddressID = val
+}
+func (p *Order) SetAddressInfo(val string) {
+	p.AddressInfo = val
+}
+
+func (p *Order) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("Order(%+v)", *p)
+}
+
+func (p *Order) DeepEqual(ano *Order) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Id) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Status) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Uid) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.TotalAmountOfGoods) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.TotalAmountOfFreight) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.TotalAmountOfDiscount) {
+		return false
+	}
+	if !p.Field7DeepEqual(ano.PaymentAmount) {
+		return false
+	}
+	if !p.Field8DeepEqual(ano.PaymentStatus) {
+		return false
+	}
+	if !p.Field9DeepEqual(ano.PaymentAt) {
+		return false
+	}
+	if !p.Field10DeepEqual(ano.PaymentStyle) {
+		return false
+	}
+	if !p.Field11DeepEqual(ano.OrderedAt) {
+		return false
+	}
+	if !p.Field12DeepEqual(ano.DeletedAt) {
+		return false
+	}
+	if !p.Field13DeepEqual(ano.DeliveryAt) {
+		return false
+	}
+	if !p.Field14DeepEqual(ano.AddressID) {
+		return false
+	}
+	if !p.Field15DeepEqual(ano.AddressInfo) {
+		return false
+	}
+	return true
+}
+
+func (p *Order) Field1DeepEqual(src int64) bool {
+
+	if p.Id != src {
+		return false
+	}
+	return true
+}
+func (p *Order) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Status, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Order) Field3DeepEqual(src int64) bool {
+
+	if p.Uid != src {
+		return false
+	}
+	return true
+}
+func (p *Order) Field4DeepEqual(src float64) bool {
+
+	if p.TotalAmountOfGoods != src {
+		return false
+	}
+	return true
+}
+func (p *Order) Field5DeepEqual(src float64) bool {
+
+	if p.TotalAmountOfFreight != src {
+		return false
+	}
+	return true
+}
+func (p *Order) Field6DeepEqual(src float64) bool {
+
+	if p.TotalAmountOfDiscount != src {
+		return false
+	}
+	return true
+}
+func (p *Order) Field7DeepEqual(src float64) bool {
+
+	if p.PaymentAmount != src {
+		return false
+	}
+	return true
+}
+func (p *Order) Field8DeepEqual(src string) bool {
+
+	if strings.Compare(p.PaymentStatus, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Order) Field9DeepEqual(src int64) bool {
+
+	if p.PaymentAt != src {
+		return false
+	}
+	return true
+}
+func (p *Order) Field10DeepEqual(src string) bool {
+
+	if strings.Compare(p.PaymentStyle, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Order) Field11DeepEqual(src int64) bool {
+
+	if p.OrderedAt != src {
+		return false
+	}
+	return true
+}
+func (p *Order) Field12DeepEqual(src int64) bool {
+
+	if p.DeletedAt != src {
+		return false
+	}
+	return true
+}
+func (p *Order) Field13DeepEqual(src int64) bool {
+
+	if p.DeliveryAt != src {
+		return false
+	}
+	return true
+}
+func (p *Order) Field14DeepEqual(src int64) bool {
+
+	if p.AddressID != src {
+		return false
+	}
+	return true
+}
+func (p *Order) Field15DeepEqual(src string) bool {
+
+	if strings.Compare(p.AddressInfo, src) != 0 {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_Order = map[int16]string{
+	1:  "id",
+	2:  "status",
+	3:  "uid",
+	4:  "totalAmountOfGoods",
+	5:  "totalAmountOfFreight",
+	6:  "totalAmountOfDiscount",
+	7:  "paymentAmount",
+	8:  "paymentStatus",
+	9:  "paymentAt",
+	10: "paymentStyle",
+	11: "orderedAt",
+	12: "deletedAt",
+	13: "deliveryAt",
+	14: "addressID",
+	15: "addressInfo",
+}
+
+type BaseOrder struct {
+	Id                 int64   `thrift:"id,1,required" frugal:"1,required,i64" json:"id"`
+	Status             string  `thrift:"status,2,required" frugal:"2,required,string" json:"status"`
+	TotalAmountOfGoods float64 `thrift:"totalAmountOfGoods,3,required" frugal:"3,required,double" json:"totalAmountOfGoods"`
+	PaymentAmount      float64 `thrift:"paymentAmount,4,required" frugal:"4,required,double" json:"paymentAmount"`
+	PaymentStatus      string  `thrift:"paymentStatus,5,required" frugal:"5,required,string" json:"paymentStatus"`
+}
+
+func NewBaseOrder() *BaseOrder {
+	return &BaseOrder{}
+}
+
+func (p *BaseOrder) InitDefault() {
+}
+
+func (p *BaseOrder) GetId() (v int64) {
+	return p.Id
+}
+
+func (p *BaseOrder) GetStatus() (v string) {
+	return p.Status
+}
+
+func (p *BaseOrder) GetTotalAmountOfGoods() (v float64) {
+	return p.TotalAmountOfGoods
+}
+
+func (p *BaseOrder) GetPaymentAmount() (v float64) {
+	return p.PaymentAmount
+}
+
+func (p *BaseOrder) GetPaymentStatus() (v string) {
+	return p.PaymentStatus
+}
+func (p *BaseOrder) SetId(val int64) {
+	p.Id = val
+}
+func (p *BaseOrder) SetStatus(val string) {
+	p.Status = val
+}
+func (p *BaseOrder) SetTotalAmountOfGoods(val float64) {
+	p.TotalAmountOfGoods = val
+}
+func (p *BaseOrder) SetPaymentAmount(val float64) {
+	p.PaymentAmount = val
+}
+func (p *BaseOrder) SetPaymentStatus(val string) {
+	p.PaymentStatus = val
+}
+
+func (p *BaseOrder) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("BaseOrder(%+v)", *p)
+}
+
+func (p *BaseOrder) DeepEqual(ano *BaseOrder) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Id) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Status) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.TotalAmountOfGoods) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.PaymentAmount) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.PaymentStatus) {
+		return false
+	}
+	return true
+}
+
+func (p *BaseOrder) Field1DeepEqual(src int64) bool {
+
+	if p.Id != src {
+		return false
+	}
+	return true
+}
+func (p *BaseOrder) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Status, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *BaseOrder) Field3DeepEqual(src float64) bool {
+
+	if p.TotalAmountOfGoods != src {
+		return false
+	}
+	return true
+}
+func (p *BaseOrder) Field4DeepEqual(src float64) bool {
+
+	if p.PaymentAmount != src {
+		return false
+	}
+	return true
+}
+func (p *BaseOrder) Field5DeepEqual(src string) bool {
+
+	if strings.Compare(p.PaymentStatus, src) != 0 {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_BaseOrder = map[int16]string{
+	1: "id",
+	2: "status",
+	3: "totalAmountOfGoods",
+	4: "paymentAmount",
+	5: "paymentStatus",
+}
+
+type OrderWithGoods struct {
+	Order *Order        `thrift:"order,1,required" frugal:"1,required,Order" json:"order"`
+	Goods []*OrderGoods `thrift:"goods,2,required" frugal:"2,required,list<OrderGoods>" json:"goods"`
+}
+
+func NewOrderWithGoods() *OrderWithGoods {
+	return &OrderWithGoods{}
+}
+
+func (p *OrderWithGoods) InitDefault() {
+}
+
+var OrderWithGoods_Order_DEFAULT *Order
+
+func (p *OrderWithGoods) GetOrder() (v *Order) {
+	if !p.IsSetOrder() {
+		return OrderWithGoods_Order_DEFAULT
+	}
+	return p.Order
+}
+
+func (p *OrderWithGoods) GetGoods() (v []*OrderGoods) {
+	return p.Goods
+}
+func (p *OrderWithGoods) SetOrder(val *Order) {
+	p.Order = val
+}
+func (p *OrderWithGoods) SetGoods(val []*OrderGoods) {
+	p.Goods = val
+}
+
+func (p *OrderWithGoods) IsSetOrder() bool {
+	return p.Order != nil
+}
+
+func (p *OrderWithGoods) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("OrderWithGoods(%+v)", *p)
+}
+
+func (p *OrderWithGoods) DeepEqual(ano *OrderWithGoods) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Order) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Goods) {
+		return false
+	}
+	return true
+}
+
+func (p *OrderWithGoods) Field1DeepEqual(src *Order) bool {
+
+	if !p.Order.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+func (p *OrderWithGoods) Field2DeepEqual(src []*OrderGoods) bool {
+
+	if len(p.Goods) != len(src) {
+		return false
+	}
+	for i, v := range p.Goods {
+		_src := src[i]
+		if !v.DeepEqual(_src) {
+			return false
+		}
+	}
+	return true
+}
+
+var fieldIDToName_OrderWithGoods = map[int16]string{
+	1: "order",
+	2: "goods",
+}
+
+type BaseOrderWithGoods struct {
+	Order *BaseOrder        `thrift:"order,1,required" frugal:"1,required,BaseOrder" json:"order"`
+	Goods []*BaseOrderGoods `thrift:"goods,2,required" frugal:"2,required,list<BaseOrderGoods>" json:"goods"`
+}
+
+func NewBaseOrderWithGoods() *BaseOrderWithGoods {
+	return &BaseOrderWithGoods{}
+}
+
+func (p *BaseOrderWithGoods) InitDefault() {
+}
+
+var BaseOrderWithGoods_Order_DEFAULT *BaseOrder
+
+func (p *BaseOrderWithGoods) GetOrder() (v *BaseOrder) {
+	if !p.IsSetOrder() {
+		return BaseOrderWithGoods_Order_DEFAULT
+	}
+	return p.Order
+}
+
+func (p *BaseOrderWithGoods) GetGoods() (v []*BaseOrderGoods) {
+	return p.Goods
+}
+func (p *BaseOrderWithGoods) SetOrder(val *BaseOrder) {
+	p.Order = val
+}
+func (p *BaseOrderWithGoods) SetGoods(val []*BaseOrderGoods) {
+	p.Goods = val
+}
+
+func (p *BaseOrderWithGoods) IsSetOrder() bool {
+	return p.Order != nil
+}
+
+func (p *BaseOrderWithGoods) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("BaseOrderWithGoods(%+v)", *p)
+}
+
+func (p *BaseOrderWithGoods) DeepEqual(ano *BaseOrderWithGoods) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Order) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Goods) {
+		return false
+	}
+	return true
+}
+
+func (p *BaseOrderWithGoods) Field1DeepEqual(src *BaseOrder) bool {
+
+	if !p.Order.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+func (p *BaseOrderWithGoods) Field2DeepEqual(src []*BaseOrderGoods) bool {
+
+	if len(p.Goods) != len(src) {
+		return false
+	}
+	for i, v := range p.Goods {
+		_src := src[i]
+		if !v.DeepEqual(_src) {
+			return false
+		}
+	}
+	return true
+}
+
+var fieldIDToName_BaseOrderWithGoods = map[int16]string{
+	1: "order",
+	2: "goods",
+}
+
 type OrderGoods struct {
-	MerchantID       int64   `thrift:"MerchantID,1,required" frugal:"1,required,i64" json:"MerchantID"`
-	GoodsID          int64   `thrift:"GoodsID,2,required" frugal:"2,required,i64" json:"GoodsID"`
-	GoodsName        string  `thrift:"GoodsName,3,required" frugal:"3,required,string" json:"GoodsName"`
-	GoodsHeadDrawing string  `thrift:"GoodsHeadDrawing,4,required" frugal:"4,required,string" json:"GoodsHeadDrawing"`
-	StyleID          int64   `thrift:"StyleID,5,required" frugal:"5,required,i64" json:"StyleID"`
-	StyleName        string  `thrift:"StyleName,6,required" frugal:"6,required,string" json:"StyleName"`
-	StyleHeadDrawing string  `thrift:"StyleHeadDrawing,7,required" frugal:"7,required,string" json:"StyleHeadDrawing"`
-	OriginCast       float64 `thrift:"OriginCast,8,required" frugal:"8,required,double" json:"OriginCast"`
-	SaleCast         float64 `thrift:"SaleCast,9,required" frugal:"9,required,double" json:"SaleCast"`
-	PurchaseQuantity int64   `thrift:"PurchaseQuantity,10,required" frugal:"10,required,i64" json:"PurchaseQuantity"`
-	PaymentAmount    float64 `thrift:"PaymentAmount,11,required" frugal:"11,required,double" json:"PaymentAmount"`
-	FreightAmount    float64 `thrift:"FreightAmount,12,required" frugal:"12,required,double" json:"FreightAmount"`
-	SettlementAmount float64 `thrift:"SettlementAmount,13,required" frugal:"13,required,double" json:"SettlementAmount"`
-	DiscountAmount   float64 `thrift:"DiscountAmount,14,required" frugal:"14,required,double" json:"DiscountAmount"`
-	SingleCast       float64 `thrift:"SingleCast,15,required" frugal:"15,required,double" json:"SingleCast"`
-	CouponID         int64   `thrift:"CouponID,16" frugal:"16,default,i64" json:"CouponID"`
+	MerchantID       int64   `thrift:"merchantID,1,required" frugal:"1,required,i64" json:"merchantID"`
+	GoodsID          int64   `thrift:"goodsID,2,required" frugal:"2,required,i64" json:"goodsID"`
+	GoodsName        string  `thrift:"goodsName,3,required" frugal:"3,required,string" json:"goodsName"`
+	GoodsHeadDrawing string  `thrift:"goodsHeadDrawing,4,required" frugal:"4,required,string" json:"goodsHeadDrawing"`
+	StyleID          int64   `thrift:"styleID,5,required" frugal:"5,required,i64" json:"styleID"`
+	StyleName        string  `thrift:"styleName,6,required" frugal:"6,required,string" json:"styleName"`
+	StyleHeadDrawing string  `thrift:"styleHeadDrawing,7,required" frugal:"7,required,string" json:"styleHeadDrawing"`
+	OriginCast       float64 `thrift:"originCast,8,required" frugal:"8,required,double" json:"originCast"`
+	SaleCast         float64 `thrift:"saleCast,9,required" frugal:"9,required,double" json:"saleCast"`
+	PurchaseQuantity int64   `thrift:"purchaseQuantity,10,required" frugal:"10,required,i64" json:"purchaseQuantity"`
+	PaymentAmount    float64 `thrift:"paymentAmount,11,required" frugal:"11,required,double" json:"paymentAmount"`
+	FreightAmount    float64 `thrift:"freightAmount,12,required" frugal:"12,required,double" json:"freightAmount"`
+	SettlementAmount float64 `thrift:"settlementAmount,13,required" frugal:"13,required,double" json:"settlementAmount"`
+	DiscountAmount   float64 `thrift:"discountAmount,14,required" frugal:"14,required,double" json:"discountAmount"`
+	SingleCast       float64 `thrift:"singleCast,15,required" frugal:"15,required,double" json:"singleCast"`
+	CouponID         int64   `thrift:"couponID,16" frugal:"16,default,i64" json:"couponID"`
 }
 
 func NewOrderGoods() *OrderGoods {
@@ -2589,30 +3214,31 @@ func (p *OrderGoods) Field16DeepEqual(src int64) bool {
 }
 
 var fieldIDToName_OrderGoods = map[int16]string{
-	1:  "MerchantID",
-	2:  "GoodsID",
-	3:  "GoodsName",
-	4:  "GoodsHeadDrawing",
-	5:  "StyleID",
-	6:  "StyleName",
-	7:  "StyleHeadDrawing",
-	8:  "OriginCast",
-	9:  "SaleCast",
-	10: "PurchaseQuantity",
-	11: "PaymentAmount",
-	12: "FreightAmount",
-	13: "SettlementAmount",
-	14: "DiscountAmount",
-	15: "SingleCast",
-	16: "CouponID",
+	1:  "merchantID",
+	2:  "goodsID",
+	3:  "goodsName",
+	4:  "goodsHeadDrawing",
+	5:  "styleID",
+	6:  "styleName",
+	7:  "styleHeadDrawing",
+	8:  "originCast",
+	9:  "saleCast",
+	10: "purchaseQuantity",
+	11: "paymentAmount",
+	12: "freightAmount",
+	13: "settlementAmount",
+	14: "discountAmount",
+	15: "singleCast",
+	16: "couponID",
 }
 
 type BaseOrderGoods struct {
-	MerchantID       int64 `thrift:"MerchantID,1,required" frugal:"1,required,i64" json:"MerchantID"`
-	GoodsID          int64 `thrift:"GoodsID,2,required" frugal:"2,required,i64" json:"GoodsID"`
-	StyleID          int64 `thrift:"StyleID,3,required" frugal:"3,required,i64" json:"StyleID"`
-	PurchaseQuantity int64 `thrift:"PurchaseQuantity,4,required" frugal:"4,required,i64" json:"PurchaseQuantity"`
-	CouponID         int64 `thrift:"CouponID,5" frugal:"5,default,i64" json:"CouponID"`
+	MerchantName     string `thrift:"merchantName,1,required" frugal:"1,required,string" json:"merchantName"`
+	GoodsName        int64  `thrift:"goodsName,2,required" frugal:"2,required,i64" json:"goodsName"`
+	StyleName        int64  `thrift:"styleName,3,required" frugal:"3,required,i64" json:"styleName"`
+	PurchaseQuantity int64  `thrift:"purchaseQuantity,4,required" frugal:"4,required,i64" json:"purchaseQuantity"`
+	StyleHeadDrawing string `thrift:"styleHeadDrawing,5,required" frugal:"5,required,string" json:"styleHeadDrawing"`
+	CouponID         int64  `thrift:"couponID,6" frugal:"6,default,i64" json:"couponID"`
 }
 
 func NewBaseOrderGoods() *BaseOrderGoods {
@@ -2622,36 +3248,43 @@ func NewBaseOrderGoods() *BaseOrderGoods {
 func (p *BaseOrderGoods) InitDefault() {
 }
 
-func (p *BaseOrderGoods) GetMerchantID() (v int64) {
-	return p.MerchantID
+func (p *BaseOrderGoods) GetMerchantName() (v string) {
+	return p.MerchantName
 }
 
-func (p *BaseOrderGoods) GetGoodsID() (v int64) {
-	return p.GoodsID
+func (p *BaseOrderGoods) GetGoodsName() (v int64) {
+	return p.GoodsName
 }
 
-func (p *BaseOrderGoods) GetStyleID() (v int64) {
-	return p.StyleID
+func (p *BaseOrderGoods) GetStyleName() (v int64) {
+	return p.StyleName
 }
 
 func (p *BaseOrderGoods) GetPurchaseQuantity() (v int64) {
 	return p.PurchaseQuantity
 }
 
+func (p *BaseOrderGoods) GetStyleHeadDrawing() (v string) {
+	return p.StyleHeadDrawing
+}
+
 func (p *BaseOrderGoods) GetCouponID() (v int64) {
 	return p.CouponID
 }
-func (p *BaseOrderGoods) SetMerchantID(val int64) {
-	p.MerchantID = val
+func (p *BaseOrderGoods) SetMerchantName(val string) {
+	p.MerchantName = val
 }
-func (p *BaseOrderGoods) SetGoodsID(val int64) {
-	p.GoodsID = val
+func (p *BaseOrderGoods) SetGoodsName(val int64) {
+	p.GoodsName = val
 }
-func (p *BaseOrderGoods) SetStyleID(val int64) {
-	p.StyleID = val
+func (p *BaseOrderGoods) SetStyleName(val int64) {
+	p.StyleName = val
 }
 func (p *BaseOrderGoods) SetPurchaseQuantity(val int64) {
 	p.PurchaseQuantity = val
+}
+func (p *BaseOrderGoods) SetStyleHeadDrawing(val string) {
+	p.StyleHeadDrawing = val
 }
 func (p *BaseOrderGoods) SetCouponID(val int64) {
 	p.CouponID = val
@@ -2670,41 +3303,44 @@ func (p *BaseOrderGoods) DeepEqual(ano *BaseOrderGoods) bool {
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.MerchantID) {
+	if !p.Field1DeepEqual(ano.MerchantName) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.GoodsID) {
+	if !p.Field2DeepEqual(ano.GoodsName) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.StyleID) {
+	if !p.Field3DeepEqual(ano.StyleName) {
 		return false
 	}
 	if !p.Field4DeepEqual(ano.PurchaseQuantity) {
 		return false
 	}
-	if !p.Field5DeepEqual(ano.CouponID) {
+	if !p.Field5DeepEqual(ano.StyleHeadDrawing) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.CouponID) {
 		return false
 	}
 	return true
 }
 
-func (p *BaseOrderGoods) Field1DeepEqual(src int64) bool {
+func (p *BaseOrderGoods) Field1DeepEqual(src string) bool {
 
-	if p.MerchantID != src {
+	if strings.Compare(p.MerchantName, src) != 0 {
 		return false
 	}
 	return true
 }
 func (p *BaseOrderGoods) Field2DeepEqual(src int64) bool {
 
-	if p.GoodsID != src {
+	if p.GoodsName != src {
 		return false
 	}
 	return true
 }
 func (p *BaseOrderGoods) Field3DeepEqual(src int64) bool {
 
-	if p.StyleID != src {
+	if p.StyleName != src {
 		return false
 	}
 	return true
@@ -2716,7 +3352,14 @@ func (p *BaseOrderGoods) Field4DeepEqual(src int64) bool {
 	}
 	return true
 }
-func (p *BaseOrderGoods) Field5DeepEqual(src int64) bool {
+func (p *BaseOrderGoods) Field5DeepEqual(src string) bool {
+
+	if strings.Compare(p.StyleHeadDrawing, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *BaseOrderGoods) Field6DeepEqual(src int64) bool {
 
 	if p.CouponID != src {
 		return false
@@ -2725,11 +3368,12 @@ func (p *BaseOrderGoods) Field5DeepEqual(src int64) bool {
 }
 
 var fieldIDToName_BaseOrderGoods = map[int16]string{
-	1: "MerchantID",
-	2: "GoodsID",
-	3: "StyleID",
-	4: "PurchaseQuantity",
-	5: "CouponID",
+	1: "merchantName",
+	2: "goodsName",
+	3: "styleName",
+	4: "purchaseQuantity",
+	5: "styleHeadDrawing",
+	6: "couponID",
 }
 
 type CreditCardInfo struct {

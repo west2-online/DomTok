@@ -18,12 +18,16 @@ package errno
 
 // 业务强相关, 范围是 1000-9999
 const (
+	// User
 	ServiceWrongPassword = 1000 + iota
 	ServiceUserExist
 	ServiceUserNotExist
 
+	// order
+	ServiceOrderNotFound
 	ServiceSpuNotExist
 	ServiceImgNotExist
+	ServiceSkuExist
 	PaymentOrderNotExist
 	UserNotExist
 )

@@ -35,7 +35,6 @@ _testmain.go
 *.local.yml
 dumped_hertz_remote_config.json
 /cmd/**/output
-/config/elasticsearch/config
 /config/redis
 /config/grafana
 /config/jaeger

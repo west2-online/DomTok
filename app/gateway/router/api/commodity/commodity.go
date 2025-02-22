@@ -74,9 +74,15 @@ func Register(r *server.Hertz) {
 					_spu := _commodity.Group("/spu", _spuMw()...)
 					_spu.POST("/create", append(_createspuMw(), commodity.CreateSpu)...)
 					_spu.DELETE("/delete", append(_deletespuMw(), commodity.DeleteSpu)...)
-					_spu.GET("/image", append(_viewspuimageMw(), commodity.ViewSpuImage)...)
 					_spu.GET("/search", append(_viewspuMw(), commodity.ViewSpu)...)
 					_spu.POST("/update", append(_updatespuMw(), commodity.UpdateSpu)...)
+					{
+						_image := _spu.Group("/image", _imageMw()...)
+						_image.POST("/create", append(_createspuimageMw(), commodity.CreateSpuImage)...)
+						_image.DELETE("/delete", append(_deletespuimageMw(), commodity.DeleteSpuImage)...)
+						_image.GET("/search", append(_viewspuimageMw(), commodity.ViewSpuImage)...)
+						_image.POST("/update", append(_updatespuimageMw(), commodity.UpdateSpuImage)...)
+					}
 				}
 			}
 		}
