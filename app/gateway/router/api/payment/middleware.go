@@ -20,6 +20,7 @@ package payment
 
 import (
 	"github.com/cloudwego/hertz/pkg/app"
+
 	"github.com/west2-online/DomTok/app/gateway/mw"
 )
 
