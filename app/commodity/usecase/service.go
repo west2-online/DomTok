@@ -34,7 +34,7 @@ func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category)
 		return 0, fmt.Errorf("check category exist failed: %w", err)
 	}
 	if exist {
-		return 0, errno.NewErrNo(errno.ServiceUserNotExist, "category  exist")
+		return 0, errno.NewErrNo(errno.ServiceUserExist, "category  exist")
 	}
 
 	if err = uc.svc.CreateCategory(ctx, category); err != nil {

@@ -43,7 +43,7 @@ func (d *commodityDB) IsCategoryExist(ctx context.Context, name string) (bool, e
 	err := d.client.WithContext(ctx).Where("Name = ?", name).First(&category).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, gorm.ErrRecordNotFound
+			return false,errno.Errorf(errno.ErrRecordNotFound, "mysql: ErrRecordNotFound record not found: %v", err)
 		}
 		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
 	}
