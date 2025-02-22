@@ -74,7 +74,7 @@ func (db *commodityDB) CreateSpuImage(ctx context.Context, spuImage *model.SpuIm
 
 func (db *commodityDB) DeleteSpu(ctx context.Context, spuId int64) error {
 	s := Spu{}
-	if err := db.client.WithContext(ctx).Table(s.TableName()).Where("spu_id = ?", spuId).Delete(&s).Error; err != nil {
+	if err := db.client.WithContext(ctx).Table(s.TableName()).Where("id = ?", spuId).Delete(&s).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete spu: %v", err)
 	}
 	return nil
@@ -88,8 +88,28 @@ func (db *commodityDB) IsExistSku(ctx context.Context, spuId int64) (bool, error
 	return cnt != 0, nil
 }
 
+func (db *commodityDB) GetImagesBySpuId(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error) {
+	imgs := make([]*SpuImage, 0)
+	var cnt int64
+	if err := db.client.WithContext(ctx).Table(constants.SpuImageTableName).Where("spu_id = ?", spuId).
+		Order("created_at").Limit(limit).Offset(offset).Find(&imgs).Count(&cnt).Error; err != nil {
+		return nil, 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get images: %v", err)
+	}
+	ret := make([]*model.SpuImage, 0)
+	for _, img := range imgs {
+		ret = append(ret, &model.SpuImage{
+			ImageID:   img.Id,
+			SpuID:     img.SpuId,
+			Url:       img.Url,
+			CreatedAt: img.CreatedAt.Unix(),
+			UpdatedAt: img.UpdatedAt.Unix(),
+		})
+	}
+	return ret, cnt, nil
+}
+
 func (db *commodityDB) GetSpuBySpuId(ctx context.Context, spuId int64) (*model.Spu, error) {
-	s := &Spu{}
+	s := Spu{}
 	if err := db.client.WithContext(ctx).Table(constants.SpuTableName).Where("id = ?", spuId).First(&s).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errno.NewErrNo(errno.ServiceSpuNotExist, "spu not exist")
@@ -144,18 +164,41 @@ func (db *commodityDB) UpdateSpuImage(ctx context.Context, spuImage *model.SpuIm
 }
 
 func (db *commodityDB) DeleteSpuImage(ctx context.Context, spuImageId int64) error {
-	s := &SpuImage{}
-	if err := db.client.WithContext(ctx).Table(s.TableName()).Where("spu_id = ?", spuImageId).Delete(s).Error; err != nil {
+	s := SpuImage{}
+	if err := db.client.WithContext(ctx).Table(s.TableName()).Where("id = ?", spuImageId).Delete(&s).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete spu image: %v", err)
 	}
 	return nil
 }
 
-func (db *commodityDB) DeleteSpuImageToSpu(ctx context.Context, spuImageId int64, spuId int64) error {
-	return nil
+func (db *commodityDB) GetSpuImage(ctx context.Context, spuImageId int64) (*model.SpuImage, error) {
+	img := SpuImage{}
+
+	if err := db.client.WithContext(ctx).Table(img.TableName()).Where("id=?", spuImageId).First(&img).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errno.NewErrNo(errno.ServiceImgNotExist, "spu image not exist")
+		}
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get spu image: %v", err)
+	}
+	ret := &model.SpuImage{
+		ImageID: img.Id,
+		SpuID:   img.SpuId,
+		Url:     img.Url,
+	}
+	return ret, nil
 }
 
-func (db *commodityDB) GetSpuImage(ctx context.Context, spuImageId int64) (*model.SpuImage, error) {
-	// TODO implement me
-	panic("implement me")
+func (db *commodityDB) DeleteSpuImagesBySpuId(ctx context.Context, spuId int64) (ids []int64, url []string, err error) {
+	ids = make([]int64, 0)
+	url = make([]string, 0)
+	imgs := make([]*SpuImage, 0)
+
+	if err = db.client.WithContext(ctx).Table(constants.SpuImageTableName).Where("spu_id = ?", spuId).Delete(imgs).Error; err != nil {
+		return nil, nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete images: %v", err)
+	}
+	for _, img := range imgs {
+		ids = append(ids, img.SpuId)
+		url = append(url, img.Url)
+	}
+	return ids, url, nil
 }

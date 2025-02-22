@@ -27,6 +27,7 @@ const (
 	ServiceOrderNotFound
 	ServiceSpuNotExist
 	ServiceImgNotExist
+	ServiceSkuExist
 	PaymentOrderNotExist
 	UserNotExist
 )

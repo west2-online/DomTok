@@ -50,3 +50,9 @@ const (
 	OrderStatusCancelled = "已取消"
 	OrderStatusUnknown   = "未知状态"
 )
+
+// CommodityService
+const (
+	CommodityAllowedForSale    = 1
+	CommodityNotAllowedForSale = 2
+)

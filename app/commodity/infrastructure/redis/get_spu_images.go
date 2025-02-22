@@ -14,29 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package service
+package redis
 
 import (
-	"github.com/west2-online/DomTok/pkg/constants"
+	"context"
+
+	"github.com/bytedance/sonic"
+
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-type CommodityVerifyOps func() error
-
-func (svc *CommodityService) Verify(opts ...CommodityVerifyOps) error {
-	for _, opt := range opts {
-		if err := opt(); err != nil {
-			return err
-		}
+func (c commodityCache) GetSpuImages(ctx context.Context, key string) (*model.SpuImages, error) {
+	dataJSON, err := c.client.Get(ctx, key).Result()
+	if err != nil {
+		return nil, errno.Errorf(errno.InternalRedisErrorCode, "commodityCache.GetSpuImages faile: %v", err)
 	}
-	return nil
-}
-
-func (svc *CommodityService) VerifyForSaleStatus(status int) CommodityVerifyOps {
-	return func() error {
-		if status != constants.CommodityAllowedForSale && status != constants.CommodityNotAllowedForSale {
-			return errno.ParamVerifyError
-		}
-		return nil
+	ret := new(model.SpuImages)
+	err = sonic.Unmarshal([]byte(dataJSON), &ret)
+	if err != nil {
+		return nil, errno.Errorf(errno.InternalServiceErrorCode, "commodityCache.GetSpuImages Unmarshal failed: %v", err)
 	}
+	return ret, nil
 }
