@@ -22,7 +22,6 @@ import (
 	"io"
 	"sync"
 
-	"github.com/cloudwego/eino/callbacks"
 	components "github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/compose"
@@ -53,7 +52,7 @@ type Client struct {
 func NewClient() *Client {
 	cli := &Client{}
 	cli.persona = GetPersona()
-	callbacks.InitCallbackHandlers([]callbacks.Handler{&LoggerCallback{}})
+	// callbacks.InitCallbackHandlers([]callbacks.Handler{&LoggerCallback{}})
 	return cli
 }
 
@@ -94,9 +93,17 @@ func (c *Client) Call(ctx context.Context, dialog model.IDialog) (err error) {
 	}
 
 	ra, err := react.NewAgent(ctx, &react.AgentConfig{
-		Model:                 chatModel,
-		ToolsConfig:           compose.ToolsNodeConfig{Tools: c.tools},
-		MessageModifier:       func(_ context.Context, input []*schema.Message) []*schema.Message { return append(history, input...) },
+		Model:       chatModel,
+		ToolsConfig: compose.ToolsNodeConfig{Tools: c.tools},
+		MessageModifier: func(_ context.Context, input []*schema.Message) []*schema.Message {
+			for _, m := range input {
+				if m.Role != schema.User && m.Role != schema.System {
+					tokenUsageLog(m, dialog, m.Content)
+				}
+			}
+			history = append(history, input...)
+			return history
+		},
 		StreamToolCallChecker: streamToolCallCheckerStrict,
 	})
 	if err != nil {
@@ -108,7 +115,7 @@ func (c *Client) Call(ctx context.Context, dialog model.IDialog) (err error) {
 		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, err.Error())
 	}
 
-	history = append(history, schema.UserMessage(dialog.Message()), schema.AssistantMessage(out, nil))
+	history = append(history, schema.AssistantMessage(out, nil))
 	c.storeMarkedDialog(dialog, history)
 
 	return nil
@@ -193,11 +200,16 @@ func (c *Client) readStreamWithDialog(
 			dialog.Send(frame.Content)
 			out += frame.Content
 		}
+
+		if frame.ResponseMeta != nil && frame.ResponseMeta.Usage != nil {
+			frame.Role = schema.Assistant
+			tokenUsageLog(frame, dialog, out)
+		}
 	}
 	return out, nil
 }
 
-func streamToolCallCheckerStrict(ctx context.Context, sr *schema.StreamReader[*schema.Message]) (bool, error) {
+func streamToolCallCheckerStrict(_ context.Context, sr *schema.StreamReader[*schema.Message]) (bool, error) {
 	defer sr.Close()
 
 	frame, err := sr.Recv()
@@ -230,7 +242,8 @@ func streamToolCallCheckerStrict(ctx context.Context, sr *schema.StreamReader[*s
 	//     - if tool calls is not empty, it is a tool call stream
 	//   - ai always response message with content, so if content is not empty, it is a message stream
 	// only try with doubao 1.5 pro 32k, other models may not work or need modification
-	if len(frame.ToolCalls) != 0 || len(frame.Content) == 0 {
+	if len(frame.ToolCalls) != 0 ||
+		(len(frame.ToolCalls) == 0 && len(frame.Content) == 0) {
 		return true, nil
 	}
 

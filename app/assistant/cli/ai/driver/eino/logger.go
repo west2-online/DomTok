@@ -23,7 +23,9 @@ import (
 
 	"github.com/cloudwego/eino/callbacks"
 	"github.com/cloudwego/eino/schema"
+	"go.uber.org/zap"
 
+	"github.com/west2-online/DomTok/app/assistant/model"
 	"github.com/west2-online/DomTok/pkg/logger"
 )
 
@@ -42,7 +44,7 @@ func (cb *LoggerCallback) OnEnd(ctx context.Context, _ *callbacks.RunInfo, outpu
 }
 
 func (cb *LoggerCallback) OnError(ctx context.Context, _ *callbacks.RunInfo, err error) context.Context {
-	logger.Debugf("[AI-Agent Stream] error: %v", err)
+	logger.Debugf("[AI-Agent] error: %v", err)
 	return ctx
 }
 
@@ -52,7 +54,7 @@ func (cb *LoggerCallback) OnEndWithStreamOutput(ctx context.Context, _ *callback
 	go func() {
 		defer func() {
 			if err := recover(); err != nil {
-				logger.Debugf("internal error: %v", err)
+				logger.Debugf("[AI-Agent] internal error: %v", err)
 			}
 		}()
 
@@ -64,7 +66,7 @@ func (cb *LoggerCallback) OnEndWithStreamOutput(ctx context.Context, _ *callback
 				break
 			}
 			if err != nil {
-				logger.Debugf("[AI-Agent Stream] error: %v", err)
+				logger.Debugf("[AI-Agent] error: %v", err)
 				return
 			}
 		}
@@ -77,4 +79,31 @@ func (cb *LoggerCallback) OnStartWithStreamInput(ctx context.Context, _ *callbac
 ) context.Context {
 	defer input.Close()
 	return ctx
+}
+
+const (
+	_TokenUsageKeyDialogID  = "dialog_id"
+	_TokenUsageKeyInput     = "input"
+	_TokenUsageKeyOutput    = "output"
+	_TokenUsageKeyRole      = "role"
+	_TokenUsageKeyToolCalls = "tool_calls"
+	_TokenUsageKeyUsage     = "usage"
+
+	_TokenUsageMaxCap = 6
+)
+
+func tokenUsageLog(m *schema.Message, dialog model.IDialog, output string) {
+	zfs := make([]zap.Field, 0, _TokenUsageMaxCap)
+	zfs = append(zfs, zap.String(_TokenUsageKeyDialogID, dialog.Unique()))
+	zfs = append(zfs, zap.String(_TokenUsageKeyInput, dialog.Message()))
+	zfs = append(zfs, zap.String(_TokenUsageKeyOutput, output))
+	zfs = append(zfs, zap.String(_TokenUsageKeyRole, string(m.Role)))
+	if m.ToolCalls != nil || len(m.ToolCalls) != 0 {
+		zfs = append(zfs, zap.Any(_TokenUsageKeyToolCalls, m.ToolCalls))
+	}
+	if m.ResponseMeta != nil && m.ResponseMeta.Usage != nil {
+		zfs = append(zfs, zap.Any(_TokenUsageKeyUsage, m.ResponseMeta.Usage))
+	}
+
+	logger.Info("token usage", zap.Any("metainfo", zfs))
 }
