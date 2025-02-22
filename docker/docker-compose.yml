@@ -74,7 +74,7 @@ services:
       interval: 60s # ⼼跳检测间隔周期
       timeout: 10s
       retries: 3
-      start_period: 60s # ⾸次检测延迟时间
+      start_period: 90 s # ⾸次检测延迟时间
     ulimits:
       memlock:
         soft: -1
