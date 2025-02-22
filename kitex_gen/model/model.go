@@ -2915,6 +2915,8 @@ type OrderGoods struct {
 	DiscountAmount   float64 `thrift:"discountAmount,14,required" frugal:"14,required,double" json:"discountAmount"`
 	SingleCast       float64 `thrift:"singleCast,15,required" frugal:"15,required,double" json:"singleCast"`
 	CouponID         int64   `thrift:"couponID,16" frugal:"16,default,i64" json:"couponID"`
+	OrderID          int64   `thrift:"orderID,17,required" frugal:"17,required,i64" json:"orderID"`
+	GoodsVersion     int32   `thrift:"goodsVersion,18,required" frugal:"18,required,i32" json:"goodsVersion"`
 }
 
 func NewOrderGoods() *OrderGoods {
@@ -2987,6 +2989,14 @@ func (p *OrderGoods) GetSingleCast() (v float64) {
 func (p *OrderGoods) GetCouponID() (v int64) {
 	return p.CouponID
 }
+
+func (p *OrderGoods) GetOrderID() (v int64) {
+	return p.OrderID
+}
+
+func (p *OrderGoods) GetGoodsVersion() (v int32) {
+	return p.GoodsVersion
+}
 func (p *OrderGoods) SetMerchantID(val int64) {
 	p.MerchantID = val
 }
@@ -3034,6 +3044,12 @@ func (p *OrderGoods) SetSingleCast(val float64) {
 }
 func (p *OrderGoods) SetCouponID(val int64) {
 	p.CouponID = val
+}
+func (p *OrderGoods) SetOrderID(val int64) {
+	p.OrderID = val
+}
+func (p *OrderGoods) SetGoodsVersion(val int32) {
+	p.GoodsVersion = val
 }
 
 func (p *OrderGoods) String() string {
@@ -3095,6 +3111,12 @@ func (p *OrderGoods) DeepEqual(ano *OrderGoods) bool {
 		return false
 	}
 	if !p.Field16DeepEqual(ano.CouponID) {
+		return false
+	}
+	if !p.Field17DeepEqual(ano.OrderID) {
+		return false
+	}
+	if !p.Field18DeepEqual(ano.GoodsVersion) {
 		return false
 	}
 	return true
@@ -3212,6 +3234,20 @@ func (p *OrderGoods) Field16DeepEqual(src int64) bool {
 	}
 	return true
 }
+func (p *OrderGoods) Field17DeepEqual(src int64) bool {
+
+	if p.OrderID != src {
+		return false
+	}
+	return true
+}
+func (p *OrderGoods) Field18DeepEqual(src int32) bool {
+
+	if p.GoodsVersion != src {
+		return false
+	}
+	return true
+}
 
 var fieldIDToName_OrderGoods = map[int16]string{
 	1:  "merchantID",
@@ -3230,6 +3266,8 @@ var fieldIDToName_OrderGoods = map[int16]string{
 	14: "discountAmount",
 	15: "singleCast",
 	16: "couponID",
+	17: "orderID",
+	18: "goodsVersion",
 }
 
 type BaseOrderGoods struct {

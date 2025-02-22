@@ -61,6 +61,15 @@ struct DeleteOrderResp {
     1: required model.BaseResp base;
 }
 
+struct IsOrderExistReq {
+    1: required i64 orderID
+}
+
+struct IsOrderExistResp {
+    1: required model.BaseResp base
+    2: required bool exist
+}
+
 service OrderService {
     CreateOrderResp CreateOrder(1:CreateOrderReq req) (api.post="/api/order/create")
     ViewOrderListResp ViewOrderList(1:ViewOrderListReq req) (api.get="/api/order/list")
@@ -68,4 +77,5 @@ service OrderService {
     CancelOrderResp CancelOrder(1:CancelOrderReq req) (api.delete="/api/order/cancel")
     ChangeDeliverAddressResp ChangeDeliverAddress(1:ChangeDeliverAddressReq req) (api.put="/api/order/change-address")
     DeleteOrderResp DeleteOrder(1:DeleteOrderReq req) (api.delete="/api/order/delete")
+    IsOrderExistResp IsOrderExist(1:IsOrderExistReq req) (api.get="/api/order/exist")
 }

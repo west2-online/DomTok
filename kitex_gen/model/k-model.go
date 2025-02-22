@@ -6812,6 +6812,8 @@ func (p *OrderGoods) FastRead(buf []byte) (int, error) {
 	var issetSettlementAmount bool = false
 	var issetDiscountAmount bool = false
 	var issetSingleCast bool = false
+	var issetOrderID bool = false
+	var issetGoodsVersion bool = false
 	for {
 		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
 		offset += l
@@ -7061,6 +7063,36 @@ func (p *OrderGoods) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
+		case 17:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField17(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetOrderID = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 18:
+			if fieldTypeId == thrift.I32 {
+				l, err = p.FastReadField18(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetGoodsVersion = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -7142,6 +7174,16 @@ func (p *OrderGoods) FastRead(buf []byte) (int, error) {
 
 	if !issetSingleCast {
 		fieldId = 15
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetOrderID {
+		fieldId = 17
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetGoodsVersion {
+		fieldId = 18
 		goto RequiredFieldNotSetError
 	}
 	return offset, nil
@@ -7379,6 +7421,34 @@ func (p *OrderGoods) FastReadField16(buf []byte) (int, error) {
 	return offset, nil
 }
 
+func (p *OrderGoods) FastReadField17(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.OrderID = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField18(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int32
+	if v, l, err := thrift.Binary.ReadI32(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.GoodsVersion = _field
+	return offset, nil
+}
+
 func (p *OrderGoods) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
@@ -7398,6 +7468,8 @@ func (p *OrderGoods) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 		offset += p.fastWriteField14(buf[offset:], w)
 		offset += p.fastWriteField15(buf[offset:], w)
 		offset += p.fastWriteField16(buf[offset:], w)
+		offset += p.fastWriteField17(buf[offset:], w)
+		offset += p.fastWriteField18(buf[offset:], w)
 		offset += p.fastWriteField3(buf[offset:], w)
 		offset += p.fastWriteField4(buf[offset:], w)
 		offset += p.fastWriteField6(buf[offset:], w)
@@ -7426,6 +7498,8 @@ func (p *OrderGoods) BLength() int {
 		l += p.field14Length()
 		l += p.field15Length()
 		l += p.field16Length()
+		l += p.field17Length()
+		l += p.field18Length()
 	}
 	l += thrift.Binary.FieldStopLength()
 	return l
@@ -7543,6 +7617,20 @@ func (p *OrderGoods) fastWriteField16(buf []byte, w thrift.NocopyWriter) int {
 	return offset
 }
 
+func (p *OrderGoods) fastWriteField17(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 17)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.OrderID)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField18(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I32, 18)
+	offset += thrift.Binary.WriteI32(buf[offset:], p.GoodsVersion)
+	return offset
+}
+
 func (p *OrderGoods) field1Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
@@ -7652,6 +7740,20 @@ func (p *OrderGoods) field16Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *OrderGoods) field17Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *OrderGoods) field18Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I32Length()
 	return l
 }
 
