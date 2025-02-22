@@ -25,6 +25,7 @@ import (
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
@@ -38,7 +39,7 @@ func NewCommodityDB(client *gorm.DB) repository.CommodityDB {
 }
 
 func (d *commodityDB) IsCategoryExist(ctx context.Context, Id int64) (bool, error) {
-	var category entities.Category
+	var category model.Category
 	err := d.client.WithContext(ctx).Where("id = ?", Id).First(&category).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -50,19 +51,19 @@ func (d *commodityDB) IsCategoryExist(ctx context.Context, Id int64) (bool, erro
 }
 
 func (d *commodityDB) CategoryCreatorId(ctx context.Context, Id int64) int64 {
-	var category entities.Category
+	var category model.Category
 	_ = d.client.WithContext(ctx).Where("Id = ?", Id).First(&category).Error
 	return category.CreatorId
 }
 
-func (d *commodityDB) CreateCategory(ctx context.Context, entity *entities.Category) error {
+func (d *commodityDB) CreateCategory(ctx context.Context, entity *model.Category) error {
 	model := Category{
 		Id:        entity.Id,
 		Name:      entity.Name,
 		CreatorId: entity.CreatorId,
 		CreatedAt: entity.CreatedAt,
 		UpdatedAt: entity.UpdatedAt,
-		DeletedAt: entity.DeletedAt,
+		DeletedAt: gorm.DeletedAt{},
 	}
 	if err := d.client.WithContext(ctx).Create(model).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create category: %v", err)
@@ -70,15 +71,177 @@ func (d *commodityDB) CreateCategory(ctx context.Context, entity *entities.Categ
 	return nil
 }
 
-func (d *commodityDB) DeleteCategory(ctx context.Context, category *entities.Category) error {
+func (d *commodityDB) DeleteCategory(ctx context.Context, category *model.Category) error {
 	if err := d.client.WithContext(ctx).Delete(Category{Id: category.Id}).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete category: %v", err)
 	}
 	return nil
 }
 
-func (d *commodityDB) UpdateCategory(ctx context.Context, category *entities.Category) error {
-	if err := d.client.WithContext(ctx).Model(&entities.Category{}).Where("id = ?", category.Id).Updates(category).Error; err != nil {
+func (db *commodityDB) CreateSpu(ctx context.Context, spu *model.Spu) error {
+	s := Spu{
+		Id:               spu.SpuId,
+		Name:             spu.Name,
+		CreatorId:        spu.CreatorId,
+		Description:      spu.Description,
+		CategoryId:       spu.CategoryId,
+		GoodsHeadDrawing: spu.GoodsHeadDrawingUrl,
+		Price:            spu.Price,
+		ForSale:          spu.ForSale,
+		Shipping:         spu.Shipping,
+	}
+
+	if err := db.client.WithContext(ctx).Table(s.TableName()).Create(&s).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to spu: %v", err)
+	}
+	return nil
+}
+
+func (db *commodityDB) CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
+	s := SpuImage{
+		Id:    spuImage.ImageID,
+		SpuId: spuImage.SpuID,
+		Url:   spuImage.Url,
+	}
+	if err := db.client.WithContext(ctx).Table(s.TableName()).Create(&s).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to spu image: %v", err)
+	}
+	return nil
+}
+
+func (db *commodityDB) DeleteSpu(ctx context.Context, spuId int64) error {
+	s := Spu{}
+	if err := db.client.WithContext(ctx).Table(s.TableName()).Where("id = ?", spuId).Delete(&s).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete spu: %v", err)
+	}
+	return nil
+}
+
+func (db *commodityDB) IsExistSku(ctx context.Context, spuId int64) (bool, error) {
+	var cnt int64
+	if err := db.client.WithContext(ctx).Table(constants.SpuSkuTableName).Where("spu_id = ?", spuId).Count(&cnt).Error; err != nil {
+		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get count: %v", err)
+	}
+	return cnt != 0, nil
+}
+
+func (db *commodityDB) GetImagesBySpuId(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error) {
+	imgs := make([]*SpuImage, 0)
+	var cnt int64
+	if err := db.client.WithContext(ctx).Table(constants.SpuImageTableName).Where("spu_id = ?", spuId).
+		Order("created_at").Limit(limit).Offset(offset).Find(&imgs).Count(&cnt).Error; err != nil {
+		return nil, 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get images: %v", err)
+	}
+	ret := make([]*model.SpuImage, 0)
+	for _, img := range imgs {
+		ret = append(ret, &model.SpuImage{
+			ImageID:   img.Id,
+			SpuID:     img.SpuId,
+			Url:       img.Url,
+			CreatedAt: img.CreatedAt.Unix(),
+			UpdatedAt: img.UpdatedAt.Unix(),
+		})
+	}
+	return ret, cnt, nil
+}
+
+func (db *commodityDB) GetSpuBySpuId(ctx context.Context, spuId int64) (*model.Spu, error) {
+	s := Spu{}
+	if err := db.client.WithContext(ctx).Table(constants.SpuTableName).Where("id = ?", spuId).First(&s).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errno.NewErrNo(errno.ServiceSpuNotExist, "spu not exist")
+		}
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get spu: %v", err)
+	}
+	ret := &model.Spu{
+		SpuId:               s.Id,
+		Name:                s.Name,
+		CreatorId:           s.CreatorId,
+		CategoryId:          s.CategoryId,
+		Description:         s.Description,
+		GoodsHeadDrawingUrl: s.GoodsHeadDrawing,
+		Price:               s.Price,
+		ForSale:             s.ForSale,
+		Shipping:            s.Shipping,
+		CreatedAt:           s.CreatedAt.Unix(),
+		UpdatedAt:           s.UpdatedAt.Unix(),
+	}
+
+	return ret, nil
+}
+
+func (db *commodityDB) UpdateSpu(ctx context.Context, spu *model.Spu) error {
+	s := Spu{
+		Id:               spu.SpuId,
+		Name:             spu.Name,
+		CreatorId:        spu.CreatorId,
+		Description:      spu.Description,
+		CategoryId:       spu.CategoryId,
+		GoodsHeadDrawing: spu.GoodsHeadDrawingUrl,
+		Price:            spu.Price,
+		ForSale:          spu.ForSale,
+		Shipping:         spu.Shipping,
+	}
+	if err := db.client.WithContext(ctx).Table(constants.SpuTableName).Where("id=?", spu.SpuId).Updates(&s).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update spu: %v", err)
+	}
+	return nil
+}
+
+func (db *commodityDB) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
+	img := SpuImage{
+		Id:    spuImage.ImageID,
+		SpuId: spuImage.SpuID,
+		Url:   spuImage.Url,
+	}
+	if err := db.client.WithContext(ctx).Table(constants.SpuImageTableName).Updates(&img).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update spu image: %v", err)
+	}
+	return nil
+}
+
+func (db *commodityDB) DeleteSpuImage(ctx context.Context, spuImageId int64) error {
+	s := SpuImage{}
+	if err := db.client.WithContext(ctx).Table(s.TableName()).Where("id = ?", spuImageId).Delete(&s).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete spu image: %v", err)
+	}
+	return nil
+}
+
+func (db *commodityDB) GetSpuImage(ctx context.Context, spuImageId int64) (*model.SpuImage, error) {
+	img := SpuImage{}
+
+	if err := db.client.WithContext(ctx).Table(img.TableName()).Where("id=?", spuImageId).First(&img).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errno.NewErrNo(errno.ServiceImgNotExist, "spu image not exist")
+		}
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get spu image: %v", err)
+	}
+	ret := &model.SpuImage{
+		ImageID: img.Id,
+		SpuID:   img.SpuId,
+		Url:     img.Url,
+	}
+	return ret, nil
+}
+
+func (db *commodityDB) DeleteSpuImagesBySpuId(ctx context.Context, spuId int64) (ids []int64, url []string, err error) {
+	ids = make([]int64, 0)
+	url = make([]string, 0)
+	imgs := make([]*SpuImage, 0)
+
+	if err = db.client.WithContext(ctx).Table(constants.SpuImageTableName).Where("spu_id = ?", spuId).Delete(imgs).Error; err != nil {
+		return nil, nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete images: %v", err)
+	}
+	for _, img := range imgs {
+		ids = append(ids, img.SpuId)
+		url = append(url, img.Url)
+	}
+	return ids, url, nil
+}
+
+func (d *commodityDB) UpdateCategory(ctx context.Context, category *model.Category) error {
+	if err := d.client.WithContext(ctx).Model(&model.Category{}).Where("id = ?", category.Id).Updates(category).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update category: %v", err)
 	}
 	return nil

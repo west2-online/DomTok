@@ -22,11 +22,14 @@ import (
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
+	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
 	kcontext "github.com/west2-online/DomTok/pkg/base/context"
+	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
-func (uc *useCase) CreateCategory(ctx context.Context, category *entities.Category) (int64, error) {
+func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category) (int64, error) {
 	exist, err := uc.db.IsCategoryExist(ctx, category.Id)
 	if err != nil {
 		return 0, fmt.Errorf("check category exist failed: %w", err)
@@ -42,7 +45,7 @@ func (uc *useCase) CreateCategory(ctx context.Context, category *entities.Catego
 	return category.Id, nil
 }
 
-func (uc *useCase) DeleteCategory(ctx context.Context, category *entities.Category) (err error) {
+func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category) (err error) {
 	// 判断是否存在
 	exist, err := uc.db.IsCategoryExist(ctx, category.Id)
 	if err != nil {
@@ -57,7 +60,7 @@ func (uc *useCase) DeleteCategory(ctx context.Context, category *entities.Catego
 		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
 	}
 	category.CreatorId = uc.db.CategoryCreatorId(ctx, category.Id)
-	if LoginData.UserId != category.CreatorId {
+	if LoginData != category.CreatorId {
 		return errno.NewErrNo(errno.AuthNoOperatePermissionCode, " You are not authorized to delete this category")
 	}
 	err = uc.db.DeleteCategory(ctx, category)
@@ -67,7 +70,7 @@ func (uc *useCase) DeleteCategory(ctx context.Context, category *entities.Catego
 	return nil
 }
 
-func (uc *useCase) UpdateCategory(ctx context.Context, category *entities.Category) (err error) {
+func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category) (err error) {
 	// 判断是否存在
 	exist, err := uc.db.IsCategoryExist(ctx, category.Id)
 	if err != nil {
@@ -82,7 +85,7 @@ func (uc *useCase) UpdateCategory(ctx context.Context, category *entities.Catego
 		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
 	}
 	category.CreatorId = uc.db.CategoryCreatorId(ctx, category.Id)
-	if LoginData.UserId != category.CreatorId {
+	if LoginData != category.CreatorId {
 		return errno.NewErrNo(errno.AuthNoOperatePermissionCode, " You are not authorized to delete this category")
 	}
 	err = uc.db.UpdateCategory(ctx, category)
@@ -98,4 +101,117 @@ func (uc *useCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (res
 		return nil, errno.Errorf(errno.ServiceListCategoryFailed, "failed to view categories: %v", err)
 	}
 	return resp, nil
+}
+
+func (us *useCase) CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err error) {
+	loginData, err := contextLogin.GetStreamLoginData(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("usecase.CreateSpu failed: %w", err)
+	}
+	spu.CreatorId = loginData
+
+	if err = us.svc.Verify(us.svc.VerifyForSaleStatus(spu.ForSale)); err != nil {
+		return 0, fmt.Errorf("usecase.CreateSpu verify failed: %w", err)
+	}
+
+	id, err = us.svc.CreateSpu(ctx, spu)
+	if err != nil {
+		return 0, fmt.Errorf("usecase.CreateSpu failed: %w", err)
+	}
+	return id, nil
+}
+
+func (us *useCase) CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) (int64, error) {
+	_, err := us.db.GetSpuBySpuId(ctx, spuImage.SpuID)
+	if err != nil {
+		return 0, fmt.Errorf("usecase.CreateSpuImage failed: %w", err)
+	}
+	id, err := us.svc.CreateSpuImage(ctx, spuImage)
+	if err != nil {
+		return 0, fmt.Errorf("usecase.CreateSpuImage failed: %w", err)
+	}
+	return id, nil
+}
+
+func (us *useCase) DeleteSpu(ctx context.Context, spuId int64) error {
+	ret, err := us.svc.MatchDeleteSpuCondition(ctx, spuId)
+	if err != nil {
+		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
+	}
+
+	err = us.svc.IdentifyUser(ctx, ret.CreatorId)
+	if err != nil {
+		return fmt.Errorf("usecase.DeleteSpu identify user failed: %w", err)
+	}
+
+	if err = us.svc.DeleteSpu(ctx, spuId, ret.GoodsHeadDrawingUrl); err != nil {
+		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
+	}
+
+	if err = us.svc.DeleteAllSpuImages(ctx, spuId); err != nil {
+		return fmt.Errorf("usecase.DeleteSpu failed: %w", err)
+	}
+
+	return nil
+}
+
+func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
+	ret, err := us.db.GetSpuBySpuId(ctx, spu.SpuId)
+	if err != nil {
+		return fmt.Errorf("usecase.UpdateSpu failed: %w", err)
+	}
+
+	err = us.svc.IdentifyUserInStreamCtx(ctx, ret.CreatorId)
+	if err != nil {
+		return fmt.Errorf("usecase.UpdateSpu identify user failed: %w", err)
+	}
+
+	if err = us.svc.Verify(us.svc.VerifyForSaleStatus(spu.ForSale)); err != nil {
+		return fmt.Errorf("usecase.UpdateSpu verify failed: %w", err)
+	}
+
+	spu.GoodsHeadDrawingUrl = utils.GenerateFileName(constants.SpuDirDest, spu.SpuId)
+	if err = us.svc.UpdateSpu(ctx, spu, ret); err != nil {
+		return fmt.Errorf("usecase.UpdateSpu failed: %w", err)
+	}
+	return nil
+}
+
+func (us *useCase) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
+	spu, img, err := us.svc.GetSpuFromImageId(ctx, spuImage.ImageID)
+	if err != nil {
+		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
+	}
+
+	err = us.svc.IdentifyUserInStreamCtx(ctx, spu.CreatorId)
+	if err != nil {
+		return fmt.Errorf("usecase.UpdateSpuImage identify user failed: %w", err)
+	}
+
+	spuImage.Url = utils.GenerateFileName(constants.SpuImageDirDest, img.ImageID)
+	if err = us.svc.UpdateSpuImage(ctx, spuImage, img); err != nil {
+		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
+	}
+	return nil
+}
+
+func (us *useCase) DeleteSpuImage(ctx context.Context, imageId int64) error {
+	spu, img, err := us.svc.GetSpuFromImageId(ctx, imageId)
+	if err != nil {
+		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
+	}
+
+	err = us.svc.IdentifyUser(ctx, spu.CreatorId)
+	if err != nil {
+		return fmt.Errorf("usecase.DeleteSpuImage identify user failed: %w", err)
+	}
+
+	if err = us.svc.DeleteSpuImage(ctx, imageId, img.Url); err != nil {
+		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
+	}
+	return nil
+}
+
+func (us *useCase) ViewSpuImages(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error) {
+	return us.svc.GetSpuImages(ctx, spuId, offset, limit)
 }

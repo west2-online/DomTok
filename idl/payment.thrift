@@ -1,7 +1,6 @@
 namespace go payment
 
 include "model.thrift"
-
 /*
  * struct PaymentTokenRequest 支付令牌请求
  * @Param orderID 商户订单号
@@ -20,22 +19,18 @@ struct PaymentTokenRequest {
  */
 struct PaymentTokenResponse {
     1: model.BaseResp base,
-    2: required string paymentToken
-    3: required i64 expirationTime
+    2: model.PaymentTokenInfo tokenInfo,
 }
-
 /*
  * struct PaymentRequest 订单结算请求
  * @Param orderID 商户订单号
  * @Param userID 用户ID
- * @Param paymentToken 支付令牌
  * @Param creditCard 信用卡信息
  * @Param description 订单描述
  */
 struct PaymentRequest {
     1: required i64 orderID
     2: required i64 userID
-    3: required string paymentToken
     4: required model.CreditCardInfo creditCard
     5: optional string description
 }
@@ -98,7 +93,6 @@ struct RefundResponse {
     3: required i64 status
 }
 
-
 /*
  * service PaymentService 支付服务
  * @Method RequestPaymentToken 请求支付令牌
@@ -112,3 +106,4 @@ service PaymentService {
     RefundResponse ProcessRefund(1: RefundRequest request)
     RefundTokenResponse RequestRefundToken(1: RefundTokenRequest request)
 }
+

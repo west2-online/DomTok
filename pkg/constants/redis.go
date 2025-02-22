@@ -24,13 +24,21 @@ const (
 
 // Redis Key and Expire Time
 const (
-	ClassroomKeyExpire    = 2 * 24 * time.Hour
-	LaunchScreenKeyExpire = 2 * 24 * time.Hour
-	LastLaunchScreenIdKey = "last_launch_screen_id"
+	RedisCartExpireTime     = 5 * 60 * time.Second
+	RedisCartStoreNum       = 30
+	RedisSpuImageExpireTime = 5 * 60 * time.Second
 )
 
 // Redis DB Name
 const (
 	RedisDBOrder     = 0
 	RedisDBCommodity = 1
+	RedisDBCart      = 2
+)
+
+// Redis Connection Pool Configuration
+const (
+	RedisPoolSize           = 50              // 最大连接数
+	RedisMinIdleConnections = 10              // 最小空闲连接数
+	RedisDialTimeout        = 5 * time.Second // 连接超时时间
 )
