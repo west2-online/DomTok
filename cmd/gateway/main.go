@@ -31,8 +31,12 @@ import (
 var serviceName = constants.GatewayServiceName
 
 func init() {
-	config.Init(serviceName)
-	logger.Init(serviceName, config.GetLoggerLevel())
+	config.InitFromConfigMap(serviceName)
+	// logger.Init(serviceName, config.GetLoggerLevel())
+
+	// ⚠️for debug, could be removed
+	// time.Sleep(10 * time.Minute)
+
 	rpc.Init()
 }
 
