@@ -23,14 +23,13 @@ import (
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
-	kcontext "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category) (int64, error) {
-	exist, err := uc.db.IsCategoryExist(ctx, category.Id)
+	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
 	if err != nil {
 		return 0, fmt.Errorf("check category exist failed: %w", err)
 	}
@@ -47,7 +46,7 @@ func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category)
 
 func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category) (err error) {
 	// 判断是否存在
-	exist, err := uc.db.IsCategoryExist(ctx, category.Id)
+	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
 	if err != nil {
 		return fmt.Errorf("check category exist failed: %w", err)
 	}
@@ -55,13 +54,13 @@ func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category)
 		return errno.NewErrNo(errno.ServiceUserNotExist, "category does not exist")
 	}
 	// 判断用户是否有权限
-	LoginData, err := kcontext.GetLoginData(ctx)
+	err = uc.svc.IdentifyUser(ctx, category.CreatorId)
 	if err != nil {
 		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
 	}
-	category.CreatorId = uc.db.CategoryCreatorId(ctx, category.Id)
-	if LoginData != category.CreatorId {
-		return errno.NewErrNo(errno.AuthNoOperatePermissionCode, " You are not authorized to delete this category")
+	err = uc.svc.IdentifyUserInStreamCtx(ctx, category.CreatorId)
+	if err != nil {
+		return errno.NewErrNo(errno.AuthInvalidCode, " You are not authorized to delete this category")
 	}
 	err = uc.db.DeleteCategory(ctx, category)
 	if err != nil {
@@ -72,7 +71,7 @@ func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category)
 
 func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category) (err error) {
 	// 判断是否存在
-	exist, err := uc.db.IsCategoryExist(ctx, category.Id)
+	exist, err := uc.db.IsCategoryExist(ctx, category.Name)
 	if err != nil {
 		return fmt.Errorf("check category exist failed: %w", err)
 	}
@@ -80,13 +79,13 @@ func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category)
 		return errno.NewErrNo(errno.ServiceUserNotExist, "category does not exist")
 	}
 	// 判断用户是否有权限
-	LoginData, err := kcontext.GetLoginData(ctx)
+	err = uc.svc.IdentifyUser(ctx, category.CreatorId)
 	if err != nil {
 		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
 	}
-	category.CreatorId = uc.db.CategoryCreatorId(ctx, category.Id)
-	if LoginData != category.CreatorId {
-		return errno.NewErrNo(errno.AuthNoOperatePermissionCode, " You are not authorized to delete this category")
+	err = uc.svc.IdentifyUserInStreamCtx(ctx, category.CreatorId)
+	if err != nil {
+		return errno.NewErrNo(errno.AuthInvalidCode, " You are not authorized to delete this category")
 	}
 	err = uc.db.UpdateCategory(ctx, category)
 	if err != nil {
