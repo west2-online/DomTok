@@ -116,3 +116,7 @@ func (uc *useCase) DeleteOrder(ctx context.Context, orderID int64) error {
 	// 2. 删除订单（包含订单商品）
 	return uc.db.DeleteOrder(ctx, orderID)
 }
+
+func (uc *useCase) IsOrderExist(ctx context.Context, orderID int64) (bool, error) {
+	return uc.db.IsOrderExist(ctx, orderID)
+}

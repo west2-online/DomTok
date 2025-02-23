@@ -83,3 +83,9 @@ func (h *OrderHandler) DeleteOrder(ctx context.Context, req *order.DeleteOrderRe
 	resp = new(order.DeleteOrderResp)
 	return resp, h.useCase.DeleteOrder(ctx, req.GetOrderID())
 }
+
+func (h *OrderHandler) IsOrderExist(ctx context.Context, req *order.IsOrderExistReq) (resp *order.IsOrderExistResp, err error) {
+	resp = new(order.IsOrderExistResp)
+	resp.Exist, err = h.useCase.IsOrderExist(ctx, req.GetOrderID())
+	return resp, err
+}
