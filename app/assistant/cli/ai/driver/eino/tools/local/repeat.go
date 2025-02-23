@@ -18,8 +18,8 @@ package local
 
 import (
 	"context"
-	"encoding/json"
 
+	"github.com/bytedance/sonic"
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/schema"
 
@@ -49,7 +49,7 @@ func Repeat() *ToolRepeat {
 
 func (t *ToolRepeat) InvokableRun(ctx context.Context, argumentsInJSON string, opts ...tool.Option) (string, error) {
 	args := &ToolRepeatArgs{}
-	err := json.Unmarshal([]byte(argumentsInJSON), args)
+	err := sonic.Unmarshal([]byte(argumentsInJSON), args)
 	if err != nil {
 		return "", err
 	}

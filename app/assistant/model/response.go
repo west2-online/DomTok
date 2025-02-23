@@ -16,7 +16,9 @@ limitations under the License.
 
 package model
 
-import "encoding/json"
+import (
+	"github.com/bytedance/sonic"
+)
 
 // Response is a struct that represents the response of the websocket.
 type Response struct {
@@ -53,7 +55,7 @@ func (r *Response) GetData() interface{} {
 
 // Marshal marshals the response into a byte slice.
 func (r *Response) Marshal() ([]byte, error) {
-	return json.Marshal(r)
+	return sonic.Marshal(r)
 }
 
 // MustMarshal marshals the response into a byte slice, ignoring errors.
