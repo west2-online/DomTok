@@ -35,6 +35,7 @@ type Client interface {
 	CancelOrder(ctx context.Context, req *order.CancelOrderReq, callOptions ...callopt.Option) (r *order.CancelOrderResp, err error)
 	ChangeDeliverAddress(ctx context.Context, req *order.ChangeDeliverAddressReq, callOptions ...callopt.Option) (r *order.ChangeDeliverAddressResp, err error)
 	DeleteOrder(ctx context.Context, req *order.DeleteOrderReq, callOptions ...callopt.Option) (r *order.DeleteOrderResp, err error)
+	IsOrderExist(ctx context.Context, req *order.IsOrderExistReq, callOptions ...callopt.Option) (r *order.IsOrderExistResp, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -94,4 +95,9 @@ func (p *kOrderServiceClient) ChangeDeliverAddress(ctx context.Context, req *ord
 func (p *kOrderServiceClient) DeleteOrder(ctx context.Context, req *order.DeleteOrderReq, callOptions ...callopt.Option) (r *order.DeleteOrderResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.DeleteOrder(ctx, req)
+}
+
+func (p *kOrderServiceClient) IsOrderExist(ctx context.Context, req *order.IsOrderExistReq, callOptions ...callopt.Option) (r *order.IsOrderExistResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.IsOrderExist(ctx, req)
 }

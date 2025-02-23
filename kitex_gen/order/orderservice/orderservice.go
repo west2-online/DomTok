@@ -73,6 +73,13 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"IsOrderExist": kitex.NewMethodInfo(
+		isOrderExistHandler,
+		newOrderServiceIsOrderExistArgs,
+		newOrderServiceIsOrderExistResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -247,6 +254,24 @@ func newOrderServiceDeleteOrderResult() interface{} {
 	return order.NewOrderServiceDeleteOrderResult()
 }
 
+func isOrderExistHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*order.OrderServiceIsOrderExistArgs)
+	realResult := result.(*order.OrderServiceIsOrderExistResult)
+	success, err := handler.(order.OrderService).IsOrderExist(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newOrderServiceIsOrderExistArgs() interface{} {
+	return order.NewOrderServiceIsOrderExistArgs()
+}
+
+func newOrderServiceIsOrderExistResult() interface{} {
+	return order.NewOrderServiceIsOrderExistResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -312,6 +337,16 @@ func (p *kClient) DeleteOrder(ctx context.Context, req *order.DeleteOrderReq) (r
 	_args.Req = req
 	var _result order.OrderServiceDeleteOrderResult
 	if err = p.c.Call(ctx, "DeleteOrder", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) IsOrderExist(ctx context.Context, req *order.IsOrderExistReq) (r *order.IsOrderExistResp, err error) {
+	var _args order.OrderServiceIsOrderExistArgs
+	_args.Req = req
+	var _result order.OrderServiceIsOrderExistResult
+	if err = p.c.Call(ctx, "IsOrderExist", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
