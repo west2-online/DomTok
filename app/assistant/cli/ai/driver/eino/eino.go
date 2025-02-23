@@ -242,10 +242,9 @@ func streamToolCallCheckerStrict(_ context.Context, sr *schema.StreamReader[*sch
 	//     - if tool calls is not empty, it is a tool call stream
 	//   - ai always response message with content, so if content is not empty, it is a message stream
 	// only try with doubao 1.5 pro 32k, other models may not work or need modification
-	if len(frame.ToolCalls) != 0 ||
-		(len(frame.ToolCalls) == 0 && len(frame.Content) == 0) {
-		return true, nil
+	if len(frame.ToolCalls) == 0 && len(frame.Content) != 0 {
+		return false, nil
 	}
 
-	return false, nil
+	return true, nil
 }
