@@ -31,3 +31,23 @@ type Spu struct {
 	DeletedAt           int64
 	GoodsHeadDrawingUrl string
 }
+
+type SpuES struct {
+	SpuId      int64
+	Name       string
+	CategoryId int64
+	Price      float64
+	Shipping   bool
+}
+
+// ConvertIntToBool 将输入的int转换为bool，1为出售true,2为暂不出售false
+func (s *Spu) ConvertIntToBool(input int) bool {
+	return input == 1
+}
+
+func (s *SpuES) ConvertBoolToInt(input bool) int {
+	if input {
+		return 1
+	}
+	return 2
+}

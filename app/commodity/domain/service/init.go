@@ -17,6 +17,7 @@ limitations under the License.
 package service
 
 import (
+	"context"
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
@@ -62,4 +63,11 @@ func NewCommodityService(db repository.CommodityDB, sf *utils.Snowflake, cache r
 }
 
 func (s *CommodityService) init() {
+	err := s.IsSpuMappingExist(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	go s.ConsumeCreateSpuMsg(context.Background())
+	go s.ConsumeUpdateSpuMsg(context.Background())
+	go s.ConsumeDeleteSpuMsg(context.Background())
 }

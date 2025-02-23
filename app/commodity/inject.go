@@ -47,7 +47,7 @@ func InjectCommodityHandlerr() commodity.CommodityService {
 		panic(err)
 	}
 
-	elastic, err := client.NewEsClient()
+	elastic, err := client.NewEsCommodityClient()
 	if err != nil {
 		panic(err)
 	}
