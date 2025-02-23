@@ -21,104 +21,157 @@ package order
 import (
 	"context"
 
+	"github.com/west2-online/DomTok/app/gateway/pack"
+
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
 	api "github.com/west2-online/DomTok/app/gateway/model/api/order"
+	"github.com/west2-online/DomTok/app/gateway/rpc"
+	orderrpc "github.com/west2-online/DomTok/kitex_gen/order"
 )
 
 // CreateOrder .
-// @router /api/api/create [POST]
+// @router /api/v1/create [POST]
 func CreateOrder(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.CreateOrderReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 
-	resp := new(api.CreateOrderResp)
+	// todo: 未实现
 
-	c.JSON(consts.StatusOK, resp)
+	resp, err := rpc.CreateOrderRPC(ctx, nil)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespData(c, resp)
 }
 
 // ViewOrderList .
-// @router /api/api/list [GET]
+// @router /api/v1/list [GET]
 func ViewOrderList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.ViewOrderListReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 
-	resp := new(api.ViewOrderListResp)
+	rpcReq := &orderrpc.ViewOrderListReq{
+		Page: req.Page,
+		Size: req.Size,
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	resp, err := rpc.ViewOrderListRPC(ctx, rpcReq)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespData(c, resp)
 }
 
 // ViewOrder .
-// @router /api/api/view [GET]
+// @router /api/v1/view [GET]
 func ViewOrder(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.ViewOrderReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 
-	resp := new(api.ViewOrderResp)
+	// 转换请求
+	rpcReq := &orderrpc.ViewOrderReq{
+		OrderID: req.OrderID,
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	resp, err := rpc.ViewOrderRPC(ctx, rpcReq)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespData(c, resp)
 }
 
 // CancelOrder .
-// @router /api/api/cancel [DELETE]
+// @router /api/v1/cancel [DELETE]
 func CancelOrder(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.CancelOrderReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 
-	resp := new(api.CancelOrderResp)
+	rpcReq := &orderrpc.CancelOrderReq{
+		OrderID: req.OrderID,
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	err = rpc.CancelOrderRPC(ctx, rpcReq)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespSuccess(c)
 }
 
 // ChangeDeliverAddress .
-// @router /api/api/change-address [PUT]
+// @router /api/v1/change-address [PUT]
 func ChangeDeliverAddress(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.ChangeDeliverAddressReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 
-	resp := new(api.ChangeDeliverAddressResp)
+	rpcReq := &orderrpc.ChangeDeliverAddressReq{
+		OrderID:     req.OrderID,
+		AddressID:   req.AddressID,
+		AddressInfo: req.AddressInfo,
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	err = rpc.ChangeDeliverAddressRPC(ctx, rpcReq)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespSuccess(c)
 }
 
 // DeleteOrder .
-// @router /api/api/delete [DELETE]
+// @router /api/v1/delete [DELETE]
 func DeleteOrder(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.DeleteOrderReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 
-	resp := new(api.DeleteOrderResp)
+	rpcReq := &orderrpc.DeleteOrderReq{
+		OrderID: req.OrderID,
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	err = rpc.DeleteOrderRPC(ctx, rpcReq)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespSuccess(c)
 }

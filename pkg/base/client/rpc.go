@@ -27,6 +27,7 @@ import (
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
 	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
+	"github.com/west2-online/DomTok/kitex_gen/order/orderservice"
 	"github.com/west2-online/DomTok/kitex_gen/payment/paymentservice"
 	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
 	"github.com/west2-online/DomTok/pkg/constants"
@@ -52,6 +53,10 @@ func initRPCClient[T any](serviceName string, newClientFunc func(string, ...clie
 
 func InitUserRPC() (*userservice.Client, error) {
 	return initRPCClient("user", userservice.NewClient)
+}
+
+func InitOrderRPC() (*orderservice.Client, error) {
+	return initRPCClient(constants.OrderServiceName, orderservice.NewClient)
 }
 
 func InitCommodityRPC() (*commodityservice.Client, error) {

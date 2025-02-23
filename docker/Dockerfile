@@ -10,7 +10,7 @@ ENV CGO_ENABLED=0
 ENV GOPROXY=https://goproxy.cn,direct
 ENV GOOS=linux
 ENV GOARCH=amd64
-# 创建工作目录
+# 创建工作目录c
 RUN mkdir -p /app
 RUN mkdir -p /app/output
 

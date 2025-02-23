@@ -28,7 +28,6 @@ import (
 
 type PaymentTokenRequest struct {
 	OrderID int64 `thrift:"orderID,1,required" frugal:"1,required,i64" json:"orderID"`
-	UserID  int64 `thrift:"userID,2,required" frugal:"2,required,i64" json:"userID"`
 }
 
 func NewPaymentTokenRequest() *PaymentTokenRequest {
@@ -41,15 +40,8 @@ func (p *PaymentTokenRequest) InitDefault() {
 func (p *PaymentTokenRequest) GetOrderID() (v int64) {
 	return p.OrderID
 }
-
-func (p *PaymentTokenRequest) GetUserID() (v int64) {
-	return p.UserID
-}
 func (p *PaymentTokenRequest) SetOrderID(val int64) {
 	p.OrderID = val
-}
-func (p *PaymentTokenRequest) SetUserID(val int64) {
-	p.UserID = val
 }
 
 func (p *PaymentTokenRequest) String() string {
@@ -68,9 +60,6 @@ func (p *PaymentTokenRequest) DeepEqual(ano *PaymentTokenRequest) bool {
 	if !p.Field1DeepEqual(ano.OrderID) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.UserID) {
-		return false
-	}
 	return true
 }
 
@@ -81,17 +70,9 @@ func (p *PaymentTokenRequest) Field1DeepEqual(src int64) bool {
 	}
 	return true
 }
-func (p *PaymentTokenRequest) Field2DeepEqual(src int64) bool {
-
-	if p.UserID != src {
-		return false
-	}
-	return true
-}
 
 var fieldIDToName_PaymentTokenRequest = map[int16]string{
 	1: "orderID",
-	2: "userID",
 }
 
 type PaymentTokenResponse struct {
@@ -407,7 +388,6 @@ var fieldIDToName_PaymentResponse = map[int16]string{
 
 type RefundTokenRequest struct {
 	OrderID int64 `thrift:"orderID,1,required" frugal:"1,required,i64" json:"orderID"`
-	UserID  int64 `thrift:"userID,2,required" frugal:"2,required,i64" json:"userID"`
 }
 
 func NewRefundTokenRequest() *RefundTokenRequest {
@@ -420,15 +400,8 @@ func (p *RefundTokenRequest) InitDefault() {
 func (p *RefundTokenRequest) GetOrderID() (v int64) {
 	return p.OrderID
 }
-
-func (p *RefundTokenRequest) GetUserID() (v int64) {
-	return p.UserID
-}
 func (p *RefundTokenRequest) SetOrderID(val int64) {
 	p.OrderID = val
-}
-func (p *RefundTokenRequest) SetUserID(val int64) {
-	p.UserID = val
 }
 
 func (p *RefundTokenRequest) String() string {
@@ -447,9 +420,6 @@ func (p *RefundTokenRequest) DeepEqual(ano *RefundTokenRequest) bool {
 	if !p.Field1DeepEqual(ano.OrderID) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.UserID) {
-		return false
-	}
 	return true
 }
 
@@ -460,23 +430,14 @@ func (p *RefundTokenRequest) Field1DeepEqual(src int64) bool {
 	}
 	return true
 }
-func (p *RefundTokenRequest) Field2DeepEqual(src int64) bool {
-
-	if p.UserID != src {
-		return false
-	}
-	return true
-}
 
 var fieldIDToName_RefundTokenRequest = map[int16]string{
 	1: "orderID",
-	2: "userID",
 }
 
 type RefundTokenResponse struct {
-	Base           *model.BaseResp `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
-	RefundToken    string          `thrift:"refundToken,2,required" frugal:"2,required,string" json:"refundToken"`
-	ExpirationTime int64           `thrift:"expirationTime,3,required" frugal:"3,required,i64" json:"expirationTime"`
+	Base     *model.BaseResp `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
+	RefundID int64           `thrift:"refundID,2,required" frugal:"2,required,i64" json:"refundID"`
 }
 
 func NewRefundTokenResponse() *RefundTokenResponse {
@@ -495,21 +456,14 @@ func (p *RefundTokenResponse) GetBase() (v *model.BaseResp) {
 	return p.Base
 }
 
-func (p *RefundTokenResponse) GetRefundToken() (v string) {
-	return p.RefundToken
-}
-
-func (p *RefundTokenResponse) GetExpirationTime() (v int64) {
-	return p.ExpirationTime
+func (p *RefundTokenResponse) GetRefundID() (v int64) {
+	return p.RefundID
 }
 func (p *RefundTokenResponse) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
-func (p *RefundTokenResponse) SetRefundToken(val string) {
-	p.RefundToken = val
-}
-func (p *RefundTokenResponse) SetExpirationTime(val int64) {
-	p.ExpirationTime = val
+func (p *RefundTokenResponse) SetRefundID(val int64) {
+	p.RefundID = val
 }
 
 func (p *RefundTokenResponse) IsSetBase() bool {
@@ -532,10 +486,7 @@ func (p *RefundTokenResponse) DeepEqual(ano *RefundTokenResponse) bool {
 	if !p.Field1DeepEqual(ano.Base) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.RefundToken) {
-		return false
-	}
-	if !p.Field3DeepEqual(ano.ExpirationTime) {
+	if !p.Field2DeepEqual(ano.RefundID) {
 		return false
 	}
 	return true
@@ -548,16 +499,9 @@ func (p *RefundTokenResponse) Field1DeepEqual(src *model.BaseResp) bool {
 	}
 	return true
 }
-func (p *RefundTokenResponse) Field2DeepEqual(src string) bool {
+func (p *RefundTokenResponse) Field2DeepEqual(src int64) bool {
 
-	if strings.Compare(p.RefundToken, src) != 0 {
-		return false
-	}
-	return true
-}
-func (p *RefundTokenResponse) Field3DeepEqual(src int64) bool {
-
-	if p.ExpirationTime != src {
+	if p.RefundID != src {
 		return false
 	}
 	return true
@@ -565,8 +509,7 @@ func (p *RefundTokenResponse) Field3DeepEqual(src int64) bool {
 
 var fieldIDToName_RefundTokenResponse = map[int16]string{
 	1: "base",
-	2: "refundToken",
-	3: "expirationTime",
+	2: "refundID",
 }
 
 type RefundRequest struct {
@@ -778,7 +721,7 @@ type PaymentService interface {
 
 	ProcessRefund(ctx context.Context, request *RefundRequest) (r *RefundResponse, err error)
 
-	RequestRefundToken(ctx context.Context, request *RefundTokenRequest) (r *RefundTokenResponse, err error)
+	RequestRefundInfo(ctx context.Context, request *RefundTokenRequest) (r *RefundTokenResponse, err error)
 }
 
 type PaymentServiceProcessPaymentArgs struct {
@@ -1129,41 +1072,41 @@ var fieldIDToName_PaymentServiceProcessRefundResult = map[int16]string{
 	0: "success",
 }
 
-type PaymentServiceRequestRefundTokenArgs struct {
+type PaymentServiceRequestRefundInfoArgs struct {
 	Request *RefundTokenRequest `thrift:"request,1" frugal:"1,default,RefundTokenRequest" json:"request"`
 }
 
-func NewPaymentServiceRequestRefundTokenArgs() *PaymentServiceRequestRefundTokenArgs {
-	return &PaymentServiceRequestRefundTokenArgs{}
+func NewPaymentServiceRequestRefundInfoArgs() *PaymentServiceRequestRefundInfoArgs {
+	return &PaymentServiceRequestRefundInfoArgs{}
 }
 
-func (p *PaymentServiceRequestRefundTokenArgs) InitDefault() {
+func (p *PaymentServiceRequestRefundInfoArgs) InitDefault() {
 }
 
-var PaymentServiceRequestRefundTokenArgs_Request_DEFAULT *RefundTokenRequest
+var PaymentServiceRequestRefundInfoArgs_Request_DEFAULT *RefundTokenRequest
 
-func (p *PaymentServiceRequestRefundTokenArgs) GetRequest() (v *RefundTokenRequest) {
+func (p *PaymentServiceRequestRefundInfoArgs) GetRequest() (v *RefundTokenRequest) {
 	if !p.IsSetRequest() {
-		return PaymentServiceRequestRefundTokenArgs_Request_DEFAULT
+		return PaymentServiceRequestRefundInfoArgs_Request_DEFAULT
 	}
 	return p.Request
 }
-func (p *PaymentServiceRequestRefundTokenArgs) SetRequest(val *RefundTokenRequest) {
+func (p *PaymentServiceRequestRefundInfoArgs) SetRequest(val *RefundTokenRequest) {
 	p.Request = val
 }
 
-func (p *PaymentServiceRequestRefundTokenArgs) IsSetRequest() bool {
+func (p *PaymentServiceRequestRefundInfoArgs) IsSetRequest() bool {
 	return p.Request != nil
 }
 
-func (p *PaymentServiceRequestRefundTokenArgs) String() string {
+func (p *PaymentServiceRequestRefundInfoArgs) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("PaymentServiceRequestRefundTokenArgs(%+v)", *p)
+	return fmt.Sprintf("PaymentServiceRequestRefundInfoArgs(%+v)", *p)
 }
 
-func (p *PaymentServiceRequestRefundTokenArgs) DeepEqual(ano *PaymentServiceRequestRefundTokenArgs) bool {
+func (p *PaymentServiceRequestRefundInfoArgs) DeepEqual(ano *PaymentServiceRequestRefundInfoArgs) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1175,7 +1118,7 @@ func (p *PaymentServiceRequestRefundTokenArgs) DeepEqual(ano *PaymentServiceRequ
 	return true
 }
 
-func (p *PaymentServiceRequestRefundTokenArgs) Field1DeepEqual(src *RefundTokenRequest) bool {
+func (p *PaymentServiceRequestRefundInfoArgs) Field1DeepEqual(src *RefundTokenRequest) bool {
 
 	if !p.Request.DeepEqual(src) {
 		return false
@@ -1183,45 +1126,45 @@ func (p *PaymentServiceRequestRefundTokenArgs) Field1DeepEqual(src *RefundTokenR
 	return true
 }
 
-var fieldIDToName_PaymentServiceRequestRefundTokenArgs = map[int16]string{
+var fieldIDToName_PaymentServiceRequestRefundInfoArgs = map[int16]string{
 	1: "request",
 }
 
-type PaymentServiceRequestRefundTokenResult struct {
+type PaymentServiceRequestRefundInfoResult struct {
 	Success *RefundTokenResponse `thrift:"success,0,optional" frugal:"0,optional,RefundTokenResponse" json:"success,omitempty"`
 }
 
-func NewPaymentServiceRequestRefundTokenResult() *PaymentServiceRequestRefundTokenResult {
-	return &PaymentServiceRequestRefundTokenResult{}
+func NewPaymentServiceRequestRefundInfoResult() *PaymentServiceRequestRefundInfoResult {
+	return &PaymentServiceRequestRefundInfoResult{}
 }
 
-func (p *PaymentServiceRequestRefundTokenResult) InitDefault() {
+func (p *PaymentServiceRequestRefundInfoResult) InitDefault() {
 }
 
-var PaymentServiceRequestRefundTokenResult_Success_DEFAULT *RefundTokenResponse
+var PaymentServiceRequestRefundInfoResult_Success_DEFAULT *RefundTokenResponse
 
-func (p *PaymentServiceRequestRefundTokenResult) GetSuccess() (v *RefundTokenResponse) {
+func (p *PaymentServiceRequestRefundInfoResult) GetSuccess() (v *RefundTokenResponse) {
 	if !p.IsSetSuccess() {
-		return PaymentServiceRequestRefundTokenResult_Success_DEFAULT
+		return PaymentServiceRequestRefundInfoResult_Success_DEFAULT
 	}
 	return p.Success
 }
-func (p *PaymentServiceRequestRefundTokenResult) SetSuccess(x interface{}) {
+func (p *PaymentServiceRequestRefundInfoResult) SetSuccess(x interface{}) {
 	p.Success = x.(*RefundTokenResponse)
 }
 
-func (p *PaymentServiceRequestRefundTokenResult) IsSetSuccess() bool {
+func (p *PaymentServiceRequestRefundInfoResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
-func (p *PaymentServiceRequestRefundTokenResult) String() string {
+func (p *PaymentServiceRequestRefundInfoResult) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("PaymentServiceRequestRefundTokenResult(%+v)", *p)
+	return fmt.Sprintf("PaymentServiceRequestRefundInfoResult(%+v)", *p)
 }
 
-func (p *PaymentServiceRequestRefundTokenResult) DeepEqual(ano *PaymentServiceRequestRefundTokenResult) bool {
+func (p *PaymentServiceRequestRefundInfoResult) DeepEqual(ano *PaymentServiceRequestRefundInfoResult) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1233,7 +1176,7 @@ func (p *PaymentServiceRequestRefundTokenResult) DeepEqual(ano *PaymentServiceRe
 	return true
 }
 
-func (p *PaymentServiceRequestRefundTokenResult) Field0DeepEqual(src *RefundTokenResponse) bool {
+func (p *PaymentServiceRequestRefundInfoResult) Field0DeepEqual(src *RefundTokenResponse) bool {
 
 	if !p.Success.DeepEqual(src) {
 		return false
@@ -1241,6 +1184,6 @@ func (p *PaymentServiceRequestRefundTokenResult) Field0DeepEqual(src *RefundToke
 	return true
 }
 
-var fieldIDToName_PaymentServiceRequestRefundTokenResult = map[int16]string{
+var fieldIDToName_PaymentServiceRequestRefundInfoResult = map[int16]string{
 	0: "success",
 }
