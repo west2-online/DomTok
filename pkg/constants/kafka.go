@@ -32,9 +32,18 @@ const (
 
 // Commodity Service
 const (
-	KafkaImageTopic   = "ImageTopic"
-	KafkaPartitionNum = 3
-	KafkaImageGroupId = "ImageGroupId"
+	KafkaImageTopic            = "ImageTopic"
+	KafkaCreateSpuTopic        = "SpuCreateTopic"
+	KafkaUpdateSpuTopic        = "SpuUpdateTopic"
+	KafkaDeleteSpuTopic        = "SpuDeleteTopic"
+	KafkaPartitionNum          = 3
+	KafkaImageGroupId          = "ImageGroupId"
+	KafkaCreateSpuGroupId      = "CreateSpuGroupId"
+	KafkaUpdateSpuGroupId      = "UpdateSpuGroupId"
+	KafkaDeleteSpuGroupId      = "DeleteSpuGroupId"
+	KafkaCommodityCreateSpuNum = 3
+	KafkaCommodityUpdateSpuNum = 3
+	KafkaCommodityDeleteSpuNum = 3
 )
 
 // CartService

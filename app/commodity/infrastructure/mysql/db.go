@@ -37,6 +37,14 @@ func NewCommodityDB(client *gorm.DB) repository.CommodityDB {
 	return &commodityDB{client: client}
 }
 
+func (db *commodityDB) GetSpuByIds(ctx context.Context, spuIds []int64) ([]*model.Spu, error) {
+	spus := make([]*model.Spu, 0)
+	if err := db.client.WithContext(ctx).Table(constants.SpuTableName).Where("id in (?)", spuIds).Find(&spus).Error; err != nil {
+		return nil, errno.Errorf(errno.InternalServiceErrorCode, "CommodityDB.GetSpuByIds failed: %v", err)
+	}
+	return spus, nil
+}
+
 func (db *commodityDB) CreateCategory(ctx context.Context, name string) error {
 	return nil
 }

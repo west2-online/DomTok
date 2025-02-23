@@ -22,11 +22,9 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"strings"
-
 	"github.com/cloudwego/kitex/pkg/streaming"
-
 	"github.com/west2-online/DomTok/kitex_gen/model"
+	"strings"
 )
 
 type CreateCouponReq struct {
@@ -2013,8 +2011,9 @@ var fieldIDToName_ViewSpuReq = map[int16]string{
 }
 
 type ViewSpuResp struct {
-	Base *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
-	Spus []*model.Spu    `thrift:"spus,2,required" frugal:"2,required,list<model.Spu>" json:"spus"`
+	Base  *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+	Spus  []*model.Spu    `thrift:"spus,2,required" frugal:"2,required,list<model.Spu>" json:"spus"`
+	Total int64           `thrift:"total,3,required" frugal:"3,required,i64" json:"total"`
 }
 
 func NewViewSpuResp() *ViewSpuResp {
@@ -2036,11 +2035,18 @@ func (p *ViewSpuResp) GetBase() (v *model.BaseResp) {
 func (p *ViewSpuResp) GetSpus() (v []*model.Spu) {
 	return p.Spus
 }
+
+func (p *ViewSpuResp) GetTotal() (v int64) {
+	return p.Total
+}
 func (p *ViewSpuResp) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
 func (p *ViewSpuResp) SetSpus(val []*model.Spu) {
 	p.Spus = val
+}
+func (p *ViewSpuResp) SetTotal(val int64) {
+	p.Total = val
 }
 
 func (p *ViewSpuResp) IsSetBase() bool {
@@ -2066,6 +2072,9 @@ func (p *ViewSpuResp) DeepEqual(ano *ViewSpuResp) bool {
 	if !p.Field2DeepEqual(ano.Spus) {
 		return false
 	}
+	if !p.Field3DeepEqual(ano.Total) {
+		return false
+	}
 	return true
 }
 
@@ -2089,10 +2098,18 @@ func (p *ViewSpuResp) Field2DeepEqual(src []*model.Spu) bool {
 	}
 	return true
 }
+func (p *ViewSpuResp) Field3DeepEqual(src int64) bool {
+
+	if p.Total != src {
+		return false
+	}
+	return true
+}
 
 var fieldIDToName_ViewSpuResp = map[int16]string{
 	1: "base",
 	2: "spus",
+	3: "total",
 }
 
 type DeleteSpuReq struct {

@@ -19,6 +19,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"github.com/west2-online/DomTok/kitex_gen/commodity"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
@@ -141,4 +142,17 @@ func (us *useCase) DeleteSpuImage(ctx context.Context, imageId int64) error {
 
 func (us *useCase) ViewSpuImages(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error) {
 	return us.svc.GetSpuImages(ctx, spuId, offset, limit)
+}
+
+func (us *useCase) ViewSpus(ctx context.Context, req *commodity.ViewSpuReq) ([]*model.Spu, int64, error) {
+	ids, total, err := us.es.SearchItems(ctx, constants.SpuTableName, req)
+	if err != nil {
+		return nil, 0, fmt.Errorf("usecase.ViewSpus failed: %w", err)
+	}
+
+	res, err := us.db.GetSpuByIds(ctx, ids)
+	if err != nil {
+		return nil, 0, fmt.Errorf("usecase.ViewSpus failed: %w", err)
+	}
+	return res, total, err
 }

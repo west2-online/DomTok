@@ -224,3 +224,15 @@ func ViewSpuImagesRPC(ctx context.Context, req *commodity.ViewSpuImageReq) (*com
 	}
 	return resp, nil
 }
+
+func ViewSpuRPC(ctx context.Context, req *commodity.ViewSpuReq) (*commodity.ViewSpuResp, error) {
+	resp, err := commodityClient.ViewSpu(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.ViewSpuRPC ViewSpu failed, err  %v", err)
+		return nil, errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return resp, nil
+}

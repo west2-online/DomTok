@@ -19,8 +19,10 @@ package service
 import (
 	"context"
 	"fmt"
-
+	"github.com/bytedance/sonic"
+	"github.com/west2-online/DomTok/pkg/logger"
 	"golang.org/x/sync/errgroup"
+	"strconv"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
@@ -51,6 +53,17 @@ func (svc *CommodityService) CreateSpu(ctx context.Context, spu *model.Spu) (int
 		if err := upyun.UploadImg(spu.GoodsHeadDrawing, spu.GoodsHeadDrawingUrl); err != nil {
 			return fmt.Errorf("service.UploadImg: upload image failed: %w", err)
 		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		if err := svc.SendCreateSpuMsg(ctx, spu); err != nil {
+			return fmt.Errorf("service.SendCreateSpuMsg: send msg failed: %w", err)
+		}
+		// TODO: 后续改成mq
+		//if err := svc.es.AddItem(ctx, constants.SpuTableName, spu); err != nil {
+		//	return fmt.Errorf("service.AddItem: create index failed: %w", err)
+		//}
 		return nil
 	})
 
@@ -122,15 +135,27 @@ func (svc *CommodityService) UpdateSpuImage(ctx context.Context, spuImage *model
 }
 
 func (svc *CommodityService) UpdateSpu(ctx context.Context, spu *model.Spu, originSpu *model.Spu) error {
-	err := svc.db.UpdateSpu(ctx, spu)
-	if err != nil {
-		return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
-	}
+	var eg errgroup.Group
+	eg.Go(func() error {
+		err := svc.db.UpdateSpu(ctx, spu)
+		if err != nil {
+			return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		err := svc.es.UpdateItem(ctx, constants.SpuTableName, spu)
+		if err != nil {
+			return fmt.Errorf("service.UpdateSpu: update spu msg failed: %w", err)
+		}
+		return nil
+	})
 
 	if len(spu.GoodsHeadDrawing) > 0 {
-		var eg errgroup.Group
+
 		eg.Go(func() error {
-			err = upyun.UploadImg(spu.GoodsHeadDrawing, spu.GoodsHeadDrawingUrl)
+			err := upyun.UploadImg(spu.GoodsHeadDrawing, spu.GoodsHeadDrawingUrl)
 			if err != nil {
 				return fmt.Errorf("service.UpdateSpu: upload spuImage failed: %w", err)
 			}
@@ -138,14 +163,14 @@ func (svc *CommodityService) UpdateSpu(ctx context.Context, spu *model.Spu, orig
 		})
 
 		eg.Go(func() error {
-			err = upyun.DeleteImg(originSpu.GoodsHeadDrawingUrl)
+			err := upyun.DeleteImg(originSpu.GoodsHeadDrawingUrl)
 			if err != nil {
 				return fmt.Errorf("service.UpdateSpu: delete spuImage failed: %w", err)
 			}
 			return nil
 		})
 
-		if err = eg.Wait(); err != nil {
+		if err := eg.Wait(); err != nil {
 			return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
 		}
 	}
@@ -185,6 +210,20 @@ func (svc *CommodityService) DeleteSpu(ctx context.Context, spuId int64, url str
 	eg.Go(func() error {
 		if err := upyun.DeleteImg(url); err != nil {
 			return fmt.Errorf("service.DeleteSpu: delete spuImage failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		if err := svc.es.RemoveItem(ctx, constants.SpuTableName, spuId); err != nil {
+			return fmt.Errorf("service.DeleteSpu: remove spu failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		if err := svc.SendDeleteSpuMsg(ctx, spuId); err != nil {
+			return fmt.Errorf("service.SendDeleteSpuMsg: send delete spu msg failed: %w", err)
 		}
 		return nil
 	})
@@ -288,4 +327,91 @@ func (svc *CommodityService) GetSpuImages(ctx context.Context, spuId int64, offs
 	}
 	go svc.cache.SetSpuImages(ctx, key, &model.SpuImages{Images: imgs, Total: total})
 	return imgs, total, nil
+}
+
+func (svc *CommodityService) SendCreateSpuMsg(ctx context.Context, spu *model.Spu) error {
+	err := svc.mq.SendCreateSpuInfo(ctx, spu)
+	if err != nil {
+		return fmt.Errorf("service.SendCreateSpuMsg failed: %w", err)
+	}
+	return nil
+}
+
+func (svc *CommodityService) SendUpdateSpuMsg(ctx context.Context, spu *model.Spu) error {
+	err := svc.mq.SendCreateSpuInfo(ctx, spu)
+	if err != nil {
+		return fmt.Errorf("service.SendUpdateSpuMsg failed: %w", err)
+	}
+	return nil
+}
+
+func (svc *CommodityService) SendDeleteSpuMsg(ctx context.Context, id int64) error {
+	err := svc.mq.SendDeleteSpuInfo(ctx, id)
+	if err != nil {
+		return fmt.Errorf("service.SendDeleteSpuMsg failed: %w", err)
+	}
+	return nil
+}
+
+func (svc *CommodityService) ConsumeCreateSpuMsg(ctx context.Context) {
+	msgCh := svc.mq.ConsumeCreateSpuInfo(ctx)
+	go func() {
+		for msg := range msgCh {
+			req := new(model.Spu)
+			err := sonic.Unmarshal(msg.V, req)
+			if err != nil {
+				logger.Errorf("service.ConsumeCreateSpuMsg Unmarshal failed: %v", err)
+			}
+			err = svc.es.AddItem(ctx, constants.SpuTableName, req)
+			if err != nil {
+				logger.Errorf("service.ConsumeCreateSpuMsg add item failed: %v", err)
+			}
+		}
+	}()
+}
+
+func (svc *CommodityService) ConsumeUpdateSpuMsg(ctx context.Context) {
+	msgCh := svc.mq.ConsumeUpdateSpuInfo(ctx)
+	go func() {
+		for msg := range msgCh {
+			req := new(model.Spu)
+			err := sonic.Unmarshal(msg.V, req)
+			if err != nil {
+				logger.Errorf("service.ConsumeUpdateSpuMsg Unmarshal failed: %v", err)
+			}
+			err = svc.es.UpdateItem(ctx, constants.SpuTableName, req)
+			if err != nil {
+				logger.Errorf("service.ConsumeUpdateSpuMsg update item failed: %v", err)
+			}
+		}
+	}()
+}
+
+func (svc *CommodityService) ConsumeDeleteSpuMsg(ctx context.Context) {
+	msgCh := svc.mq.ConsumeDeleteSpuInfo(ctx)
+	go func() {
+		for msg := range msgCh {
+			idStr := string(msg.V)
+			id, err := strconv.ParseInt(idStr, 10, 64)
+			if err != nil {
+				logger.Errorf("CommodityService.ConsumeDeleteSpuMsg: invalid param, %v", errno.ParamVerifyError.WithMessage(err.Error()))
+			}
+
+			err = svc.es.RemoveItem(ctx, constants.SpuTableName, id)
+			if err != nil {
+				logger.Errorf("service.ConsumeDeleteSpuMsg delete item failed: %v", err)
+			}
+		}
+	}()
+}
+
+func (svc *CommodityService) IsSpuMappingExist(ctx context.Context) error {
+	var err error
+	if !svc.es.IsExist(ctx, constants.SpuTableName) {
+		err = svc.es.CreateIndex(ctx, constants.SpuTableName)
+		if err != nil {
+			return fmt.Errorf("service.IsSpuMappingExist CreateIndex failed: %w", err)
+		}
+	}
+	return err
 }

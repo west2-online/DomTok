@@ -19,7 +19,6 @@ package commodityservice
 
 import (
 	server "github.com/cloudwego/kitex/server"
-
 	commodity "github.com/west2-online/DomTok/kitex_gen/commodity"
 )
 

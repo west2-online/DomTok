@@ -223,8 +223,17 @@ func (c CommodityHandler) UpdateSpu(streamServer commodity.CommodityService_Upda
 }
 
 func (c CommodityHandler) ViewSpu(ctx context.Context, req *commodity.ViewSpuReq) (r *commodity.ViewSpuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ViewSpuResp)
+	res, total, err := c.useCase.ViewSpus(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.ViewSpus: view spus error: %v", err)
+		r.Base = base.BuildBaseResp(err)
+		return r, nil
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.Total = total
+	r.Spus = pack.BuildSpus(res)
+	return r, err
 }
 
 func (c CommodityHandler) DeleteSpu(ctx context.Context, req *commodity.DeleteSpuReq) (r *commodity.DeleteSpuResp, err error) {

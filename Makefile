@@ -26,6 +26,9 @@ IDL_PATH = $(DIR)/idl
 OUTPUT_PATH = $(DIR)/output
 API_PATH= $(DIR)/cmd/api
 
+#es
+ES_ANALYSIS = domtok-elasticsearch
+
 # 服务名
 SERVICES := gateway user commodity orders cart payment
 service = $(word 1, $@)
@@ -209,3 +212,9 @@ verify: license vet fmt import lint vulncheck tidy
 .PHONY: license
 license:
 	sh ./hack/add-license.sh
+
+.PHONY: analysis-ik
+analysis-ik:
+	docker exec -it --user root $(ES_ANALYSIS) \
+	bin/elasticsearch-plugin install https://get.infini.cloud/elasticsearch/analysis-ik/8.4.2 && \
+	docker restart $(ES_ANALYSIS)

@@ -20,14 +20,12 @@ package commodityservice
 
 import (
 	"context"
-
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
 	"github.com/cloudwego/kitex/client/callopt/streamcall"
 	"github.com/cloudwego/kitex/client/streamclient"
 	streaming "github.com/cloudwego/kitex/pkg/streaming"
 	transport "github.com/cloudwego/kitex/transport"
-
 	commodity "github.com/west2-online/DomTok/kitex_gen/commodity"
 )
 

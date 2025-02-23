@@ -35,3 +35,22 @@ func BuildImage(img *model.SpuImage) *modelKitex.SpuImage {
 func BuildImages(imgs []*model.SpuImage) []*modelKitex.SpuImage {
 	return base.BuildTypeList(imgs, BuildImage)
 }
+
+func BuildSpu(spu *model.Spu) *modelKitex.Spu {
+	return &modelKitex.Spu{
+		SpuID:            spu.SpuId,
+		Name:             spu.Name,
+		CreatorID:        spu.CreatorId,
+		Description:      spu.Description,
+		GoodsHeadDrawing: spu.GoodsHeadDrawingUrl,
+		Price:            spu.Price,
+		ForSale:          int32(spu.ForSale),
+		Shipping:         spu.Shipping,
+		CreatedAt:        spu.CreatedAt,
+		UpdatedAt:        spu.UpdatedAt,
+	}
+}
+
+func BuildSpus(spus []*model.Spu) []*modelKitex.Spu {
+	return base.BuildTypeList(spus, BuildSpu)
+}
