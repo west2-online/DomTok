@@ -53,7 +53,7 @@ func (t *ToolRepeat) InvokableRun(ctx context.Context, argumentsInJSON string, o
 	if err != nil {
 		return "", err
 	}
-	return args.Message, nil
+	return argumentsInJSON, nil
 }
 
 func (t *ToolRepeat) Info(_ context.Context) (*schema.ToolInfo, error) {
