@@ -84,7 +84,6 @@ func ProcessRefund(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	// TODO 这鬼地方是api. 还是 payment.？
 	resp := new(payment.RefundResponse)
 
 	c.JSON(consts.StatusOK, resp)
