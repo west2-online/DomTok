@@ -44,6 +44,8 @@ const (
 	KafkaCommodityCreateSpuNum = 3
 	KafkaCommodityUpdateSpuNum = 3
 	KafkaCommodityDeleteSpuNum = 3
+
+	KafkaESConsumerChanCap = 10
 )
 
 // CartService

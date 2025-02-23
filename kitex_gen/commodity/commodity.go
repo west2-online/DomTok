@@ -22,9 +22,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/cloudwego/kitex/pkg/streaming"
-	"github.com/west2-online/DomTok/kitex_gen/model"
 	"strings"
+
+	"github.com/cloudwego/kitex/pkg/streaming"
+
+	"github.com/west2-online/DomTok/kitex_gen/model"
 )
 
 type CreateCouponReq struct {

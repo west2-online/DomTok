@@ -18,6 +18,7 @@ package es
 
 import (
 	"github.com/olivere/elastic/v7"
+
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 )
 

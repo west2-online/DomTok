@@ -32,22 +32,11 @@ type Spu struct {
 	GoodsHeadDrawingUrl string
 }
 
+// SpuEs : SpuId 和 Category 不能是int64, 存到es里会有精度损失
 type SpuES struct {
-	SpuId      int64
-	Name       string
-	CategoryId int64
-	Price      float64
-	Shipping   bool
-}
-
-// ConvertIntToBool 将输入的int转换为bool，1为出售true,2为暂不出售false
-func (s *Spu) ConvertIntToBool(input int) bool {
-	return input == 1
-}
-
-func (s *SpuES) ConvertBoolToInt(input bool) int {
-	if input {
-		return 1
-	}
-	return 2
+	SpuId      string  `json:"spu_id,omitempty"`
+	Name       string  `json:"name,omitempty"`
+	CategoryId string  `json:"category_id,omitempty"`
+	Price      float64 `json:"price,omitempty"`
+	Shipping   bool    `json:"shipping,omitempty"`
 }

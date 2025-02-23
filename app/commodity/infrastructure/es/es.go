@@ -19,8 +19,11 @@ package es
 import (
 	"context"
 	"fmt"
+	"strconv"
+
 	"github.com/bytedance/sonic"
 	"github.com/olivere/elastic/v7"
+
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	"github.com/west2-online/DomTok/pkg/constants"
@@ -40,16 +43,16 @@ func (es *CommodityElastic) IsExist(ctx context.Context, indexName string) bool 
 func (es *CommodityElastic) CreateIndex(ctx context.Context, indexName string) error {
 	_, err := es.client.CreateIndex(indexName).BodyString(mapping).Do(ctx)
 	if err != nil {
-		return errno.Errorf(errno.InternalESErrorCode, err.Error())
+		return errno.Errorf(errno.InternalESErrorCode, "CommodityElastic.CreateIndex Error creating index: %v", err)
 	}
 	return nil
 }
 
 func (es *CommodityElastic) AddItem(ctx context.Context, indexName string, spu *model.Spu) error {
 	spuEs := &model.SpuES{
-		SpuId:      spu.SpuId,
+		SpuId:      strconv.FormatInt(spu.SpuId, 10),
 		Name:       spu.Name,
-		CategoryId: spu.CategoryId,
+		CategoryId: strconv.FormatInt(spu.CategoryId, 10),
 		Price:      spu.Price,
 		Shipping:   spu.Shipping > 0,
 	}
@@ -58,7 +61,7 @@ func (es *CommodityElastic) AddItem(ctx context.Context, indexName string, spu *
 		Id(fmt.Sprintf("%d", spu.SpuId)).
 		BodyJson(spuEs).Do(ctx)
 	if err != nil {
-		return errno.Errorf(errno.InternalESErrorCode, err.Error())
+		return errno.Errorf(errno.InternalESErrorCode, "CommodityElastic.AddItem Error adding item: %v", err)
 	}
 
 	return nil
@@ -67,7 +70,7 @@ func (es *CommodityElastic) AddItem(ctx context.Context, indexName string, spu *
 func (es *CommodityElastic) RemoveItem(ctx context.Context, indexName string, id int64) error {
 	_, err := es.client.Delete().Index(indexName).Id(fmt.Sprintf("%d", id)).Do(ctx)
 	if err != nil {
-		return errno.Errorf(errno.InternalESErrorCode, err.Error())
+		return errno.Errorf(errno.InternalESErrorCode, "CommodityElastic.RemoveItem failed: %v", err)
 	}
 
 	return nil
@@ -82,9 +85,9 @@ func structToMapUsingJSON(obj interface{}) map[string]interface{} {
 
 func (es *CommodityElastic) UpdateItem(ctx context.Context, indexName string, spu *model.Spu) error {
 	spuEs := &model.SpuES{
-		SpuId:      spu.SpuId,
+		SpuId:      strconv.FormatInt(spu.SpuId, 10),
 		Name:       spu.Name,
-		CategoryId: spu.CategoryId,
+		CategoryId: strconv.FormatInt(spu.CategoryId, 10),
 		Price:      spu.Price,
 		Shipping:   spu.Shipping > 0,
 	}
@@ -92,7 +95,7 @@ func (es *CommodityElastic) UpdateItem(ctx context.Context, indexName string, sp
 		Id(fmt.Sprintf("%d", spu.SpuId)).Doc(structToMapUsingJSON(spuEs)).
 		Do(ctx)
 	if err != nil {
-		return errno.Errorf(errno.InternalESErrorCode, err.Error())
+		return errno.Errorf(errno.InternalESErrorCode, "CommodityElastic.UpdateItem failed: %v", err)
 	}
 
 	return nil
@@ -108,7 +111,7 @@ func (es *CommodityElastic) SearchItems(ctx context.Context, indexName string, q
 		From(pageNum * pageSize).Size(pageSize).
 		Do(ctx)
 	if err != nil {
-		return nil, 0, errno.Errorf(errno.InternalESErrorCode, err.Error())
+		return nil, 0, errno.Errorf(errno.InternalESErrorCode, "CommodityElastic.SearchItems failed: %v", err)
 	}
 
 	rets := make([]int64, 0)
@@ -116,14 +119,18 @@ func (es *CommodityElastic) SearchItems(ctx context.Context, indexName string, q
 		var spuEs model.SpuES
 		data, err := hit.Source.MarshalJSON()
 		if err != nil {
-			return nil, 0, errno.Errorf(errno.InternalServiceErrorCode, err.Error())
+			return nil, 0, errno.Errorf(errno.InternalServiceErrorCode, "CommodityElastic.SearchItems failed: %v", err)
 		}
 		err = sonic.Unmarshal(data, &spuEs)
 		if err != nil {
-			return nil, 0, errno.Errorf(errno.InternalServiceErrorCode, err.Error())
+			return nil, 0, errno.Errorf(errno.InternalServiceErrorCode, "CommodityElastic.SearchItems failed: %v", err)
+		}
+		id, err := strconv.ParseInt(spuEs.SpuId, 10, 64)
+		if err != nil {
+			return nil, 0, errno.Errorf(errno.InternalServiceErrorCode, "CommodityElastic.SearchItems failed: %v", err)
 		}
 		spu := &model.Spu{
-			SpuId: spuEs.SpuId,
+			SpuId: id,
 		}
 		rets = append(rets, spu.SpuId)
 	}
@@ -135,24 +142,24 @@ func (es *CommodityElastic) BuildQuery(req *commodity.ViewSpuReq) *elastic.BoolQ
 	hasCondition := false
 	// 处理关键词
 	if req.KeyWord != nil && req.GetKeyWord() != "" {
-		query = query.Must(elastic.NewMatchQuery("Name", req.GetKeyWord()))
+		query = query.Must(elastic.NewMatchQuery("name", req.GetKeyWord()))
 		hasCondition = true
 	}
 
-	//处理分类 ID
+	// 处理分类 ID
 	if req.CategoryID != nil && req.GetCategoryID() != 0 {
-		query = query.Must(elastic.NewMatchQuery("CateGoryId", req.GetCategoryID()))
+		query = query.Must(elastic.NewMatchQuery("category_id", req.GetCategoryID()))
 		hasCondition = true
 	}
 
 	// 处理 Spu ID
 	if req.SpuID != nil && req.GetSpuID() != 0 {
-		query = query.Must(elastic.NewMatchQuery("SpuId", req.GetSpuID()))
+		query = query.Must(elastic.NewMatchQuery("spu_id", req.GetSpuID()))
 		hasCondition = true
 	}
 	if req.MinCost != nil || req.MaxCost != nil {
 		// 价格范围查询
-		rangeQuery := elastic.NewRangeQuery("Price")
+		rangeQuery := elastic.NewRangeQuery("price")
 		minCost := constants.CommodityDefaultMinCost
 		maxCost := constants.CommodityDefaultMaxCost
 
@@ -165,7 +172,6 @@ func (es *CommodityElastic) BuildQuery(req *commodity.ViewSpuReq) *elastic.BoolQ
 			hasCondition = true
 		}
 
-		// 确保 minCost <= maxCost，避免查询无效
 		if minCost > maxCost {
 			minCost, maxCost = maxCost, minCost
 		}
@@ -174,7 +180,7 @@ func (es *CommodityElastic) BuildQuery(req *commodity.ViewSpuReq) *elastic.BoolQ
 	}
 
 	if req.IsShipping != nil {
-		query = query.Must(elastic.NewMatchQuery("Shipping", req.IsShipping))
+		query = query.Must(elastic.NewMatchQuery("shipping", req.IsShipping))
 	}
 
 	if !hasCondition {

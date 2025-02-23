@@ -19,9 +19,9 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"github.com/west2-online/DomTok/kitex_gen/commodity"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/utils"

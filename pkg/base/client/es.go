@@ -20,10 +20,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/olivere/elastic/v7"
 
 	"github.com/elastic/go-elasticsearch"
 	"github.com/elastic/go-elasticsearch/esapi"
+	"github.com/olivere/elastic/v7"
 
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/pkg/errno"
@@ -55,10 +55,9 @@ func NewEsCommodityClient() (*elastic.Client, error) {
 		return nil, errors.New("elasticsearch config is nil")
 	}
 	esConn := fmt.Sprintf("http://%s", config.Elasticsearch.Addr)
-	cfg := elastic.ClientOptionFunc(
+	client, err := elastic.NewClient(
 		elastic.SetURL(esConn),
 	)
-	client, err := elastic.NewClient(cfg)
 	if err != nil {
 		return nil, errno.NewErrNo(errno.InternalESErrorCode, fmt.Sprintf("es clint failed,error: %v", err))
 	}

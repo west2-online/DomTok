@@ -18,6 +18,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
@@ -31,7 +32,9 @@ type CommodityService struct {
 	// TODO
 }
 
-func NewCommodityService(db repository.CommodityDB, sf *utils.Snowflake, cache repository.CommodityCache, mq repository.CommodityMQ, es repository.CommodityElastic) *CommodityService {
+func NewCommodityService(db repository.CommodityDB, sf *utils.Snowflake, cache repository.CommodityCache,
+	mq repository.CommodityMQ, es repository.CommodityElastic,
+) *CommodityService {
 	if db == nil {
 		panic("commodityService's db should not be nil")
 	}

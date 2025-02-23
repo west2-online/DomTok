@@ -38,11 +38,28 @@ func NewCommodityDB(client *gorm.DB) repository.CommodityDB {
 }
 
 func (db *commodityDB) GetSpuByIds(ctx context.Context, spuIds []int64) ([]*model.Spu, error) {
-	spus := make([]*model.Spu, 0)
+	spus := make([]*Spu, 0)
 	if err := db.client.WithContext(ctx).Table(constants.SpuTableName).Where("id in (?)", spuIds).Find(&spus).Error; err != nil {
 		return nil, errno.Errorf(errno.InternalServiceErrorCode, "CommodityDB.GetSpuByIds failed: %v", err)
 	}
-	return spus, nil
+	rets := make([]*model.Spu, 0)
+	for _, spu := range spus {
+		ret := &model.Spu{
+			SpuId:               spu.Id,
+			Name:                spu.Name,
+			CreatorId:           spu.CreatorId,
+			Description:         spu.Description,
+			CategoryId:          spu.CategoryId,
+			Price:               spu.Price,
+			ForSale:             spu.ForSale,
+			Shipping:            spu.Shipping,
+			CreatedAt:           spu.CreatedAt.Unix(),
+			UpdatedAt:           spu.UpdatedAt.Unix(),
+			GoodsHeadDrawingUrl: spu.GoodsHeadDrawing,
+		}
+		rets = append(rets, ret)
+	}
+	return rets, nil
 }
 
 func (db *commodityDB) CreateCategory(ctx context.Context, name string) error {

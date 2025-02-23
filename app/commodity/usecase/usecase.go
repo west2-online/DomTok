@@ -18,11 +18,11 @@ package usecase
 
 import (
 	"context"
-	"github.com/west2-online/DomTok/kitex_gen/commodity"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 	"github.com/west2-online/DomTok/app/commodity/domain/service"
+	"github.com/west2-online/DomTok/kitex_gen/commodity"
 )
 
 type CommodityUseCase interface {
@@ -45,7 +45,9 @@ type useCase struct {
 	es    repository.CommodityElastic
 }
 
-func NewCommodityCase(db repository.CommodityDB, svc *service.CommodityService, cache repository.CommodityCache, mq repository.CommodityMQ, es repository.CommodityElastic) *useCase {
+func NewCommodityCase(db repository.CommodityDB, svc *service.CommodityService, cache repository.CommodityCache,
+	mq repository.CommodityMQ, es repository.CommodityElastic,
+) *useCase {
 	return &useCase{
 		db:    db,
 		svc:   svc,
