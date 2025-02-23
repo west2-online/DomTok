@@ -42,7 +42,7 @@ func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64)
 	paymentOrder := &model.PaymentOrder{
 		ID:      paymentID,
 		OrderID: orderID,
-		Status:  paymentStatus.PaymentStatusPending, // 设定初始状态
+		Status:  paymentStatus.PaymentStatusPendingCode, // 设定初始状态
 	}
 
 	// 3. 存入数据库
@@ -157,7 +157,7 @@ func (svc *PaymentService) CreateRefundInfo(ctx context.Context, orderID int64) 
 	refundOrder := &model.PaymentRefund{
 		ID:      refundID,
 		OrderID: orderID,
-		Status:  paymentStatus.RefundStatusPending, // 设定初始状态
+		Status:  paymentStatus.RefundStatusPendingCode, // 设定初始状态
 	}
 
 	// 3. 存入数据库

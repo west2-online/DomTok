@@ -43,17 +43,31 @@ const (
 )
 
 const (
-	PaymentStatusPending    = iota // 待支付
-	PaymentStatusProcessing        // 处理中
-	PaymentStatusSuccess           // 成功支付
-	PaymentStatusFailed            // 支付失败
+	PaymentStatusPendingCode    = iota // 待支付
+	PaymentStatusProcessingCode        // 处理中
+	PaymentStatusSuccessCode           // 成功支付
+	PaymentStatusFailedCode            // 支付失败
 )
 
 const (
-	RefundStatusPending = iota
-	RefundStatusProcessing
-	RefundStatusSuccess
-	RefundStatusFailed
+	PaymentStatusPending    = "待支付"  // 待支付
+	PaymentStatusProcessing = "处理中"  // 处理中
+	PaymentStatusSuccess    = "成功支付" // 成功支付
+	PaymentStatusFailed     = "支付失败" // 支付失败
+)
+
+const (
+	RefundStatusPendingCode = iota
+	RefundStatusProcessingCode
+	RefundStatusSuccessCode
+	RefundStatusFailedCode
+)
+
+const (
+	RefundStatusPending    = "待退款"
+	RefundStatusProcessing = "退款中"
+	RefundStatusSuccess    = "成功退款"
+	RefundStatusFailed     = "退款失败"
 )
 
 // TODO 最后要删除这个东西
