@@ -41,6 +41,7 @@ var (
 	Kafka         *kafka
 	Volcengine    *volcengine
 	Upyun         *upyun
+	Rocketmq      *rocketmq
 	runtimeViper  = viper.New()
 )
 
@@ -103,6 +104,7 @@ func configMapping(srv string) {
 	DefaultUser = &c.DefaultUser
 	Volcengine = &c.Volcengine
 	Upyun = &c.Upyun
+	Rocketmq = &c.Rocketmq
 	Service = getService(srv)
 }
 
