@@ -75,8 +75,9 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - ../config/elasticsearch:/usr/share/elasticsearch/config
+      - ../config/elasticsearch/config:/usr/share/elasticsearch/config
       - ./data/elasticsearch:/usr/share/elasticsearch/data
+      - ../config/elasticsearch/plugins:/usr/share/elasticsearch/plugins
     ports:
       - "9200:9200"
     restart: always

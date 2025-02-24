@@ -213,8 +213,3 @@ verify: license vet fmt import lint vulncheck tidy
 license:
 	sh ./hack/add-license.sh
 
-.PHONY: analysis-ik
-analysis-ik:
-	docker exec -it --user root $(ES_ANALYSIS) \
-	bin/elasticsearch-plugin install https://get.infini.cloud/elasticsearch/analysis-ik/8.4.2 && \
-	docker restart $(ES_ANALYSIS)

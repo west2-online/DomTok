@@ -97,7 +97,7 @@ func (c CommodityHandler) DeleteSpuImage(ctx context.Context, req *commodity.Del
 	err = c.useCase.DeleteSpuImage(ctx, req.GetSpuImageID())
 	if err != nil {
 		resp.Base = base.BuildBaseResp(err)
-		return resp, nil
+		return resp, err
 	}
 
 	resp.Base = base.BuildBaseResp(nil)
@@ -213,7 +213,7 @@ func (c CommodityHandler) ViewSpu(ctx context.Context, req *commodity.ViewSpuReq
 	res, total, err := c.useCase.ViewSpus(ctx, req)
 	if err != nil {
 		r.Base = base.BuildBaseResp(err)
-		return r, nil
+		return r, err
 	}
 	r.Base = base.BuildBaseResp(nil)
 	r.Total = total
@@ -226,7 +226,7 @@ func (c CommodityHandler) DeleteSpu(ctx context.Context, req *commodity.DeleteSp
 	err = c.useCase.DeleteSpu(ctx, req.GetSpuID())
 	if err != nil {
 		r.Base = base.BuildBaseResp(err)
-		return r, nil
+		return r, err
 	}
 	r.Base = base.BuildBaseResp(nil)
 	return r, nil
@@ -238,7 +238,7 @@ func (c CommodityHandler) ViewSpuImage(ctx context.Context, req *commodity.ViewS
 	imgs, total, err := c.useCase.ViewSpuImages(ctx, req.GetSpuID(), int(offset), int(req.GetPageSize()))
 	if err != nil {
 		r.Base = base.BuildBaseResp(err)
-		return r, nil
+		return r, err
 	}
 
 	r.Base = base.BuildBaseResp(nil)
