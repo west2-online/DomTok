@@ -303,23 +303,58 @@ func (c CommodityHandler) DescSkuStock(ctx context.Context, req *commodity.DescS
 }
 
 func (c CommodityHandler) CreateCategory(ctx context.Context, req *commodity.CreateCategoryReq) (r *commodity.CreateCategoryResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.CreateCategoryResp)
+	category := model.Category{
+		Name: req.Name,
+	}
+	id, err := c.useCase.CreateCategory(ctx, &category)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.CategoryID = id
+	return
 }
 
 func (c CommodityHandler) DeleteCategory(ctx context.Context, req *commodity.DeleteCategoryReq) (r *commodity.DeleteCategoryResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.DeleteCategoryResp)
+	category := model.Category{
+		Id: req.CategoryID,
+	}
+	err = c.useCase.DeleteCategory(ctx, &category)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return
 }
 
 func (c CommodityHandler) ViewCategory(ctx context.Context, req *commodity.ViewCategoryReq) (r *commodity.ViewCategoryResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ViewCategoryResp)
+	r.CategoryInfo, err = c.useCase.ViewCategory(ctx, int(req.PageNum), int(req.PageSize))
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return
 }
 
 func (c CommodityHandler) UpdateCategory(ctx context.Context, req *commodity.UpdateCategoryReq) (r *commodity.UpdateCategoryResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.UpdateCategoryResp)
+	category := model.Category{
+		Id:   req.CategoryID,
+		Name: req.Name,
+	}
+	err = c.useCase.UpdateCategory(ctx, &category)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return
 }
 
 func NewCommodityHandler(useCase usecase.CommodityUseCase) *CommodityHandler {
