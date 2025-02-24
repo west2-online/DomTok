@@ -283,6 +283,7 @@ func (p *RegisterRequest) String() string {
 }
 
 type RegisterResponse struct {
+	UID int64 `thrift:"uid,1,required" form:"uid,required" json:"uid,required" query:"uid,required"`
 }
 
 func NewRegisterResponse() *RegisterResponse {
@@ -292,119 +293,19 @@ func NewRegisterResponse() *RegisterResponse {
 func (p *RegisterResponse) InitDefault() {
 }
 
-var fieldIDToName_RegisterResponse = map[int16]string{}
+func (p *RegisterResponse) GetUID() (v int64) {
+	return p.UID
+}
+
+var fieldIDToName_RegisterResponse = map[int16]string{
+	1: "uid",
+}
 
 func (p *RegisterResponse) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-
-	if _, err = iprot.ReadStructBegin(); err != nil {
-		goto ReadStructBeginError
-	}
-
-	for {
-		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
-		if err != nil {
-			goto ReadFieldBeginError
-		}
-		if fieldTypeId == thrift.STOP {
-			break
-		}
-		if err = iprot.Skip(fieldTypeId); err != nil {
-			goto SkipFieldTypeError
-		}
-		if err = iprot.ReadFieldEnd(); err != nil {
-			goto ReadFieldEndError
-		}
-	}
-	if err = iprot.ReadStructEnd(); err != nil {
-		goto ReadStructEndError
-	}
-
-	return nil
-ReadStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
-ReadFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-SkipFieldTypeError:
-	return thrift.PrependError(fmt.Sprintf("%T skip field type %d error", p, fieldTypeId), err)
-
-ReadFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
-ReadStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-}
-
-func (p *RegisterResponse) Write(oprot thrift.TProtocol) (err error) {
-
-	if err = oprot.WriteStructBegin("RegisterResponse"); err != nil {
-		goto WriteStructBeginError
-	}
-	if p != nil {
-	}
-	if err = oprot.WriteFieldStop(); err != nil {
-		goto WriteFieldStopError
-	}
-	if err = oprot.WriteStructEnd(); err != nil {
-		goto WriteStructEndError
-	}
-	return nil
-WriteStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
-WriteFieldStopError:
-	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
-WriteStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
-}
-
-func (p *RegisterResponse) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("RegisterResponse(%+v)", *p)
-
-}
-
-// cart
-type AddGoodsIntoCartRequest struct {
-	SkuId  int64 `thrift:"skuId,1,required" form:"skuId,required" json:"skuId,required" query:"skuId,required"`
-	ShopID int64 `thrift:"shop_id,2,required" form:"shop_id,required" json:"shop_id,required" query:"shop_id,required"`
-	Count  int64 `thrift:"count,3,required" form:"count,required" json:"count,required" query:"count,required"`
-}
-
-func NewAddGoodsIntoCartRequest() *AddGoodsIntoCartRequest {
-	return &AddGoodsIntoCartRequest{}
-}
-
-func (p *AddGoodsIntoCartRequest) InitDefault() {
-}
-
-func (p *AddGoodsIntoCartRequest) GetSkuId() (v int64) {
-	return p.SkuId
-}
-
-func (p *AddGoodsIntoCartRequest) GetShopID() (v int64) {
-	return p.ShopID
-}
-
-func (p *AddGoodsIntoCartRequest) GetCount() (v int64) {
-	return p.Count
-}
-
-var fieldIDToName_AddGoodsIntoCartRequest = map[int16]string{
-	1: "skuId",
-	2: "shop_id",
-	3: "count",
-}
-
-func (p *AddGoodsIntoCartRequest) Read(iprot thrift.TProtocol) (err error) {
-
-	var fieldTypeId thrift.TType
-	var fieldId int16
-	var issetSkuId bool = false
-	var issetShopID bool = false
-	var issetCount bool = false
+	var issetUID bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -425,25 +326,7 @@ func (p *AddGoodsIntoCartRequest) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetSkuId = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 2:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetShopID = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 3:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField3(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetCount = true
+				issetUID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -460,18 +343,8 @@ func (p *AddGoodsIntoCartRequest) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetSkuId {
+	if !issetUID {
 		fieldId = 1
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetShopID {
-		fieldId = 2
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetCount {
-		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -480,7 +353,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AddGoodsIntoCartRequest[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RegisterResponse[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -489,10 +362,10 @@ ReadFieldEndError:
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 RequiredFieldNotSetError:
-	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_AddGoodsIntoCartRequest[fieldId]))
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_RegisterResponse[fieldId]))
 }
 
-func (p *AddGoodsIntoCartRequest) ReadField1(iprot thrift.TProtocol) error {
+func (p *RegisterResponse) ReadField1(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -500,49 +373,19 @@ func (p *AddGoodsIntoCartRequest) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.SkuId = _field
-	return nil
-}
-func (p *AddGoodsIntoCartRequest) ReadField2(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.ShopID = _field
-	return nil
-}
-func (p *AddGoodsIntoCartRequest) ReadField3(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.Count = _field
+	p.UID = _field
 	return nil
 }
 
-func (p *AddGoodsIntoCartRequest) Write(oprot thrift.TProtocol) (err error) {
+func (p *RegisterResponse) Write(oprot thrift.TProtocol) (err error) {
 
 	var fieldId int16
-	if err = oprot.WriteStructBegin("AddGoodsIntoCartRequest"); err != nil {
+	if err = oprot.WriteStructBegin("RegisterResponse"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
-			goto WriteFieldError
-		}
-		if err = p.writeField2(oprot); err != nil {
-			fieldId = 2
-			goto WriteFieldError
-		}
-		if err = p.writeField3(oprot); err != nil {
-			fieldId = 3
 			goto WriteFieldError
 		}
 	}
@@ -563,11 +406,11 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *AddGoodsIntoCartRequest) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("skuId", thrift.I64, 1); err != nil {
+func (p *RegisterResponse) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("uid", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.SkuId); err != nil {
+	if err := oprot.WriteI64(p.UID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -580,11 +423,196 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *AddGoodsIntoCartRequest) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("shop_id", thrift.I64, 2); err != nil {
+func (p *RegisterResponse) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("RegisterResponse(%+v)", *p)
+
+}
+
+type LoginRequest struct {
+	Name     string `thrift:"name,1,required" form:"name,required" json:"name,required" query:"name,required"`
+	Password string `thrift:"password,2,required" form:"password,required" json:"password,required" query:"password,required"`
+}
+
+func NewLoginRequest() *LoginRequest {
+	return &LoginRequest{}
+}
+
+func (p *LoginRequest) InitDefault() {
+}
+
+func (p *LoginRequest) GetName() (v string) {
+	return p.Name
+}
+
+func (p *LoginRequest) GetPassword() (v string) {
+	return p.Password
+}
+
+var fieldIDToName_LoginRequest = map[int16]string{
+	1: "name",
+	2: "password",
+}
+
+func (p *LoginRequest) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetName bool = false
+	var issetPassword bool = false
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetName = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 2:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetPassword = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	if !issetName {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetPassword {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_LoginRequest[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_LoginRequest[fieldId]))
+}
+
+func (p *LoginRequest) ReadField1(iprot thrift.TProtocol) error {
+
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Name = _field
+	return nil
+}
+func (p *LoginRequest) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Password = _field
+	return nil
+}
+
+func (p *LoginRequest) Write(oprot thrift.TProtocol) (err error) {
+
+	var fieldId int16
+	if err = oprot.WriteStructBegin("LoginRequest"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *LoginRequest) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("name", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ShopID); err != nil {
+	if err := oprot.WriteString(p.Name); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *LoginRequest) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("password", thrift.STRING, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.Password); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -597,64 +625,46 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
-func (p *AddGoodsIntoCartRequest) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("count", thrift.I64, 3); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI64(p.Count); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
-}
-
-func (p *AddGoodsIntoCartRequest) String() string {
+func (p *LoginRequest) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AddGoodsIntoCartRequest(%+v)", *p)
+	return fmt.Sprintf("LoginRequest(%+v)", *p)
 
 }
 
-type AddGoodsIntoCartResponse struct {
-	Base *model.BaseResp `thrift:"base,1,required" form:"base,required" json:"base,required" query:"base,required"`
+type LoginResponse struct {
+	User *model.UserInfo `thrift:"user,2" form:"user" json:"user" query:"user"`
 }
 
-func NewAddGoodsIntoCartResponse() *AddGoodsIntoCartResponse {
-	return &AddGoodsIntoCartResponse{}
+func NewLoginResponse() *LoginResponse {
+	return &LoginResponse{}
 }
 
-func (p *AddGoodsIntoCartResponse) InitDefault() {
+func (p *LoginResponse) InitDefault() {
 }
 
-var AddGoodsIntoCartResponse_Base_DEFAULT *model.BaseResp
+var LoginResponse_User_DEFAULT *model.UserInfo
 
-func (p *AddGoodsIntoCartResponse) GetBase() (v *model.BaseResp) {
-	if !p.IsSetBase() {
-		return AddGoodsIntoCartResponse_Base_DEFAULT
+func (p *LoginResponse) GetUser() (v *model.UserInfo) {
+	if !p.IsSetUser() {
+		return LoginResponse_User_DEFAULT
 	}
-	return p.Base
+	return p.User
 }
 
-var fieldIDToName_AddGoodsIntoCartResponse = map[int16]string{
-	1: "base",
+var fieldIDToName_LoginResponse = map[int16]string{
+	2: "user",
 }
 
-func (p *AddGoodsIntoCartResponse) IsSetBase() bool {
-	return p.Base != nil
+func (p *LoginResponse) IsSetUser() bool {
+	return p.User != nil
 }
 
-func (p *AddGoodsIntoCartResponse) Read(iprot thrift.TProtocol) (err error) {
+func (p *LoginResponse) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetBase bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -670,12 +680,11 @@ func (p *AddGoodsIntoCartResponse) Read(iprot thrift.TProtocol) (err error) {
 		}
 
 		switch fieldId {
-		case 1:
+		case 2:
 			if fieldTypeId == thrift.STRUCT {
-				if err = p.ReadField1(iprot); err != nil {
+				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetBase = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -692,17 +701,13 @@ func (p *AddGoodsIntoCartResponse) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetBase {
-		fieldId = 1
-		goto RequiredFieldNotSetError
-	}
 	return nil
 ReadStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AddGoodsIntoCartResponse[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_LoginResponse[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -710,28 +715,26 @@ ReadFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-RequiredFieldNotSetError:
-	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_AddGoodsIntoCartResponse[fieldId]))
 }
 
-func (p *AddGoodsIntoCartResponse) ReadField1(iprot thrift.TProtocol) error {
-	_field := model.NewBaseResp()
+func (p *LoginResponse) ReadField2(iprot thrift.TProtocol) error {
+	_field := model.NewUserInfo()
 	if err := _field.Read(iprot); err != nil {
 		return err
 	}
-	p.Base = _field
+	p.User = _field
 	return nil
 }
 
-func (p *AddGoodsIntoCartResponse) Write(oprot thrift.TProtocol) (err error) {
+func (p *LoginResponse) Write(oprot thrift.TProtocol) (err error) {
 
 	var fieldId int16
-	if err = oprot.WriteStructBegin("AddGoodsIntoCartResponse"); err != nil {
+	if err = oprot.WriteStructBegin("LoginResponse"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
-		if err = p.writeField1(oprot); err != nil {
-			fieldId = 1
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 	}
@@ -752,11 +755,11 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *AddGoodsIntoCartResponse) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("base", thrift.STRUCT, 1); err != nil {
+func (p *LoginResponse) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("user", thrift.STRUCT, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := p.Base.Write(oprot); err != nil {
+	if err := p.User.Write(oprot); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -764,21 +767,23 @@ func (p *AddGoodsIntoCartResponse) writeField1(oprot thrift.TProtocol) (err erro
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
-func (p *AddGoodsIntoCartResponse) String() string {
+func (p *LoginResponse) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AddGoodsIntoCartResponse(%+v)", *p)
+	return fmt.Sprintf("LoginResponse(%+v)", *p)
 
 }
 
 type UserService interface {
 	Register(ctx context.Context, req *RegisterRequest) (r *RegisterResponse, err error)
+
+	Login(ctx context.Context, req *LoginRequest) (r *LoginResponse, err error)
 }
 
 type UserServiceClient struct {
@@ -816,42 +821,11 @@ func (p *UserServiceClient) Register(ctx context.Context, req *RegisterRequest) 
 	}
 	return _result.GetSuccess(), nil
 }
-
-type CartService interface {
-	AddGoodsIntoCart(ctx context.Context, req *AddGoodsIntoCartRequest) (r *AddGoodsIntoCartResponse, err error)
-}
-
-type CartServiceClient struct {
-	c thrift.TClient
-}
-
-func NewCartServiceClientFactory(t thrift.TTransport, f thrift.TProtocolFactory) *CartServiceClient {
-	return &CartServiceClient{
-		c: thrift.NewTStandardClient(f.GetProtocol(t), f.GetProtocol(t)),
-	}
-}
-
-func NewCartServiceClientProtocol(t thrift.TTransport, iprot thrift.TProtocol, oprot thrift.TProtocol) *CartServiceClient {
-	return &CartServiceClient{
-		c: thrift.NewTStandardClient(iprot, oprot),
-	}
-}
-
-func NewCartServiceClient(c thrift.TClient) *CartServiceClient {
-	return &CartServiceClient{
-		c: c,
-	}
-}
-
-func (p *CartServiceClient) Client_() thrift.TClient {
-	return p.c
-}
-
-func (p *CartServiceClient) AddGoodsIntoCart(ctx context.Context, req *AddGoodsIntoCartRequest) (r *AddGoodsIntoCartResponse, err error) {
-	var _args CartServiceAddGoodsIntoCartArgs
+func (p *UserServiceClient) Login(ctx context.Context, req *LoginRequest) (r *LoginResponse, err error) {
+	var _args UserServiceLoginArgs
 	_args.Req = req
-	var _result CartServiceAddGoodsIntoCartResult
-	if err = p.Client_().Call(ctx, "AddGoodsIntoCart", &_args, &_result); err != nil {
+	var _result UserServiceLoginResult
+	if err = p.Client_().Call(ctx, "Login", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -878,6 +852,7 @@ func (p *UserServiceProcessor) ProcessorMap() map[string]thrift.TProcessorFuncti
 func NewUserServiceProcessor(handler UserService) *UserServiceProcessor {
 	self := &UserServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
 	self.AddToProcessorMap("Register", &userServiceProcessorRegister{handler: handler})
+	self.AddToProcessorMap("Login", &userServiceProcessorLogin{handler: handler})
 	return self
 }
 func (p *UserServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -929,6 +904,54 @@ func (p *userServiceProcessorRegister) Process(ctx context.Context, seqId int32,
 		result.Success = retval
 	}
 	if err2 = oprot.WriteMessageBegin("Register", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type userServiceProcessorLogin struct {
+	handler UserService
+}
+
+func (p *userServiceProcessorLogin) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := UserServiceLoginArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("Login", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	var err2 error
+	result := UserServiceLoginResult{}
+	var retval *LoginResponse
+	if retval, err2 = p.handler.Login(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing Login: "+err2.Error())
+		oprot.WriteMessageBegin("Login", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("Login", thrift.REPLY, seqId); err2 != nil {
 		err = err2
 	}
 	if err2 = result.Write(oprot); err == nil && err2 != nil {
@@ -1242,124 +1265,35 @@ func (p *UserServiceRegisterResult) String() string {
 
 }
 
-type CartServiceProcessor struct {
-	processorMap map[string]thrift.TProcessorFunction
-	handler      CartService
+type UserServiceLoginArgs struct {
+	Req *LoginRequest `thrift:"req,1"`
 }
 
-func (p *CartServiceProcessor) AddToProcessorMap(key string, processor thrift.TProcessorFunction) {
-	p.processorMap[key] = processor
+func NewUserServiceLoginArgs() *UserServiceLoginArgs {
+	return &UserServiceLoginArgs{}
 }
 
-func (p *CartServiceProcessor) GetProcessorFunction(key string) (processor thrift.TProcessorFunction, ok bool) {
-	processor, ok = p.processorMap[key]
-	return processor, ok
+func (p *UserServiceLoginArgs) InitDefault() {
 }
 
-func (p *CartServiceProcessor) ProcessorMap() map[string]thrift.TProcessorFunction {
-	return p.processorMap
-}
+var UserServiceLoginArgs_Req_DEFAULT *LoginRequest
 
-func NewCartServiceProcessor(handler CartService) *CartServiceProcessor {
-	self := &CartServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
-	self.AddToProcessorMap("AddGoodsIntoCart", &cartServiceProcessorAddGoodsIntoCart{handler: handler})
-	return self
-}
-func (p *CartServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-	name, _, seqId, err := iprot.ReadMessageBegin()
-	if err != nil {
-		return false, err
-	}
-	if processor, ok := p.GetProcessorFunction(name); ok {
-		return processor.Process(ctx, seqId, iprot, oprot)
-	}
-	iprot.Skip(thrift.STRUCT)
-	iprot.ReadMessageEnd()
-	x := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function "+name)
-	oprot.WriteMessageBegin(name, thrift.EXCEPTION, seqId)
-	x.Write(oprot)
-	oprot.WriteMessageEnd()
-	oprot.Flush(ctx)
-	return false, x
-}
-
-type cartServiceProcessorAddGoodsIntoCart struct {
-	handler CartService
-}
-
-func (p *cartServiceProcessorAddGoodsIntoCart) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-	args := CartServiceAddGoodsIntoCartArgs{}
-	if err = args.Read(iprot); err != nil {
-		iprot.ReadMessageEnd()
-		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
-		oprot.WriteMessageBegin("AddGoodsIntoCart", thrift.EXCEPTION, seqId)
-		x.Write(oprot)
-		oprot.WriteMessageEnd()
-		oprot.Flush(ctx)
-		return false, err
-	}
-
-	iprot.ReadMessageEnd()
-	var err2 error
-	result := CartServiceAddGoodsIntoCartResult{}
-	var retval *AddGoodsIntoCartResponse
-	if retval, err2 = p.handler.AddGoodsIntoCart(ctx, args.Req); err2 != nil {
-		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing AddGoodsIntoCart: "+err2.Error())
-		oprot.WriteMessageBegin("AddGoodsIntoCart", thrift.EXCEPTION, seqId)
-		x.Write(oprot)
-		oprot.WriteMessageEnd()
-		oprot.Flush(ctx)
-		return true, err2
-	} else {
-		result.Success = retval
-	}
-	if err2 = oprot.WriteMessageBegin("AddGoodsIntoCart", thrift.REPLY, seqId); err2 != nil {
-		err = err2
-	}
-	if err2 = result.Write(oprot); err == nil && err2 != nil {
-		err = err2
-	}
-	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
-		err = err2
-	}
-	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
-		err = err2
-	}
-	if err != nil {
-		return
-	}
-	return true, err
-}
-
-type CartServiceAddGoodsIntoCartArgs struct {
-	Req *AddGoodsIntoCartRequest `thrift:"req,1"`
-}
-
-func NewCartServiceAddGoodsIntoCartArgs() *CartServiceAddGoodsIntoCartArgs {
-	return &CartServiceAddGoodsIntoCartArgs{}
-}
-
-func (p *CartServiceAddGoodsIntoCartArgs) InitDefault() {
-}
-
-var CartServiceAddGoodsIntoCartArgs_Req_DEFAULT *AddGoodsIntoCartRequest
-
-func (p *CartServiceAddGoodsIntoCartArgs) GetReq() (v *AddGoodsIntoCartRequest) {
+func (p *UserServiceLoginArgs) GetReq() (v *LoginRequest) {
 	if !p.IsSetReq() {
-		return CartServiceAddGoodsIntoCartArgs_Req_DEFAULT
+		return UserServiceLoginArgs_Req_DEFAULT
 	}
 	return p.Req
 }
 
-var fieldIDToName_CartServiceAddGoodsIntoCartArgs = map[int16]string{
+var fieldIDToName_UserServiceLoginArgs = map[int16]string{
 	1: "req",
 }
 
-func (p *CartServiceAddGoodsIntoCartArgs) IsSetReq() bool {
+func (p *UserServiceLoginArgs) IsSetReq() bool {
 	return p.Req != nil
 }
 
-func (p *CartServiceAddGoodsIntoCartArgs) Read(iprot thrift.TProtocol) (err error) {
+func (p *UserServiceLoginArgs) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1405,7 +1339,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_CartServiceAddGoodsIntoCartArgs[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UserServiceLoginArgs[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1415,8 +1349,8 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *CartServiceAddGoodsIntoCartArgs) ReadField1(iprot thrift.TProtocol) error {
-	_field := NewAddGoodsIntoCartRequest()
+func (p *UserServiceLoginArgs) ReadField1(iprot thrift.TProtocol) error {
+	_field := NewLoginRequest()
 	if err := _field.Read(iprot); err != nil {
 		return err
 	}
@@ -1424,10 +1358,10 @@ func (p *CartServiceAddGoodsIntoCartArgs) ReadField1(iprot thrift.TProtocol) err
 	return nil
 }
 
-func (p *CartServiceAddGoodsIntoCartArgs) Write(oprot thrift.TProtocol) (err error) {
+func (p *UserServiceLoginArgs) Write(oprot thrift.TProtocol) (err error) {
 
 	var fieldId int16
-	if err = oprot.WriteStructBegin("AddGoodsIntoCart_args"); err != nil {
+	if err = oprot.WriteStructBegin("Login_args"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -1453,7 +1387,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *CartServiceAddGoodsIntoCartArgs) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *UserServiceLoginArgs) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1470,43 +1404,43 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *CartServiceAddGoodsIntoCartArgs) String() string {
+func (p *UserServiceLoginArgs) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("CartServiceAddGoodsIntoCartArgs(%+v)", *p)
+	return fmt.Sprintf("UserServiceLoginArgs(%+v)", *p)
 
 }
 
-type CartServiceAddGoodsIntoCartResult struct {
-	Success *AddGoodsIntoCartResponse `thrift:"success,0,optional"`
+type UserServiceLoginResult struct {
+	Success *LoginResponse `thrift:"success,0,optional"`
 }
 
-func NewCartServiceAddGoodsIntoCartResult() *CartServiceAddGoodsIntoCartResult {
-	return &CartServiceAddGoodsIntoCartResult{}
+func NewUserServiceLoginResult() *UserServiceLoginResult {
+	return &UserServiceLoginResult{}
 }
 
-func (p *CartServiceAddGoodsIntoCartResult) InitDefault() {
+func (p *UserServiceLoginResult) InitDefault() {
 }
 
-var CartServiceAddGoodsIntoCartResult_Success_DEFAULT *AddGoodsIntoCartResponse
+var UserServiceLoginResult_Success_DEFAULT *LoginResponse
 
-func (p *CartServiceAddGoodsIntoCartResult) GetSuccess() (v *AddGoodsIntoCartResponse) {
+func (p *UserServiceLoginResult) GetSuccess() (v *LoginResponse) {
 	if !p.IsSetSuccess() {
-		return CartServiceAddGoodsIntoCartResult_Success_DEFAULT
+		return UserServiceLoginResult_Success_DEFAULT
 	}
 	return p.Success
 }
 
-var fieldIDToName_CartServiceAddGoodsIntoCartResult = map[int16]string{
+var fieldIDToName_UserServiceLoginResult = map[int16]string{
 	0: "success",
 }
 
-func (p *CartServiceAddGoodsIntoCartResult) IsSetSuccess() bool {
+func (p *UserServiceLoginResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
-func (p *CartServiceAddGoodsIntoCartResult) Read(iprot thrift.TProtocol) (err error) {
+func (p *UserServiceLoginResult) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1552,7 +1486,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_CartServiceAddGoodsIntoCartResult[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UserServiceLoginResult[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1562,8 +1496,8 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *CartServiceAddGoodsIntoCartResult) ReadField0(iprot thrift.TProtocol) error {
-	_field := NewAddGoodsIntoCartResponse()
+func (p *UserServiceLoginResult) ReadField0(iprot thrift.TProtocol) error {
+	_field := NewLoginResponse()
 	if err := _field.Read(iprot); err != nil {
 		return err
 	}
@@ -1571,10 +1505,10 @@ func (p *CartServiceAddGoodsIntoCartResult) ReadField0(iprot thrift.TProtocol) e
 	return nil
 }
 
-func (p *CartServiceAddGoodsIntoCartResult) Write(oprot thrift.TProtocol) (err error) {
+func (p *UserServiceLoginResult) Write(oprot thrift.TProtocol) (err error) {
 
 	var fieldId int16
-	if err = oprot.WriteStructBegin("AddGoodsIntoCart_result"); err != nil {
+	if err = oprot.WriteStructBegin("Login_result"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -1600,7 +1534,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *CartServiceAddGoodsIntoCartResult) writeField0(oprot thrift.TProtocol) (err error) {
+func (p *UserServiceLoginResult) writeField0(oprot thrift.TProtocol) (err error) {
 	if p.IsSetSuccess() {
 		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
 			goto WriteFieldBeginError
@@ -1619,10 +1553,10 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
 }
 
-func (p *CartServiceAddGoodsIntoCartResult) String() string {
+func (p *UserServiceLoginResult) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("CartServiceAddGoodsIntoCartResult(%+v)", *p)
+	return fmt.Sprintf("UserServiceLoginResult(%+v)", *p)
 
 }

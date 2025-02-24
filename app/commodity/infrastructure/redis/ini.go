@@ -17,6 +17,8 @@ limitations under the License.
 package redis
 
 import (
+	"context"
+
 	"github.com/redis/go-redis/v9"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
@@ -28,4 +30,8 @@ type commodityCache struct {
 
 func NewCommodityCache(client *redis.Client) repository.CommodityCache {
 	return &commodityCache{client: client}
+}
+
+func (c *commodityCache) IsExist(ctx context.Context, key string) bool {
+	return c.client.Exists(ctx, key).Val() == 1
 }

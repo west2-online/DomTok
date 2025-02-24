@@ -4,7 +4,6 @@ include "model.thrift"
 
 /*
 * struct CreateCouponReq 创建优惠券信息
-* @Param UserID 创建者ID
 * @Param Name 名称
 * @Param TypeInfo 类型
 * @Param ConditionCost 用券门槛
@@ -17,7 +16,7 @@ include "model.thrift"
 * @Param deadlineForGet 可领取优惠券的截止时间
 */
 struct CreateCouponReq {
-    1: required i64 userID;
+    1: required i64 deadlineForGet;
     2: required string name;
     3: required i32 typeInfo;
     4: optional double conditionCost;
@@ -27,7 +26,7 @@ struct CreateCouponReq {
     8: required i64 rangeID;
     9: optional string description;
     10: required i64 expireTime;
-    11: required i64 deadlineForGet;
+
 }
 
 struct CreateCouponResp {
@@ -51,12 +50,10 @@ struct DeleteCouponResp {
 
 /*
 * struct CreateUserCouponReq 用户领取优惠券
-* @Param UserID 用户ID
 * @Param CouponID 优惠券信息ID
 */
 struct CreateUserCouponReq {
-    1: required i64 userID;
-    2: required i64 couponID;
+    1: required i64 couponID;
 }
 
 struct CreateUserCouponResp {
@@ -66,15 +63,13 @@ struct CreateUserCouponResp {
 /*
 * struct ViewCouponReq 查看优惠券信息或商家创建的优惠券
 * @Param CouponID 优惠券信息ID
-* @Param UserID 用户ID
 * @Param PageNum 页数
 * @Param PageSize 页面大小
 */
 struct ViewCouponReq {
     1: required i64 couponID;
-    2: optional i64 creatorID;
-    3: optional i64 pageNum;
-    4: optional i64 pageSize;
+    2: optional i64 pageNum;
+    3: optional i64 pageSize;
 }
 
 struct ViewCouponResp {
@@ -84,16 +79,14 @@ struct ViewCouponResp {
 
 /*
 * struct ViewUserAllCouponReq 查看用户自己持有的优惠券
-* @Param UserID 用户ID
 * @Param IsIncludeExpired 是否包含过期的券
 * @Param PageNum 页数
 * @Param PageSize 页面大小
 */
 struct ViewUserAllCouponReq {
-    1: required i64 userID;
-    2: required i64 isIncludeExpired;
-    3: required i64 pageNum;
-    4: required i64 pageSize;
+    1: required i64 isIncludeExpired;
+    2: required i64 pageNum;
+    3: required i64 pageSize;
 }
 
 struct ViewUserAllCouponResp {
@@ -103,12 +96,10 @@ struct ViewUserAllCouponResp {
 
 /*
 * struct UseUserCouponReq 使用用户优惠券
-* @Param UserID 用户
 * @Param CouponID 优惠券ID
 */
 struct UseUserCouponReq {
-    1: required i64 userID;
-    2: required i64 couponID;
+    1: required i64 couponID;
 }
 
 struct UseUserCouponResp {
@@ -117,26 +108,25 @@ struct UseUserCouponResp {
 
 /*
 * struct CreateSpuReq 创建Spu请求
-* @Param spuImages spu具体介绍图
+* @Param spuImagesName spu具体介绍图名
 * @Param name 名称
-* @Param userID 创建者ID
 * @Param description 描述
 * @Param categoryID 类型ID
-* @Param goodsHeadDrawing 款式头图
 * @Param price 价格
 * @Param forSale 是否出售
 * @Param shipping 运费
+* @Param goodsHeadDrawing 款式头图数据
+* @Param spu展示图数据
 */
 struct CreateSpuReq {
-    1: optional list<binary> spuImages;
-    2: required string name;
-    3: required i64 userID;
-    4: required string description;
-    5: required i64 categoryID;
-    6: required string goodsHeadDrawing;
-    7: required double price;
-    8: required i32 forSale;
-    9: required double shipping;
+    1: required string name;
+    2: required string description;
+    3: required i64 categoryID;
+    4: required binary goodsHeadDrawing;
+    5: required double price;
+    6: required i32 forSale;
+    7: required double shipping;
+    8: required i64 bufferCount;
 }
 
 struct CreateSpuResp {
@@ -146,28 +136,26 @@ struct CreateSpuResp {
 
 /*
 * struct UpdateSpuReq 创建spu请求
-* @Param spuImages spu具体介绍图
+* @Param spuImages spu具体介绍图名
 * @Param name 名称
-* @Param userID 创建者ID
 * @Param description 描述
 * @Param categoryID 类型ID
-* @Param goodsHeadDrawing 款式头图
+* @Param goodsHeadDrawing 款式头图名
 * @Param price 价钱
 * @Param forSale 是否出售
 * @Param shipping 运费
 * @Param spuID spu的ID
 */
 struct UpdateSpuReq {
-    1: optional list<binary> spuImages;
-    2: optional string name;
-    3: required i64 userID;
-    4: optional string description;
-    5: optional i64 categoryID;
-    6: optional string goodsHeadDrawing;
-    7: optional double price;
-    8: optional i32 forSale;
-    9: optional double shipping;
-    10: required i64 spuID;
+    1: optional string name;
+    2: optional string description;
+    3: optional i64 categoryID;
+    4: optional binary goodsHeadDrawing;
+    5: optional double price;
+    6: optional i32 forSale;
+    7: optional double shipping;
+    8: required i64 spuID;
+    9: optional i64 bufferCount;
 }
 
 struct UpdateSpuResp {
@@ -196,19 +184,39 @@ struct ViewSpuReq {
 struct ViewSpuResp {
     1: required model.BaseResp base;
     2: required list<model.Spu> spus;
+    3: required i64 total;
 }
 
 /*
 * struct DeleteSpuReq 删除spu请求
-* @Param userID 创建者ID
 * @Param spuID spuID
  */
 struct DeleteSpuReq {
-    1: required i64 userID;
-    2: required i64 spuID;
+    1: required i64 spuID;
 }
 
 struct DeleteSpuResp {
+    1: required model.BaseResp base;
+}
+
+struct CreateSpuImageReq {
+    1: required binary data;
+    2: required i64 spuID;
+    3: required i64 bufferCount;
+}
+
+struct CreateSpuImageResp {
+    1: required model.BaseResp base;
+    2: required i64 imageID;
+}
+
+struct UpdateSpuImageReq {
+    1: required binary data;
+    2: required i64 imageID;
+    3: required i64 bufferCount;
+}
+
+struct UpdateSpuImageResp {
     1: required model.BaseResp base;
 }
 
@@ -227,13 +235,21 @@ struct ViewSpuImageReq {
 struct ViewSpuImageResp {
     1: required model.BaseResp base;
     2: required list<model.SpuImage> images;
+    3: required i64 total;
+}
+
+struct DeleteSpuImageReq {
+    1: required i64 spuImageID;
+}
+
+struct DeleteSpuImageResp {
+    1: required model.BaseResp base;
 }
 
 /*
 * struct CreateSkuReq 创建Sku请求
 * @Param skuImages sku图片
 * @Param name 名称
-* @Param userID 创建者ID
 * @Param description 描述
 * @Param styleHeadDrawing 款式头图
 * @Param price 价钱
@@ -244,13 +260,13 @@ struct ViewSpuImageResp {
 struct CreateSkuReq {
     1: optional list<binary> skuImages;
     2: required string name;
-    3: required i64 creatorID;
+    3: required i64 stock;
     4: required string description;
     5: required string styleHeadDrawing;
     6: required double price;
     7: required i32 forSale;
     8: required i64 spuID;
-    9: required i64 stock;
+
 }
 
 struct CreateSkuResp {
@@ -261,7 +277,6 @@ struct CreateSkuResp {
 /*
 * struct UpdateSkuReq 更新sku请求
 * @Param skuID skuID
-* @Param creatorID 创建者ID
 * @Param skuImages sku图片
 * @Param description 描述
 * @Param styleHeadDrawing 款式头图
@@ -271,13 +286,13 @@ struct CreateSkuResp {
 */
 struct UpdateSkuReq {
     1: required i64 skuID;
-    2: required i64 creatorID;
+    2: optional i64 stock;
     3: optional list<binary> skuImages;
     4: optional string description;
     5: optional string styleHeadDrawing;
     6: optional double price;
     7: optional i32 forSale;
-    8: optional i64 stock;
+
 }
 
 struct UpdateSkuResp {
@@ -287,11 +302,9 @@ struct UpdateSkuResp {
 /*
 * struct DeleteSkuReq 删除sku请求
 * @Param skuID skuID
-* @Param userID 创建者ID
  */
 struct DeleteSkuReq {
     1: required i64 skuID;
-    2: required i64 userID;
 }
 
 struct DeleteSkuResp {
@@ -350,12 +363,10 @@ struct UploadSkuAttrResp {
 /*
 * struct CreateCategoryReq 创建种类
 * @Param name 名称
-* @Param creatorID 创建者ID
  */
 
 struct CreateCategoryReq {
     1: required string name;
-    2: required i64 creatorID;
 }
 
 struct CreateCategoryResp {
@@ -365,12 +376,10 @@ struct CreateCategoryResp {
 
 /*
 * struct DeleteCategoryReq 删除种类请求
-* @Param userID 用户ID
 * @Param categoryID 种类ID
  */
 struct DeleteCategoryReq {
-    1: required i64 userID;
-    2: required i64 categoryID;
+    1: required i64 categoryID;
 }
 
 struct DeleteCategoryResp {
@@ -414,7 +423,7 @@ struct ViewCategoryResp {
 * @Param pageSize 页尺寸
  */
 struct ListSkuInfoReq {
-    1: required list<i64> skuIDs;
+    1: required list<model.SkuVersion> skuVersions;
     2: required i64 pageNum;
     3: required i64 pageSize;
 }
@@ -478,6 +487,14 @@ struct ViewHistoryPriceResp {
     2: required list<model.PriceHistory> records;
 }
 
+struct UploadImageReq {
+
+}
+
+struct UploadImageResp {
+
+}
+
 service CommodityService {
     // 优惠券
     CreateCouponResp CreateCoupon(1: CreateCouponReq req);
@@ -488,11 +505,14 @@ service CommodityService {
     UseUserCouponResp UseUserCoupon(1: UseUserCouponReq req);
 
     // SPU
-    CreateSpuResp CreateSpu(1: CreateSpuReq req);
-    UpdateSpuResp UpdateSpu(1: UpdateSkuReq req);
+    CreateSpuResp CreateSpu(1: CreateSpuReq req) (streaming.mode="client");
+    UpdateSpuResp UpdateSpu(1: UpdateSpuReq req) (streaming.mode="client");
     ViewSpuResp ViewSpu(1: ViewSpuReq req);
     DeleteSpuResp DeleteSpu(1: DeleteSpuReq req);
     ViewSpuImageResp ViewSpuImage(1: ViewSpuImageReq req);
+    CreateSpuImageResp CreateSpuImage(1: CreateSpuImageReq req) (streaming.mode="client");
+    UpdateSpuImageResp UpdateSpuImage(1: UpdateSpuImageReq req) (streaming.mode="client");
+    DeleteSpuImageResp DeleteSpuImage(1: DeleteSpuImageReq req);
 
     //SKU
     CreateSkuResp CreateSku(1: CreateSkuReq req);

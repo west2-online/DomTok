@@ -19,19 +19,68 @@ package mysql
 import (
 	"time"
 
+	"gorm.io/gorm"
+
 	"github.com/west2-online/DomTok/pkg/constants"
 )
 
 type Category struct {
-	Id        int64
+	Id        int64 `gorm:"primary_key"`
 	Name      string
 	CreatorId int64
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 	// gorm.Model
+}
+
+type Spu struct {
+	Id               int64 `gorm:"primary_key"`
+	Name             string
+	CreatorId        int64
+	Description      string
+	CategoryId       int64
+	GoodsHeadDrawing string
+	Price            float64
+	ForSale          int
+	Shipping         float64
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+	DeletedAt        gorm.DeletedAt `gorm:"index"`
+}
+
+type SpuImage struct {
+	Id        int64 `gorm:"primary_key"`
+	Url       string
+	SpuId     int64
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+	//	gorm.Model
+}
+
+type SpuToSku struct {
+	SkuId     int64
+	SpuId     int64
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
+// 对应表名
+
+func (spu *Spu) TableName() string {
+	return constants.SpuTableName
+}
+
+func (spu *SpuImage) TableName() string {
+	return constants.SpuImageTableName
 }
 
 func (Category) TableName() string {
 	return constants.CategoryTableName
+}
+
+func (s *SpuToSku) TableName() string {
+	return constants.SpuSkuTableName
 }

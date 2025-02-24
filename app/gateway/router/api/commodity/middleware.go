@@ -20,11 +20,15 @@ package commodity
 
 import (
 	"github.com/cloudwego/hertz/pkg/app"
+
+	"github.com/west2-online/DomTok/app/gateway/mw"
 )
 
 func rootMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
 }
 
 func _apiMw() []app.HandlerFunc {
@@ -178,6 +182,26 @@ func _viewspuMw() []app.HandlerFunc {
 }
 
 func _updatespuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _imageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createspuimageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deletespuimageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updatespuimageMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }

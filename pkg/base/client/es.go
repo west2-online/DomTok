@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/go-elasticsearch"
 	"github.com/elastic/go-elasticsearch/esapi"
+	"github.com/olivere/elastic/v7"
 
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/pkg/errno"
@@ -47,4 +48,18 @@ func IsESConnected(es *elasticsearch.Client) bool {
 	req := esapi.PingRequest{}
 	_, err := req.Do(context.Background(), es)
 	return err == nil
+}
+
+func NewEsCommodityClient() (*elastic.Client, error) {
+	if config.Elasticsearch == nil {
+		return nil, errors.New("elasticsearch config is nil")
+	}
+	esConn := fmt.Sprintf("http://%s", config.Elasticsearch.Addr)
+	client, err := elastic.NewClient(
+		elastic.SetURL(esConn),
+	)
+	if err != nil {
+		return nil, errno.NewErrNo(errno.InternalESErrorCode, fmt.Sprintf("es clint failed,error: %v", err))
+	}
+	return client, nil
 }

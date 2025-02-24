@@ -24,8 +24,9 @@ const (
 
 // Redis Key and Expire Time
 const (
-	RedisCartExpireTime = 5 * 60 * time.Second
-	RedisCartStoreNum   = 30
+	RedisCartExpireTime     = 5 * 60 * time.Second
+	RedisCartStoreNum       = 30
+	RedisSpuImageExpireTime = 5 * 60 * time.Second
 )
 
 // Redis DB Name
@@ -33,4 +34,11 @@ const (
 	RedisDBOrder     = 0
 	RedisDBCommodity = 1
 	RedisDBCart      = 2
+)
+
+// Redis Connection Pool Configuration
+const (
+	RedisPoolSize           = 50              // 最大连接数
+	RedisMinIdleConnections = 10              // 最小空闲连接数
+	RedisDialTimeout        = 5 * time.Second // 连接超时时间
 )

@@ -65,6 +65,7 @@ struct SpuImage {
     3: required string url;
     4: required i64 createdAt;
     5: optional i64 deletedAt;
+    6: required i64 updatedAt;
 }
 
 struct SkuImage {
@@ -120,6 +121,11 @@ struct SkuInfo {
     9: required i64 historyID;
 }
 
+struct SkuVersion {
+    1: required i64 skuID;
+    2: required i64 versionID;
+}
+
 struct PriceHistory {
     1: required i64 historyID;
     2: required i64 skuID;
@@ -128,31 +134,70 @@ struct PriceHistory {
     5: optional i64 prevVersion;
 }
 
+struct Order {
+    1: required i64 id;
+    2: required string status;
+    3: required i64 uid;
+    4: required double totalAmountOfGoods;
+    5: required double totalAmountOfFreight;
+    6: required double totalAmountOfDiscount;
+    7: required double paymentAmount;
+    8: required string paymentStatus;
+    9: required i64 paymentAt;
+    10: required string paymentStyle;
+    11: required i64 orderedAt;
+    12: required i64 deletedAt;
+    13: required i64 deliveryAt
+    14: required i64 addressID;
+    15: required string addressInfo;
+}
+
+struct BaseOrder {
+    1: required i64 id;
+    2: required string status;
+    3: required double totalAmountOfGoods;
+    4: required double paymentAmount;
+    5: required string paymentStatus;
+}
+
+struct orderWithGoods {
+    1: required Order order;
+    2: required list<OrderGoods> goods;
+}
+
+struct baseOrderWithGoods {
+    1: required BaseOrder order;
+    2: required list<BaseOrderGoods> goods;
+}
+
 struct OrderGoods {
-    1: required i64 MerchantID; // 商家 ID
-    2: required i64 GoodsID; // 商品 ID
-    3: required string GoodsName; // 商品名字
-    4: required string GoodsHeadDrawing; // 商品头图链接
-    5: required i64 StyleID; // 商品款式 ID
-    6: required string StyleName; // 款式名称
-    7: required string StyleHeadDrawing; // 款式头图
-    8: required double OriginCast; // 原价
-    9: required double SaleCast; // 售卖价
-    10: required i64 PurchaseQuantity; // 购买数量
-    11: required double PaymentAmount; // 支付金额
-    12: required double FreightAmount; // 运费金额
-    13: required double SettlementAmount; // 结算金额
-    14: required double DiscountAmount; // 优惠金额
-    15: required double SingleCast; // 下单单价
-    16: i64 CouponID // 优惠券 ID
+    1: required i64 merchantID; // 商家 ID
+    2: required i64 goodsID; // 商品 ID
+    3: required string goodsName; // 商品名字
+    4: required string goodsHeadDrawing; // 商品头图链接
+    5: required i64 styleID; // 商品款式 ID
+    6: required string styleName; // 款式名称
+    7: required string styleHeadDrawing; // 款式头图
+    8: required double originCast; // 原价
+    9: required double saleCast; // 售卖价
+    10: required i64 purchaseQuantity; // 购买数量
+    11: required double paymentAmount; // 支付金额
+    12: required double freightAmount; // 运费金额
+    13: required double settlementAmount; // 结算金额
+    14: required double discountAmount; // 优惠金额
+    15: required double singleCast; // 下单单价
+    16: i64 couponID // 优惠券 ID
+    17: required i64 orderID;
+    18: required i32 goodsVersion;
 }
 
 struct BaseOrderGoods {
-    1: required i64 MerchantID; // 商家 ID
-    2: required i64 GoodsID; // 商品 ID
-    3: required i64 StyleID; // 商品款式 ID
-    4: required i64 PurchaseQuantity; // 购买数量
-    5: i64 CouponID // 优惠券 ID
+    1: required string merchantName; // 商家 ID
+    2: required i64 goodsName; // 商品 ID
+    3: required i64 styleName; // 商品款式 ID
+    4: required i64 purchaseQuantity; // 购买数量
+    5: required string styleHeadDrawing; // 款式头图链接
+    6: i64 couponID // 优惠券 ID
 }
 
 /*
@@ -167,4 +212,14 @@ struct CreditCardInfo {
     2: required i64 creditCardExpirationYear
     3: required i64 creditCardExpirationMonth
     4: required i64 creditCardCvv
+}
+
+struct PaymentTokenInfo{
+    1:required string paymentToken
+    2:required i64 paymentTokenExpirationTime
+}
+
+struct RefundTokenInfo{
+    1:required string refundToken
+    2:required i64 refundTokenExpirationTime
 }

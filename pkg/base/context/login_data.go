@@ -18,35 +18,47 @@ package context
 
 import (
 	"context"
+	"strconv"
 
-	"github.com/bytedance/sonic"
-
-	"github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
-const loginDataKey string = "loginData"
-
 // WithLoginData 将LoginData加入到context中，通过metainfo传递到RPC server
-func WithLoginData(ctx context.Context, loginData *model.LoginData) context.Context {
-	value, err := sonic.MarshalString(*loginData)
-	if err != nil {
-		logger.Infof("Failed to marshal LoginData: %v", err)
-	}
-	return newContext(ctx, loginDataKey, value)
+func WithLoginData(ctx context.Context, uid int64) context.Context {
+	return newContext(ctx, constants.LoginDataKey, strconv.FormatInt(uid, 10))
 }
 
 // GetLoginData 从context中取出LoginData
-func GetLoginData(ctx context.Context) (*model.LoginData, error) {
-	user, ok := fromContext(ctx, loginDataKey)
+func GetLoginData(ctx context.Context) (int64, error) {
+	user, ok := fromContext(ctx, constants.LoginDataKey)
 	if !ok {
-		return nil, errno.NewErrNo(errno.ParamMissingErrorCode, "Failed to get header in context")
+		return -1, errno.NewErrNo(errno.ParamMissingErrorCode, "Failed to get header in context")
 	}
-	value := new(model.LoginData)
-	err := sonic.UnmarshalString(user, value)
+
+	value, err := strconv.ParseInt(user, 10, 64)
 	if err != nil {
-		return nil, errno.NewErrNo(errno.InternalServiceErrorCode, "Failed to get header in context when unmarshalling loginData")
+		return -1, errno.NewErrNo(errno.InternalServiceErrorCode, "Failed to get header in context when parse loginData")
 	}
 	return value, nil
+}
+
+// GetStreamLoginData 流式传输传递ctx, 获取loginData
+func GetStreamLoginData(ctx context.Context) (int64, error) {
+	uid, success := streamFromContext(ctx, constants.LoginDataKey)
+	if !success {
+		return -1, errno.NewErrNo(errno.ParamMissingErrorCode, "Failed to get info in context")
+	}
+
+	value, err := strconv.ParseInt(uid, 10, 64)
+	if err != nil {
+		return -1, errno.NewErrNo(errno.InternalServiceErrorCode, "Failed to get info in context when parse loginData")
+	}
+	return value, nil
+}
+
+// SetStreamLoginData 流式传输传递ctx, 设置ctx值
+func SetStreamLoginData(ctx context.Context, uid int64) context.Context {
+	value := strconv.FormatInt(uid, 10)
+	return streamAppendContext(ctx, constants.LoginDataKey, value)
 }

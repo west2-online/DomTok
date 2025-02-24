@@ -30,6 +30,24 @@ const (
 	DefaultKafkaReplicationFactor = -1
 )
 
+// Commodity Service
+const (
+	KafkaImageTopic            = "ImageTopic"
+	KafkaCreateSpuTopic        = "SpuCreateTopic"
+	KafkaUpdateSpuTopic        = "SpuUpdateTopic"
+	KafkaDeleteSpuTopic        = "SpuDeleteTopic"
+	KafkaPartitionNum          = 3
+	KafkaImageGroupId          = "ImageGroupId"
+	KafkaCreateSpuGroupId      = "CreateSpuGroupId"
+	KafkaUpdateSpuGroupId      = "UpdateSpuGroupId"
+	KafkaDeleteSpuGroupId      = "DeleteSpuGroupId"
+	KafkaCommodityCreateSpuNum = 3
+	KafkaCommodityUpdateSpuNum = 3
+	KafkaCommodityDeleteSpuNum = 3
+
+	KafkaESConsumerChanCap = 10
+)
+
 // CartService
 const (
 	KafkaCartTopic                = "cart"           // Kafka的话题

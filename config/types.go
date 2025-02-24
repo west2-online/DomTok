@@ -17,10 +17,11 @@ limitations under the License.
 package config
 
 type server struct {
-	Secret      string `mapstructure:"private-key"`
-	Version     string
-	Name        string
-	LogLevel    string `mapstructure:"log-level"`
+	Secret    string `mapstructure:"private-key"`
+	PublicKey string `mapstructure:"public-key"`
+	Version   string
+	Name      string
+	LogLevel  string `mapstructure:"log-level"`
 	IntranetUrl string `mapstructure:"intranet-url"`
 }
 
@@ -93,6 +94,27 @@ type volcengine struct {
 	Model   string `mapstructure:"model"`
 }
 
+/*
+* struct upyun 又拍云配置
+* @Bucket: 存储桶
+* @Opearator: 操作员
+* @Password: 密码
+* @TokenSecret: 对应又拍云里的SecretAccessKey
+* @TokenTimeout: Token过期时间
+* @UssDomain: 域名
+* @UnCheckedDir: 上传目录
+ */
+type upyun struct {
+	Bucket         string
+	Operator       string
+	Password       string
+	TokenSecret    string `mapstructure:"token-secret"`
+	TokenTimeout   int64  `mapstructure:"token-timeout"`
+	UssDomain      string `mapstructure:"uss-domain"`
+	DownloadDomain string `mapstructure:"download-domain"`
+	Path           string
+}
+
 type config struct {
 	Server        server
 	Snowflake     snowflake
@@ -106,4 +128,5 @@ type config struct {
 	Kafka         kafka
 	DefaultUser   defaultUser
 	Volcengine    volcengine
+	Upyun         upyun
 }

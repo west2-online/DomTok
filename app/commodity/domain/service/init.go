@@ -17,6 +17,8 @@ limitations under the License.
 package service
 
 import (
+	"context"
+
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
@@ -25,10 +27,14 @@ type CommodityService struct {
 	db    repository.CommodityDB
 	sf    *utils.Snowflake
 	cache repository.CommodityCache
+	mq    repository.CommodityMQ
+	es    repository.CommodityElastic
 	// TODO
 }
 
-func NewCommodityService(db repository.CommodityDB, sf *utils.Snowflake, cache repository.CommodityCache) *CommodityService {
+func NewCommodityService(db repository.CommodityDB, sf *utils.Snowflake, cache repository.CommodityCache,
+	mq repository.CommodityMQ, es repository.CommodityElastic,
+) *CommodityService {
 	if db == nil {
 		panic("commodityService's db should not be nil")
 	}
@@ -40,14 +46,31 @@ func NewCommodityService(db repository.CommodityDB, sf *utils.Snowflake, cache r
 		panic("commodityService's cache should not be nil")
 	}
 
+	if mq == nil {
+		panic("commodityService's mq should not be nil")
+	}
+
+	if es == nil {
+		panic("commodityService's elastic should not be nil")
+	}
+
 	svc := &CommodityService{
 		db:    db,
 		sf:    sf,
 		cache: cache,
+		mq:    mq,
+		es:    es,
 	}
 	svc.init()
 	return svc
 }
 
 func (s *CommodityService) init() {
+	err := s.IsSpuMappingExist(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	go s.ConsumeCreateSpuMsg(context.Background())
+	go s.ConsumeUpdateSpuMsg(context.Background())
+	go s.ConsumeDeleteSpuMsg(context.Background())
 }

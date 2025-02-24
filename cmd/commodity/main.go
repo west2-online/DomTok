@@ -34,7 +34,7 @@ import (
 
 // constants部分看了其他的pr有写了，防止冲突先找个数代替，到时候合并完再改掉
 var (
-	serviceName = "constants.CommodityServiceName" // TODO
+	serviceName = constants.CommodityServiceName
 )
 
 func init() {
@@ -61,7 +61,7 @@ func main() {
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
 			ServiceName: serviceName,
 		}),
-		server.WithMuxTransport(),
+
 		server.WithServiceAddr(addr),
 		server.WithRegistry(r),
 		server.WithLimit(&limit.Option{

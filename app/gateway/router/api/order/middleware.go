@@ -20,11 +20,15 @@ package order
 
 import (
 	"github.com/cloudwego/hertz/pkg/app"
+
+	"github.com/west2-online/DomTok/app/gateway/mw"
 )
 
 func rootMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
 }
 
 func _apiMw() []app.HandlerFunc {

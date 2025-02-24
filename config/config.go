@@ -40,6 +40,7 @@ var (
 	Elasticsearch *elasticsearch
 	Kafka         *kafka
 	Volcengine    *volcengine
+	Upyun         *upyun
 	runtimeViper  = viper.New()
 )
 
@@ -101,6 +102,7 @@ func configMapping(srv string) {
 	Kafka = &c.Kafka
 	DefaultUser = &c.DefaultUser
 	Volcengine = &c.Volcengine
+	Upyun = &c.Upyun
 	Service = getService(srv)
 }
 

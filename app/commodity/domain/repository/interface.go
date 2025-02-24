@@ -16,10 +16,61 @@ limitations under the License.
 
 package repository
 
-import "context"
+import (
+	"context"
+
+	"github.com/olivere/elastic/v7"
+
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	"github.com/west2-online/DomTok/kitex_gen/commodity"
+	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/pkg/kafka"
+)
 
 type CommodityDB interface {
-	CreateCategory(ctx context.Context, name string) error
+	IsCategoryExistByName(ctx context.Context, name string) (bool, error)
+	IsCategoryExistById(ctx context.Context, id int64) (bool, error)
+	CreateCategory(ctx context.Context, entity *model.Category) error
+	DeleteCategory(ctx context.Context, category *model.Category) error
+	UpdateCategory(ctx context.Context, category *model.Category) error
+	ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*kmodel.CategoryInfo, err error)
+
+	CreateSpu(ctx context.Context, spu *model.Spu) error
+	CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
+	DeleteSpu(ctx context.Context, spuId int64) error
+	IsExistSku(ctx context.Context, spuId int64) (bool, error)
+	GetSpuBySpuId(ctx context.Context, spuId int64) (*model.Spu, error)
+	GetSpuImage(ctx context.Context, spuImageId int64) (*model.SpuImage, error)
+	UpdateSpu(ctx context.Context, spu *model.Spu) error
+	UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
+	DeleteSpuImage(ctx context.Context, spuImageId int64) error
+	DeleteSpuImagesBySpuId(ctx context.Context, spuId int64) (ids []int64, url []string, err error)
+	GetImagesBySpuId(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error)
+	GetSpuByIds(ctx context.Context, spuIds []int64) ([]*model.Spu, error)
 }
 
-type CommodityCache interface{}
+type CommodityCache interface {
+	IsExist(ctx context.Context, key string) bool
+	GetSpuImages(ctx context.Context, key string) (*model.SpuImages, error)
+	SetSpuImages(ctx context.Context, key string, images *model.SpuImages)
+}
+
+type CommodityMQ interface {
+	Send(ctx context.Context, topic string, message []*kafka.Message) error
+	SendCreateSpuInfo(ctx context.Context, spu *model.Spu) error
+	SendUpdateSpuInfo(ctx context.Context, spu *model.Spu) error
+	SendDeleteSpuInfo(ctx context.Context, id int64) error
+	ConsumeCreateSpuInfo(ctx context.Context) <-chan *kafka.Message
+	ConsumeUpdateSpuInfo(ctx context.Context) <-chan *kafka.Message
+	ConsumeDeleteSpuInfo(ctx context.Context) <-chan *kafka.Message
+}
+
+type CommodityElastic interface {
+	IsExist(ctx context.Context, indexName string) bool
+	CreateIndex(ctx context.Context, indexName string) error
+	AddItem(ctx context.Context, indexName string, spu *model.Spu) error
+	RemoveItem(ctx context.Context, indexName string, id int64) error
+	UpdateItem(ctx context.Context, indexName string, spu *model.Spu) error
+	SearchItems(ctx context.Context, indexName string, query *commodity.ViewSpuReq) ([]int64, int64, error)
+	BuildQuery(req *commodity.ViewSpuReq) *elastic.BoolQuery
+}

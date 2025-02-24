@@ -5,68 +5,69 @@ include "model.thrift"
 
 
 struct CreateOrderReq {
-    1: required i64 AddressID; // 地址信息 ID
-    2: required string AddressInfo; // 简略地址信息
-    3: required list<model.BaseOrderGoods> BaseOrderGoods; // 商品列表
+    1: required i64 addressID; // 地址信息 ID
+    2: required string addressInfo; // 简略地址信息
+    3: required list<model.BaseOrderGoods> baseOrderGoods; // 商品列表
 }
 
 struct CreateOrderResp {
-    1: required model.BaseResp Base;
-    2: required i64 OrderID; // 订单号
+    1: required model.BaseResp base;
+    2: required i64 orderID; // 订单号
 }
 
 struct ViewOrderListReq {
-    1: i32 Page;
-    2: i32 Size;
+    1: i32 page;
+    2: i32 size;
 }
 
 struct ViewOrderListResp {
-    1: required model.BaseResp Base;
-    2: required i32 Total;
-    3: required i64 OrderID;
-    4: required list<model.OrderGoods> OrderGoods;
+    1: required model.BaseResp base;
+    2: required i32 total;
+    3: required list<model.baseOrderWithGoods> orderList;
 }
 
 struct ViewOrderReq {
-    1: required i64 OrderID;
+    1: required i64 orderID;
 }
 
 struct ViewOrderResp {
-    1: required model.BaseResp Base;
-    2: required double TotalAmountOfGoods; // 商品总金额
-    3: required double TotalAmountOfFreight; // 总运费
-    4: required double TotalAmountOfDiscount; // 总优惠
-    5: required double PaymentAmount; // 实际付款价
-    6: required i64 AddressID; // 地址信息 ID
-    7: required string AddressInfo; // 简略地址信息
-    8: required string Status; // 订单状态
-    9: required list<model.OrderGoods> OrderGoods; // 商品列表
+    1: required model.BaseResp base;
+    2: required model.orderWithGoods data;
 }
 
 struct CancelOrderReq {
-    1: required i64 OrderID;
+    1: required i64 orderID;
 }
 
 struct CancelOrderResp {
-    1: required model.BaseResp Base;
+    1: required model.BaseResp base;
 }
 
 struct ChangeDeliverAddressReq {
-    1: required i64 AddressID;
-    2: required string AddressInfo;
-    3: required i64 OrderID;
+    1: required i64 addressID;
+    2: required string addressInfo;
+    3: required i64 orderID;
 }
 
 struct ChangeDeliverAddressResp {
-    1: required model.BaseResp Base;
+    1: required model.BaseResp base;
 }
 
 struct DeleteOrderReq {
-    1: required i64 OrderID;
+    1: required i64 orderID;
 }
 
 struct DeleteOrderResp {
-    1: required model.BaseResp Base;
+    1: required model.BaseResp base;
+}
+
+struct IsOrderExistReq {
+    1: required i64 orderID
+}
+
+struct IsOrderExistResp {
+    1: required model.BaseResp base
+    2: required bool exist
 }
 
 service OrderService {
@@ -76,4 +77,5 @@ service OrderService {
     CancelOrderResp CancelOrder(1:CancelOrderReq req) (api.delete="/api/order/cancel")
     ChangeDeliverAddressResp ChangeDeliverAddress(1:ChangeDeliverAddressReq req) (api.put="/api/order/change-address")
     DeleteOrderResp DeleteOrder(1:DeleteOrderReq req) (api.delete="/api/order/delete")
+    IsOrderExistResp IsOrderExist(1:IsOrderExistReq req) (api.get="/api/order/exist")
 }
