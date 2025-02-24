@@ -116,10 +116,10 @@ type upyun struct {
 }
 
 type rocketmq struct {
-	BrokerAddr  string `mapstructure:"broker-addr"`
-	NameSrvAddr string `mapstructure:"nameSrv-addr"`
-	AccessKey   string `mapstructure:"access-key"`
-	SecretKey   string `mapstructure:"secret-key"`
+	BrokerAddr  string `mapstructure:"brokerAddr"`
+	NameSrvAddr string `mapstructure:"nameSrvAddr"`
+	AccessKey   string `mapstructure:"accessKey"`
+	SecretKey   string `mapstructure:"secretKey"`
 }
 
 type config struct {
