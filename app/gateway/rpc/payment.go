@@ -53,7 +53,7 @@ func RequestPaymentTokenRPC(ctx context.Context, req *payment.PaymentTokenReques
 
 func RequestRefundRPC(ctx context.Context, req *payment.RefundTokenRequest) (response int64, err error) {
 	logger.Infof("RequestRefundTokenRPC called") // 记录日志，确保调用成功
-	// 调用 RPC 获取退款令牌
+	// 调用 RPC 获取退款信息（退款ID）
 	resp, err := paymentClient.RequestRefundInfo(ctx, req)
 	if err != nil {
 		logger.Errorf("RequestRefundRPC: RPC call failed: %v", err.Error())
@@ -66,6 +66,6 @@ func RequestRefundRPC(ctx context.Context, req *payment.RefundTokenRequest) (res
 		return 0, errno.InternalServiceError.WithMessage(resp.Base.Msg)
 	}
 
-	// 返回退款令牌信息
+	// 返回退款令牌信息（退款ID）
 	return resp.RefundID, nil
 }

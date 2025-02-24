@@ -34,7 +34,6 @@ import (
  */
 type PaymentTokenRequest struct {
 	OrderID int64 `thrift:"orderID,1,required" form:"orderID,required" json:"orderID,required" query:"orderID,required"`
-	UserID  int64 `thrift:"userID,2,required" form:"userID,required" json:"userID,required" query:"userID,required"`
 }
 
 func NewPaymentTokenRequest() *PaymentTokenRequest {
@@ -48,20 +47,14 @@ func (p *PaymentTokenRequest) GetOrderID() (v int64) {
 	return p.OrderID
 }
 
-func (p *PaymentTokenRequest) GetUserID() (v int64) {
-	return p.UserID
-}
-
 var fieldIDToName_PaymentTokenRequest = map[int16]string{
 	1: "orderID",
-	2: "userID",
 }
 
 func (p *PaymentTokenRequest) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetOrderID bool = false
-	var issetUserID bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -86,15 +79,6 @@ func (p *PaymentTokenRequest) Read(iprot thrift.TProtocol) (err error) {
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 2:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetUserID = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -110,11 +94,6 @@ func (p *PaymentTokenRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetOrderID {
 		fieldId = 1
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetUserID {
-		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -146,17 +125,6 @@ func (p *PaymentTokenRequest) ReadField1(iprot thrift.TProtocol) error {
 	p.OrderID = _field
 	return nil
 }
-func (p *PaymentTokenRequest) ReadField2(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.UserID = _field
-	return nil
-}
 
 func (p *PaymentTokenRequest) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
@@ -166,10 +134,6 @@ func (p *PaymentTokenRequest) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
-			goto WriteFieldError
-		}
-		if err = p.writeField2(oprot); err != nil {
-			fieldId = 2
 			goto WriteFieldError
 		}
 	}
@@ -205,22 +169,6 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
-}
-func (p *PaymentTokenRequest) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("userID", thrift.I64, 2); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI64(p.UserID); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *PaymentTokenRequest) String() string {
@@ -786,7 +734,6 @@ func (p *PaymentResponse) String() string {
  */
 type RefundTokenRequest struct {
 	OrderID int64 `thrift:"orderID,1,required" form:"orderID,required" json:"orderID,required" query:"orderID,required"`
-	UserID  int64 `thrift:"userID,2,required" form:"userID,required" json:"userID,required" query:"userID,required"`
 }
 
 func NewRefundTokenRequest() *RefundTokenRequest {
@@ -800,20 +747,14 @@ func (p *RefundTokenRequest) GetOrderID() (v int64) {
 	return p.OrderID
 }
 
-func (p *RefundTokenRequest) GetUserID() (v int64) {
-	return p.UserID
-}
-
 var fieldIDToName_RefundTokenRequest = map[int16]string{
 	1: "orderID",
-	2: "userID",
 }
 
 func (p *RefundTokenRequest) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetOrderID bool = false
-	var issetUserID bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -838,15 +779,6 @@ func (p *RefundTokenRequest) Read(iprot thrift.TProtocol) (err error) {
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 2:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetUserID = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -862,11 +794,6 @@ func (p *RefundTokenRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetOrderID {
 		fieldId = 1
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetUserID {
-		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -898,17 +825,6 @@ func (p *RefundTokenRequest) ReadField1(iprot thrift.TProtocol) error {
 	p.OrderID = _field
 	return nil
 }
-func (p *RefundTokenRequest) ReadField2(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.UserID = _field
-	return nil
-}
 
 func (p *RefundTokenRequest) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
@@ -918,10 +834,6 @@ func (p *RefundTokenRequest) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
-			goto WriteFieldError
-		}
-		if err = p.writeField2(oprot); err != nil {
-			fieldId = 2
 			goto WriteFieldError
 		}
 	}
@@ -957,22 +869,6 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
-}
-func (p *RefundTokenRequest) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("userID", thrift.I64, 2); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI64(p.UserID); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *RefundTokenRequest) String() string {

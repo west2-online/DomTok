@@ -22,6 +22,7 @@ import (
 
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
 )
 
@@ -33,7 +34,7 @@ func (uc *paymentUseCase) CreatePayment(ctx context.Context, orderID int64) (*mo
 func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (token string, expTime int64, err error) {
 	// 1. 检查订单是否存在
 	// TODO 这个要向order模块要一个RPC接口然后再来填充
-	/*var orderInfo bool
+	var orderInfo bool
 	orderInfo, err = uc.svc.CheckOrderExist(ctx, orderID)
 	if err != nil {
 		return "", 0, fmt.Errorf("check order existed failed:%w", err)
@@ -67,11 +68,11 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 		// 获取订单的支付状态
 		payStatus, err := uc.db.GetPaymentInfo(ctx, orderID)
 		// 如果订单正在支付或者已经支付完成，则拒绝进行接下来的生成令牌的活动
-		if payStatus == paymentStatus.PaymentStatusSuccess || payStatus == paymentStatus.PaymentStatusProcessing {
+		if payStatus == paymentStatus.PaymentStatusSuccessCode || payStatus == paymentStatus.PaymentStatusProcessingCode {
 			return "", 0, fmt.Errorf("payment is processing or has already done:%w", err)
 		}
 	}
-	*/
+
 	// 4. HMAC生成支付令牌
 	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, orderID)
 	if err != nil {
@@ -80,8 +81,6 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	}
 	var redisStatus bool
 	// 5. 存储令牌到 Redis
-	// TODO 记得删除这个测试数值
-	uid := int64(paymentStatus.TestUserID)
 	redisStatus, err = uc.svc.StorePaymentToken(ctx, token, expTime, uid, orderID)
 	if err != nil && redisStatus != paymentStatus.RedisStoreSuccess {
 		logger.Errorf("Error store payment token: orderID:%d,userID:%d,err:%v", orderID, uid, err)
@@ -91,26 +90,21 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	return token, expTime, nil
 }
 
-// TODO
+// GetRefundInfo 获取退款信息 TODO
 func (uc *paymentUseCase) GetRefundInfo(ctx context.Context, orderID int64) (refundID int64, err error) {
-	/*
-		// 1. 检查订单是否存在
-		orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
-		if err != nil {
-			return "", 0, fmt.Errorf("check order existence failed: %w", err)
-		}
-		if !orderExists {
-			return "", 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
-		}
-
-		// 2. 获取用户ID
-		uid, err := uc.svc.GetUserID(ctx)
-		if err != nil {
-			return "", 0, fmt.Errorf("get user id failed: %w", err)
-		}
-	*/
-	// TODO 记得删除这个测试数值
-	uid := int64(paymentStatus.TestUserID)
+	// 1. 检查订单是否存在
+	orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
+	if err != nil {
+		return 0, fmt.Errorf("check order existence failed: %w", err)
+	}
+	if !orderExists {
+		return 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
+	}
+	// 2. 获取用户ID
+	uid, err := uc.svc.GetUserID(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("get user id failed: %w", err)
+	}
 	// 3. Redis 限流检查
 	var frequencyInfo bool
 	var timeInfo bool

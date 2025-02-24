@@ -9,7 +9,6 @@ include "../model.thrift"
  */
 struct PaymentTokenRequest {
     1: required i64 orderID
-    2: required i64 userID
 }
 
 /*
@@ -53,7 +52,6 @@ struct PaymentResponse {
  */
 struct RefundTokenRequest {
     1: required i64 orderID
-    2: required i64 userID
 }
 
 /*

@@ -42,7 +42,7 @@ func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64)
 	paymentOrder := &model.PaymentOrder{
 		ID:      paymentID,
 		OrderID: orderID,
-		Status:  paymentStatus.PaymentStatusPending, // 设定初始状态
+		Status:  paymentStatus.PaymentStatusPendingCode, // 设定初始状态
 	}
 
 	// 3. 存入数据库
@@ -66,7 +66,11 @@ func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error)
 
 // TODO 后面完善这个接口，要发起RPC请求向order模块申请数据库的查询，所以后面再来写
 func (svc *PaymentService) CheckOrderExist(ctx context.Context, orderID int64) (orderInfo bool, err error) {
-	return paymentStatus.OrderNotExist, nil
+	userInfo, err := svc.rpc.PaymentIsOrderExist(ctx, orderID)
+	if err != nil {
+		return false, fmt.Errorf("failed to check order existence: %w", err)
+	}
+	return userInfo, nil
 }
 
 // GeneratePaymentToken HMAC生成支付令牌
@@ -157,7 +161,7 @@ func (svc *PaymentService) CreateRefundInfo(ctx context.Context, orderID int64) 
 	refundOrder := &model.PaymentRefund{
 		ID:      refundID,
 		OrderID: orderID,
-		Status:  paymentStatus.RefundStatusPending, // 设定初始状态
+		Status:  paymentStatus.RefundStatusPendingCode, // 设定初始状态
 	}
 
 	// 3. 存入数据库
