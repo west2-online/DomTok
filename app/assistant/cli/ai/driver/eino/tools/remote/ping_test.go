@@ -35,7 +35,7 @@ func TestToolPing_InvokableRun(t *testing.T) {
 	fakeServerCaller := &MockServerCaller{}
 	PatchConvey("Test ToolPing.InvokableRun", t, func() {
 		PatchConvey("success", func() {
-			MockValue(&f.server).To(fakeServerCaller)
+			MockValue(&f.getServerCaller).To(func(_ string) adapter.ServerCaller { return fakeServerCaller })
 			Mock((*MockServerCaller).Ping).Return([]byte("pong"), nil).Build()
 
 			resp, err := f.InvokableRun(context.Background(), "")
@@ -44,7 +44,7 @@ func TestToolPing_InvokableRun(t *testing.T) {
 		})
 
 		PatchConvey("if server caller is nil", func() {
-			MockValue(&f.server).To(nil)
+			MockValue(&f.getServerCaller).To(func(_ string) adapter.ServerCaller { return nil })
 			Mock((*MockServerCaller).Ping).Return([]byte("pong"), nil).Build()
 
 			_, err := f.InvokableRun(context.Background(), "")
@@ -53,7 +53,7 @@ func TestToolPing_InvokableRun(t *testing.T) {
 		})
 
 		PatchConvey("if server caller returns error", func() {
-			MockValue(&f.server).To(fakeServerCaller)
+			MockValue(&f.getServerCaller).To(func(_ string) adapter.ServerCaller { return fakeServerCaller })
 			Mock((*MockServerCaller).Ping).Return(nil, errors.New("dial error")).Build()
 
 			resp, err := f.InvokableRun(context.Background(), "")

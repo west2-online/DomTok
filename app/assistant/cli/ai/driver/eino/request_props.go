@@ -50,8 +50,8 @@ func RebuildTools(caller model.GetServerCaller) {
 }
 
 // BuildTools builds the tools
-func BuildTools(caller model.GetServerCaller) []tool.BaseTool {
+func BuildTools(strategy model.GetServerCaller) []tool.BaseTool {
 	return []tool.BaseTool{
-		remote.Ping(caller(remote.ToolPingName)),
+		remote.Ping(strategy),
 	}
 }
