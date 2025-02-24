@@ -1,0 +1,32 @@
+# Filebeat 输入配置
+filebeat.inputs:
+  - type: log
+    id: "fzuhelper"
+    paths:
+      - /usr/share/filebeat/logs/**/*.log
+    json.keys_under_root: true
+    json.add_error_key: true
+    json.overwrite_keys: true
+
+# Filebeat 输出配置
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  index: "logs"
+  retry:
+    max_retries: 5  # 最大重试次数
+    backoff: 5s     # 重试间隔
+
+# 模板配置
+setup.template:
+  name: "logs-template"  # 模板名称
+  pattern: "logs-*"        # 模板匹配模式
+  enabled: true              # 必须启用模板
+  overwrite: true            # 允许覆盖旧模板
+  append_fields:
+    - name: stacktrace
+      type: text
+      index: false
+  settings:
+    index:
+      number_of_shards: 1   # 分片数
+      number_of_replicas: 1 # 副本数
