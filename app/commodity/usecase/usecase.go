@@ -18,6 +18,7 @@ package usecase
 
 import (
 	"context"
+	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
@@ -26,7 +27,10 @@ import (
 )
 
 type CommodityUseCase interface {
-	CreateCategory(ctx context.Context, category *model.Category) (id int64, err error)
+	CreateCategory(ctx context.Context, category *model.Category) (int64, error)
+	DeleteCategory(ctx context.Context, category *model.Category) (err error)
+	UpdateCategory(ctx context.Context, category *model.Category) (err error)
+	ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*modelKitex.CategoryInfo, err error)
 	CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err error)
 	CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) (int64, error)
 	DeleteSpu(ctx context.Context, spuId int64) error
@@ -34,6 +38,7 @@ type CommodityUseCase interface {
 	UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
 	DeleteSpuImage(ctx context.Context, imageId int64) error
 	ViewSpuImages(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error)
+	ViewSpus(ctx context.Context, req *commodity.ViewSpuReq) ([]*model.Spu, int64, error)
 	ListSpuInfo(ctx context.Context, ids []int64) ([]*model.Spu, error)
 
 	IncrLockStock(ctx context.Context, infos []*modelKitex.SkuBuyInfo) error
@@ -46,13 +51,17 @@ type useCase struct {
 	svc   *service.CommodityService
 	cache repository.CommodityCache
 	mq    repository.CommodityMQ
+	es    repository.CommodityElastic
 }
 
-func NewCommodityCase(db repository.CommodityDB, svc *service.CommodityService, cache repository.CommodityCache, mq repository.CommodityMQ) *useCase {
+func NewCommodityCase(db repository.CommodityDB, svc *service.CommodityService, cache repository.CommodityCache,
+	mq repository.CommodityMQ, es repository.CommodityElastic,
+) *useCase {
 	return &useCase{
 		db:    db,
 		svc:   svc,
 		cache: cache,
 		mq:    mq,
+		es:    es,
 	}
 }

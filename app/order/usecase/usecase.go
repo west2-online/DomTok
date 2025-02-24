@@ -32,6 +32,7 @@ type OrderUseCase interface {
 	CancelOrder(ctx context.Context, orderID int64) error
 	ChangeDeliverAddress(ctx context.Context, orderID, addressID int64, addressInfo string) error
 	DeleteOrder(ctx context.Context, orderID int64) error
+	IsOrderExist(ctx context.Context, orderID int64) (bool, error)
 }
 
 // useCase 实现了 OrderUseCase 接口

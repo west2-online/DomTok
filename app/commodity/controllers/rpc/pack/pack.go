@@ -20,6 +20,7 @@ import (
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/base"
+	"github.com/west2-online/DomTok/pkg/upyun"
 )
 
 func BuildImage(img *model.SpuImage) *modelKitex.SpuImage {
@@ -34,4 +35,24 @@ func BuildImage(img *model.SpuImage) *modelKitex.SpuImage {
 
 func BuildImages(imgs []*model.SpuImage) []*modelKitex.SpuImage {
 	return base.BuildTypeList(imgs, BuildImage)
+}
+
+func BuildSpu(spu *model.Spu) *modelKitex.Spu {
+	return &modelKitex.Spu{
+		SpuID:            spu.SpuId,
+		Name:             spu.Name,
+		CreatorID:        spu.CreatorId,
+		CategoryID:       spu.CategoryId,
+		Description:      spu.Description,
+		GoodsHeadDrawing: upyun.GetImageUrl(spu.GoodsHeadDrawingUrl),
+		Price:            spu.Price,
+		ForSale:          int32(spu.ForSale),
+		Shipping:         spu.Shipping,
+		CreatedAt:        spu.CreatedAt,
+		UpdatedAt:        spu.UpdatedAt,
+	}
+}
+
+func BuildSpus(spus []*model.Spu) []*modelKitex.Spu {
+	return base.BuildTypeList(spus, BuildSpu)
 }

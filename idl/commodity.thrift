@@ -184,6 +184,7 @@ struct ViewSpuReq {
 struct ViewSpuResp {
     1: required model.BaseResp base;
     2: required list<model.Spu> spus;
+    3: required i64 total;
 }
 
 /*

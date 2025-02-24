@@ -239,13 +239,30 @@ func ViewSpu(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewSpuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	res, err := rpc.ViewSpuRPC(ctx, &commodity.ViewSpuReq{
+		KeyWord:    req.KeyWord,
+		CategoryID: req.CategoryID,
+		SpuID:      req.SpuID,
+		MinCost:    req.MinCost,
+		MaxCost:    req.MaxCost,
+		IsShipping: req.IsShipping,
+		PageSize:   req.PageSize,
+		PageNum:    req.PageNum,
+	})
+	if err != nil {
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.ViewSpuResp)
+	resp.Total = res.Total
+	resp.Spus = pack.BuildSpus(res.Spus)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.RespData(c, resp)
 }
 
 // DeleteSpu .

@@ -111,3 +111,15 @@ func DeleteOrderRPC(ctx context.Context, req *order.DeleteOrderReq) error {
 	}
 	return nil
 }
+
+func IsOrderExistRPC(ctx context.Context, req *order.IsOrderExistReq) (bool, error) {
+	resp, err := orderClient.IsOrderExist(ctx, req)
+	if err != nil {
+		logger.Errorf("IsOrderExistRPC: RPC called failed: %v", err.Error())
+		return false, errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return false, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return resp.Exist, nil
+}
