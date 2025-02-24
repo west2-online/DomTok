@@ -23,10 +23,14 @@ import (
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 	"github.com/west2-online/DomTok/app/commodity/domain/service"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
+	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 )
 
 type CommodityUseCase interface {
-	CreateCategory(ctx context.Context, category *model.Category) (id int64, err error)
+	CreateCategory(ctx context.Context, category *model.Category) (int64, error)
+	DeleteCategory(ctx context.Context, category *model.Category) (err error)
+	UpdateCategory(ctx context.Context, category *model.Category) (err error)
+	ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*kmodel.CategoryInfo, err error)
 	CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err error)
 	CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) (int64, error)
 	DeleteSpu(ctx context.Context, spuId int64) error

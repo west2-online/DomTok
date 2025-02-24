@@ -23,11 +23,17 @@ import (
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
+	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/kafka"
 )
 
 type CommodityDB interface {
-	CreateCategory(ctx context.Context, name string) error
+	IsCategoryExistByName(ctx context.Context, name string) (bool, error)
+	IsCategoryExistById(ctx context.Context, id int64) (bool, error)
+	CreateCategory(ctx context.Context, entity *model.Category) error
+	DeleteCategory(ctx context.Context, category *model.Category) error
+	UpdateCategory(ctx context.Context, category *model.Category) error
+	ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*kmodel.CategoryInfo, err error)
 
 	CreateSpu(ctx context.Context, spu *model.Spu) error
 	CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
