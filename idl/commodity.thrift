@@ -184,6 +184,7 @@ struct ViewSpuReq {
 struct ViewSpuResp {
     1: required model.BaseResp base;
     2: required list<model.Spu> spus;
+    3: required i64 total;
 }
 
 /*
@@ -422,7 +423,7 @@ struct ViewCategoryResp {
 * @Param pageSize 页尺寸
  */
 struct ListSkuInfoReq {
-    1: required list<i64> skuIDs;
+    1: required list<model.SkuVersion> skuVersions;
     2: required i64 pageNum;
     3: required i64 pageSize;
 }

@@ -32,6 +32,6 @@ func NewCommodityCache(client *redis.Client) repository.CommodityCache {
 	return &commodityCache{client: client}
 }
 
-func (c commodityCache) IsExist(ctx context.Context, key string) bool {
+func (c *commodityCache) IsExist(ctx context.Context, key string) bool {
 	return c.client.Exists(ctx, key).Val() == 1
 }

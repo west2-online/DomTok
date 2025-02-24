@@ -16,8 +16,6 @@ limitations under the License.
 
 package model
 
-import "github.com/west2-online/DomTok/pkg/constants"
-
 type Spu struct {
 	SpuId               int64
 	Name                string
@@ -34,6 +32,11 @@ type Spu struct {
 	GoodsHeadDrawingUrl string
 }
 
-func (Category) TableName() string {
-	return constants.CategoryTableName
+// SpuEs : SpuId 和 Category 不能是int64, 存到es里会有精度损失, ref: https://www.cnblogs.com/ahfuzhang/p/16922292.html
+type SpuES struct {
+	SpuId      string  `json:"spu_id,omitempty"`
+	Name       string  `json:"name,omitempty"`
+	CategoryId string  `json:"category_id,omitempty"`
+	Price      float64 `json:"price,omitempty"`
+	Shipping   bool    `json:"shipping,omitempty"`
 }

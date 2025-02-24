@@ -121,6 +121,11 @@ struct SkuInfo {
     9: required i64 historyID;
 }
 
+struct SkuVersion {
+    1: required i64 skuID;
+    2: required i64 versionID;
+}
+
 struct PriceHistory {
     1: required i64 historyID;
     2: required i64 skuID;
