@@ -38,3 +38,7 @@ type PaymentRedis interface {
 	SetRefundToken(ctx context.Context, key string, token string, duration time.Duration) error
 	// GetPaymentToken(ctx context.Context, key string) (string, error)
 }
+
+type RPC interface {
+	PaymentIsOrderExist(ctx context.Context, orderID int64) (bool, error)
+}
