@@ -50,7 +50,6 @@ func (p *PaymentTokenRequest) FastRead(buf []byte) (int, error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetOrderID bool = false
-	var issetUserID bool = false
 	for {
 		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
 		offset += l
@@ -76,21 +75,6 @@ func (p *PaymentTokenRequest) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
-		case 2:
-			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField2(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetUserID = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
 		default:
 			l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -102,11 +86,6 @@ func (p *PaymentTokenRequest) FastRead(buf []byte) (int, error) {
 
 	if !issetOrderID {
 		fieldId = 1
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetUserID {
-		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return offset, nil
@@ -134,20 +113,6 @@ func (p *PaymentTokenRequest) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *PaymentTokenRequest) FastReadField2(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.UserID = _field
-	return offset, nil
-}
-
 func (p *PaymentTokenRequest) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
@@ -156,7 +121,6 @@ func (p *PaymentTokenRequest) FastWriteNocopy(buf []byte, w thrift.NocopyWriter)
 	offset := 0
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], w)
-		offset += p.fastWriteField2(buf[offset:], w)
 	}
 	offset += thrift.Binary.WriteFieldStop(buf[offset:])
 	return offset
@@ -166,7 +130,6 @@ func (p *PaymentTokenRequest) BLength() int {
 	l := 0
 	if p != nil {
 		l += p.field1Length()
-		l += p.field2Length()
 	}
 	l += thrift.Binary.FieldStopLength()
 	return l
@@ -179,21 +142,7 @@ func (p *PaymentTokenRequest) fastWriteField1(buf []byte, w thrift.NocopyWriter)
 	return offset
 }
 
-func (p *PaymentTokenRequest) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 2)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.UserID)
-	return offset
-}
-
 func (p *PaymentTokenRequest) field1Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *PaymentTokenRequest) field2Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.I64Length()
@@ -802,7 +751,6 @@ func (p *RefundTokenRequest) FastRead(buf []byte) (int, error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetOrderID bool = false
-	var issetUserID bool = false
 	for {
 		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
 		offset += l
@@ -828,21 +776,6 @@ func (p *RefundTokenRequest) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
-		case 2:
-			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField2(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetUserID = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
 		default:
 			l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -854,11 +787,6 @@ func (p *RefundTokenRequest) FastRead(buf []byte) (int, error) {
 
 	if !issetOrderID {
 		fieldId = 1
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetUserID {
-		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return offset, nil
@@ -886,20 +814,6 @@ func (p *RefundTokenRequest) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *RefundTokenRequest) FastReadField2(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.UserID = _field
-	return offset, nil
-}
-
 func (p *RefundTokenRequest) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
@@ -908,7 +822,6 @@ func (p *RefundTokenRequest) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) 
 	offset := 0
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], w)
-		offset += p.fastWriteField2(buf[offset:], w)
 	}
 	offset += thrift.Binary.WriteFieldStop(buf[offset:])
 	return offset
@@ -918,7 +831,6 @@ func (p *RefundTokenRequest) BLength() int {
 	l := 0
 	if p != nil {
 		l += p.field1Length()
-		l += p.field2Length()
 	}
 	l += thrift.Binary.FieldStopLength()
 	return l
@@ -931,21 +843,7 @@ func (p *RefundTokenRequest) fastWriteField1(buf []byte, w thrift.NocopyWriter) 
 	return offset
 }
 
-func (p *RefundTokenRequest) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 2)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.UserID)
-	return offset
-}
-
 func (p *RefundTokenRequest) field1Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *RefundTokenRequest) field2Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.I64Length()
@@ -959,8 +857,7 @@ func (p *RefundTokenResponse) FastRead(buf []byte) (int, error) {
 	var l int
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetRefundToken bool = false
-	var issetExpirationTime bool = false
+	var issetRefundID bool = false
 	for {
 		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
 		offset += l
@@ -986,28 +883,13 @@ func (p *RefundTokenResponse) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 2:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I64 {
 				l, err = p.FastReadField2(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetRefundToken = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 3:
-			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField3(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetExpirationTime = true
+				issetRefundID = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -1024,13 +906,8 @@ func (p *RefundTokenResponse) FastRead(buf []byte) (int, error) {
 		}
 	}
 
-	if !issetRefundToken {
+	if !issetRefundID {
 		fieldId = 2
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetExpirationTime {
-		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
 	return offset, nil
@@ -1059,20 +936,6 @@ func (p *RefundTokenResponse) FastReadField1(buf []byte) (int, error) {
 func (p *RefundTokenResponse) FastReadField2(buf []byte) (int, error) {
 	offset := 0
 
-	var _field string
-	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.RefundToken = _field
-	return offset, nil
-}
-
-func (p *RefundTokenResponse) FastReadField3(buf []byte) (int, error) {
-	offset := 0
-
 	var _field int64
 	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
 		return offset, err
@@ -1080,7 +943,7 @@ func (p *RefundTokenResponse) FastReadField3(buf []byte) (int, error) {
 		offset += l
 		_field = v
 	}
-	p.ExpirationTime = _field
+	p.RefundID = _field
 	return offset, nil
 }
 
@@ -1091,9 +954,8 @@ func (p *RefundTokenResponse) FastWrite(buf []byte) int {
 func (p *RefundTokenResponse) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
-		offset += p.fastWriteField3(buf[offset:], w)
-		offset += p.fastWriteField1(buf[offset:], w)
 		offset += p.fastWriteField2(buf[offset:], w)
+		offset += p.fastWriteField1(buf[offset:], w)
 	}
 	offset += thrift.Binary.WriteFieldStop(buf[offset:])
 	return offset
@@ -1104,7 +966,6 @@ func (p *RefundTokenResponse) BLength() int {
 	if p != nil {
 		l += p.field1Length()
 		l += p.field2Length()
-		l += p.field3Length()
 	}
 	l += thrift.Binary.FieldStopLength()
 	return l
@@ -1119,15 +980,8 @@ func (p *RefundTokenResponse) fastWriteField1(buf []byte, w thrift.NocopyWriter)
 
 func (p *RefundTokenResponse) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 2)
-	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.RefundToken)
-	return offset
-}
-
-func (p *RefundTokenResponse) fastWriteField3(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 3)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.ExpirationTime)
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 2)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.RefundID)
 	return offset
 }
 
@@ -1139,13 +993,6 @@ func (p *RefundTokenResponse) field1Length() int {
 }
 
 func (p *RefundTokenResponse) field2Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.StringLengthNocopy(p.RefundToken)
-	return l
-}
-
-func (p *RefundTokenResponse) field3Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.I64Length()
@@ -2206,7 +2053,7 @@ func (p *PaymentServiceProcessRefundResult) field0Length() int {
 	return l
 }
 
-func (p *PaymentServiceRequestRefundTokenArgs) FastRead(buf []byte) (int, error) {
+func (p *PaymentServiceRequestRefundInfoArgs) FastRead(buf []byte) (int, error) {
 
 	var err error
 	var offset int
@@ -2250,12 +2097,12 @@ func (p *PaymentServiceRequestRefundTokenArgs) FastRead(buf []byte) (int, error)
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_PaymentServiceRequestRefundTokenArgs[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_PaymentServiceRequestRefundInfoArgs[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 }
 
-func (p *PaymentServiceRequestRefundTokenArgs) FastReadField1(buf []byte) (int, error) {
+func (p *PaymentServiceRequestRefundInfoArgs) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 	_field := NewRefundTokenRequest()
 	if l, err := _field.FastRead(buf[offset:]); err != nil {
@@ -2267,11 +2114,11 @@ func (p *PaymentServiceRequestRefundTokenArgs) FastReadField1(buf []byte) (int, 
 	return offset, nil
 }
 
-func (p *PaymentServiceRequestRefundTokenArgs) FastWrite(buf []byte) int {
+func (p *PaymentServiceRequestRefundInfoArgs) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
 
-func (p *PaymentServiceRequestRefundTokenArgs) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+func (p *PaymentServiceRequestRefundInfoArgs) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], w)
@@ -2280,7 +2127,7 @@ func (p *PaymentServiceRequestRefundTokenArgs) FastWriteNocopy(buf []byte, w thr
 	return offset
 }
 
-func (p *PaymentServiceRequestRefundTokenArgs) BLength() int {
+func (p *PaymentServiceRequestRefundInfoArgs) BLength() int {
 	l := 0
 	if p != nil {
 		l += p.field1Length()
@@ -2289,21 +2136,21 @@ func (p *PaymentServiceRequestRefundTokenArgs) BLength() int {
 	return l
 }
 
-func (p *PaymentServiceRequestRefundTokenArgs) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
+func (p *PaymentServiceRequestRefundInfoArgs) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 1)
 	offset += p.Request.FastWriteNocopy(buf[offset:], w)
 	return offset
 }
 
-func (p *PaymentServiceRequestRefundTokenArgs) field1Length() int {
+func (p *PaymentServiceRequestRefundInfoArgs) field1Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += p.Request.BLength()
 	return l
 }
 
-func (p *PaymentServiceRequestRefundTokenResult) FastRead(buf []byte) (int, error) {
+func (p *PaymentServiceRequestRefundInfoResult) FastRead(buf []byte) (int, error) {
 
 	var err error
 	var offset int
@@ -2347,12 +2194,12 @@ func (p *PaymentServiceRequestRefundTokenResult) FastRead(buf []byte) (int, erro
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_PaymentServiceRequestRefundTokenResult[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_PaymentServiceRequestRefundInfoResult[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 }
 
-func (p *PaymentServiceRequestRefundTokenResult) FastReadField0(buf []byte) (int, error) {
+func (p *PaymentServiceRequestRefundInfoResult) FastReadField0(buf []byte) (int, error) {
 	offset := 0
 	_field := NewRefundTokenResponse()
 	if l, err := _field.FastRead(buf[offset:]); err != nil {
@@ -2364,11 +2211,11 @@ func (p *PaymentServiceRequestRefundTokenResult) FastReadField0(buf []byte) (int
 	return offset, nil
 }
 
-func (p *PaymentServiceRequestRefundTokenResult) FastWrite(buf []byte) int {
+func (p *PaymentServiceRequestRefundInfoResult) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
 
-func (p *PaymentServiceRequestRefundTokenResult) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+func (p *PaymentServiceRequestRefundInfoResult) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
 		offset += p.fastWriteField0(buf[offset:], w)
@@ -2377,7 +2224,7 @@ func (p *PaymentServiceRequestRefundTokenResult) FastWriteNocopy(buf []byte, w t
 	return offset
 }
 
-func (p *PaymentServiceRequestRefundTokenResult) BLength() int {
+func (p *PaymentServiceRequestRefundInfoResult) BLength() int {
 	l := 0
 	if p != nil {
 		l += p.field0Length()
@@ -2386,7 +2233,7 @@ func (p *PaymentServiceRequestRefundTokenResult) BLength() int {
 	return l
 }
 
-func (p *PaymentServiceRequestRefundTokenResult) fastWriteField0(buf []byte, w thrift.NocopyWriter) int {
+func (p *PaymentServiceRequestRefundInfoResult) fastWriteField0(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p.IsSetSuccess() {
 		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 0)
@@ -2395,7 +2242,7 @@ func (p *PaymentServiceRequestRefundTokenResult) fastWriteField0(buf []byte, w t
 	return offset
 }
 
-func (p *PaymentServiceRequestRefundTokenResult) field0Length() int {
+func (p *PaymentServiceRequestRefundInfoResult) field0Length() int {
 	l := 0
 	if p.IsSetSuccess() {
 		l += thrift.Binary.FieldBeginLength()
@@ -2428,10 +2275,10 @@ func (p *PaymentServiceProcessRefundResult) GetResult() interface{} {
 	return p.Success
 }
 
-func (p *PaymentServiceRequestRefundTokenArgs) GetFirstArgument() interface{} {
+func (p *PaymentServiceRequestRefundInfoArgs) GetFirstArgument() interface{} {
 	return p.Request
 }
 
-func (p *PaymentServiceRequestRefundTokenResult) GetResult() interface{} {
+func (p *PaymentServiceRequestRefundInfoResult) GetResult() interface{} {
 	return p.Success
 }

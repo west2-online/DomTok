@@ -27,6 +27,7 @@ import (
 	"github.com/west2-online/DomTok/pkg/constants"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // paymentDB impl domain.PaymentDB defined domain
@@ -74,6 +75,7 @@ func ConvertToDBModel(p *model.PaymentOrder) (*PaymentOrder, error) {
 		return nil, errno.Errorf(errno.ParamVerifyErrorCode, "ConvertToDBModel: input payment order is nil")
 	}
 	return &PaymentOrder{
+		ID:                        p.ID,
 		OrderID:                   p.OrderID,
 		UserID:                    p.UserID,
 		Amount:                    p.Amount,
@@ -94,5 +96,41 @@ func (db *paymentDB) CreatePayment(ctx context.Context, p *model.PaymentOrder) e
 	if err := db.client.WithContext(ctx).Create(paymentOrder).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create payment: %v", err)
 	}
+	return nil
+}
+
+// ConvertRefundToDBModel 转换函数
+func ConvertRefundToDBModel(p *model.PaymentRefund) (*PaymentRefund, error) {
+	if p == nil {
+		// TODO 这里应该是用errno.ParamVerifyErrorCode这个错误码？
+		return nil, errno.Errorf(errno.ParamVerifyErrorCode, "ConvertToDBModel: input payment order is nil")
+	}
+	return &PaymentRefund{
+		ID:                        p.ID,
+		OrderID:                   p.OrderID,
+		UserID:                    p.UserID,
+		RefundAmount:              p.RefundAmount,
+		RefundReason:              p.RefundReason,
+		Status:                    p.Status,
+		MaskedCreditCardNumber:    p.MaskedCreditCardNumber,
+		CreditCardExpirationYear:  p.CreditCardExpirationYear,
+		CreditCardExpirationMonth: p.CreditCardExpirationMonth,
+	}, nil
+}
+
+func (db *paymentDB) CreateRefund(ctx context.Context, p *model.PaymentRefund) error {
+	// 将 entity 转换成 MySQL 需要的 refundOrder 结构
+	refundOrder, err := ConvertRefundToDBModel(p)
+	if err != nil {
+		logger.Errorf("CreateRefund: failed to convert refund order: %v", err)
+		return errno.Errorf(errno.InternalServiceErrorCode, "CreateRefund: failed to convert refund order: %v", err)
+	}
+
+	// 插入数据库
+	if err := db.client.WithContext(ctx).Create(refundOrder).Error; err != nil {
+		logger.Errorf("CreateRefund: failed to create refund order: %v", err)
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create refund: %v", err)
+	}
+	logger.Infof("CreateRefund: refund order created successfully")
 	return nil
 }

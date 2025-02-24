@@ -32,7 +32,7 @@ type Client interface {
 	ProcessPayment(ctx context.Context, request *payment.PaymentRequest, callOptions ...callopt.Option) (r *payment.PaymentResponse, err error)
 	RequestPaymentToken(ctx context.Context, request *payment.PaymentTokenRequest, callOptions ...callopt.Option) (r *payment.PaymentTokenResponse, err error)
 	ProcessRefund(ctx context.Context, request *payment.RefundRequest, callOptions ...callopt.Option) (r *payment.RefundResponse, err error)
-	RequestRefundToken(ctx context.Context, request *payment.RefundTokenRequest, callOptions ...callopt.Option) (r *payment.RefundTokenResponse, err error)
+	RequestRefundInfo(ctx context.Context, request *payment.RefundTokenRequest, callOptions ...callopt.Option) (r *payment.RefundTokenResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -79,7 +79,7 @@ func (p *kPaymentServiceClient) ProcessRefund(ctx context.Context, request *paym
 	return p.kClient.ProcessRefund(ctx, request)
 }
 
-func (p *kPaymentServiceClient) RequestRefundToken(ctx context.Context, request *payment.RefundTokenRequest, callOptions ...callopt.Option) (r *payment.RefundTokenResponse, err error) {
+func (p *kPaymentServiceClient) RequestRefundInfo(ctx context.Context, request *payment.RefundTokenRequest, callOptions ...callopt.Option) (r *payment.RefundTokenResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.RequestRefundToken(ctx, request)
+	return p.kClient.RequestRefundInfo(ctx, request)
 }

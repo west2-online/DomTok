@@ -17,14 +17,29 @@ limitations under the License.
 package pack
 
 import (
-	model2 "github.com/west2-online/DomTok/app/commodity/domain/model"
-	"github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/pkg/base"
 )
 
-func BuildImages(i []*model2.SkuImage) []*model.SkuImage {
-	result := make([]*model.SkuImage, 0, len(i)) // 预分配容量
+func BuildImage(img *model.SpuImage) *modelKitex.SpuImage {
+	return &modelKitex.SpuImage{
+		ImageID:   img.ImageID,
+		SpuID:     img.SpuID,
+		Url:       img.Url,
+		CreatedAt: img.CreatedAt,
+		UpdatedAt: img.UpdatedAt,
+	}
+}
+
+func BuildImages(imgs []*model.SpuImage) []*modelKitex.SpuImage {
+	return base.BuildTypeList(imgs, BuildImage)
+}
+
+func BuildSkuImages(i []*model.SkuImage) []*modelKitex.SkuImage {
+	result := make([]*modelKitex.SkuImage, 0, len(i)) // 预分配容量
 	for _, v := range i {
-		result = append(result, &model.SkuImage{
+		result = append(result, &modelKitex.SkuImage{
 			ImageID:   v.ImageID,
 			SkuID:     v.SkuID,
 			Url:       v.Url,
@@ -35,18 +50,18 @@ func BuildImages(i []*model2.SkuImage) []*model.SkuImage {
 	return result
 }
 
-func BuildSkus(i []*model2.Sku) []*model.Sku {
-	result := make([]*model.Sku, 0, len(i)) // 预分配容量
+func BuildSkus(i []*model.Sku) []*modelKitex.Sku {
+	result := make([]*modelKitex.Sku, 0, len(i)) // 预分配容量
 	for _, v := range i {
-		attr := make([]*model.AttrValue, 0, len(v.SaleAttr))
+		attr := make([]*modelKitex.AttrValue, 0, len(v.SaleAttr))
 		for _, value := range v.SaleAttr {
-			attr = append(attr, &model.AttrValue{
+			attr = append(attr, &modelKitex.AttrValue{
 				SaleAttr:  value.SaleAttr,
 				SaleValue: value.SaleValue,
 			})
 		}
 
-		result = append(result, &model.Sku{
+		result = append(result, &modelKitex.Sku{
 			SkuID:            v.SkuID,
 			CreatorID:        v.CreatorID,
 			Price:            v.Price,
@@ -67,10 +82,10 @@ func BuildSkus(i []*model2.Sku) []*model.Sku {
 	return result
 }
 
-func BuildSkuInfos(i []*model2.Sku) []*model.SkuInfo {
-	result := make([]*model.SkuInfo, 0, len(i)) // 预分配容量
+func BuildSkuInfos(i []*model.Sku) []*modelKitex.SkuInfo {
+	result := make([]*modelKitex.SkuInfo, 0, len(i)) // 预分配容量
 	for _, v := range i {
-		result = append(result, &model.SkuInfo{
+		result = append(result, &modelKitex.SkuInfo{
 			SkuID:            v.SkuID,
 			CreatorID:        v.CreatorID,
 			Price:            v.Price,

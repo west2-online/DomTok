@@ -21,6 +21,12 @@ type SpuImage struct {
 	SpuID     int64
 	Url       string
 	CreatedAt int64
+	UpdatedAt int64
 	DeletedAt int64
 	Data      []byte
+}
+
+type SpuImages struct {
+	Images []*SpuImage
+	Total  int64
 }

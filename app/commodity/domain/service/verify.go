@@ -16,6 +16,11 @@ limitations under the License.
 
 package service
 
+import (
+	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/errno"
+)
+
 type CommodityVerifyOps func() error
 
 func (svc *CommodityService) Verify(opts ...CommodityVerifyOps) error {
@@ -25,4 +30,13 @@ func (svc *CommodityService) Verify(opts ...CommodityVerifyOps) error {
 		}
 	}
 	return nil
+}
+
+func (svc *CommodityService) VerifyForSaleStatus(status int) CommodityVerifyOps {
+	return func() error {
+		if status != constants.CommodityAllowedForSale && status != constants.CommodityNotAllowedForSale {
+			return errno.ParamVerifyError
+		}
+		return nil
+	}
 }
