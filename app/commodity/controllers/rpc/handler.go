@@ -25,7 +25,6 @@ import (
 	"github.com/west2-online/DomTok/app/commodity/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	"github.com/west2-online/DomTok/pkg/base"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 type CommodityHandler struct {
@@ -36,7 +35,6 @@ func (c CommodityHandler) CreateSpuImage(streamServer commodity.CommodityService
 	resp := new(commodity.CreateSpuImageResp)
 	req, err := streamServer.Recv()
 	if err != nil {
-		logger.Errorf("rpc.CreateSpuImage: receive error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -44,7 +42,6 @@ func (c CommodityHandler) CreateSpuImage(streamServer commodity.CommodityService
 	for i := 0; i < int(req.BufferCount); i++ {
 		data, err := streamServer.Recv()
 		if err != nil {
-			logger.Errorf("rpc.CreateSpuImage: receive error: %v", err)
 			resp.Base = base.BuildBaseResp(err)
 			return streamServer.SendAndClose(resp)
 		}
@@ -56,7 +53,6 @@ func (c CommodityHandler) CreateSpuImage(streamServer commodity.CommodityService
 		SpuID: req.SpuID,
 	})
 	if err != nil {
-		logger.Errorf("rpc.CreateSpuImage: create spu image error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -70,7 +66,6 @@ func (c CommodityHandler) UpdateSpuImage(streamServer commodity.CommodityService
 	resp := new(commodity.UpdateSpuImageResp)
 	req, err := streamServer.Recv()
 	if err != nil {
-		logger.Errorf("rpc.UpdateSpuImage: receive error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -78,7 +73,6 @@ func (c CommodityHandler) UpdateSpuImage(streamServer commodity.CommodityService
 	for i := 0; i < int(req.BufferCount); i++ {
 		data, err := streamServer.Recv()
 		if err != nil {
-			logger.Errorf("rpc.UpdateSpuImage: receive error: %v", err)
 			resp.Base = base.BuildBaseResp(err)
 			return streamServer.SendAndClose(resp)
 		}
@@ -90,7 +84,6 @@ func (c CommodityHandler) UpdateSpuImage(streamServer commodity.CommodityService
 		ImageID: req.ImageID,
 	})
 	if err != nil {
-		logger.Errorf("rpc.UpdateSpuImage: update spu image error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -103,9 +96,8 @@ func (c CommodityHandler) DeleteSpuImage(ctx context.Context, req *commodity.Del
 	resp := new(commodity.DeleteSpuImageResp)
 	err = c.useCase.DeleteSpuImage(ctx, req.GetSpuImageID())
 	if err != nil {
-		logger.Errorf("rpc.DeleteSpuImage: delete spu image error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
-		return resp, nil
+		return resp, err
 	}
 
 	resp.Base = base.BuildBaseResp(nil)
@@ -147,7 +139,6 @@ func (c CommodityHandler) CreateSpu(streamServer commodity.CommodityService_Crea
 
 	req, err := streamServer.Recv()
 	if err != nil {
-		logger.Errorf("rpc.CreateSpu: receive error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -155,7 +146,6 @@ func (c CommodityHandler) CreateSpu(streamServer commodity.CommodityService_Crea
 	for i := 0; i < int(req.BufferCount); i++ {
 		fileData, err := streamServer.Recv()
 		if err != nil {
-			logger.Errorf("rpc.CreateSpu: receive error: %v", err)
 			resp.Base = base.BuildBaseResp(err)
 			return streamServer.SendAndClose(resp)
 		}
@@ -172,7 +162,6 @@ func (c CommodityHandler) CreateSpu(streamServer commodity.CommodityService_Crea
 		GoodsHeadDrawing: req.GoodsHeadDrawing,
 	})
 	if err != nil {
-		logger.Errorf("rpc.CreateSpu: create spu error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -187,7 +176,6 @@ func (c CommodityHandler) UpdateSpu(streamServer commodity.CommodityService_Upda
 
 	req, err := streamServer.Recv()
 	if err != nil {
-		logger.Errorf("rpc.UpdateSpu: receive error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -195,7 +183,6 @@ func (c CommodityHandler) UpdateSpu(streamServer commodity.CommodityService_Upda
 	for i := 0; i < int(*req.BufferCount); i++ {
 		fileData, err := streamServer.Recv()
 		if err != nil {
-			logger.Errorf("rpc.UpdateSpu: receive error: %v", err)
 			resp.Base = base.BuildBaseResp(err)
 			return streamServer.SendAndClose(resp)
 		}
@@ -213,7 +200,6 @@ func (c CommodityHandler) UpdateSpu(streamServer commodity.CommodityService_Upda
 		GoodsHeadDrawing: req.GetGoodsHeadDrawing(),
 	})
 	if err != nil {
-		logger.Errorf("rpc.UpdateSpu: update spu error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -223,17 +209,24 @@ func (c CommodityHandler) UpdateSpu(streamServer commodity.CommodityService_Upda
 }
 
 func (c CommodityHandler) ViewSpu(ctx context.Context, req *commodity.ViewSpuReq) (r *commodity.ViewSpuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ViewSpuResp)
+	res, total, err := c.useCase.ViewSpus(ctx, req)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return r, err
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.Total = total
+	r.Spus = pack.BuildSpus(res)
+	return r, err
 }
 
 func (c CommodityHandler) DeleteSpu(ctx context.Context, req *commodity.DeleteSpuReq) (r *commodity.DeleteSpuResp, err error) {
 	r = new(commodity.DeleteSpuResp)
 	err = c.useCase.DeleteSpu(ctx, req.GetSpuID())
 	if err != nil {
-		logger.Errorf("rpc.DeleteSpu: delete spu error: %v", err)
 		r.Base = base.BuildBaseResp(err)
-		return r, nil
+		return r, err
 	}
 	r.Base = base.BuildBaseResp(nil)
 	return r, nil
@@ -244,9 +237,8 @@ func (c CommodityHandler) ViewSpuImage(ctx context.Context, req *commodity.ViewS
 	offset := req.GetPageNum() * req.GetPageSize()
 	imgs, total, err := c.useCase.ViewSpuImages(ctx, req.GetSpuID(), int(offset), int(req.GetPageSize()))
 	if err != nil {
-		logger.Errorf("rpc.ViewSpuImage: view spu error: %v", err)
 		r.Base = base.BuildBaseResp(err)
-		return r, nil
+		return r, err
 	}
 
 	r.Base = base.BuildBaseResp(nil)

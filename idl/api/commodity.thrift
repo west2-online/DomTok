@@ -106,6 +106,7 @@ struct ViewSpuReq {
 
 struct ViewSpuResp {
     1: required list<model.Spu> spus;
+    2: required i64 total;
 }
 
 struct DeleteSpuReq {

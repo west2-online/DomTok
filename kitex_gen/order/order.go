@@ -860,6 +860,132 @@ var fieldIDToName_DeleteOrderResp = map[int16]string{
 	1: "base",
 }
 
+type IsOrderExistReq struct {
+	OrderID int64 `thrift:"orderID,1,required" frugal:"1,required,i64" json:"orderID"`
+}
+
+func NewIsOrderExistReq() *IsOrderExistReq {
+	return &IsOrderExistReq{}
+}
+
+func (p *IsOrderExistReq) InitDefault() {
+}
+
+func (p *IsOrderExistReq) GetOrderID() (v int64) {
+	return p.OrderID
+}
+func (p *IsOrderExistReq) SetOrderID(val int64) {
+	p.OrderID = val
+}
+
+func (p *IsOrderExistReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("IsOrderExistReq(%+v)", *p)
+}
+
+func (p *IsOrderExistReq) DeepEqual(ano *IsOrderExistReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.OrderID) {
+		return false
+	}
+	return true
+}
+
+func (p *IsOrderExistReq) Field1DeepEqual(src int64) bool {
+
+	if p.OrderID != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_IsOrderExistReq = map[int16]string{
+	1: "orderID",
+}
+
+type IsOrderExistResp struct {
+	Base  *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+	Exist bool            `thrift:"exist,2,required" frugal:"2,required,bool" json:"exist"`
+}
+
+func NewIsOrderExistResp() *IsOrderExistResp {
+	return &IsOrderExistResp{}
+}
+
+func (p *IsOrderExistResp) InitDefault() {
+}
+
+var IsOrderExistResp_Base_DEFAULT *model.BaseResp
+
+func (p *IsOrderExistResp) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return IsOrderExistResp_Base_DEFAULT
+	}
+	return p.Base
+}
+
+func (p *IsOrderExistResp) GetExist() (v bool) {
+	return p.Exist
+}
+func (p *IsOrderExistResp) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+func (p *IsOrderExistResp) SetExist(val bool) {
+	p.Exist = val
+}
+
+func (p *IsOrderExistResp) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *IsOrderExistResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("IsOrderExistResp(%+v)", *p)
+}
+
+func (p *IsOrderExistResp) DeepEqual(ano *IsOrderExistResp) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Exist) {
+		return false
+	}
+	return true
+}
+
+func (p *IsOrderExistResp) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+func (p *IsOrderExistResp) Field2DeepEqual(src bool) bool {
+
+	if p.Exist != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_IsOrderExistResp = map[int16]string{
+	1: "base",
+	2: "exist",
+}
+
 type OrderService interface {
 	CreateOrder(ctx context.Context, req *CreateOrderReq) (r *CreateOrderResp, err error)
 
@@ -872,6 +998,8 @@ type OrderService interface {
 	ChangeDeliverAddress(ctx context.Context, req *ChangeDeliverAddressReq) (r *ChangeDeliverAddressResp, err error)
 
 	DeleteOrder(ctx context.Context, req *DeleteOrderReq) (r *DeleteOrderResp, err error)
+
+	IsOrderExist(ctx context.Context, req *IsOrderExistReq) (r *IsOrderExistResp, err error)
 }
 
 type OrderServiceCreateOrderArgs struct {
@@ -1567,5 +1695,121 @@ func (p *OrderServiceDeleteOrderResult) Field0DeepEqual(src *DeleteOrderResp) bo
 }
 
 var fieldIDToName_OrderServiceDeleteOrderResult = map[int16]string{
+	0: "success",
+}
+
+type OrderServiceIsOrderExistArgs struct {
+	Req *IsOrderExistReq `thrift:"req,1" frugal:"1,default,IsOrderExistReq" json:"req"`
+}
+
+func NewOrderServiceIsOrderExistArgs() *OrderServiceIsOrderExistArgs {
+	return &OrderServiceIsOrderExistArgs{}
+}
+
+func (p *OrderServiceIsOrderExistArgs) InitDefault() {
+}
+
+var OrderServiceIsOrderExistArgs_Req_DEFAULT *IsOrderExistReq
+
+func (p *OrderServiceIsOrderExistArgs) GetReq() (v *IsOrderExistReq) {
+	if !p.IsSetReq() {
+		return OrderServiceIsOrderExistArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *OrderServiceIsOrderExistArgs) SetReq(val *IsOrderExistReq) {
+	p.Req = val
+}
+
+func (p *OrderServiceIsOrderExistArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *OrderServiceIsOrderExistArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("OrderServiceIsOrderExistArgs(%+v)", *p)
+}
+
+func (p *OrderServiceIsOrderExistArgs) DeepEqual(ano *OrderServiceIsOrderExistArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *OrderServiceIsOrderExistArgs) Field1DeepEqual(src *IsOrderExistReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_OrderServiceIsOrderExistArgs = map[int16]string{
+	1: "req",
+}
+
+type OrderServiceIsOrderExistResult struct {
+	Success *IsOrderExistResp `thrift:"success,0,optional" frugal:"0,optional,IsOrderExistResp" json:"success,omitempty"`
+}
+
+func NewOrderServiceIsOrderExistResult() *OrderServiceIsOrderExistResult {
+	return &OrderServiceIsOrderExistResult{}
+}
+
+func (p *OrderServiceIsOrderExistResult) InitDefault() {
+}
+
+var OrderServiceIsOrderExistResult_Success_DEFAULT *IsOrderExistResp
+
+func (p *OrderServiceIsOrderExistResult) GetSuccess() (v *IsOrderExistResp) {
+	if !p.IsSetSuccess() {
+		return OrderServiceIsOrderExistResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *OrderServiceIsOrderExistResult) SetSuccess(x interface{}) {
+	p.Success = x.(*IsOrderExistResp)
+}
+
+func (p *OrderServiceIsOrderExistResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *OrderServiceIsOrderExistResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("OrderServiceIsOrderExistResult(%+v)", *p)
+}
+
+func (p *OrderServiceIsOrderExistResult) DeepEqual(ano *OrderServiceIsOrderExistResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *OrderServiceIsOrderExistResult) Field0DeepEqual(src *IsOrderExistResp) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_OrderServiceIsOrderExistResult = map[int16]string{
 	0: "success",
 }

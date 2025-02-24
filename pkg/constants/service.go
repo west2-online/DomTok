@@ -55,4 +55,7 @@ const (
 const (
 	CommodityAllowedForSale    = 1
 	CommodityNotAllowedForSale = 2
+
+	CommodityDefaultMinCost = 0.0
+	CommodityDefaultMaxCost = 1e7
 )

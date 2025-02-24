@@ -80,6 +80,32 @@ func (d *commodityDB) DeleteCategory(ctx context.Context, category *model.Catego
 	if err := d.client.WithContext(ctx).Delete(Category{Id: category.Id}).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete category: %v", err)
 	}
+func (db *commodityDB) GetSpuByIds(ctx context.Context, spuIds []int64) ([]*model.Spu, error) {
+	spus := make([]*Spu, 0)
+	if err := db.client.WithContext(ctx).Table(constants.SpuTableName).Where("id in (?)", spuIds).Find(&spus).Error; err != nil {
+		return nil, errno.Errorf(errno.InternalServiceErrorCode, "CommodityDB.GetSpuByIds failed: %v", err)
+	}
+	rets := make([]*model.Spu, 0)
+	for _, spu := range spus {
+		ret := &model.Spu{
+			SpuId:               spu.Id,
+			Name:                spu.Name,
+			CreatorId:           spu.CreatorId,
+			Description:         spu.Description,
+			CategoryId:          spu.CategoryId,
+			Price:               spu.Price,
+			ForSale:             spu.ForSale,
+			Shipping:            spu.Shipping,
+			CreatedAt:           spu.CreatedAt.Unix(),
+			UpdatedAt:           spu.UpdatedAt.Unix(),
+			GoodsHeadDrawingUrl: spu.GoodsHeadDrawing,
+		}
+		rets = append(rets, ret)
+	}
+	return rets, nil
+}
+
+func (db *commodityDB) CreateCategory(ctx context.Context, name string) error {
 	return nil
 }
 

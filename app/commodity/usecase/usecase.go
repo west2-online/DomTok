@@ -23,6 +23,7 @@ import (
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 	"github.com/west2-online/DomTok/app/commodity/domain/service"
+	"github.com/west2-online/DomTok/kitex_gen/commodity"
 )
 
 type CommodityUseCase interface {
@@ -37,6 +38,7 @@ type CommodityUseCase interface {
 	UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
 	DeleteSpuImage(ctx context.Context, imageId int64) error
 	ViewSpuImages(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error)
+	ViewSpus(ctx context.Context, req *commodity.ViewSpuReq) ([]*model.Spu, int64, error)
 }
 
 type useCase struct {
@@ -44,13 +46,17 @@ type useCase struct {
 	svc   *service.CommodityService
 	cache repository.CommodityCache
 	mq    repository.CommodityMQ
+	es    repository.CommodityElastic
 }
 
-func NewCommodityCase(db repository.CommodityDB, svc *service.CommodityService, cache repository.CommodityCache, mq repository.CommodityMQ) *useCase {
+func NewCommodityCase(db repository.CommodityDB, svc *service.CommodityService, cache repository.CommodityCache,
+	mq repository.CommodityMQ, es repository.CommodityElastic,
+) *useCase {
 	return &useCase{
 		db:    db,
 		svc:   svc,
 		cache: cache,
 		mq:    mq,
+		es:    es,
 	}
 }

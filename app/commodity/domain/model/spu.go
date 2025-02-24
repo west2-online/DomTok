@@ -31,3 +31,12 @@ type Spu struct {
 	DeletedAt           int64
 	GoodsHeadDrawingUrl string
 }
+
+// SpuEs : SpuId 和 Category 不能是int64, 存到es里会有精度损失, ref: https://www.cnblogs.com/ahfuzhang/p/16922292.html
+type SpuES struct {
+	SpuId      string  `json:"spu_id,omitempty"`
+	Name       string  `json:"name,omitempty"`
+	CategoryId string  `json:"category_id,omitempty"`
+	Price      float64 `json:"price,omitempty"`
+	Shipping   bool    `json:"shipping,omitempty"`
+}

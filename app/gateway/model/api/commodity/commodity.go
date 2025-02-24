@@ -4108,7 +4108,8 @@ func (p *ViewSpuReq) String() string {
 }
 
 type ViewSpuResp struct {
-	Spus []*model.Spu `thrift:"spus,1,required" form:"spus,required" json:"spus,required" query:"spus,required"`
+	Spus  []*model.Spu `thrift:"spus,1,required" form:"spus,required" json:"spus,required" query:"spus,required"`
+	Total int64        `thrift:"total,2,required" form:"total,required" json:"total,required" query:"total,required"`
 }
 
 func NewViewSpuResp() *ViewSpuResp {
@@ -4122,8 +4123,13 @@ func (p *ViewSpuResp) GetSpus() (v []*model.Spu) {
 	return p.Spus
 }
 
+func (p *ViewSpuResp) GetTotal() (v int64) {
+	return p.Total
+}
+
 var fieldIDToName_ViewSpuResp = map[int16]string{
 	1: "spus",
+	2: "total",
 }
 
 func (p *ViewSpuResp) Read(iprot thrift.TProtocol) (err error) {
@@ -4131,6 +4137,7 @@ func (p *ViewSpuResp) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetSpus bool = false
+	var issetTotal bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -4155,6 +4162,15 @@ func (p *ViewSpuResp) Read(iprot thrift.TProtocol) (err error) {
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetTotal = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -4170,6 +4186,11 @@ func (p *ViewSpuResp) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetSpus {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetTotal {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -4213,6 +4234,17 @@ func (p *ViewSpuResp) ReadField1(iprot thrift.TProtocol) error {
 	p.Spus = _field
 	return nil
 }
+func (p *ViewSpuResp) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Total = _field
+	return nil
+}
 
 func (p *ViewSpuResp) Write(oprot thrift.TProtocol) (err error) {
 
@@ -4223,6 +4255,10 @@ func (p *ViewSpuResp) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 	}
@@ -4266,6 +4302,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *ViewSpuResp) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("total", thrift.I64, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.Total); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *ViewSpuResp) String() string {
