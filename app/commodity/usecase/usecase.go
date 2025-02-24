@@ -18,11 +18,11 @@ package usecase
 
 import (
 	"context"
-	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 	"github.com/west2-online/DomTok/app/commodity/domain/service"
+	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 )
 
 type CommodityUseCase interface {
