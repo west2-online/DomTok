@@ -14,26 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package service
 
-// 业务强相关, 范围是 1000-9999
-const (
-	// User
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
+import "github.com/west2-online/DomTok/app/assistant/cli/ai/adapter"
 
-	ErrRecordNotFound
-
-	// order
-	ServiceOrderNotFound
-	ServiceSpuNotExist
-	ServiceImgNotExist
-	ServiceSkuExist
-	PaymentOrderNotExist
-	UserNotExist
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
-)
+// Use sets the ai adapter to be used by the service
+// Goland 索引老是出错
+func Use(ai adapter.AIClient) {
+	Service.ai = ai
+}

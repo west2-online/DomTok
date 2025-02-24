@@ -14,26 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package pack
 
-// 业务强相关, 范围是 1000-9999
-const (
-	// User
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
+import "github.com/google/uuid"
 
-	ErrRecordNotFound
-
-	// order
-	ServiceOrderNotFound
-	ServiceSpuNotExist
-	ServiceImgNotExist
-	ServiceSkuExist
-	PaymentOrderNotExist
-	UserNotExist
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
-)
+// GenerateUUID generates a UUID
+func GenerateUUID() string {
+	return uuid.New().String()
+}

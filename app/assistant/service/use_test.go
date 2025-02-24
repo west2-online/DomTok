@@ -14,26 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package service
 
-// 业务强相关, 范围是 1000-9999
-const (
-	// User
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
+import (
+	"testing"
 
-	ErrRecordNotFound
+	. "github.com/bytedance/mockey"
+	. "github.com/smartystreets/goconvey/convey"
 
-	// order
-	ServiceOrderNotFound
-	ServiceSpuNotExist
-	ServiceImgNotExist
-	ServiceSkuExist
-	PaymentOrderNotExist
-	UserNotExist
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
+	"github.com/west2-online/DomTok/app/assistant/cli/ai/adapter"
 )
+
+func TestUse(t *testing.T) {
+	PatchConvey("Test Core.Use", t, func() {
+		type EmptyAIClient struct {
+			adapter.AIClient
+		}
+		cli := EmptyAIClient{}
+		Service.ai = nil
+		Use(&cli)
+		So(Service.ai, ShouldEqual, &cli)
+	})
+}

@@ -14,26 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package http
 
-// 业务强相关, 范围是 1000-9999
-const (
-	// User
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
+import (
+	"context"
 
-	ErrRecordNotFound
-
-	// order
-	ServiceOrderNotFound
-	ServiceSpuNotExist
-	ServiceImgNotExist
-	ServiceSkuExist
-	PaymentOrderNotExist
-	UserNotExist
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
+	"github.com/cloudwego/hertz/pkg/protocol"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
+
+// Tips: This function should not be used in the future
+
+const (
+	_PingPath   = "/ping"
+	_PingMethod = consts.MethodGet
+)
+
+func (c *Client) Ping(ctx context.Context) ([]byte, error) {
+	req, resp := protocol.AcquireRequest(), protocol.AcquireResponse()
+	req.SetRequestURI(c.buildUrl(_PingPath))
+	req.SetMethod(_PingMethod)
+
+	err := c.do(ctx, req, resp)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Body(), nil
+}

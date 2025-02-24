@@ -14,26 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package router
 
-// 业务强相关, 范围是 1000-9999
-const (
-	// User
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
+import (
+	"github.com/cloudwego/hertz/pkg/app/server"
 
-	ErrRecordNotFound
-
-	// order
-	ServiceOrderNotFound
-	ServiceSpuNotExist
-	ServiceImgNotExist
-	ServiceSkuExist
-	PaymentOrderNotExist
-	UserNotExist
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
+	"github.com/west2-online/DomTok/app/assistant/handler"
 )
+
+// GeneratedRegister registers routers.
+func GeneratedRegister(r *server.Hertz) {
+	// any path and any method would be handled by the Entrypoint handler
+	root := r.Group("/")
+	root.Any("/", handler.Entrypoint)
+}
