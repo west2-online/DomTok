@@ -34,7 +34,7 @@ func TestToolRepeat_InvokableRun(t *testing.T) {
 		PatchConvey("success", func() {
 			resp, err := f.InvokableRun(context.Background(), argsStr)
 			So(err, ShouldBeNil)
-			So(resp, ShouldEqual, argsFmt.Message)
+			So(resp, ShouldEqual, argsStr)
 		})
 
 		PatchConvey("if argumentsInJSON is invalid", func() {
