@@ -28,6 +28,7 @@ const (
 	RedisCartStoreNum        = 30
 	RedisSpuImageExpireTime  = 5 * 60 * time.Second
 	RedisLockStockExpireTime = 24 * 60 * 60 * time.Second
+	RedisStockExpireTime     = 24 * 60 * 60 * time.Second
 )
 
 // Redis DB Name

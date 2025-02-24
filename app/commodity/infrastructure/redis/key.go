@@ -23,3 +23,7 @@ import (
 func (c *commodityCache) GetLockStockKey(id int64) string {
 	return fmt.Sprintf("goods:%d:lockstock", id)
 }
+
+func (c *commodityCache) GetStockKey(id int64) string {
+	return fmt.Sprintf("goods:%d:stock", id)
+}

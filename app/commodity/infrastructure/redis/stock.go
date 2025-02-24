@@ -18,11 +18,11 @@ package redis
 
 import (
 	"context"
+	"github.com/west2-online/DomTok/kitex_gen/model"
 	"strconv"
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
@@ -47,9 +47,9 @@ func (c *commodityCache) SetLockStockNum(ctx context.Context, key string, num in
 	}
 }
 
-func (c *commodityCache) IncrLockStockNum(ctx context.Context, req *commodity.IncrSkuLockStockReq) error {
+func (c *commodityCache) IncrLockStockNum(ctx context.Context, infos []*model.SkuBuyInfo) error {
 	_, err := c.client.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
-		for _, info := range req.GetInfos() {
+		for _, info := range infos {
 			key := c.GetLockStockKey(info.SkuID)
 			err := pipe.IncrBy(ctx, key, info.Count).Err()
 			if err != nil {
@@ -64,29 +64,62 @@ func (c *commodityCache) IncrLockStockNum(ctx context.Context, req *commodity.In
 	return nil
 }
 
-func (c *commodityCache) DecrLockStockNum(ctx context.Context, req *commodity.DescSkuLockStockReq) error {
+func (c *commodityCache) DecrLockStockNum(ctx context.Context, infos []*model.SkuBuyInfo) error {
 	keys := make([]string, 0)
-	for _, info := range req.GetInfos() {
+	for _, info := range infos {
 		keys = append(keys, c.GetLockStockKey(info.SkuID))
 	}
 	err := c.client.Watch(ctx, func(tx *redis.Tx) error {
-		for i := 0; i < len(req.GetInfos()); i++ {
+		for i := 0; i < len(infos); i++ {
 			val, err := tx.Get(ctx, keys[i]).Int64()
 			if err != nil {
 				return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.DecrLockStockNum failed :%v", err)
 			}
 
-			if val < 0 || val-req.Infos[i].Count < 0 {
+			if val < 0 || val-infos[i].Count < 0 {
 				return errno.NewErrNo(errno.InsufficientStockErrorCode, "CommodityCache.DecrLockStockNum failed: too many goods")
 			}
 
-			err = tx.DecrBy(ctx, keys[i], req.Infos[i].Count).Err()
+			err = tx.DecrBy(ctx, keys[i], infos[i].Count).Err()
 			if err != nil {
 				return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.DecrLockStockNum failed :%v", err)
 			}
 			err = tx.Expire(ctx, keys[i], constants.RedisLockStockExpireTime).Err()
 			if err != nil {
 				return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.DecrLockStockNum failed :%v", err)
+			}
+		}
+		return nil
+	}, keys...)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func (c *commodityCache) DecrStockNum(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	keys := make([]string, 0)
+	for _, info := range infos {
+		keys = append(keys, c.GetStockKey(info.SkuID))
+	}
+	err := c.client.Watch(ctx, func(tx *redis.Tx) error {
+		for i := 0; i < len(infos); i++ {
+			val, err := tx.Get(ctx, keys[i]).Int64()
+			if err != nil {
+				return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.DecrStockNum failed :%v", err)
+			}
+
+			if val < 0 || val-infos[i].Count < 0 {
+				return errno.NewErrNo(errno.InsufficientStockErrorCode, "CommodityCache.DecrStockNum failed: too many goods")
+			}
+
+			err = tx.DecrBy(ctx, keys[i], infos[i].Count).Err()
+			if err != nil {
+				return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.DecrStockNum failed :%v", err)
+			}
+			err = tx.Expire(ctx, keys[i], constants.RedisStockExpireTime).Err()
+			if err != nil {
+				return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.DecrStockNum failed :%v", err)
 			}
 		}
 		return nil

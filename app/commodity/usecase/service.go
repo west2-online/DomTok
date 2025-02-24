@@ -19,7 +19,7 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"github.com/west2-online/DomTok/kitex_gen/commodity"
+	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/errno"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
@@ -149,27 +149,38 @@ func (us *useCase) ListSpuInfo(ctx context.Context, ids []int64) ([]*model.Spu, 
 	return nil, nil
 }
 
-func (us *useCase) IncrLockStock(ctx context.Context, req *commodity.IncrSkuLockStockReq) error {
+func (us *useCase) IncrLockStock(ctx context.Context, infos []*modelKitex.SkuBuyInfo) error {
+	if !us.svc.Cached(ctx, infos) {
+		return errno.Errorf(errno.RedisKeyNotExist, "useCase.IncrLockStock failed")
+	}
+	err := us.cache.IncrLockStockNum(ctx, infos)
+	if err != nil {
+		return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
+	}
+	err = us.db.IncrLockStock(ctx, infos)
+	if err != nil {
+		return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
+	}
 	return nil
 }
 
-func (us *useCase) DecrLockStock(ctx context.Context, req *commodity.DescSkuLockStockReq) error {
-	if !us.svc.DecrCached(ctx, req) {
+func (us *useCase) DecrLockStock(ctx context.Context, infos []*modelKitex.SkuBuyInfo) error {
+	if !us.svc.Cached(ctx, infos) {
 		return errno.Errorf(errno.RedisKeyNotExist, "useCase.DecrLockStock failed")
 	}
-	err := us.cache.DecrLockStockNum(ctx, req)
+	err := us.cache.DecrLockStockNum(ctx, infos)
 	if err != nil {
 		return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
 	}
 
 	// TODO: mq配置db后续处理
-	err = us.db.DecrLockStock(ctx, req)
+	err = us.db.DecrLockStock(ctx, infos)
 	if err != nil {
 		return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
 	}
 	return err
 }
 
-func (us *useCase) DecrStock(ctx context.Context, id int64, count int) error {
-	return us.db.DecrStock(ctx, id, count)
+func (us *useCase) DecrStock(ctx context.Context, infos []*modelKitex.SkuBuyInfo) error {
+	return us.db.DecrStock(ctx, infos)
 }
