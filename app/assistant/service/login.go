@@ -14,26 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package service
 
-// 业务强相关, 范围是 1000-9999
-const (
-	// User
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
+import (
+	"context"
 
-	ErrRecordNotFound
-
-	// order
-	ServiceOrderNotFound
-	ServiceSpuNotExist
-	ServiceImgNotExist
-	ServiceSkuExist
-	PaymentOrderNotExist
-	UserNotExist
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
+	"github.com/west2-online/DomTok/pkg/errno"
 )
+
+// Login logs in the user
+func (s Core) Login(ctx context.Context) error {
+	_, ok := ctx.Value(CtxKeyID).(string)
+	if !ok {
+		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, "missing id in context")
+	}
+	_, ok = ctx.Value(CtxKeyAccessToken).(string)
+	if !ok {
+		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, "missing access token in context")
+	}
+
+	return nil
+}

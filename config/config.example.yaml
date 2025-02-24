@@ -10,6 +10,7 @@ server:
   version: "1.0"
   name: "DomTok"
   log-level: "INFO" # OPTIONS: TRACE, DEBUG, INFO(default), NOTICE, WARN, ERROR, FATAL
+  intranet-url: ""
 
 defaultUser:
   account: ""
@@ -49,6 +50,12 @@ kafka:
   user: domtok
   password: domtok-password
 
+volcengine:
+  api-key: ""
+  base-url: ""
+  region: ""
+  model: ""
+  
 upyuns:
     bucket: "w2-domtok"
     operator: "penqee"
@@ -57,7 +64,6 @@ upyuns:
     token-timeout: 60
     uss-domain: "http://w2-domtok.test.upcdn.net" # 测试域名
     download-domain: ""
-
 
 services:
   template:
@@ -83,7 +89,7 @@ services:
     load-balance: false
     addr:
       - 0.0.0.0:20003
-
+      
   commodity:
     name: commodity
     load-balance: false
@@ -95,3 +101,9 @@ services:
     load-balance: false
     addr:
       - 0.0.0.0:20005
+      
+  assistant:
+    name: assistant
+    load-balance: false
+    addr:
+      - 0.0.0.0:20008

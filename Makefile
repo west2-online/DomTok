@@ -30,7 +30,7 @@ API_PATH= $(DIR)/cmd/api
 ES_ANALYSIS = domtok-elasticsearch
 
 # 服务名
-SERVICES := gateway user commodity order cart payment
+SERVICES := gateway user commodity orders cart payment assistant
 service = $(word 1, $@)
 
 PREFIX = "[Makefile]"

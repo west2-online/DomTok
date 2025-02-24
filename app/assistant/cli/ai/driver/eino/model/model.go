@@ -14,26 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package model
 
-// 业务强相关, 范围是 1000-9999
-const (
-	// User
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
+import (
+	"context"
 
-	ErrRecordNotFound
+	"github.com/cloudwego/eino/components/model"
 
-	// order
-	ServiceOrderNotFound
-	ServiceSpuNotExist
-	ServiceImgNotExist
-	ServiceSkuExist
-	PaymentOrderNotExist
-	UserNotExist
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
+	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
 )
+
+type GetServerCaller func(functionName string) adapter.ServerCaller
+
+type BuildChatModel func(ctx context.Context) (model.ChatModel, error)

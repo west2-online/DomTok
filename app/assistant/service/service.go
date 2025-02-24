@@ -14,26 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package service
 
-// 业务强相关, 范围是 1000-9999
+import (
+	"github.com/west2-online/DomTok/app/assistant/cli/ai/adapter"
+	"github.com/west2-online/DomTok/pkg/constants"
+)
+
+type Core struct {
+	ai adapter.AIClient
+}
+
+var Service Core
+
+// CtxKey 先把service的ctx key定义在这里
+type CtxKey string
+
 const (
-	// User
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
-
-	ErrRecordNotFound
-
-	// order
-	ServiceOrderNotFound
-	ServiceSpuNotExist
-	ServiceImgNotExist
-	ServiceSkuExist
-	PaymentOrderNotExist
-	UserNotExist
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
+	CtxKeyID          CtxKey = "id"
+	CtxKeyInput       CtxKey = "input"
+	CtxKeyTurn        CtxKey = "turn"
+	CtxKeyAccessToken CtxKey = constants.AccessTokenHeader
 )

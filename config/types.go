@@ -17,11 +17,12 @@ limitations under the License.
 package config
 
 type server struct {
-	Secret    string `mapstructure:"private-key"`
-	PublicKey string `mapstructure:"public-key"`
-	Version   string
-	Name      string
-	LogLevel  string `mapstructure:"log-level"`
+	Secret      string `mapstructure:"private-key"`
+	PublicKey   string `mapstructure:"public-key"`
+	Version     string
+	Name        string
+	LogLevel    string `mapstructure:"log-level"`
+	IntranetUrl string `mapstructure:"intranet-url"`
 }
 
 type snowflake struct {
@@ -86,6 +87,13 @@ type defaultUser struct {
 	Password string `mapstructure:"password"`
 }
 
+type volcengine struct {
+	ApiKey  string `mapstructure:"api-key"`
+	BaseUrl string `mapstructure:"base-url"`
+	Region  string `mapstructure:"region"`
+	Model   string `mapstructure:"model"`
+}
+
 /*
 * struct upyun 又拍云配置
 * @Bucket: 存储桶
@@ -119,5 +127,6 @@ type config struct {
 	Elasticsearch elasticsearch
 	Kafka         kafka
 	DefaultUser   defaultUser
+	Volcengine    volcengine
 	Upyun         upyun
 }

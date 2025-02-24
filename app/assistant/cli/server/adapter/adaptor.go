@@ -14,26 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package adapter
 
-// 业务强相关, 范围是 1000-9999
-const (
-	// User
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
+import "context"
 
-	ErrRecordNotFound
+// ServerCaller is the interface for calling the server
+// It is used by the AI client to call the server
+// List required methods here
+type ServerCaller interface {
+	// Ping TODO: remove this method
+	Ping(ctx context.Context) ([]byte, error)
 
-	// order
-	ServiceOrderNotFound
-	ServiceSpuNotExist
-	ServiceImgNotExist
-	ServiceSkuExist
-	PaymentOrderNotExist
-	UserNotExist
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
-)
+	// TODO: add more methods here
+}
