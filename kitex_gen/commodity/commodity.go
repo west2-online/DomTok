@@ -2836,14 +2836,15 @@ var fieldIDToName_DeleteSpuImageResp = map[int16]string{
 }
 
 type CreateSkuReq struct {
-	SkuImages        [][]byte `thrift:"skuImages,1,optional" frugal:"1,optional,list<binary>" json:"skuImages,omitempty"`
-	Name             string   `thrift:"name,2,required" frugal:"2,required,string" json:"name"`
-	Stock            int64    `thrift:"stock,3,required" frugal:"3,required,i64" json:"stock"`
-	Description      string   `thrift:"description,4,required" frugal:"4,required,string" json:"description"`
-	StyleHeadDrawing string   `thrift:"styleHeadDrawing,5,required" frugal:"5,required,string" json:"styleHeadDrawing"`
-	Price            float64  `thrift:"price,6,required" frugal:"6,required,double" json:"price"`
-	ForSale          int32    `thrift:"forSale,7,required" frugal:"7,required,i32" json:"forSale"`
-	SpuID            int64    `thrift:"spuID,8,required" frugal:"8,required,i64" json:"spuID"`
+	Name             string  `thrift:"name,1,required" frugal:"1,required,string" json:"name"`
+	Stock            int64   `thrift:"stock,2,required" frugal:"2,required,i64" json:"stock"`
+	Description      string  `thrift:"description,3,required" frugal:"3,required,string" json:"description"`
+	StyleHeadDrawing []byte  `thrift:"styleHeadDrawing,4,required" frugal:"4,required,binary" json:"styleHeadDrawing"`
+	Price            float64 `thrift:"price,5,required" frugal:"5,required,double" json:"price"`
+	ForSale          int32   `thrift:"forSale,6,required" frugal:"6,required,i32" json:"forSale"`
+	SpuID            int64   `thrift:"spuID,7,required" frugal:"7,required,i64" json:"spuID"`
+	BufferCount      int64   `thrift:"bufferCount,8,required" frugal:"8,required,i64" json:"bufferCount"`
+	Ext              string  `thrift:"ext,9,required" frugal:"9,required,string" json:"ext"`
 }
 
 func NewCreateSkuReq() *CreateSkuReq {
@@ -2851,15 +2852,6 @@ func NewCreateSkuReq() *CreateSkuReq {
 }
 
 func (p *CreateSkuReq) InitDefault() {
-}
-
-var CreateSkuReq_SkuImages_DEFAULT [][]byte
-
-func (p *CreateSkuReq) GetSkuImages() (v [][]byte) {
-	if !p.IsSetSkuImages() {
-		return CreateSkuReq_SkuImages_DEFAULT
-	}
-	return p.SkuImages
 }
 
 func (p *CreateSkuReq) GetName() (v string) {
@@ -2874,7 +2866,7 @@ func (p *CreateSkuReq) GetDescription() (v string) {
 	return p.Description
 }
 
-func (p *CreateSkuReq) GetStyleHeadDrawing() (v string) {
+func (p *CreateSkuReq) GetStyleHeadDrawing() (v []byte) {
 	return p.StyleHeadDrawing
 }
 
@@ -2889,8 +2881,13 @@ func (p *CreateSkuReq) GetForSale() (v int32) {
 func (p *CreateSkuReq) GetSpuID() (v int64) {
 	return p.SpuID
 }
-func (p *CreateSkuReq) SetSkuImages(val [][]byte) {
-	p.SkuImages = val
+
+func (p *CreateSkuReq) GetBufferCount() (v int64) {
+	return p.BufferCount
+}
+
+func (p *CreateSkuReq) GetExt() (v string) {
+	return p.Ext
 }
 func (p *CreateSkuReq) SetName(val string) {
 	p.Name = val
@@ -2901,7 +2898,7 @@ func (p *CreateSkuReq) SetStock(val int64) {
 func (p *CreateSkuReq) SetDescription(val string) {
 	p.Description = val
 }
-func (p *CreateSkuReq) SetStyleHeadDrawing(val string) {
+func (p *CreateSkuReq) SetStyleHeadDrawing(val []byte) {
 	p.StyleHeadDrawing = val
 }
 func (p *CreateSkuReq) SetPrice(val float64) {
@@ -2913,9 +2910,11 @@ func (p *CreateSkuReq) SetForSale(val int32) {
 func (p *CreateSkuReq) SetSpuID(val int64) {
 	p.SpuID = val
 }
-
-func (p *CreateSkuReq) IsSetSkuImages() bool {
-	return p.SkuImages != nil
+func (p *CreateSkuReq) SetBufferCount(val int64) {
+	p.BufferCount = val
+}
+func (p *CreateSkuReq) SetExt(val string) {
+	p.Ext = val
 }
 
 func (p *CreateSkuReq) String() string {
@@ -2931,105 +2930,110 @@ func (p *CreateSkuReq) DeepEqual(ano *CreateSkuReq) bool {
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.SkuImages) {
+	if !p.Field1DeepEqual(ano.Name) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.Name) {
+	if !p.Field2DeepEqual(ano.Stock) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.Stock) {
+	if !p.Field3DeepEqual(ano.Description) {
 		return false
 	}
-	if !p.Field4DeepEqual(ano.Description) {
+	if !p.Field4DeepEqual(ano.StyleHeadDrawing) {
 		return false
 	}
-	if !p.Field5DeepEqual(ano.StyleHeadDrawing) {
+	if !p.Field5DeepEqual(ano.Price) {
 		return false
 	}
-	if !p.Field6DeepEqual(ano.Price) {
+	if !p.Field6DeepEqual(ano.ForSale) {
 		return false
 	}
-	if !p.Field7DeepEqual(ano.ForSale) {
+	if !p.Field7DeepEqual(ano.SpuID) {
 		return false
 	}
-	if !p.Field8DeepEqual(ano.SpuID) {
+	if !p.Field8DeepEqual(ano.BufferCount) {
+		return false
+	}
+	if !p.Field9DeepEqual(ano.Ext) {
 		return false
 	}
 	return true
 }
 
-func (p *CreateSkuReq) Field1DeepEqual(src [][]byte) bool {
-
-	if len(p.SkuImages) != len(src) {
-		return false
-	}
-	for i, v := range p.SkuImages {
-		_src := src[i]
-		if bytes.Compare(v, _src) != 0 {
-			return false
-		}
-	}
-	return true
-}
-func (p *CreateSkuReq) Field2DeepEqual(src string) bool {
+func (p *CreateSkuReq) Field1DeepEqual(src string) bool {
 
 	if strings.Compare(p.Name, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *CreateSkuReq) Field3DeepEqual(src int64) bool {
+func (p *CreateSkuReq) Field2DeepEqual(src int64) bool {
 
 	if p.Stock != src {
 		return false
 	}
 	return true
 }
-func (p *CreateSkuReq) Field4DeepEqual(src string) bool {
+func (p *CreateSkuReq) Field3DeepEqual(src string) bool {
 
 	if strings.Compare(p.Description, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *CreateSkuReq) Field5DeepEqual(src string) bool {
+func (p *CreateSkuReq) Field4DeepEqual(src []byte) bool {
 
-	if strings.Compare(p.StyleHeadDrawing, src) != 0 {
+	if bytes.Compare(p.StyleHeadDrawing, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *CreateSkuReq) Field6DeepEqual(src float64) bool {
+func (p *CreateSkuReq) Field5DeepEqual(src float64) bool {
 
 	if p.Price != src {
 		return false
 	}
 	return true
 }
-func (p *CreateSkuReq) Field7DeepEqual(src int32) bool {
+func (p *CreateSkuReq) Field6DeepEqual(src int32) bool {
 
 	if p.ForSale != src {
 		return false
 	}
 	return true
 }
-func (p *CreateSkuReq) Field8DeepEqual(src int64) bool {
+func (p *CreateSkuReq) Field7DeepEqual(src int64) bool {
 
 	if p.SpuID != src {
 		return false
 	}
 	return true
 }
+func (p *CreateSkuReq) Field8DeepEqual(src int64) bool {
+
+	if p.BufferCount != src {
+		return false
+	}
+	return true
+}
+func (p *CreateSkuReq) Field9DeepEqual(src string) bool {
+
+	if strings.Compare(p.Ext, src) != 0 {
+		return false
+	}
+	return true
+}
 
 var fieldIDToName_CreateSkuReq = map[int16]string{
-	1: "skuImages",
-	2: "name",
-	3: "stock",
-	4: "description",
-	5: "styleHeadDrawing",
-	6: "price",
-	7: "forSale",
-	8: "spuID",
+	1: "name",
+	2: "stock",
+	3: "description",
+	4: "styleHeadDrawing",
+	5: "price",
+	6: "forSale",
+	7: "spuID",
+	8: "bufferCount",
+	9: "ext",
 }
 
 type CreateSkuResp struct {
@@ -3112,11 +3116,11 @@ var fieldIDToName_CreateSkuResp = map[int16]string{
 type UpdateSkuReq struct {
 	SkuID            int64    `thrift:"skuID,1,required" frugal:"1,required,i64" json:"skuID"`
 	Stock            *int64   `thrift:"stock,2,optional" frugal:"2,optional,i64" json:"stock,omitempty"`
-	SkuImages        [][]byte `thrift:"skuImages,3,optional" frugal:"3,optional,list<binary>" json:"skuImages,omitempty"`
-	Description      *string  `thrift:"description,4,optional" frugal:"4,optional,string" json:"description,omitempty"`
-	StyleHeadDrawing *string  `thrift:"styleHeadDrawing,5,optional" frugal:"5,optional,string" json:"styleHeadDrawing,omitempty"`
-	Price            *float64 `thrift:"price,6,optional" frugal:"6,optional,double" json:"price,omitempty"`
-	ForSale          *int32   `thrift:"forSale,7,optional" frugal:"7,optional,i32" json:"forSale,omitempty"`
+	Description      *string  `thrift:"description,3,optional" frugal:"3,optional,string" json:"description,omitempty"`
+	StyleHeadDrawing []byte   `thrift:"styleHeadDrawing,4,optional" frugal:"4,optional,binary" json:"styleHeadDrawing,omitempty"`
+	Price            *float64 `thrift:"price,5,optional" frugal:"5,optional,double" json:"price,omitempty"`
+	ForSale          *int32   `thrift:"forSale,6,optional" frugal:"6,optional,i32" json:"forSale,omitempty"`
+	BufferCount      *int64   `thrift:"bufferCount,7,optional" frugal:"7,optional,i64" json:"bufferCount,omitempty"`
 }
 
 func NewUpdateSkuReq() *UpdateSkuReq {
@@ -3139,15 +3143,6 @@ func (p *UpdateSkuReq) GetStock() (v int64) {
 	return *p.Stock
 }
 
-var UpdateSkuReq_SkuImages_DEFAULT [][]byte
-
-func (p *UpdateSkuReq) GetSkuImages() (v [][]byte) {
-	if !p.IsSetSkuImages() {
-		return UpdateSkuReq_SkuImages_DEFAULT
-	}
-	return p.SkuImages
-}
-
 var UpdateSkuReq_Description_DEFAULT string
 
 func (p *UpdateSkuReq) GetDescription() (v string) {
@@ -3157,13 +3152,13 @@ func (p *UpdateSkuReq) GetDescription() (v string) {
 	return *p.Description
 }
 
-var UpdateSkuReq_StyleHeadDrawing_DEFAULT string
+var UpdateSkuReq_StyleHeadDrawing_DEFAULT []byte
 
-func (p *UpdateSkuReq) GetStyleHeadDrawing() (v string) {
+func (p *UpdateSkuReq) GetStyleHeadDrawing() (v []byte) {
 	if !p.IsSetStyleHeadDrawing() {
 		return UpdateSkuReq_StyleHeadDrawing_DEFAULT
 	}
-	return *p.StyleHeadDrawing
+	return p.StyleHeadDrawing
 }
 
 var UpdateSkuReq_Price_DEFAULT float64
@@ -3183,19 +3178,25 @@ func (p *UpdateSkuReq) GetForSale() (v int32) {
 	}
 	return *p.ForSale
 }
+
+var UpdateSkuReq_BufferCount_DEFAULT int64
+
+func (p *UpdateSkuReq) GetBufferCount() (v int64) {
+	if !p.IsSetBufferCount() {
+		return UpdateSkuReq_BufferCount_DEFAULT
+	}
+	return *p.BufferCount
+}
 func (p *UpdateSkuReq) SetSkuID(val int64) {
 	p.SkuID = val
 }
 func (p *UpdateSkuReq) SetStock(val *int64) {
 	p.Stock = val
 }
-func (p *UpdateSkuReq) SetSkuImages(val [][]byte) {
-	p.SkuImages = val
-}
 func (p *UpdateSkuReq) SetDescription(val *string) {
 	p.Description = val
 }
-func (p *UpdateSkuReq) SetStyleHeadDrawing(val *string) {
+func (p *UpdateSkuReq) SetStyleHeadDrawing(val []byte) {
 	p.StyleHeadDrawing = val
 }
 func (p *UpdateSkuReq) SetPrice(val *float64) {
@@ -3204,13 +3205,12 @@ func (p *UpdateSkuReq) SetPrice(val *float64) {
 func (p *UpdateSkuReq) SetForSale(val *int32) {
 	p.ForSale = val
 }
+func (p *UpdateSkuReq) SetBufferCount(val *int64) {
+	p.BufferCount = val
+}
 
 func (p *UpdateSkuReq) IsSetStock() bool {
 	return p.Stock != nil
-}
-
-func (p *UpdateSkuReq) IsSetSkuImages() bool {
-	return p.SkuImages != nil
 }
 
 func (p *UpdateSkuReq) IsSetDescription() bool {
@@ -3227,6 +3227,10 @@ func (p *UpdateSkuReq) IsSetPrice() bool {
 
 func (p *UpdateSkuReq) IsSetForSale() bool {
 	return p.ForSale != nil
+}
+
+func (p *UpdateSkuReq) IsSetBufferCount() bool {
+	return p.BufferCount != nil
 }
 
 func (p *UpdateSkuReq) String() string {
@@ -3248,19 +3252,19 @@ func (p *UpdateSkuReq) DeepEqual(ano *UpdateSkuReq) bool {
 	if !p.Field2DeepEqual(ano.Stock) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.SkuImages) {
+	if !p.Field3DeepEqual(ano.Description) {
 		return false
 	}
-	if !p.Field4DeepEqual(ano.Description) {
+	if !p.Field4DeepEqual(ano.StyleHeadDrawing) {
 		return false
 	}
-	if !p.Field5DeepEqual(ano.StyleHeadDrawing) {
+	if !p.Field5DeepEqual(ano.Price) {
 		return false
 	}
-	if !p.Field6DeepEqual(ano.Price) {
+	if !p.Field6DeepEqual(ano.ForSale) {
 		return false
 	}
-	if !p.Field7DeepEqual(ano.ForSale) {
+	if !p.Field7DeepEqual(ano.BufferCount) {
 		return false
 	}
 	return true
@@ -3285,20 +3289,7 @@ func (p *UpdateSkuReq) Field2DeepEqual(src *int64) bool {
 	}
 	return true
 }
-func (p *UpdateSkuReq) Field3DeepEqual(src [][]byte) bool {
-
-	if len(p.SkuImages) != len(src) {
-		return false
-	}
-	for i, v := range p.SkuImages {
-		_src := src[i]
-		if bytes.Compare(v, _src) != 0 {
-			return false
-		}
-	}
-	return true
-}
-func (p *UpdateSkuReq) Field4DeepEqual(src *string) bool {
+func (p *UpdateSkuReq) Field3DeepEqual(src *string) bool {
 
 	if p.Description == src {
 		return true
@@ -3310,19 +3301,14 @@ func (p *UpdateSkuReq) Field4DeepEqual(src *string) bool {
 	}
 	return true
 }
-func (p *UpdateSkuReq) Field5DeepEqual(src *string) bool {
+func (p *UpdateSkuReq) Field4DeepEqual(src []byte) bool {
 
-	if p.StyleHeadDrawing == src {
-		return true
-	} else if p.StyleHeadDrawing == nil || src == nil {
-		return false
-	}
-	if strings.Compare(*p.StyleHeadDrawing, *src) != 0 {
+	if bytes.Compare(p.StyleHeadDrawing, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *UpdateSkuReq) Field6DeepEqual(src *float64) bool {
+func (p *UpdateSkuReq) Field5DeepEqual(src *float64) bool {
 
 	if p.Price == src {
 		return true
@@ -3334,7 +3320,7 @@ func (p *UpdateSkuReq) Field6DeepEqual(src *float64) bool {
 	}
 	return true
 }
-func (p *UpdateSkuReq) Field7DeepEqual(src *int32) bool {
+func (p *UpdateSkuReq) Field6DeepEqual(src *int32) bool {
 
 	if p.ForSale == src {
 		return true
@@ -3346,15 +3332,27 @@ func (p *UpdateSkuReq) Field7DeepEqual(src *int32) bool {
 	}
 	return true
 }
+func (p *UpdateSkuReq) Field7DeepEqual(src *int64) bool {
+
+	if p.BufferCount == src {
+		return true
+	} else if p.BufferCount == nil || src == nil {
+		return false
+	}
+	if *p.BufferCount != *src {
+		return false
+	}
+	return true
+}
 
 var fieldIDToName_UpdateSkuReq = map[int16]string{
 	1: "skuID",
 	2: "stock",
-	3: "skuImages",
-	4: "description",
-	5: "styleHeadDrawing",
-	6: "price",
-	7: "forSale",
+	3: "description",
+	4: "styleHeadDrawing",
+	5: "price",
+	6: "forSale",
+	7: "bufferCount",
 }
 
 type UpdateSkuResp struct {
@@ -5462,9 +5460,9 @@ type CommodityService interface {
 
 	DeleteSpuImage(ctx context.Context, req *DeleteSpuImageReq) (r *DeleteSpuImageResp, err error)
 
-	CreateSku(ctx context.Context, req *CreateSkuReq) (r *CreateSkuResp, err error)
+	CreateSku(stream CommodityService_CreateSkuServer) (err error)
 
-	UpdateSku(ctx context.Context, req *UpdateSkuReq) (r *UpdateSkuResp, err error)
+	UpdateSku(stream CommodityService_UpdateSkuServer) (err error)
 
 	DeleteSku(ctx context.Context, req *DeleteSkuReq) (r *DeleteSkuResp, err error)
 
@@ -7265,6 +7263,14 @@ var fieldIDToName_CommodityServiceCreateSkuResult = map[int16]string{
 	0: "success",
 }
 
+type CommodityService_CreateSkuServer interface {
+	streaming.Stream
+
+	Recv() (*CreateSkuReq, error)
+
+	SendAndClose(*CreateSkuResp) error
+}
+
 type CommodityServiceUpdateSkuArgs struct {
 	Req *UpdateSkuReq `thrift:"req,1" frugal:"1,default,UpdateSkuReq" json:"req"`
 }
@@ -7379,6 +7385,14 @@ func (p *CommodityServiceUpdateSkuResult) Field0DeepEqual(src *UpdateSkuResp) bo
 
 var fieldIDToName_CommodityServiceUpdateSkuResult = map[int16]string{
 	0: "success",
+}
+
+type CommodityService_UpdateSkuServer interface {
+	streaming.Stream
+
+	Recv() (*UpdateSkuReq, error)
+
+	SendAndClose(*UpdateSkuResp) error
 }
 
 type CommodityServiceDeleteSkuArgs struct {

@@ -53,6 +53,13 @@ type CommodityCache interface {
 	IsExist(ctx context.Context, key string) bool
 	GetSpuImages(ctx context.Context, key string) (*model.SpuImages, error)
 	SetSpuImages(ctx context.Context, key string, images *model.SpuImages)
+
+	GetSku(ctx context.Context, key string) (*model.Sku, error)
+	SetSku(ctx context.Context, key string, sku *model.Sku)
+	DeleteSku(ctx context.Context, key string) error
+	SetSkuImages(ctx context.Context, key string, skuImages []*model.SkuImage)
+	GetSkuImages(ctx context.Context, key string) ([]*model.SkuImage, error)
+	DeleteSkuImages(ctx context.Context, key string) error
 }
 
 type CommodityMQ interface {

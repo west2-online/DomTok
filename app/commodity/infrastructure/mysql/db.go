@@ -246,7 +246,7 @@ func (db *commodityDB) UpdateSku(ctx context.Context, sku *model.Sku) error {
 		Stock:            sku.Stock,
 	}
 
-	if err := db.client.WithContext(ctx).Table(s.TableName()).Where("id = ? = ?", sku.SkuID).Updates(s).Error; err != nil {
+	if err := db.client.WithContext(ctx).Table(s.TableName()).Where("id = ?", sku.SkuID).Updates(s).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errno.Errorf(errno.ServiceSkuNotExist, "mysql: sku not found")
 		}
@@ -293,7 +293,6 @@ func (db *commodityDB) ViewSkuImage(ctx context.Context, sku *model.Sku, pageNum
 			SkuID:     v.SkuId,
 			Url:       v.Url,
 			CreatedAt: v.CreatedAt.Unix(),
-			DeletedAt: v.DeletedAt.Unix(),
 		})
 	}
 
@@ -323,7 +322,6 @@ func (db *commodityDB) GetSkuBySkuId(ctx context.Context, skuId int64) (*model.S
 		StyleHeadDrawingUrl: sku.StyleHeadDrawing,
 		CreatedAt:           sku.CreatedAt.Unix(),
 		UpdatedAt:           sku.UpdatedAt.Unix(),
-		DeletedAt:           sku.DeletedAt.Unix(),
 		LockStock:           sku.LockStock,
 	}
 
@@ -390,7 +388,6 @@ func (db *commodityDB) ViewSku(ctx context.Context, skuIds []*int64, pageNum int
 			StyleHeadDrawingUrl: sku.StyleHeadDrawing,
 			CreatedAt:           sku.CreatedAt.Unix(),
 			UpdatedAt:           sku.UpdatedAt.Unix(),
-			DeletedAt:           sku.DeletedAt.Unix(),
 			SpuID:               spuID,
 			SaleAttr:            attrValue,
 			HistoryID:           sku.HistoryVersionId,

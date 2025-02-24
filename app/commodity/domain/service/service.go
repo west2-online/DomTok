@@ -39,7 +39,6 @@ func (svc *CommodityService) CreateSpu(ctx context.Context, spu *model.Spu) (int
 	spu.SpuId = svc.nextID()
 	spu.GoodsHeadDrawingUrl = utils.GenerateFileName(constants.SpuDirDest, spu.SpuId)
 	var eg errgroup.Group
-
 	eg.Go(func() error {
 		if err := svc.db.CreateSpu(ctx, spu); err != nil {
 			return fmt.Errorf("service.CreateSpu: create spu failed: %w", err)
@@ -290,10 +289,9 @@ func (svc *CommodityService) GetSpuImages(ctx context.Context, spuId int64, offs
 	return imgs, total, nil
 }
 
-func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku) (int64, error) {
+func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku, ext string) (int64, error) {
 	sku.SkuID = svc.nextID()
-	sku.StyleHeadDrawingUrl = utils.GenerateFileName(constants.SkuDirDest, sku.SkuID)
-
+	sku.StyleHeadDrawingUrl = utils.GenerateFileName(constants.SkuDirDest, sku.SkuID) + ext
 	var eg errgroup.Group
 	eg.Go(func() error {
 		if err := svc.db.CreateSku(ctx, sku); err != nil {
@@ -312,13 +310,21 @@ func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku) (int
 	if err := eg.Wait(); err != nil {
 		return 0, err
 	}
-
 	return sku.SkuID, nil
 }
 
 func (svc *CommodityService) UpdateSku(ctx context.Context, sku *model.Sku, originSpu *model.Sku) error {
+	key := fmt.Sprintf("sku:%d", sku.SkuID)
+
 	if err := svc.db.UpdateSku(ctx, sku); err != nil {
 		return fmt.Errorf("service.UpdateSku: update sku failed: %w", err)
+	}
+
+	if svc.cache.IsExist(ctx, key) {
+		err := svc.cache.DeleteSku(ctx, key)
+		if err != nil {
+			return fmt.Errorf("service.UpdateSku: delete sku cache failed: %w", err)
+		}
 	}
 
 	if len(sku.StyleHeadDrawing) > 0 {

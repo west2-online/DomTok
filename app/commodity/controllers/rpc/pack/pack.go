@@ -37,7 +37,7 @@ func BuildImages(imgs []*model.SpuImage) []*modelKitex.SpuImage {
 }
 
 func BuildSkuImages(i []*model.SkuImage) []*modelKitex.SkuImage {
-	result := make([]*modelKitex.SkuImage, 0, len(i)) // 预分配容量
+	result := make([]*modelKitex.SkuImage, 0, len(i))
 	for _, v := range i {
 		result = append(result, &modelKitex.SkuImage{
 			ImageID:   v.ImageID,
@@ -51,7 +51,7 @@ func BuildSkuImages(i []*model.SkuImage) []*modelKitex.SkuImage {
 }
 
 func BuildSkus(i []*model.Sku) []*modelKitex.Sku {
-	result := make([]*modelKitex.Sku, 0, len(i)) // 预分配容量
+	result := make([]*modelKitex.Sku, 0, len(i))
 	for _, v := range i {
 		attr := make([]*modelKitex.AttrValue, 0, len(v.SaleAttr))
 		for _, value := range v.SaleAttr {

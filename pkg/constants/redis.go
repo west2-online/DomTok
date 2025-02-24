@@ -27,6 +27,8 @@ const (
 	RedisCartExpireTime     = 5 * 60 * time.Second
 	RedisCartStoreNum       = 30
 	RedisSpuImageExpireTime = 5 * 60 * time.Second
+
+	RedisSkuExpireTime = 5 * 60 * time.Second
 )
 
 // Redis DB Name

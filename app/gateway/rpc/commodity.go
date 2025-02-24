@@ -250,7 +250,10 @@ func CreateSkuRPC(ctx context.Context, req *commodity.CreateSkuReq, files [][]by
 	resp, err := stream.CloseAndRecv()
 	if err != nil {
 		logger.Errorf("rpc.CreateSkuRPC: RPC called failed: %v", err.Error())
-		return 0, errno.InternalServiceError.WithMessage(err.Error())
+		return -1, errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return -1, errno.InternalServiceError.WithMessage(resp.Base.Msg)
 	}
 	return resp.SkuID, nil
 }
@@ -276,12 +279,15 @@ func UpdateSkuRPC(ctx context.Context, req *commodity.UpdateSkuReq, files [][]by
 		}
 	}
 
-	_, err = stream.CloseAndRecv()
+	resp, err := stream.CloseAndRecv()
 	if err != nil {
 		logger.Errorf("rpc.UpdateSkuRPC UpdateSku failed, err  %v", err)
 		return errno.InternalServiceError.WithMessage(err.Error())
 	}
 
+	if !utils.IsSuccess(resp.Base) {
+		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
 	return nil
 }
 

@@ -266,6 +266,7 @@ struct CreateSkuReq {
     6: required i32 forSale;
     7: required i64 spuID;
     8: required i64 bufferCount;
+    9:required string ext;
 
 
 }

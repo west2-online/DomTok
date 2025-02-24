@@ -34,7 +34,7 @@ type CommodityUseCase interface {
 	DeleteSpuImage(ctx context.Context, imageId int64) error
 	ViewSpuImages(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error)
 
-	CreateSku(ctx context.Context, sku *model.Sku) (skuID int64, err error)
+	CreateSku(ctx context.Context, sku *model.Sku, ext string) (skuID int64, err error)
 	UpdateSku(ctx context.Context, sku *model.Sku) (err error)
 	DeleteSku(ctx context.Context, sku *model.Sku) (err error)
 	ViewSkuImage(ctx context.Context, sku *model.Sku, pageNum *int64, pageSize *int64) (Images []*model.SkuImage, err error)

@@ -284,7 +284,7 @@ func (c CommodityHandler) CreateSku(streamServer commodity.CommodityService_Crea
 		Price:            req.Price,
 		ForSale:          int(req.ForSale),
 		SpuID:            req.SpuID,
-	})
+	}, req.Ext)
 	if err != nil {
 		logger.Errorf("rpc.CreateSku: create sku error: %v", err)
 		r.Base = base.BuildBaseResp(err)
@@ -365,7 +365,7 @@ func (c CommodityHandler) ViewSkuImage(ctx context.Context, req *commodity.ViewS
 	}
 
 	r.Base = base.BuildBaseResp(nil)
-	r.Images = pack.BuildImages(Images)
+	r.Images = pack.BuildSkuImages(Images)
 	return
 }
 

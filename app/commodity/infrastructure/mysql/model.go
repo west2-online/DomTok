@@ -68,7 +68,7 @@ type SpuToSku struct {
 }
 
 type Sku struct {
-	Id               int64
+	Id               int64 `gorm:"primary_key"`
 	CreatorId        int64
 	Price            float64
 	Name             string
@@ -80,28 +80,27 @@ type Sku struct {
 	StyleHeadDrawing string
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
-	DeletedAt        time.Time
-	// gorm.Model
+	DeletedAt        gorm.DeletedAt `gorm:"index"`
 }
 
 type SkuImages struct {
-	Id        int64
+	Id        int64 `gorm:"primary_key"`
 	Url       string
 	SkuId     int64
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
 type SkuSaleAttr struct {
-	Id               int64
+	Id               int64 `gorm:"primary_key"`
 	SkuId            int64
 	HistoryVersionId int64
 	SaleAttr         string
 	SaleValue        string
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
-	DeletedAt        time.Time
+	DeletedAt        gorm.DeletedAt `gorm:"index"`
 }
 
 // 对应表名

@@ -143,14 +143,16 @@ func (us *useCase) ViewSpuImages(ctx context.Context, spuId int64, offset, limit
 	return us.svc.GetSpuImages(ctx, spuId, offset, limit)
 }
 
-func (us *useCase) CreateSku(ctx context.Context, sku *model.Sku) (skuID int64, err error) {
-	if err = us.svc.SetCreatorID(ctx, sku); err != nil {
-		return 0, fmt.Errorf("usecase.CreateSku failed: %w", err)
-	}
-
-	skuID, err = us.svc.CreateSku(ctx, sku)
+func (us *useCase) CreateSku(ctx context.Context, sku *model.Sku, ext string) (skuID int64, err error) {
+	loginData, err := contextLogin.GetStreamLoginData(ctx)
 	if err != nil {
 		return 0, fmt.Errorf("usecase.CreateSku failed: %w", err)
+	}
+	sku.CreatorID = loginData
+
+	skuID, err = us.svc.CreateSku(ctx, sku, ext)
+	if err != nil {
+		return -1, fmt.Errorf("usecase.CreateSku failed: %w", err)
 	}
 	return skuID, nil
 }
@@ -161,7 +163,7 @@ func (us *useCase) UpdateSku(ctx context.Context, sku *model.Sku) (err error) {
 		return fmt.Errorf("service.UpdateSku: get sku by sku id failed: %w", err)
 	}
 
-	if err := us.svc.IdentifyUser(ctx, ret.CreatorID); err != nil {
+	if err := us.svc.IdentifyUserInStreamCtx(ctx, ret.CreatorID); err != nil {
 		return fmt.Errorf("service.UpdateSku: %w", err)
 	}
 
@@ -188,6 +190,14 @@ func (us *useCase) DeleteSku(ctx context.Context, sku *model.Sku) (err error) {
 		return fmt.Errorf("usecase.DeleteSku failed: %w", err)
 	}
 
+	key := fmt.Sprintf("sku:%d", sku.SkuID)
+	if us.cache.IsExist(ctx, key) {
+		err = us.cache.DeleteSku(ctx, key)
+		if err != nil {
+			return fmt.Errorf("usecase.DeleteSku failed: %w", err)
+		}
+	}
+
 	return nil
 }
 
@@ -197,11 +207,22 @@ func (us *useCase) ViewSkuImage(ctx context.Context, sku *model.Sku, pageNum *in
 	if pNum < 1 || pSize < 1 {
 		return nil, fmt.Errorf("usecase.ViewSkuImage failed: invalid PageNum or PageSize")
 	}
+	offset := pNum * pSize
+	key := fmt.Sprintf("skuImgs:%d:%d", sku.SkuID, offset)
+	if us.cache.IsExist(ctx, key) {
+		ret, err := us.cache.GetSkuImages(ctx, key)
+		if err != nil {
+			return nil, fmt.Errorf("service.GetSkuImages failed: %w", err)
+		}
+		return ret, nil
+	}
 
 	images, err = us.db.ViewSkuImage(ctx, sku, pNum, pSize)
 	if err != nil {
 		return nil, fmt.Errorf("usecase.ViewSkuImage failed: %w", err)
 	}
+
+	us.cache.SetSkuImages(ctx, key, images)
 
 	return images, nil
 }
@@ -223,14 +244,42 @@ func (us *useCase) ViewSku(ctx context.Context, sku *model.Sku, pageNum *int64, 
 		skuIDs = []*int64{&sku.SkuID}
 	}
 
-	skus, err = us.db.ViewSku(ctx, skuIDs, pNum, pSize)
+	var remainingIDs []*int64
+	for _, id := range skuIDs {
+		key := fmt.Sprintf("sku:%d", *id)
+		if us.cache.IsExist(ctx, key) {
+			s, err := us.cache.GetSku(ctx, key)
+			if err != nil {
+				return nil, fmt.Errorf("usecase.ViewSku failed: %w", err)
+			}
+			skus = append(skus, s)
+		} else {
+			remainingIDs = append(remainingIDs, id)
+		}
+	}
+	if len(remainingIDs) == 0 {
+		return skus, nil
+	}
+
+	skuIDs = remainingIDs
+
+	result, err := us.db.ViewSku(ctx, skuIDs, pNum, pSize)
 	if err != nil {
 		return nil, fmt.Errorf("usecase.ViewSku failed: %w", err)
 	}
+
+	for _, s := range result {
+		key := fmt.Sprintf("sku:%d", s.SkuID)
+		us.cache.SetSku(ctx, key, s)
+	}
+
+	skus = append(skus, result...)
 	return skus, nil
 }
 
 func (us *useCase) UploadSkuAttr(ctx context.Context, attr *model.AttrValue, sku *model.Sku) (err error) {
+	key := fmt.Sprintf("sku:%d", sku.SkuID)
+
 	ret, err := us.db.GetSkuBySkuId(ctx, sku.SkuID)
 	if err != nil {
 		return fmt.Errorf("service.UpdateSku: get sku by sku id failed: %w", err)
@@ -243,6 +292,16 @@ func (us *useCase) UploadSkuAttr(ctx context.Context, attr *model.AttrValue, sku
 	if err = us.db.UploadSkuAttr(ctx, sku, attr); err != nil {
 		return fmt.Errorf("usecase.UploadSkuAttr failed: %w", err)
 	}
+
+	if us.cache.IsExist(ctx, key) {
+		ret, err := us.cache.GetSku(ctx, key)
+		if err != nil {
+			return fmt.Errorf("usecase.UploadSkuAttr failed: %w", err)
+		}
+		ret.SaleAttr = append(ret.SaleAttr, attr)
+		us.cache.SetSku(ctx, key, ret)
+	}
+
 	return nil
 }
 
@@ -251,10 +310,37 @@ func (us *useCase) ListSkuInfo(ctx context.Context, ids []int64, pageNum int64, 
 		return nil, fmt.Errorf("usecase.ListSkuInfo failed: invalid PageNum or PageSize")
 	}
 
-	skuInfos, err = us.db.ListSkuInfo(ctx, ids, int(pageNum), int(pageSize))
+	var remainingIDs []int64
+	for i := (pageNum - 1) * pageSize; i < pageNum*pageSize; i++ {
+		key := fmt.Sprintf("sku:%d", ids[i])
+		if us.cache.IsExist(ctx, key) {
+			s, err := us.cache.GetSku(ctx, key)
+			if err != nil {
+				return nil, fmt.Errorf("usecase.ListSkuInfo failed: %w", err)
+			}
+			skuInfos = append(skuInfos, s)
+		} else {
+			remainingIDs = append(remainingIDs, ids[i])
+		}
+	}
+
+	if len(remainingIDs) == 0 {
+		return skuInfos, nil
+	}
+
+	ids = remainingIDs
+
+	result, err := us.db.ListSkuInfo(ctx, ids, int(pageNum), int(pageSize))
 	if err != nil {
 		return nil, fmt.Errorf("usecase.ListSkuInfo failed: %w", err)
 	}
+
+	for _, s := range result {
+		key := fmt.Sprintf("sku:%d", s.SkuID)
+		us.cache.SetSku(ctx, key, s)
+	}
+
+	skuInfos = append(skuInfos, result...)
 
 	return skuInfos, nil
 }
