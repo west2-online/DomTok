@@ -22,7 +22,7 @@ const (
 	ServiceWrongPassword = 1000 + iota
 	ServiceUserExist
 	ServiceUserNotExist
-  
+
 	ErrRecordNotFound
 
 	// order
@@ -34,6 +34,6 @@ const (
 	UserNotExist
 	ServiceCategoryExist
 	ServiceListCategoryFailed
-  
+
 	ServiceUserCloseWebsocketConn
 )
