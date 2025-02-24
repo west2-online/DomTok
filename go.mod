@@ -6,6 +6,7 @@ replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
 	github.com/alibaba/sentinel-golang v1.0.4
+	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/apache/thrift v0.16.0
 	github.com/bytedance/gopkg v0.1.1
 	github.com/bytedance/mockey v1.2.14
@@ -45,8 +46,6 @@ require (
 	cloud.google.com/go/longrunning v0.6.4 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
-	github.com/apache/rocketmq-client-go v1.2.5 // indirect
-	github.com/apache/rocketmq-client-go/v2 v2.1.2 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bufbuild/protocompile v0.14.1 // indirect
