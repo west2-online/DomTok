@@ -19,10 +19,11 @@ package repository
 import (
 	"context"
 
-	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/olivere/elastic/v7"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
+	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/kafka"
 )
 

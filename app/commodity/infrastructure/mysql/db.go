@@ -38,30 +38,31 @@ func NewCommodityDB(client *gorm.DB) repository.CommodityDB {
 	return &commodityDB{client: client}
 }
 
-func (d *commodityDB)IsCategoryExistByName(ctx context.Context, name string) (bool, error) {
+func (db *commodityDB) IsCategoryExistByName(ctx context.Context, name string) (bool, error) {
 	var category model.Category
-	err := d.client.WithContext(ctx).Where("Name = ?", name).First(&category).Error
+	err := db.client.WithContext(ctx).Where("Name = ?", name).First(&category).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false,errno.Errorf(errno.ErrRecordNotFound, "mysql: ErrRecordNotFound record not found: %v", err)
-		}
-		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
-	}
-	return true, nil
-}
-func (d *commodityDB) IsCategoryExistById(ctx context.Context, id int64) (bool, error) {
-	var category model.Category
-	err := d.client.WithContext(ctx).Where("id = ?", id).First(&category).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false,errno.Errorf(errno.ErrRecordNotFound, "mysql: ErrRecordNotFound record not found: %v", err)
+			return false, errno.Errorf(errno.ErrRecordNotFound, "mysql: ErrRecordNotFound record not found: %v", err)
 		}
 		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
 	}
 	return true, nil
 }
 
-func (d *commodityDB) CreateCategory(ctx context.Context, entity *model.Category) error {
+func (db *commodityDB) IsCategoryExistById(ctx context.Context, id int64) (bool, error) {
+	var category model.Category
+	err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, errno.Errorf(errno.ErrRecordNotFound, "mysql: ErrRecordNotFound record not found: %v", err)
+		}
+		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
+	}
+	return true, nil
+}
+
+func (db *commodityDB) CreateCategory(ctx context.Context, entity *model.Category) error {
 	model := Category{
 		Id:        entity.Id,
 		Name:      entity.Name,
@@ -70,16 +71,19 @@ func (d *commodityDB) CreateCategory(ctx context.Context, entity *model.Category
 		UpdatedAt: entity.UpdatedAt,
 		DeletedAt: gorm.DeletedAt{},
 	}
-	if err := d.client.WithContext(ctx).Create(model).Error; err != nil {
+	if err := db.client.WithContext(ctx).Create(model).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create category: %v", err)
 	}
 	return nil
 }
 
-func (d *commodityDB) DeleteCategory(ctx context.Context, category *model.Category) error {
-	if err := d.client.WithContext(ctx).Delete(Category{Id: category.Id}).Error; err != nil {
+func (db *commodityDB) DeleteCategory(ctx context.Context, category *model.Category) error {
+	if err := db.client.WithContext(ctx).Delete(Category{Id: category.Id}).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete category: %v", err)
 	}
+	return nil
+}
+
 func (db *commodityDB) GetSpuByIds(ctx context.Context, spuIds []int64) ([]*model.Spu, error) {
 	spus := make([]*Spu, 0)
 	if err := db.client.WithContext(ctx).Table(constants.SpuTableName).Where("id in (?)", spuIds).Find(&spus).Error; err != nil {
@@ -103,10 +107,6 @@ func (db *commodityDB) GetSpuByIds(ctx context.Context, spuIds []int64) ([]*mode
 		rets = append(rets, ret)
 	}
 	return rets, nil
-}
-
-func (db *commodityDB) CreateCategory(ctx context.Context, name string) error {
-	return nil
 }
 
 func (db *commodityDB) CreateSpu(ctx context.Context, spu *model.Spu) error {
@@ -271,16 +271,16 @@ func (db *commodityDB) DeleteSpuImagesBySpuId(ctx context.Context, spuId int64) 
 	return ids, url, nil
 }
 
-func (d *commodityDB) UpdateCategory(ctx context.Context, category *model.Category) error {
-	if err := d.client.WithContext(ctx).Model(&model.Category{}).Where("id = ?", category.Id).Updates(category).Error; err != nil {
+func (db *commodityDB) UpdateCategory(ctx context.Context, category *model.Category) error {
+	if err := db.client.WithContext(ctx).Model(&model.Category{}).Where("id = ?", category.Id).Updates(category).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update category: %v", err)
 	}
 	return nil
 }
 
-func (u *commodityDB) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*kmodel.CategoryInfo, err error) {
+func (db *commodityDB) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*kmodel.CategoryInfo, err error) {
 	offset := (pageNum - 1) * pageSize
-	if err := u.client.WithContext(ctx).Offset(offset).Limit(pageSize).Find(&resp).Error; err != nil {
+	if err := db.client.WithContext(ctx).Offset(offset).Limit(pageSize).Find(&resp).Error; err != nil {
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to list categories: %v", err)
 	}
 	return resp, nil
