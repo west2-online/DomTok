@@ -19,6 +19,8 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"github.com/west2-online/DomTok/kitex_gen/commodity"
+	"github.com/west2-online/DomTok/pkg/errno"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
@@ -141,4 +143,33 @@ func (us *useCase) DeleteSpuImage(ctx context.Context, imageId int64) error {
 
 func (us *useCase) ViewSpuImages(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error) {
 	return us.svc.GetSpuImages(ctx, spuId, offset, limit)
+}
+
+func (us *useCase) ListSpuInfo(ctx context.Context, ids []int64) ([]*model.Spu, error) {
+	return nil, nil
+}
+
+func (us *useCase) IncrLockStock(ctx context.Context, req *commodity.IncrSkuLockStockReq) error {
+	return nil
+}
+
+func (us *useCase) DecrLockStock(ctx context.Context, req *commodity.DescSkuLockStockReq) error {
+	if !us.svc.DecrCached(ctx, req) {
+		return errno.Errorf(errno.RedisKeyNotExist, "useCase.DecrLockStock failed")
+	}
+	err := us.cache.DecrLockStockNum(ctx, req)
+	if err != nil {
+		return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
+	}
+
+	// TODO: mq配置db后续处理
+	err = us.db.DecrLockStock(ctx, req)
+	if err != nil {
+		return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
+	}
+	return err
+}
+
+func (us *useCase) DecrStock(ctx context.Context, id int64, count int) error {
+	return us.db.DecrStock(ctx, id, count)
 }

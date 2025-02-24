@@ -19,6 +19,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/west2-online/DomTok/kitex_gen/commodity"
 
 	"golang.org/x/sync/errgroup"
 
@@ -288,4 +289,24 @@ func (svc *CommodityService) GetSpuImages(ctx context.Context, spuId int64, offs
 	}
 	go svc.cache.SetSpuImages(ctx, key, &model.SpuImages{Images: imgs, Total: total})
 	return imgs, total, nil
+}
+
+func (svc *CommodityService) DecrCached(ctx context.Context, req *commodity.DescSkuLockStockReq) bool {
+	cached := true
+	for _, info := range req.GetInfos() {
+		key := svc.cache.GetLockStockKey(info.SkuID)
+		if !svc.cache.IsExist(ctx, key) {
+			// 没有命中就先返回错误，后续及时补数据
+			go func() {
+				data, err := svc.GetSkuById(ctx, info.SkuID)
+				if err != nil {
+					return
+				}
+				svc.cache.SetLockStockNum(ctx, key, data.lockStock)
+			}()
+
+			cached = false
+		}
+	}
+	return cached
 }

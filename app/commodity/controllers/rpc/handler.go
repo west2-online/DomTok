@@ -32,6 +32,11 @@ type CommodityHandler struct {
 	useCase usecase.CommodityUseCase
 }
 
+func (c CommodityHandler) ListSpuInfo(ctx context.Context, req *commodity.ListSpuInfoReq) (r *commodity.ListSpuInfoResp, err error) {
+	// TODO implement me
+	panic("implement me")
+}
+
 func (c CommodityHandler) CreateSpuImage(streamServer commodity.CommodityService_CreateSpuImageServer) (err error) {
 	resp := new(commodity.CreateSpuImageResp)
 	req, err := streamServer.Recv()

@@ -18,6 +18,7 @@ package usecase
 
 import (
 	"context"
+	"github.com/west2-online/DomTok/kitex_gen/commodity"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
@@ -33,6 +34,11 @@ type CommodityUseCase interface {
 	UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
 	DeleteSpuImage(ctx context.Context, imageId int64) error
 	ViewSpuImages(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error)
+	ListSpuInfo(ctx context.Context, ids []int64) ([]*model.Spu, error)
+
+	IncrLockStock(ctx context.Context, req *commodity.IncrSkuLockStockReq) error
+	DecrLockStock(ctx context.Context, req *commodity.DescSkuLockStockReq) error
+	DecrStock(ctx context.Context, Id int64, count int) error
 }
 
 type useCase struct {

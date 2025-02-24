@@ -20,6 +20,7 @@ import (
 	"context"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	"github.com/west2-online/DomTok/pkg/kafka"
 )
 
@@ -37,12 +38,23 @@ type CommodityDB interface {
 	DeleteSpuImage(ctx context.Context, spuImageId int64) error
 	DeleteSpuImagesBySpuId(ctx context.Context, spuId int64) (ids []int64, url []string, err error)
 	GetImagesBySpuId(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error)
+
+	IncrLockStock(ctx context.Context, id int64, count int) error
+	DecrLockStock(ctx context.Context, req *commodity.DescSkuLockStockReq) error
+	IncrStock(ctx context.Context, id int64, count int) error
+	DecrStock(ctx context.Context, id int64, count int) error
 }
 
 type CommodityCache interface {
 	IsExist(ctx context.Context, key string) bool
 	GetSpuImages(ctx context.Context, key string) (*model.SpuImages, error)
 	SetSpuImages(ctx context.Context, key string, images *model.SpuImages)
+
+	GetLockStockNum(ctx context.Context, key string) (int64, error)
+	SetLockStockNum(ctx context.Context, key string, num int64)
+	IncrLockStockNum(ctx context.Context, req *commodity.IncrSkuLockStockReq) error
+	DecrLockStockNum(ctx context.Context, req *commodity.DescSkuLockStockReq) error
+	GetLockStockKey(id int64) string
 }
 
 type CommodityMQ interface {

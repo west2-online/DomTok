@@ -27,7 +27,7 @@ import (
 	"github.com/west2-online/DomTok/pkg/logger"
 )
 
-func (c commodityCache) SetSpuImages(ctx context.Context, key string, images *model.SpuImages) {
+func (c *commodityCache) SetSpuImages(ctx context.Context, key string, images *model.SpuImages) {
 	dataJSON, err := sonic.Marshal(images)
 	if err != nil {
 		logger.Errorf("commodityCache.SetSpuImages marshal data failed: %v", err)

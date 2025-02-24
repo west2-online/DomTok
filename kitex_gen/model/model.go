@@ -2153,6 +2153,74 @@ var fieldIDToName_SkuInfo = map[int16]string{
 	9: "historyID",
 }
 
+type SkuVersion struct {
+	SkuID     int64 `thrift:"skuID,1,required" frugal:"1,required,i64" json:"skuID"`
+	VersionID int64 `thrift:"versionID,2,required" frugal:"2,required,i64" json:"versionID"`
+}
+
+func NewSkuVersion() *SkuVersion {
+	return &SkuVersion{}
+}
+
+func (p *SkuVersion) InitDefault() {
+}
+
+func (p *SkuVersion) GetSkuID() (v int64) {
+	return p.SkuID
+}
+
+func (p *SkuVersion) GetVersionID() (v int64) {
+	return p.VersionID
+}
+func (p *SkuVersion) SetSkuID(val int64) {
+	p.SkuID = val
+}
+func (p *SkuVersion) SetVersionID(val int64) {
+	p.VersionID = val
+}
+
+func (p *SkuVersion) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("SkuVersion(%+v)", *p)
+}
+
+func (p *SkuVersion) DeepEqual(ano *SkuVersion) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.SkuID) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.VersionID) {
+		return false
+	}
+	return true
+}
+
+func (p *SkuVersion) Field1DeepEqual(src int64) bool {
+
+	if p.SkuID != src {
+		return false
+	}
+	return true
+}
+func (p *SkuVersion) Field2DeepEqual(src int64) bool {
+
+	if p.VersionID != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_SkuVersion = map[int16]string{
+	1: "skuID",
+	2: "versionID",
+}
+
 type PriceHistory struct {
 	HistoryID   int64  `thrift:"historyID,1,required" frugal:"1,required,i64" json:"historyID"`
 	SkuID       int64  `thrift:"skuID,2,required" frugal:"2,required,i64" json:"skuID"`
@@ -2290,6 +2358,74 @@ var fieldIDToName_PriceHistory = map[int16]string{
 	3: "price",
 	4: "createdAt",
 	5: "prevVersion",
+}
+
+type SkuBuyInfo struct {
+	SkuID int64 `thrift:"skuID,1,required" frugal:"1,required,i64" json:"skuID"`
+	Count int64 `thrift:"count,2,required" frugal:"2,required,i64" json:"count"`
+}
+
+func NewSkuBuyInfo() *SkuBuyInfo {
+	return &SkuBuyInfo{}
+}
+
+func (p *SkuBuyInfo) InitDefault() {
+}
+
+func (p *SkuBuyInfo) GetSkuID() (v int64) {
+	return p.SkuID
+}
+
+func (p *SkuBuyInfo) GetCount() (v int64) {
+	return p.Count
+}
+func (p *SkuBuyInfo) SetSkuID(val int64) {
+	p.SkuID = val
+}
+func (p *SkuBuyInfo) SetCount(val int64) {
+	p.Count = val
+}
+
+func (p *SkuBuyInfo) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("SkuBuyInfo(%+v)", *p)
+}
+
+func (p *SkuBuyInfo) DeepEqual(ano *SkuBuyInfo) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.SkuID) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Count) {
+		return false
+	}
+	return true
+}
+
+func (p *SkuBuyInfo) Field1DeepEqual(src int64) bool {
+
+	if p.SkuID != src {
+		return false
+	}
+	return true
+}
+func (p *SkuBuyInfo) Field2DeepEqual(src int64) bool {
+
+	if p.Count != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_SkuBuyInfo = map[int16]string{
+	1: "skuID",
+	2: "count",
 }
 
 type Order struct {

@@ -24,9 +24,10 @@ const (
 
 // Redis Key and Expire Time
 const (
-	RedisCartExpireTime     = 5 * 60 * time.Second
-	RedisCartStoreNum       = 30
-	RedisSpuImageExpireTime = 5 * 60 * time.Second
+	RedisCartExpireTime      = 5 * 60 * time.Second
+	RedisCartStoreNum        = 30
+	RedisSpuImageExpireTime  = 5 * 60 * time.Second
+	RedisLockStockExpireTime = 24 * 60 * 60 * time.Second
 )
 
 // Redis DB Name

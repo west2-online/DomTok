@@ -121,12 +121,28 @@ struct SkuInfo {
     9: required i64 historyID;
 }
 
+struct SkuVersion {
+    1: required i64 skuID;
+    2: required i64 versionID;
+}
+
 struct PriceHistory {
     1: required i64 historyID;
     2: required i64 skuID;
     3: required i64 price;
     4: required i64 createdAt;
     5: optional i64 prevVersion;
+}
+
+/*
+* struct SkuBuyInfo 实际扣除商品
+* @Param skuID skuID
+* @Param count 购买商品数
+ */
+
+struct SkuBuyInfo {
+    1: required i64 skuID;
+    2: required i64 count;
 }
 
 struct Order {
