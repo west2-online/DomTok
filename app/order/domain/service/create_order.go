@@ -81,12 +81,12 @@ func (svc *OrderService) calculateTheAmount(goods []*model.OrderGoods, order *mo
 }
 
 // DescSkuLockStock 预扣商品
-func (svc *OrderService) DescSkuLockStock(ctx context.Context, goods []*model.OrderGoods) error {
+func (svc *OrderService) DescSkuLockStock(ctx context.Context, orderID int64, goods []*model.OrderGoods) error {
 	stocks := lo.Map(goods, func(item *model.OrderGoods, index int) *model.Stock {
 		return &model.Stock{SkuID: item.StyleID, Count: item.PurchaseQuantity}
 	})
 	orderStock := &model.OrderStock{
-		OrderID: goods[0].OrderID,
+		OrderID: orderID,
 		Stocks:  stocks,
 	}
 

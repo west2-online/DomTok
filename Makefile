@@ -215,6 +215,7 @@ verify: license vet fmt import lint vulncheck tidy
 license:
 	sh ./hack/add-license.sh
 
+# 为集成测试做准备
 .PHONY: with-env-test
 with-env-test:
 	@ make env-up ;\
