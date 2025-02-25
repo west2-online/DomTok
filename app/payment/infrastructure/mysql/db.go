@@ -55,17 +55,28 @@ func (db *paymentDB) CheckPaymentExist(ctx context.Context, orderID int64) (paym
 }
 
 // GetPaymentInfo 通过orderID查询payment的信息
-func (db *paymentDB) GetPaymentInfo(ctx context.Context, orderID int64) (interface{}, error) {
+func (db *paymentDB) GetPaymentInfo(ctx context.Context, orderID int64) (*model.PaymentOrder, error) {
 	var paymentOrder PaymentOrder
 	err := db.client.WithContext(ctx).Table(constants.PaymentTableName).Where("order_id = ?", orderID).First(&paymentOrder).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return paymentStatus.PaymentNotExist, nil
+			return nil, errno.NewErrNo(errno.PaymentOrderNotExist, "payment order not found")
 		}
 		// 这里报错了就不是业务错误了, 而是服务级别的错误
-		return paymentStatus.PaymentNotExist, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment order_id: %v", err)
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment order_id: %v", err)
 	}
-	return paymentOrder.Status, nil // 查询成功，返回支付状态
+	paymentOrderInfo := &model.PaymentOrder{
+		ID:                        paymentOrder.ID,
+		OrderID:                   paymentOrder.OrderID,
+		UserID:                    paymentOrder.UserID,
+		Amount:                    paymentOrder.Amount,
+		Status:                    paymentOrder.Status,
+		MaskedCreditCardNumber:    paymentOrder.MaskedCreditCardNumber,
+		CreditCardExpirationYear:  paymentOrder.CreditCardExpirationYear,
+		CreditCardExpirationMonth: paymentOrder.CreditCardExpirationMonth,
+		Description:               paymentOrder.Description,
+	}
+	return paymentOrderInfo, nil // 查询成功，返回支付状态
 }
 
 // ConvertToDBModel 转换函数
