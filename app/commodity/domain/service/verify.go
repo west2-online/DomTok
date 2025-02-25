@@ -34,7 +34,7 @@ func (svc *CommodityService) Verify(opts ...CommodityVerifyOps) error {
 
 func (svc *CommodityService) VerifyForSaleStatus(status int) CommodityVerifyOps {
 	return func() error {
-		if status != constants.CommodityAllowedForSale && status != constants.CommodityNotAllowedForSale {
+		if status > 0 && status != constants.CommodityAllowedForSale && status != constants.CommodityNotAllowedForSale {
 			return errno.ParamVerifyError
 		}
 		return nil

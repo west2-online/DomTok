@@ -62,8 +62,10 @@ const (
 	InternalKafkaErrorCode                   // kafka 错误
 	OSOperateErrorCode
 	IOOperateErrorCode
+	InsufficientStockErrorCode
 )
 
 const (
 	UpYunFileErrorCode = 60000 + iota
+	RedisKeyNotExist
 )

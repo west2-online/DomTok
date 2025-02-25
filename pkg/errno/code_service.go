@@ -23,6 +23,8 @@ const (
 	ServiceUserExist
 	ServiceUserNotExist
 
+	ErrRecordNotFound
+
 	// order
 	ServiceOrderNotFound
 	ServiceSpuNotExist
@@ -30,4 +32,8 @@ const (
 	ServiceSkuExist
 	PaymentOrderNotExist
 	UserNotExist
+	ServiceCategoryExist
+	ServiceListCategoryFailed
+
+	ServiceUserCloseWebsocketConn
 )

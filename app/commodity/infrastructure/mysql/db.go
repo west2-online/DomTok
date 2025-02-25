@@ -37,8 +37,75 @@ func NewCommodityDB(client *gorm.DB) repository.CommodityDB {
 	return &commodityDB{client: client}
 }
 
-func (db *commodityDB) CreateCategory(ctx context.Context, name string) error {
+func (db *commodityDB) IsCategoryExistByName(ctx context.Context, name string) (bool, error) {
+	var category model.Category
+	err := db.client.WithContext(ctx).Where("Name = ?", name).First(&category).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, errno.Errorf(errno.ErrRecordNotFound, "mysql: ErrRecordNotFound record not found: %v", err)
+		}
+		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
+	}
+	return true, nil
+}
+
+func (db *commodityDB) IsCategoryExistById(ctx context.Context, id int64) (bool, error) {
+	var category model.Category
+	err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, errno.Errorf(errno.ErrRecordNotFound, "mysql: ErrRecordNotFound record not found: %v", err)
+		}
+		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
+	}
+	return true, nil
+}
+
+func (db *commodityDB) CreateCategory(ctx context.Context, entity *model.Category) error {
+	model := Category{
+		Id:        entity.Id,
+		Name:      entity.Name,
+		CreatorId: entity.CreatorId,
+		CreatedAt: entity.CreatedAt,
+		UpdatedAt: entity.UpdatedAt,
+		DeletedAt: gorm.DeletedAt{},
+	}
+	if err := db.client.WithContext(ctx).Create(model).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create category: %v", err)
+	}
 	return nil
+}
+
+func (db *commodityDB) DeleteCategory(ctx context.Context, category *model.Category) error {
+	if err := db.client.WithContext(ctx).Delete(Category{Id: category.Id}).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete category: %v", err)
+	}
+	return nil
+}
+
+func (db *commodityDB) GetSpuByIds(ctx context.Context, spuIds []int64) ([]*model.Spu, error) {
+	spus := make([]*Spu, 0)
+	if err := db.client.WithContext(ctx).Table(constants.SpuTableName).Where("id in (?)", spuIds).Find(&spus).Error; err != nil {
+		return nil, errno.Errorf(errno.InternalServiceErrorCode, "CommodityDB.GetSpuByIds failed: %v", err)
+	}
+	rets := make([]*model.Spu, 0)
+	for _, spu := range spus {
+		ret := &model.Spu{
+			SpuId:               spu.Id,
+			Name:                spu.Name,
+			CreatorId:           spu.CreatorId,
+			Description:         spu.Description,
+			CategoryId:          spu.CategoryId,
+			Price:               spu.Price,
+			ForSale:             spu.ForSale,
+			Shipping:            spu.Shipping,
+			CreatedAt:           spu.CreatedAt.Unix(),
+			UpdatedAt:           spu.UpdatedAt.Unix(),
+			GoodsHeadDrawingUrl: spu.GoodsHeadDrawing,
+		}
+		rets = append(rets, ret)
+	}
+	return rets, nil
 }
 
 func (db *commodityDB) CreateSpu(ctx context.Context, spu *model.Spu) error {
@@ -201,4 +268,139 @@ func (db *commodityDB) DeleteSpuImagesBySpuId(ctx context.Context, spuId int64) 
 		url = append(url, img.Url)
 	}
 	return ids, url, nil
+}
+
+func (db *commodityDB) UpdateCategory(ctx context.Context, category *model.Category) error {
+	if err := db.client.WithContext(ctx).Model(&model.Category{}).Where("id = ?", category.Id).Updates(category).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update category: %v", err)
+	}
+	return nil
+}
+
+func (db *commodityDB) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*model.CategoryInfo, err error) {
+	offset := (pageNum - 1) * pageSize
+	cs := make([]*Category, 0)
+	if err := db.client.WithContext(ctx).Offset(offset).Limit(pageSize).Find(&cs).Error; err != nil {
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to list categories: %v", err)
+	}
+	resp = make([]*model.CategoryInfo, 0)
+	for _, c := range cs {
+		resp = append(resp, &model.CategoryInfo{
+			Name:       c.Name,
+			CategoryID: c.Id,
+		})
+	}
+	return resp, nil
+}
+
+func (db *commodityDB) IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, info := range infos {
+			var lockStock int
+
+			if err := tx.Raw("select lock_stock from "+constants.SkuTableName+
+				" where id = ? for update", info.SkuID).Scan(&lockStock).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update lock stock: %v", err)
+			}
+
+			if lockStock < 0 {
+				return errno.Errorf(errno.InsufficientStockErrorCode, "mysql: failed to increase, invalid stock num:%d ", lockStock)
+			}
+
+			if err := tx.Table(constants.SkuTableName).Where("id = ?", info.SkuID).
+				UpdateColumn("lock_stock", gorm.Expr("lock_stock + ?", info.Count)).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update lock stock: %v", err)
+			}
+		}
+
+		return nil
+	})
+	return err
+}
+
+func (db *commodityDB) DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, info := range infos {
+			var lockStock int
+
+			if err := tx.Raw("SELECT lock_stock FROM "+constants.SkuTableName+
+				" WHERE id = ? FOR UPDATE", info.SkuID).Scan(&lockStock).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to lock stock row: %v", err)
+			}
+
+			if lockStock <= 0 || lockStock < int(info.Count) {
+				return errno.Errorf(errno.InsufficientStockErrorCode, "mysql: not enough locked stock to decrease (available: %d, requested: %d)", lockStock, info.Count)
+			}
+
+			if err := tx.Table(constants.SkuTableName).Where("id = ?", info.SkuID).
+				UpdateColumn("lock_stock", gorm.Expr("lock_stock - ?", info.Count)).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to decrease lock stock: %v", err)
+			}
+		}
+		return nil
+	})
+
+	return err
+}
+
+func (db *commodityDB) IncrStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, info := range infos {
+			var stock int
+			if err := tx.Raw("select stock from "+constants.SkuTableName+
+				" where id = ? for update", info.SkuID).Scan(&stock).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update stock: %v", err)
+			}
+			if stock < 0 {
+				return errno.Errorf(errno.InsufficientStockErrorCode, "mysql: failed to increase, invalid stock num:%d ", stock)
+			}
+			if err := tx.Table(constants.SkuTableName).Where("id = ?", info.SkuID).
+				UpdateColumn("stock", gorm.Expr("stock + ?", info.Count)).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update stock: %v", err)
+			}
+		}
+
+		return nil
+	})
+	return err
+}
+
+func (db *commodityDB) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, info := range infos {
+			var stock int
+
+			if err := tx.Raw("SELECT stock FROM "+constants.SkuTableName+
+				" WHERE id = ? FOR UPDATE", info.SkuID).Scan(&stock).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to stock row: %v", err)
+			}
+
+			if stock < int(info.Count) || stock <= 0 {
+				return errno.Errorf(errno.InsufficientStockErrorCode, "mysql: not enough  stock to decrease (available: %d, requested: %d)", stock, info.Count)
+			}
+
+			if err := tx.Table(constants.SkuTableName).Where("id = ?", info.SkuID).
+				UpdateColumn("stock", gorm.Expr("stock - ?", info.Count)).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to decrease stock: %v", err)
+			}
+		}
+		return nil
+	})
+
+	return err
+}
+
+func (c *commodityDB) GetSkuById(ctx context.Context, id int64) (*model.Sku, error) {
+	var s Sku
+	if err := c.client.WithContext(ctx).Table(constants.SkuTableName).Where("id = ?", id).First(&s).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errno.Errorf(errno.ErrRecordNotFound, "mysql: sku not exist")
+		}
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get sku: %v", err)
+	}
+	return &model.Sku{
+		Id:        id,
+		Stock:     s.Stock,
+		LockStock: s.LockStock,
+	}, nil
 }

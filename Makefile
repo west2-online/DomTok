@@ -26,8 +26,11 @@ IDL_PATH = $(DIR)/idl
 OUTPUT_PATH = $(DIR)/output
 API_PATH= $(DIR)/cmd/api
 
+#es
+ES_ANALYSIS = domtok-elasticsearch
+
 # 服务名
-SERVICES := gateway user commodity order cart payment
+SERVICES := gateway user commodity orders cart payment assistant
 service = $(word 1, $@)
 
 PREFIX = "[Makefile]"
@@ -209,3 +212,4 @@ verify: license vet fmt import lint vulncheck tidy
 .PHONY: license
 license:
 	sh ./hack/add-license.sh
+
