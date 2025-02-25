@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"context"
 
-
 	"github.com/samber/lo"
 
 	"github.com/west2-online/DomTok/app/commodity/controllers/rpc/pack"
