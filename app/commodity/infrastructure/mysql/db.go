@@ -19,12 +19,12 @@ package mysql
 import (
 	"context"
 	"errors"
-	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
 
 	"gorm.io/gorm"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
+	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
@@ -338,7 +338,6 @@ func (db *commodityDB) DecrLockStock(ctx context.Context, infos []*modelKitex.Sk
 
 func (db *commodityDB) IncrStock(ctx context.Context, infos []*modelKitex.SkuBuyInfo) error {
 	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-
 		for _, info := range infos {
 			var stock int
 			if err := tx.Raw("select stock from "+constants.SkuTableName+
@@ -361,7 +360,6 @@ func (db *commodityDB) IncrStock(ctx context.Context, infos []*modelKitex.SkuBuy
 
 func (db *commodityDB) DecrStock(ctx context.Context, infos []*modelKitex.SkuBuyInfo) error {
 	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-
 		for _, info := range infos {
 			var stock int
 
@@ -386,5 +384,16 @@ func (db *commodityDB) DecrStock(ctx context.Context, infos []*modelKitex.SkuBuy
 }
 
 func (c *commodityDB) GetSkuById(ctx context.Context, id int64) (*model.Sku, error) {
-	return nil, nil
+	var s Sku
+	if err := c.client.WithContext(ctx).Table(constants.SkuTableName).Where("id = ?", id).First(&s).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errno.Errorf(errno.ErrRecordNotFound, "mysql: sku not exist")
+		}
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get sku: %v", err)
+	}
+	return &model.Sku{
+		Id:        id,
+		Stock:     s.Stock,
+		LockStock: s.LockStock,
+	}, nil
 }

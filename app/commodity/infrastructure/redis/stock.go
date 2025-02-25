@@ -18,11 +18,11 @@ package redis
 
 import (
 	"context"
-	"github.com/west2-online/DomTok/kitex_gen/model"
 	"strconv"
 
 	"github.com/redis/go-redis/v9"
 
+	"github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
@@ -41,7 +41,7 @@ func (c *commodityCache) GetLockStockNum(ctx context.Context, key string) (int64
 }
 
 func (c *commodityCache) SetLockStockNum(ctx context.Context, key string, num int64) {
-	err := c.client.Set(ctx, key, strconv.FormatInt(num, 10), constants.RedisLockStockExpireTime).Err()
+	err := c.client.Set(ctx, key, num, constants.RedisLockStockExpireTime).Err()
 	if err != nil {
 		logger.Errorf("CommodityCache.SetLockStockNum failed :%v", err)
 	}

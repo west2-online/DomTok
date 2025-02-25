@@ -32,8 +32,14 @@ type CommodityHandler struct {
 }
 
 func (c CommodityHandler) ListSpuInfo(ctx context.Context, req *commodity.ListSpuInfoReq) (r *commodity.ListSpuInfoResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ListSpuInfoResp)
+	spus, err := c.useCase.ListSpuInfo(ctx, req.SpuIDs)
+	if err != nil {
+		return nil, err
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.Spus = pack.BuildSpus(spus)
+	return r, err
 }
 
 func (c CommodityHandler) CreateSpuImage(streamServer commodity.CommodityService_CreateSpuImageServer) (err error) {

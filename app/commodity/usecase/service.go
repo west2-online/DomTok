@@ -19,13 +19,15 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"github.com/west2-online/DomTok/kitex_gen/commodity"
-	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
-	"github.com/west2-online/DomTok/pkg/errno"
+
+	"golang.org/x/sync/errgroup"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	"github.com/west2-online/DomTok/kitex_gen/commodity"
+	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
@@ -229,13 +231,27 @@ func (us *useCase) IncrLockStock(ctx context.Context, infos []*modelKitex.SkuBuy
 	if !us.svc.Cached(ctx, infos) {
 		return errno.Errorf(errno.RedisKeyNotExist, "useCase.IncrLockStock failed")
 	}
-	err := us.cache.IncrLockStockNum(ctx, infos)
-	if err != nil {
-		return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
-	}
-	err = us.db.IncrLockStock(ctx, infos)
-	if err != nil {
-		return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
+
+	var eg errgroup.Group
+
+	eg.Go(func() error {
+		err := us.cache.IncrLockStockNum(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		err := us.db.IncrLockStock(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
+		}
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -244,17 +260,26 @@ func (us *useCase) DecrLockStock(ctx context.Context, infos []*modelKitex.SkuBuy
 	if !us.svc.Cached(ctx, infos) {
 		return errno.Errorf(errno.RedisKeyNotExist, "useCase.DecrLockStock failed")
 	}
-	err := us.cache.DecrLockStockNum(ctx, infos)
-	if err != nil {
-		return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
-	}
 
-	// TODO: mq配置db后续处理
-	err = us.db.DecrLockStock(ctx, infos)
-	if err != nil {
-		return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
-	}
-	return err
+	var eg errgroup.Group
+
+	eg.Go(func() error {
+		err := us.cache.DecrLockStockNum(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		err := us.db.DecrLockStock(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
+		}
+		return nil
+	})
+
+	return nil
 }
 
 func (us *useCase) DecrStock(ctx context.Context, infos []*modelKitex.SkuBuyInfo) error {
