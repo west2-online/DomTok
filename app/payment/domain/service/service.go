@@ -174,6 +174,14 @@ func (svc *PaymentService) CreateRefundInfo(ctx context.Context, orderID int64) 
 	return refundID, nil
 }
 
+func (svc *PaymentService) GetPaymentStatusMsg(code int8) string {
+	return paymentStatus.GetPaymentStatus(code)
+}
+
+func (svc *PaymentService) GetRefundStatusMsg(code int8) string {
+	return paymentStatus.GetRefundStatus(code)
+}
+
 /*func (svc *PaymentService) GenerateRefundToken(ctx context.Context, refundID int64) (string, int64, error) {
 	// 1. 设定过期时间（15 分钟后）
 	expirationTime := time.Now().Add(paymentStatus.RefundExpirationDuration).Unix()

@@ -50,8 +50,8 @@ const (
 )
 
 const (
-	PaymentStatusPending    = "待支付"  // 待支付
-	PaymentStatusProcessing = "处理中"  // 处理中
+	PaymentStatusPending    = "待支付"   // 待支付
+	PaymentStatusProcessing = "处理中"   // 处理中
 	PaymentStatusSuccess    = "成功支付" // 成功支付
 	PaymentStatusFailed     = "支付失败" // 支付失败
 )
@@ -70,4 +70,33 @@ const (
 	RefundStatusFailed     = "退款失败"
 )
 
-func
+func GetPaymentStatus(code int8) string {
+	switch code {
+	case PaymentStatusPendingCode:
+		return PaymentStatusPending
+	case PaymentStatusProcessingCode:
+		return PaymentStatusProcessing
+	case PaymentStatusSuccessCode:
+		return PaymentStatusSuccess
+	case PaymentStatusFailedCode:
+		return PaymentStatusFailed
+	default:
+		return PaymentStatusFailed
+	}
+}
+
+func GetRefundStatus(code int8) string {
+	switch code {
+	case RefundStatusPendingCode:
+		return RefundStatusPending
+	case RefundStatusProcessingCode:
+		return RefundStatusProcessing
+	case RefundStatusSuccessCode:
+		return RefundStatusSuccess
+	case RefundStatusFailedCode:
+		return RefundStatusFailed
+	default:
+		return RefundStatusFailed
+	}
+
+}
