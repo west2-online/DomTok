@@ -64,7 +64,7 @@ func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error)
 	return uid, nil
 }
 
-// TODO 后面完善这个接口，要发起RPC请求向order模块申请数据库的查询，所以后面再来写
+// CheckOrderExist 检查订单是否存在（调用Order模块的接口）
 func (svc *PaymentService) CheckOrderExist(ctx context.Context, orderID int64) (orderInfo bool, err error) {
 	userInfo, err := svc.rpc.PaymentIsOrderExist(ctx, orderID)
 	if err != nil {

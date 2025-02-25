@@ -22,7 +22,6 @@ import (
 
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
-	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
 )
 
@@ -33,8 +32,8 @@ func (uc *paymentUseCase) CreatePayment(ctx context.Context, orderID int64) (*mo
 
 func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (token string, expTime int64, err error) {
 	// 1. 检查订单是否存在
-	// TODO 这个要向order模块要一个RPC接口然后再来填充
-	var orderInfo bool
+	// TODO 记得删除注释
+	/*var orderInfo bool
 	orderInfo, err = uc.svc.CheckOrderExist(ctx, orderID)
 	if err != nil {
 		return "", 0, fmt.Errorf("check order existed failed:%w", err)
@@ -42,7 +41,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	if orderInfo == paymentStatus.OrderNotExist {
 		return "", 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
 	}
-
+	*/
 	// 2. 获取用户id,无需检查用户是否存在
 	// 获取用户id
 	var uid int64
@@ -93,16 +92,17 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	return token, expTime, nil
 }
 
-// CreateRefund 发起退款请求 TODO
+// CreateRefund 发起退款请求
 func (uc *paymentUseCase) CreateRefund(ctx context.Context, orderID int64) (refundStatus int64, refundID int64, err error) {
 	// 1. 检查订单是否存在
-	orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
+	// TODO记得删除注释
+	/*orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
 	if err != nil {
 		return 0, 0, fmt.Errorf("check order existence failed: %w", err)
 	}
 	if !orderExists {
 		return 0, 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
-	}
+	}*/
 	// 2. 获取用户ID
 	uid, err := uc.svc.GetUserID(ctx)
 	if err != nil {
