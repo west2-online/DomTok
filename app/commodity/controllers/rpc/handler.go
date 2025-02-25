@@ -20,10 +20,13 @@ import (
 	"bytes"
 	"context"
 
+	"github.com/samber/lo"
+
 	"github.com/west2-online/DomTok/app/commodity/controllers/rpc/pack"
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
+	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/base"
 )
 
@@ -372,9 +375,18 @@ func (c CommodityHandler) DeleteCategory(ctx context.Context, req *commodity.Del
 
 func (c CommodityHandler) ViewCategory(ctx context.Context, req *commodity.ViewCategoryReq) (r *commodity.ViewCategoryResp, err error) {
 	r = new(commodity.ViewCategoryResp)
-	r.CategoryInfo, err = c.useCase.ViewCategory(ctx, int(req.PageNum), int(req.PageSize))
-	r.Base = base.BuildBaseResp(err)
-	return
+	cInfos, err := c.useCase.ViewCategory(ctx, int(req.PageNum), int(req.PageSize))
+	if err != nil {
+		return r, err
+	}
+
+	r.CategoryInfo = lo.Map(cInfos, func(item *model.CategoryInfo, index int) *kmodel.CategoryInfo {
+		return &kmodel.CategoryInfo{
+			CategoryID: item.CategoryID,
+			Name:       item.Name,
+		}
+	})
+	return r, nil
 }
 
 func (c CommodityHandler) UpdateCategory(ctx context.Context, req *commodity.UpdateCategoryReq) (r *commodity.UpdateCategoryResp, err error) {
