@@ -44,6 +44,7 @@ func (cache *orderCache) SetPaymentResultRecord(ctx context.Context, orderID int
 	}
 	return nil
 }
+
 func (cache *orderCache) GetPaymentResultRecord(ctx context.Context, orderID int64) ([]byte, bool, error) {
 	key := getKey(orderID)
 	data, err := cache.client.Get(ctx, key).Bytes()

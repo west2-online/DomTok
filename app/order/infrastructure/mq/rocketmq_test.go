@@ -17,9 +17,9 @@ limitations under the License.
 package mq
 
 import (
-	"github.com/west2-online/DomTok/config"
 	"testing"
 
+	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
@@ -27,11 +27,11 @@ func initConfig() {
 	config.Init("test")
 }
 
+// TODO
 func TestRocketMqSendAndConsume(t *testing.T) {
 	if !utils.EnvironmentEnable() {
 		return
 	} else {
 		initConfig()
 	}
-	// TODO
 }

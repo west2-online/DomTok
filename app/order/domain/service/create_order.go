@@ -21,8 +21,6 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
-	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/logger"
 	"time"
 
 	"github.com/samber/lo"
@@ -31,6 +29,8 @@ import (
 	"github.com/west2-online/DomTok/app/order/domain/model"
 	basecontext "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 func (svc *OrderService) MakeOrderByGoods(ctx context.Context, addressID int64, addressInfo string, goods []*model.OrderGoods) (*model.Order, error) {

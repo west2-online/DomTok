@@ -55,7 +55,7 @@ func (svc *OrderService) VerifyAddressID(id int64) func() error {
 
 func (svc *OrderService) VerifyBaseOrderGoods(baseGoods []*model.BaseOrderGoods) func() error {
 	return func() error {
-		if baseGoods == nil || len(baseGoods) <= 0 {
+		if len(baseGoods) == 0 {
 			return errno.NewErrNo(errno.ParamVerifyErrorCode, "create order needed at least one goods")
 		}
 		return nil

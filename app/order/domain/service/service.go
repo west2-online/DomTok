@@ -18,12 +18,12 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/west2-online/DomTok/app/order/domain/model"
 	"github.com/west2-online/DomTok/app/order/domain/repository"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
@@ -37,7 +37,7 @@ type OrderService struct {
 
 func NewOrderService(db repository.OrderDB, sf *utils.Snowflake, rpc repository.RPC, mq repository.MQ, cache repository.Cache) *OrderService {
 	if db == nil || sf == nil || rpc == nil || mq == nil || cache == nil {
-		panic(fmt.Sprintf("failed get new order service, all arguments should not be nil"))
+		logger.Fatalf("failed get new order service, all arguments should not be nil")
 	}
 	svc := &OrderService{db: db, sf: sf, rpc: rpc, mq: mq, cache: cache}
 	svc.init()

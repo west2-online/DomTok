@@ -40,7 +40,10 @@ type rocketMq struct {
 }
 
 func NewRocketmq() repository.MQ {
-	mq := &rocketMq{}
+	mq := &rocketMq{
+		producers: make(map[string]rocketmq.Producer),
+		consumers: make([]rocketmq.PushConsumer, 0),
+	}
 	return mq
 }
 

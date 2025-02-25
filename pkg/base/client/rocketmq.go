@@ -22,7 +22,7 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/apache/rocketmq-client-go/v2/producer"
-	
+
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/pkg/logger"
 )
@@ -70,7 +70,7 @@ func GetRocketmqProducer() rocketmq.Producer {
 func GetRocketmqPushConsumer(group string, opts ...consumer.Option) rocketmq.PushConsumer {
 	nameSrvAddr := []string{config.Rocketmq.NameSrvAddr}
 	if opts == nil {
-		opts = make([]consumer.Option, 0, 3)
+		opts = make([]consumer.Option, 0)
 	}
 	opts = append(opts,
 		consumer.WithGroupName(group),

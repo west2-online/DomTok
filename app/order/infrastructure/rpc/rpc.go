@@ -18,10 +18,15 @@ package rpc
 
 import (
 	"context"
+
 	"github.com/samber/lo"
+	"github.com/shopspring/decimal"
+
 	"github.com/west2-online/DomTok/app/order/domain/model"
+	"github.com/west2-online/DomTok/app/order/domain/repository"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
+	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
@@ -31,22 +36,28 @@ type orderRpcImpl struct {
 	commodity commodityservice.Client
 }
 
+func NewOrderRpcImpl(u userservice.Client, c commodityservice.Client) repository.RPC {
+	return &orderRpcImpl{u, c}
+}
+
 // TODO 等address 接口
 func (rpc *orderRpcImpl) GetAddressInfo(ctx context.Context, addressId int64) (string, error) {
 	return "", nil
 }
 
-// TODO 等 sku 接口完善后补齐
 func (rpc *orderRpcImpl) QueryGoodsInfo(ctx context.Context, goods []*model.BaseOrderGoods) ([]*model.OrderGoods, error) {
-	skuids := lo.Map(goods, func(item *model.BaseOrderGoods, index int) int64 {
-		return item.StyleID
+	skuVs := lo.Map(goods, func(item *model.BaseOrderGoods, index int) *kmodel.SkuVersion {
+		v := &kmodel.SkuVersion{
+			SkuID:     item.StyleID,
+			VersionID: item.GoodsVersion,
+		}
+		return v
 	})
-	
-	// TODO 新参数应包含 versionid
+
 	skuReq := commodity.ListSkuInfoReq{
-		SkuIDs:   skuids,
+		SkuInfos: skuVs,
 		PageNum:  1,
-		PageSize: int64(len(skuids)),
+		PageSize: int64(len(skuVs)),
 	}
 
 	skuInfoResp, err := rpc.commodity.ListSkuInfo(ctx, &skuReq)
@@ -54,24 +65,82 @@ func (rpc *orderRpcImpl) QueryGoodsInfo(ctx context.Context, goods []*model.Base
 		return nil, err
 	}
 
-	// TODO ListSpuInfo
-	//rpc.commodity.ListSkuInfo(ctx, &req)
+	orderGoods := lo.Map(skuInfoResp.SkuInfos, func(item *kmodel.SkuInfo, index int) *model.OrderGoods {
+		purchaseCount := goods[index].PurchaseQuantity
+		couponId := goods[index].CouponID
+		return &model.OrderGoods{
+			// OrderID:            0, 后续由 service 模块赋值
+			MerchantID: item.CreatorID,
+			GoodsID:    item.SpuID,
+			// GoodsName:          item.spuName, TODO 考虑加一个字段
+			StyleID:            item.SkuID,
+			StyleName:          item.Name,
+			GoodsVersion:       item.HistoryID,
+			StyleHeadDrawing:   item.StyleHeadDrawing,
+			OriginPrice:        decimal.NewFromInt(int64(item.Price)),
+			SalePrice:          decimal.NewFromInt(int64(item.Price)),
+			SingleFreightPrice: decimal.NewFromInt(0),
+			PurchaseQuantity:   purchaseCount,
+			TotalAmount:        decimal.NewFromInt(int64(item.Price) * purchaseCount),
+			FreightAmount:      decimal.NewFromInt(0),
+			// DiscountAmount:     decimal.Decimal{}, 优惠券计算
+			// PaymentAmount: decimal.Decimal{}, 优惠券计算
+			// SinglePrice: decimal.Decimal{}, 最终更新
+			CouponId: couponId,
+			// CouponName: "", 后续更新
+		}
+	})
 
-	return nil, nil
+	return orderGoods, nil
 }
 
-// LockStock 预扣除商品数量
-func (rpc *orderRpcImpl) LockStock(ctx context.Context, goods []*model.Stock) error {
+// DescSkuLockStock 预扣除商品数量
+func (rpc *orderRpcImpl) DescSkuLockStock(ctx context.Context, stock *model.OrderStock) error {
+	infos := lo.Map(stock.Stocks, func(item *model.Stock, index int) *kmodel.SkuBuyInfo {
+		return &kmodel.SkuBuyInfo{
+			SkuID: item.SkuID,
+			Count: item.Count,
+		}
+	})
+
+	resp, err := rpc.commodity.DescSkuLockStock(ctx, &commodity.DescSkuLockStockReq{Infos: infos})
+	if err = utils.ProcessRpcError("commodity.DescSkuLockStock", resp, err); err != nil {
+		return err
+	}
+
 	return nil
-	// TODO
 }
 
-// ReleaseStock 再支付失败时进行回滚释放商品库存
-func (rpc *orderRpcImpl) ReleaseStock(ctx context.Context, goods []*model.Stock) error {
+// IncrSkuLockStock 增加商品库存, 用于预扣接口的回滚
+func (rpc *orderRpcImpl) IncrSkuLockStock(ctx context.Context, stock *model.OrderStock) error {
+	infos := lo.Map(stock.Stocks, func(item *model.Stock, index int) *kmodel.SkuBuyInfo {
+		return &kmodel.SkuBuyInfo{
+			SkuID: item.SkuID,
+			Count: item.Count,
+		}
+	})
+
+	resp, err := rpc.commodity.IncrSkuLockStock(ctx, &commodity.IncrSkuLockStockReq{Infos: infos})
+	if err = utils.ProcessRpcError("commodity.IncrSkuLockStock", resp, err); err != nil {
+		return err
+	}
+
 	return nil
-	// TODO
 }
 
-func (rpc *orderRpcImpl) DescSkuStock(ctx context.Context, goods []*model.OrderGoods) error {
+// DescSkuStock 确认商品数量扣除
+func (rpc *orderRpcImpl) DescSkuStock(ctx context.Context, stock *model.OrderStock) error {
+	infos := lo.Map(stock.Stocks, func(item *model.Stock, index int) *kmodel.SkuBuyInfo {
+		return &kmodel.SkuBuyInfo{
+			SkuID: item.SkuID,
+			Count: item.Count,
+		}
+	})
 
+	resp, err := rpc.commodity.DescSkuStock(ctx, &commodity.DescSkuStockReq{Infos: infos})
+	if err = utils.ProcessRpcError("commodity.IncrSkuLockStock", resp, err); err != nil {
+		return err
+	}
+
+	return nil
 }

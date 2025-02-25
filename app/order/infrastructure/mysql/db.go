@@ -20,15 +20,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/west2-online/DomTok/pkg/constants"
 
 	"github.com/samber/lo"
-	"github.com/west2-online/DomTok/pkg/logger"
 	"gorm.io/gorm"
 
 	"github.com/west2-online/DomTok/app/order/domain/model"
 	"github.com/west2-online/DomTok/app/order/domain/repository"
+	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 type orderDB struct {
@@ -212,7 +212,8 @@ func (db *orderDB) IsOrderPaid(ctx context.Context, orderID int64) (bool, error)
 	if err := db.client.WithContext(ctx).
 		Model(&model.Order{}).
 		Select("").Where("id = ?", orderID).Scan(&status); err != nil {
-		return false, errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("Failed to query the payment status of an order with order id %d, err: %v", orderID, err))
+		return false, errno.NewErrNo(errno.InternalDatabaseErrorCode,
+			fmt.Sprintf("Failed to query the payment status of an order with order id %d, err: %v", orderID, err))
 	}
 	return status == constants.PaymentStatusSuccess, nil
 }

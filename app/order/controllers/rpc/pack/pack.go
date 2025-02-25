@@ -34,7 +34,7 @@ func BuildOrder(o *model.Order) *idlmodel.Order {
 		TotalAmountOfFreight:  utils.DecimalFloat64(&o.TotalAmountOfFreight),
 		TotalAmountOfDiscount: utils.DecimalFloat64(&o.TotalAmountOfDiscount),
 		PaymentAmount:         utils.DecimalFloat64(&o.PaymentAmount),
-		PaymentStatus:         "待支付", //nolint // TODO
+		PaymentStatus:         "待支付", // TODO
 		PaymentAt:             o.PaymentAt,
 		PaymentStyle:          o.PaymentStyle,
 		OrderedAt:             o.OrderedAt,

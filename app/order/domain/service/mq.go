@@ -21,7 +21,7 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
-	
+
 	"github.com/west2-online/DomTok/app/order/domain/model"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
