@@ -18,8 +18,12 @@ package mysql
 
 import (
 	"context"
+	"errors"
+
+	"gorm.io/gorm"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
@@ -44,14 +48,17 @@ func (db *commodityDB) CreateCoupon(ctx context.Context, coupon *model.Coupon) e
 	return nil
 }
 
-func (db *commodityDB) GetCouponById(ctx context.Context, id int64) (*model.Coupon, error) {
+func (db *commodityDB) GetCouponById(ctx context.Context, id int64) (bool, *model.Coupon, error) {
 	dbModel := &Coupon{
 		Id: id,
 	}
 	if err := db.client.WithContext(ctx).First(dbModel).Error; err != nil {
-		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to find coupon: %v", err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil, nil
+		}
+		return false, nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get spu: %v", err)
 	}
-	return &model.Coupon{
+	return true, &model.Coupon{
 		Id:             dbModel.Id,
 		Uid:            dbModel.Uid,
 		Name:           dbModel.Name,
@@ -67,9 +74,10 @@ func (db *commodityDB) GetCouponById(ctx context.Context, id int64) (*model.Coup
 	}, nil
 }
 
-func (db *commodityDB) CheckExistCouponByCreatorId(ctx context.Context, uid int64) ([]*model.Coupon, error) {
+func (db *commodityDB) GetCouponsByCreatorId(ctx context.Context, uid int64, pageNum int64) ([]*model.Coupon, error) {
 	dbModel := make([]*Coupon, 0)
-	if err := db.client.WithContext(ctx).Where("uid = ?", uid).Find(&dbModel).Error; err != nil {
+	offset := (pageNum - 1) * constants.CouponPageSize
+	if err := db.client.WithContext(ctx).Where("uid = ?", uid).Offset(int(offset)).Limit(constants.CouponPageSize).Find(&dbModel).Error; err != nil {
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to find coupon: %v", err)
 	}
 	result := make([]*model.Coupon, 0)
@@ -92,14 +100,43 @@ func (db *commodityDB) CheckExistCouponByCreatorId(ctx context.Context, uid int6
 	return result, nil
 }
 
-func (db *commodityDB) DeleteCouponById(ctx context.Context, id int64) error {
+func (db *commodityDB) DeleteCouponById(ctx context.Context, coupon *model.Coupon) error {
 	dbModel := &Coupon{
-		Id: id,
+		Id: coupon.Id,
 	}
-	if err := db.client.WithContext(ctx).Delete(dbModel).Error; err != nil {
+	if err := db.client.WithContext(ctx).Where("id = ? AND uid = ?", coupon.Id, coupon.Uid).Delete(dbModel).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete coupon: %v", err)
 	}
 	return nil
+}
+
+func (db *commodityDB) GetCouponsByIDs(ctx context.Context, couponIDs []int64) ([]*model.Coupon, error) {
+	dbModels := make([]*Coupon, 0)
+
+	if err := db.client.WithContext(ctx).
+		Where("id IN ?", couponIDs).
+		Find(&dbModels).Error; err != nil {
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to find coupons: %v", err)
+	}
+	couponList := make([]*model.Coupon, 0, len(dbModels))
+	for _, dbCoupon := range dbModels {
+		couponList = append(couponList, &model.Coupon{
+			Id:             dbCoupon.Id,
+			Uid:            dbCoupon.Uid,
+			Name:           dbCoupon.Name,
+			TypeInfo:       dbCoupon.TypeInfo,
+			ConditionCost:  dbCoupon.ConditionCost,
+			DiscountAmount: dbCoupon.DiscountAmount,
+			Discount:       dbCoupon.Discount,
+			RangeType:      dbCoupon.RangeType,
+			RangeId:        dbCoupon.RangeId,
+			Description:    dbCoupon.Description,
+			ExpireTime:     dbCoupon.ExpireTime,
+			DeadlineForGet: dbCoupon.DeadlineForGet,
+		})
+	}
+
+	return couponList, nil
 }
 
 func (db *commodityDB) CreateUserCoupon(ctx context.Context, coupon *model.UserCoupon) error {
@@ -114,9 +151,10 @@ func (db *commodityDB) CreateUserCoupon(ctx context.Context, coupon *model.UserC
 	return nil
 }
 
-func (db *commodityDB) GetUserCouponByUId(ctx context.Context, uid int64) ([]*model.UserCoupon, error) {
+func (db *commodityDB) GetUserCouponsByUId(ctx context.Context, uid int64, pageNum int64) ([]*model.UserCoupon, error) {
 	dbModel := make([]*UserCoupon, 0)
-	if err := db.client.WithContext(ctx).Where("uid = ?", uid).Find(&dbModel).Error; err != nil {
+	offset := (pageNum - 1) * constants.CouponPageSize
+	if err := db.client.WithContext(ctx).Where("uid = ?", uid).Offset(int(offset)).Limit(constants.CouponPageSize).Find(&dbModel).Error; err != nil {
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to find user coupon: %v", err)
 	}
 	result := make([]*model.UserCoupon, 0)

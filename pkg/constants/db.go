@@ -23,6 +23,11 @@ const (
 	MaxIdleConns    = 10               // (DB) 最大空闲连接数
 	ConnMaxLifetime = 10 * time.Second // (DB) 最大可复用时间
 	ConnMaxIdleTime = 5 * time.Minute  // (DB) 最长保持空闲状态时间
+
+	CouponMaxVarCharLen     = 255 // coupon的varchar相关字段最大值
+	CouponRangeTypeSPU      = 1
+	CouponRangeTypeCategory = 2
+	CouponPageSize          = 15
 )
 
 const (

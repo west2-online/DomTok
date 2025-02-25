@@ -36,8 +36,7 @@ struct CreateUserCouponResp {
 
 struct ViewCouponReq {
     1: required i64 couponID;
-    2: optional i64 pageNum;
-    3: optional i64 pageSize;
+    3: optional i64 pageNum;
 }
 
 struct ViewCouponResp {
@@ -46,8 +45,7 @@ struct ViewCouponResp {
 
 struct ViewUserAllCouponReq {
     1: required i64 isIncludeExpired;
-    2: required i64 pageNum;
-    3: required i64 pageSize;
+    3: required i64 pageNum;
 }
 
 struct ViewUserAllCouponResp {

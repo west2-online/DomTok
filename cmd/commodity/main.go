@@ -57,7 +57,7 @@ func main() {
 	}
 
 	svr := commodityservice.NewServer(
-		commodity.InjectCommodityHandlerr(),
+		commodity.InjectCommodityHandler(),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
 			ServiceName: serviceName,
 		}),
