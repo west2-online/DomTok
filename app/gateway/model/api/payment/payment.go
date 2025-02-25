@@ -1576,9 +1576,8 @@ func (p *RefundRequest) String() string {
  * @Param status 请求状态
  */
 type RefundResponse struct {
-	Base     *model.BaseResp `thrift:"base,1" form:"base" json:"base" query:"base"`
-	RefundID int64           `thrift:"refundID,2,required" form:"refundID,required" json:"refundID,required" query:"refundID,required"`
-	Status   int64           `thrift:"status,3,required" form:"status,required" json:"status,required" query:"status,required"`
+	Base       *model.BaseResp           `thrift:"base,1" form:"base" json:"base" query:"base"`
+	RefundInfo *model.RefundResponseInfo `thrift:"refundInfo,2" form:"refundInfo" json:"refundInfo" query:"refundInfo"`
 }
 
 func NewRefundResponse() *RefundResponse {
@@ -1597,29 +1596,31 @@ func (p *RefundResponse) GetBase() (v *model.BaseResp) {
 	return p.Base
 }
 
-func (p *RefundResponse) GetRefundID() (v int64) {
-	return p.RefundID
-}
+var RefundResponse_RefundInfo_DEFAULT *model.RefundResponseInfo
 
-func (p *RefundResponse) GetStatus() (v int64) {
-	return p.Status
+func (p *RefundResponse) GetRefundInfo() (v *model.RefundResponseInfo) {
+	if !p.IsSetRefundInfo() {
+		return RefundResponse_RefundInfo_DEFAULT
+	}
+	return p.RefundInfo
 }
 
 var fieldIDToName_RefundResponse = map[int16]string{
 	1: "base",
-	2: "refundID",
-	3: "status",
+	2: "refundInfo",
 }
 
 func (p *RefundResponse) IsSetBase() bool {
 	return p.Base != nil
 }
 
+func (p *RefundResponse) IsSetRefundInfo() bool {
+	return p.RefundInfo != nil
+}
+
 func (p *RefundResponse) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetRefundID bool = false
-	var issetStatus bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -1644,20 +1645,10 @@ func (p *RefundResponse) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 2:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.STRUCT {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetRefundID = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 3:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField3(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetStatus = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -1674,15 +1665,6 @@ func (p *RefundResponse) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetRefundID {
-		fieldId = 2
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetStatus {
-		fieldId = 3
-		goto RequiredFieldNotSetError
-	}
 	return nil
 ReadStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
@@ -1697,8 +1679,6 @@ ReadFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-RequiredFieldNotSetError:
-	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_RefundResponse[fieldId]))
 }
 
 func (p *RefundResponse) ReadField1(iprot thrift.TProtocol) error {
@@ -1710,25 +1690,11 @@ func (p *RefundResponse) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 func (p *RefundResponse) ReadField2(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
+	_field := model.NewRefundResponseInfo()
+	if err := _field.Read(iprot); err != nil {
 		return err
-	} else {
-		_field = v
 	}
-	p.RefundID = _field
-	return nil
-}
-func (p *RefundResponse) ReadField3(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.Status = _field
+	p.RefundInfo = _field
 	return nil
 }
 
@@ -1744,10 +1710,6 @@ func (p *RefundResponse) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField2(oprot); err != nil {
 			fieldId = 2
-			goto WriteFieldError
-		}
-		if err = p.writeField3(oprot); err != nil {
-			fieldId = 3
 			goto WriteFieldError
 		}
 	}
@@ -1785,10 +1747,10 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 func (p *RefundResponse) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("refundID", thrift.I64, 2); err != nil {
+	if err = oprot.WriteFieldBegin("refundInfo", thrift.STRUCT, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.RefundID); err != nil {
+	if err := p.RefundInfo.Write(oprot); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1799,22 +1761,6 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-func (p *RefundResponse) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("status", thrift.I64, 3); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI64(p.Status); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
 func (p *RefundResponse) String() string {

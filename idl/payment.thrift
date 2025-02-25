@@ -85,8 +85,7 @@ struct RefundRequest {
  */
 struct RefundResponse {
     1: model.BaseResp base,
-    2: required i64 refundID
-    3: required i64 status
+    2: model.RefundResponseInfo refundInfo
 }
 
 /*

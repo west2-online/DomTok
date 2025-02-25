@@ -72,13 +72,11 @@ func (handler *PaymentHandler) RequestRefund(ctx context.Context, req *payment.R
 	var refundID int64
 	var refundStatus int64
 	// 传入ctx（包含uid）和orderID,获取退款令牌和退款令牌过期时间
-	// TODO 全错了，这里应该是发起退款请求啊啊啊啊全错了麻了
 	refundStatus, refundID, err = handler.useCase.CreateRefund(ctx, req.OrderID)
 	if err != nil {
 		return
 	}
 	r.Base = base.BuildBaseResp(err)
-	r.RefundID = refundID
-	r.Status = refundStatus
+	r.RefundInfo = pack.BuildRefundTokenInfo(refundID, refundStatus)
 	return
 }
