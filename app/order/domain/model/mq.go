@@ -14,33 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package model
 
-// 业务强相关, 范围是 1000-9999
-// User
-const (
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
-	ErrRecordNotFound
-)
+import "github.com/west2-online/DomTok/pkg/types"
 
-// order
-const (
-	ServiceOrderNotFound = 2000 + iota
-	UnknownOrderStatus
-	PaymentOrderNotExist
-	UserNotExist
-)
+type MqMessage struct {
+	Body       []byte
+	DelayLevel int
+}
 
-// commodity
-const (
-	ServiceSpuNotExist = 3000 + iota
-	ServiceImgNotExist
-	ServiceSkuExist
+func NewMqMessage(body []byte) *MqMessage {
+	return &MqMessage{Body: body}
+}
 
-	ServiceCategoryExist
-	ServiceListCategoryFailed
+func (m *MqMessage) WithDelayLevel(level int) *MqMessage {
+	m.DelayLevel = level
+	return m
+}
 
-	ServiceUserCloseWebsocketConn
-)
+func (m *MqMessage) GetDelayLevel() int {
+	return m.DelayLevel
+}
+
+func (m *MqMessage) IsSetDelayLevel() bool {
+	return m.DelayLevel != 0
+}
+
+type PaymentResultMessage types.PaymentResultMessage

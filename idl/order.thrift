@@ -6,8 +6,7 @@ include "model.thrift"
 
 struct CreateOrderReq {
     1: required i64 addressID; // 地址信息 ID
-    2: required string addressInfo; // 简略地址信息
-    3: required list<model.BaseOrderGoods> baseOrderGoods; // 商品列表
+    2: required list<model.BaseOrderGoods> baseOrderGoods; // 商品列表
 }
 
 struct CreateOrderResp {

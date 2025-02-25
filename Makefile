@@ -18,6 +18,7 @@ REMOTE_REPOSITORY = registry.cn-hangzhou.aliyuncs.com/west2-online/DomTok
 MODULE = github.com/west2-online/DomTok
 # 当前架构
 ARCH := $(shell uname -m)
+PREFIX = "[Makefile]"
 # 目录相关
 DIR = $(shell pwd)
 CMD = $(DIR)/cmd
@@ -33,7 +34,8 @@ ES_ANALYSIS = domtok-elasticsearch
 SERVICES := gateway user commodity orders cart payment assistant
 service = $(word 1, $@)
 
-PREFIX = "[Makefile]"
+EnvironmentStartEnv = DOMTOK_ENVIRONMENT_STARTED
+EnvironmentStartFlag = true
 
 .PHONY: help
 help:
@@ -213,3 +215,16 @@ verify: license vet fmt import lint vulncheck tidy
 license:
 	sh ./hack/add-license.sh
 
+.PHONY: with-env-test
+with-env-test:
+	@ make env-up ;\
+		echo "waiting for env up" ;\
+		sleep 3 ;\
+		export $(EnvironmentStartEnv)=$(EnvironmentStartFlag) ;\
+		make test
+
+.PHONY: with-env-test-nowait
+with-env-test-nowait:
+	@ make env-up ;\
+    	export $(EnvironmentStartEnv)=$(EnvironmentStartFlag) ;\
+    	make test

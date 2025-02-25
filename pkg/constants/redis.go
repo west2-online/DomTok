@@ -44,3 +44,10 @@ const (
 	RedisMinIdleConnections = 10              // 最小空闲连接数
 	RedisDialTimeout        = 5 * time.Second // 连接超时时间
 )
+
+// Order
+const (
+	OrderID2PaymentStatusFormat = "oid-PStatus-%d"
+
+	PaymentResultExpireTime = 11 * time.Minute // 大于 SkuStockRollbackTopicDelayTimeLevel 即可
+)

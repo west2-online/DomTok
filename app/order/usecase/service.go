@@ -25,6 +25,37 @@ import (
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
+func (uc *useCase) CreateOrder(ctx context.Context, addressID int64, baseGoods []*model.BaseOrderGoods) (int64, error) {
+	if err := uc.svc.Verify(uc.svc.VerifyAddressID(addressID), uc.svc.VerifyBaseOrderGoods(baseGoods)); err != nil {
+		return 0, err
+	}
+
+	addressInfo, err := uc.rpc.GetAddressInfo(ctx, addressID)
+	if err != nil {
+		return 0, err
+	}
+
+	goods, err := uc.rpc.QueryGoodsInfo(ctx, baseGoods)
+	if err != nil {
+		return 0, err
+	}
+
+	order, err := uc.svc.MakeOrderByGoods(ctx, addressID, addressInfo, goods)
+	if err != nil {
+		return 0, err
+	}
+
+	if err = uc.db.CreateOrder(ctx, order, goods); err != nil {
+		return 0, err
+	}
+
+	if err = uc.svc.DescSkuLockStock(ctx, goods); err != nil {
+		return 0, err
+	}
+
+	return order.Id, nil
+}
+
 // ViewOrderList 获取订单列表
 func (uc *useCase) ViewOrderList(ctx context.Context, page, size int32) ([]*model.Order, []*model.OrderGoods, int32, error) {
 	// 从 RPC 上下文中获取用户ID
@@ -69,7 +100,7 @@ func (uc *useCase) CancelOrder(ctx context.Context, orderID int64) error {
 
 	// 3. 只有待支付的订单可以取消
 	if order.Status != constants.OrderStatusUnpaidCode {
-		return errno.NewErrNo(errno.ServiceError, "order cannot be canceled")
+		return errno.NewErrNo(errno.IllegalOperatorCode, "order cannot be canceled")
 	}
 
 	// 4. 更新订单状态为已取消
@@ -95,7 +126,7 @@ func (uc *useCase) ChangeDeliverAddress(ctx context.Context, orderID, addressID 
 
 	// 3. 已完成/取消的订单不能修改地址
 	if order.Status >= constants.OrderStatusCompletedCode {
-		return errno.NewErrNo(errno.ServiceError, "order cannot change address")
+		return errno.NewErrNo(errno.IllegalOperatorCode, "order cannot change address")
 	}
 
 	// 4. 更新地址信息

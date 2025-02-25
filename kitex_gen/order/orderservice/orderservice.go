@@ -21,10 +21,8 @@ package orderservice
 import (
 	"context"
 	"errors"
-
 	client "github.com/cloudwego/kitex/client"
 	kitex "github.com/cloudwego/kitex/pkg/serviceinfo"
-
 	order "github.com/west2-online/DomTok/kitex_gen/order"
 )
 

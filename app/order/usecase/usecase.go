@@ -26,7 +26,8 @@ import (
 
 // OrderUseCase 定义在 usecase 层的接口
 type OrderUseCase interface {
-	// TODO：createOrder
+	// CreateOrder 返回 orderID 和 error
+	CreateOrder(ctx context.Context, addressID int64, goods []*model.BaseOrderGoods) (int64, error)
 	ViewOrderList(ctx context.Context, page, size int32) ([]*model.Order, []*model.OrderGoods, int32, error)
 	ViewOrder(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error)
 	CancelOrder(ctx context.Context, orderID int64) error
@@ -39,11 +40,13 @@ type OrderUseCase interface {
 type useCase struct {
 	db  repository.OrderDB
 	svc *service.OrderService
+	rpc repository.RPC
 }
 
-func NewOrderCase(db repository.OrderDB, svc *service.OrderService) OrderUseCase {
+func NewOrderCase(db repository.OrderDB, svc *service.OrderService, rpc repository.RPC) OrderUseCase {
 	return &useCase{
 		db:  db,
 		svc: svc,
+		rpc: rpc,
 	}
 }

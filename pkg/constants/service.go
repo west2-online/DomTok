@@ -40,16 +40,30 @@ const (
 	OrderStatusPaidCode      = 1
 	OrderStatusCompletedCode = 2
 	OrderStatusCancelledCode = 3
+	OrderStatusUnpaid        = "待支付"
+	OrderStatusPaid          = "已支付"
+	OrderStatusCompleted     = "已完成"
+	OrderStatusCancelled     = "已取消"
+	OrderStatusUnknown       = "未知状态"
+
+	OrderMqConsumerGroupFormat = "order-%s" // order-topic
 )
 
-// OrderService Status Messages
-const (
-	OrderStatusUnpaid    = "待支付"
-	OrderStatusPaid      = "已支付"
-	OrderStatusCompleted = "已完成"
-	OrderStatusCancelled = "已取消"
-	OrderStatusUnknown   = "未知状态"
-)
+// GetOrderStatusMsg logic should be equal with /app/order/domain/service/service.go
+func GetOrderStatusMsg(code int8) string {
+	switch code {
+	case OrderStatusUnpaidCode:
+		return OrderStatusUnpaid
+	case OrderStatusPaidCode:
+		return OrderStatusPaid
+	case OrderStatusCompletedCode:
+		return OrderStatusCompleted
+	case OrderStatusCancelledCode:
+		return OrderStatusCancelled
+	default:
+		return OrderStatusUnknown
+	}
+}
 
 // CommodityService
 const (

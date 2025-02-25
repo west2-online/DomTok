@@ -14,33 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package mq
 
-// 业务强相关, 范围是 1000-9999
-// User
-const (
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
-	ErrRecordNotFound
+import (
+	"github.com/west2-online/DomTok/config"
+	"testing"
+
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
-// order
-const (
-	ServiceOrderNotFound = 2000 + iota
-	UnknownOrderStatus
-	PaymentOrderNotExist
-	UserNotExist
-)
+func initConfig() {
+	config.Init("test")
+}
 
-// commodity
-const (
-	ServiceSpuNotExist = 3000 + iota
-	ServiceImgNotExist
-	ServiceSkuExist
-
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
-)
+func TestRocketMqSendAndConsume(t *testing.T) {
+	if !utils.EnvironmentEnable() {
+		return
+	} else {
+		initConfig()
+	}
+	// TODO
+}

@@ -20,8 +20,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
+	"github.com/west2-online/DomTok/pkg/constants"
 
+	"github.com/samber/lo"
+	"github.com/west2-online/DomTok/pkg/logger"
 	"gorm.io/gorm"
 
 	"github.com/west2-online/DomTok/app/order/domain/model"
@@ -49,11 +51,34 @@ func (db *orderDB) IsOrderExist(ctx context.Context, orderID int64) (bool, error
 }
 
 // CreateOrder 创建订单
-func (db *orderDB) CreateOrder(ctx context.Context, order *model.Order) error {
-	if err := db.client.WithContext(ctx).Create(order).Error; err != nil {
-		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create order: %v", err)
-	}
-	return nil
+func (db *orderDB) CreateOrder(ctx context.Context, o *model.Order, gs []*model.OrderGoods) error {
+	order := db.model2Order(o)
+	goods := lo.Map(gs, func(item *model.OrderGoods, index int) *OrderGoods {
+		return db.model2Goods(item)
+	})
+
+	return db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var err error
+		defer func() {
+			if err != nil {
+				if e := tx.Rollback().Error; e != nil {
+					logger.Errorf("failed to rollback transaction: %v", e)
+				}
+			}
+		}()
+
+		if err = tx.Create(order).Error; err != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create order: %v", err)
+		}
+		if err = tx.Create(goods).Error; err != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create goods: %v", err)
+		}
+		if err = tx.Commit().Error; err != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to commit order: %v", err)
+		}
+
+		return nil
+	})
 }
 
 // CreateOrderGoods 创建订单商品
@@ -176,45 +201,30 @@ func (db *orderDB) GetOrderWithGoods(ctx context.Context, orderID int64) (*model
 	// 转换 goods 切片
 	modelGoods := make([]*model.OrderGoods, len(goods))
 	for i, g := range goods {
-		modelGoods[i] = &model.OrderGoods{
-			MerchantID:       g.MerchantID,
-			GoodsID:          g.GoodsID,
-			GoodsName:        g.GoodsName,
-			GoodsHeadDrawing: g.GoodsHeadDrawing,
-			StyleID:          int64(g.StyleID),
-			StyleName:        g.StyleName,
-			StyleHeadDrawing: g.StyleHeadDrawing,
-			OriginCast:       g.OriginCast,
-			SaleCast:         g.SaleCast,
-			PurchaseQuantity: g.PurchaseQuantity,
-			PaymentAmount:    g.PaymentAmount,
-			FreightAmount:    g.FreightAmount,
-			SettlementAmount: g.SettlementAmount,
-			DiscountAmount:   g.DiscountAmount,
-			SingleCast:       g.SingleCast,
-			CouponID:         g.CouponID,
-		}
+		modelGoods[i] = db.goods2Model(&g)
 	}
 
-	return db.convertOrder(&order), modelGoods, nil
+	return db.order2Model(&order), modelGoods, nil
 }
 
-func (db *orderDB) convertOrder(order *Order) *model.Order {
-	return &model.Order{
-		Id:                    order.Id,
-		Status:                order.Status,
-		Uid:                   order.Uid,
-		TotalAmountOfGoods:    order.TotalAmountOfGoods,
-		TotalAmountOfFreight:  order.TotalAmountOfFreight,
-		TotalAmountOfDiscount: order.TotalAmountOfDiscount,
-		PaymentAmount:         order.PaymentAmount,
-		PaymentStatus:         strconv.Itoa(int(order.PaymentStatus)),
-		PaymentAt:             order.PaymentAt,
-		PaymentStyle:          order.PaymentStyle,
-		OrderedAt:             order.OrderedAt,
-		DeletedAt:             order.DeletedAt,
-		DeliveryAt:            order.DeliveryAt,
-		AddressID:             order.AddressID,
-		AddressInfo:           order.AddressInfo,
+func (db *orderDB) IsOrderPaid(ctx context.Context, orderID int64) (bool, error) {
+	var status int8
+	if err := db.client.WithContext(ctx).
+		Model(&model.Order{}).
+		Select("").Where("id = ?", orderID).Scan(&status); err != nil {
+		return false, errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("Failed to query the payment status of an order with order id %d, err: %v", orderID, err))
 	}
+	return status == constants.PaymentStatusSuccess, nil
+}
+
+func (db *orderDB) UpdatePaymentStatus(ctx context.Context, message *model.PaymentResultMessage) error {
+	if err := db.client.WithContext(ctx).Model(&Order{Id: message.OrderID}).
+		Updates(map[string]interface{}{
+			"payment_status": message.PaymentStatus,
+			"payment_at":     message.PaymentAt,
+			"payment_style":  message.PaymentStyle,
+		}).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update payment status: %v", err)
+	}
+	return nil
 }

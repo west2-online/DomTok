@@ -14,33 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package constants
 
-// 业务强相关, 范围是 1000-9999
-// User
 const (
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
-	ErrRecordNotFound
-)
-
-// order
-const (
-	ServiceOrderNotFound = 2000 + iota
-	UnknownOrderStatus
-	PaymentOrderNotExist
-	UserNotExist
-)
-
-// commodity
-const (
-	ServiceSpuNotExist = 3000 + iota
-	ServiceImgNotExist
-	ServiceSkuExist
-
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
+	EnvironmentStartEnv  = "DOMTOK_ENVIRONMENT_STARTED"
+	EnvironmentStartFlag = "true"
 )

@@ -21,15 +21,13 @@ package order
 import (
 	"context"
 	"fmt"
-	"strings"
-
 	"github.com/west2-online/DomTok/kitex_gen/model"
+	"strings"
 )
 
 type CreateOrderReq struct {
 	AddressID      int64                   `thrift:"addressID,1,required" frugal:"1,required,i64" json:"addressID"`
-	AddressInfo    string                  `thrift:"addressInfo,2,required" frugal:"2,required,string" json:"addressInfo"`
-	BaseOrderGoods []*model.BaseOrderGoods `thrift:"baseOrderGoods,3,required" frugal:"3,required,list<model.BaseOrderGoods>" json:"baseOrderGoods"`
+	BaseOrderGoods []*model.BaseOrderGoods `thrift:"baseOrderGoods,2,required" frugal:"2,required,list<model.BaseOrderGoods>" json:"baseOrderGoods"`
 }
 
 func NewCreateOrderReq() *CreateOrderReq {
@@ -43,18 +41,11 @@ func (p *CreateOrderReq) GetAddressID() (v int64) {
 	return p.AddressID
 }
 
-func (p *CreateOrderReq) GetAddressInfo() (v string) {
-	return p.AddressInfo
-}
-
 func (p *CreateOrderReq) GetBaseOrderGoods() (v []*model.BaseOrderGoods) {
 	return p.BaseOrderGoods
 }
 func (p *CreateOrderReq) SetAddressID(val int64) {
 	p.AddressID = val
-}
-func (p *CreateOrderReq) SetAddressInfo(val string) {
-	p.AddressInfo = val
 }
 func (p *CreateOrderReq) SetBaseOrderGoods(val []*model.BaseOrderGoods) {
 	p.BaseOrderGoods = val
@@ -76,10 +67,7 @@ func (p *CreateOrderReq) DeepEqual(ano *CreateOrderReq) bool {
 	if !p.Field1DeepEqual(ano.AddressID) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.AddressInfo) {
-		return false
-	}
-	if !p.Field3DeepEqual(ano.BaseOrderGoods) {
+	if !p.Field2DeepEqual(ano.BaseOrderGoods) {
 		return false
 	}
 	return true
@@ -92,14 +80,7 @@ func (p *CreateOrderReq) Field1DeepEqual(src int64) bool {
 	}
 	return true
 }
-func (p *CreateOrderReq) Field2DeepEqual(src string) bool {
-
-	if strings.Compare(p.AddressInfo, src) != 0 {
-		return false
-	}
-	return true
-}
-func (p *CreateOrderReq) Field3DeepEqual(src []*model.BaseOrderGoods) bool {
+func (p *CreateOrderReq) Field2DeepEqual(src []*model.BaseOrderGoods) bool {
 
 	if len(p.BaseOrderGoods) != len(src) {
 		return false
@@ -115,8 +96,7 @@ func (p *CreateOrderReq) Field3DeepEqual(src []*model.BaseOrderGoods) bool {
 
 var fieldIDToName_CreateOrderReq = map[int16]string{
 	1: "addressID",
-	2: "addressInfo",
-	3: "baseOrderGoods",
+	2: "baseOrderGoods",
 }
 
 type CreateOrderResp struct {

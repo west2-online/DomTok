@@ -18,6 +18,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/west2-online/DomTok/app/order/domain/model"
 	"github.com/west2-online/DomTok/app/order/domain/repository"
@@ -27,12 +28,20 @@ import (
 )
 
 type OrderService struct {
-	db repository.OrderDB
-	sf *utils.Snowflake
+	db    repository.OrderDB
+	sf    *utils.Snowflake
+	rpc   repository.RPC
+	mq    repository.MQ
+	cache repository.Cache
 }
 
-func NewOrderService(db repository.OrderDB, sf *utils.Snowflake) *OrderService {
-	return &OrderService{db: db, sf: sf}
+func NewOrderService(db repository.OrderDB, sf *utils.Snowflake, rpc repository.RPC, mq repository.MQ, cache repository.Cache) *OrderService {
+	if db == nil || sf == nil || rpc == nil || mq == nil || cache == nil {
+		panic(fmt.Sprintf("failed get new order service, all arguments should not be nil"))
+	}
+	svc := &OrderService{db: db, sf: sf, rpc: rpc, mq: mq, cache: cache}
+	svc.init()
+	return svc
 }
 
 // IsOrderExist 检查订单是否存在
@@ -79,16 +88,14 @@ func (svc *OrderService) ViewOrderList(ctx context.Context, userID int64, page, 
 }
 
 func (svc *OrderService) GetOrderStatusMsg(code int8) string {
-	switch code {
-	case constants.OrderStatusUnpaidCode:
-		return constants.OrderStatusUnpaid
-	case constants.OrderStatusPaidCode:
-		return constants.OrderStatusPaid
-	case constants.OrderStatusCompletedCode:
-		return constants.OrderStatusCompleted
-	case constants.OrderStatusCancelledCode:
-		return constants.OrderStatusCancelled
-	default:
-		return constants.OrderStatusUnknown
-	}
+	return constants.GetOrderStatusMsg(code)
+}
+
+func (svc *OrderService) SetPaymentResult(ctx context.Context, orderID int64, data []byte) error {
+	return svc.cache.SetPaymentResultRecord(ctx, orderID, data, constants.PaymentResultExpireTime)
+}
+
+func (svc *OrderService) nextVal() int64 {
+	v, _ := svc.sf.NextVal()
+	return v
 }

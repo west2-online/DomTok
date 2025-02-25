@@ -22,7 +22,7 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/apache/rocketmq-client-go/v2/producer"
-
+	
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/pkg/logger"
 )
@@ -63,16 +63,25 @@ func GetRocketmqProducer() rocketmq.Producer {
 }
 
 // GetRocketmqPushConsumer 获取一个 push consumer 实例
-func GetRocketmqPushConsumer(group string) rocketmq.PushConsumer {
+//
+// 参数：
+// - group: 消费者组名称
+// - opts: 消费者的可选配置项
+func GetRocketmqPushConsumer(group string, opts ...consumer.Option) rocketmq.PushConsumer {
 	nameSrvAddr := []string{config.Rocketmq.NameSrvAddr}
-	p, err := rocketmq.NewPushConsumer(
+	if opts == nil {
+		opts = make([]consumer.Option, 0, 3)
+	}
+	opts = append(opts,
+		consumer.WithGroupName(group),
 		consumer.WithNameServer(nameSrvAddr),
 		consumer.WithCredentials(primitive.Credentials{
 			AccessKey: config.Rocketmq.AccessKey,
 			SecretKey: config.Rocketmq.SecretKey,
 		}),
-		consumer.WithGroupName(group),
 	)
+
+	p, err := rocketmq.NewPushConsumer(opts...)
 	if err != nil {
 		logger.Fatalf("create rocketmq push consumer error: %v", err)
 	}

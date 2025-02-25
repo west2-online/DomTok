@@ -14,33 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package types
 
-// 业务强相关, 范围是 1000-9999
-// User
-const (
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
-	ErrRecordNotFound
-)
-
-// order
-const (
-	ServiceOrderNotFound = 2000 + iota
-	UnknownOrderStatus
-	PaymentOrderNotExist
-	UserNotExist
-)
-
-// commodity
-const (
-	ServiceSpuNotExist = 3000 + iota
-	ServiceImgNotExist
-	ServiceSkuExist
-
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
-)
+// PaymentResultMessage 是 payment 模块与 order 模块之间的 msg 格式约定, 请勿修改
+// DO NOT EDIT
+type PaymentResultMessage struct {
+	OrderID       int64  // 订单 id
+	PaymentStatus int    // 状态
+	PaymentAt     int64  // 支付时间, 毫秒级时间戳
+	PaymentStyle  string // 支付类型
+}
