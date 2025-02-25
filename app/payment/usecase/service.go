@@ -67,8 +67,11 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	} else if paymentInfo == paymentStatus.PaymentExist { // 如果订单存在
 		// 获取订单的支付状态
 		payStatus, err := uc.db.GetPaymentInfo(ctx, orderID)
+		if err != nil {
+			return "", 0, fmt.Errorf("get payment info failed:%w", err)
+		}
 		// 如果订单正在支付或者已经支付完成，则拒绝进行接下来的生成令牌的活动
-		if payStatus == paymentStatus.PaymentStatusSuccessCode || payStatus == paymentStatus.PaymentStatusProcessingCode {
+		if payStatus.Status == paymentStatus.PaymentStatusSuccessCode || payStatus.Status == paymentStatus.PaymentStatusProcessingCode {
 			return "", 0, fmt.Errorf("payment is processing or has already done:%w", err)
 		}
 	}

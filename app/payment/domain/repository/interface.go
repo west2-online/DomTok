@@ -26,7 +26,7 @@ import (
 type PaymentDB interface {
 	// CheckPaymentExist CheckUserExist(ctx context.Context, uid int64) (userInfo interface{}, err error)
 	CheckPaymentExist(ctx context.Context, orderID int64) (paymentInfo bool, err error)
-	GetPaymentInfo(ctx context.Context, orderID int64) (payStatus interface{}, err error)
+	GetPaymentInfo(ctx context.Context, orderID int64) (payStatus *model.PaymentOrder, err error)
 	CreatePayment(ctx context.Context, order *model.PaymentOrder) error
 	CreateRefund(ctx context.Context, order *model.PaymentRefund) error
 }
