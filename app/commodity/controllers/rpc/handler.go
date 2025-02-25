@@ -308,11 +308,7 @@ func (c CommodityHandler) CreateCategory(ctx context.Context, req *commodity.Cre
 		Name: req.Name,
 	}
 	id, err := c.useCase.CreateCategory(ctx, &category)
-	if err != nil {
-		r.Base = base.BuildBaseResp(err)
-		return
-	}
-	r.Base = base.BuildBaseResp(nil)
+	r.Base = base.BuildBaseResp(err)
 	r.CategoryID = id
 	return
 }
@@ -323,22 +319,14 @@ func (c CommodityHandler) DeleteCategory(ctx context.Context, req *commodity.Del
 		Id: req.CategoryID,
 	}
 	err = c.useCase.DeleteCategory(ctx, &category)
-	if err != nil {
-		r.Base = base.BuildBaseResp(err)
-		return
-	}
-	r.Base = base.BuildBaseResp(nil)
+	r.Base = base.BuildBaseResp(err)
 	return
 }
 
 func (c CommodityHandler) ViewCategory(ctx context.Context, req *commodity.ViewCategoryReq) (r *commodity.ViewCategoryResp, err error) {
 	r = new(commodity.ViewCategoryResp)
 	r.CategoryInfo, err = c.useCase.ViewCategory(ctx, int(req.PageNum), int(req.PageSize))
-	if err != nil {
-		r.Base = base.BuildBaseResp(err)
-		return
-	}
-	r.Base = base.BuildBaseResp(nil)
+	r.Base = base.BuildBaseResp(err)
 	return
 }
 
@@ -349,11 +337,7 @@ func (c CommodityHandler) UpdateCategory(ctx context.Context, req *commodity.Upd
 		Name: req.Name,
 	}
 	err = c.useCase.UpdateCategory(ctx, &category)
-	if err != nil {
-		r.Base = base.BuildBaseResp(err)
-		return
-	}
-	r.Base = base.BuildBaseResp(nil)
+	r.Base = base.BuildBaseResp(err)
 	return
 }
 
