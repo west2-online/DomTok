@@ -23,7 +23,6 @@ import (
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
-	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/kafka"
 )
 
@@ -33,7 +32,7 @@ type CommodityDB interface {
 	CreateCategory(ctx context.Context, entity *model.Category) error
 	DeleteCategory(ctx context.Context, category *model.Category) error
 	UpdateCategory(ctx context.Context, category *model.Category) error
-	ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*kmodel.CategoryInfo, err error)
+	ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*model.CategoryInfo, err error)
 
 	CreateSpu(ctx context.Context, spu *model.Spu) error
 	CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) error
@@ -47,12 +46,26 @@ type CommodityDB interface {
 	DeleteSpuImagesBySpuId(ctx context.Context, spuId int64) (ids []int64, url []string, err error)
 	GetImagesBySpuId(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error)
 	GetSpuByIds(ctx context.Context, spuIds []int64) ([]*model.Spu, error)
+
+	IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error
+	DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error
+	IncrStock(ctx context.Context, infos []*model.SkuBuyInfo) error
+	DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error
+	GetSkuById(ctx context.Context, id int64) (*model.Sku, error)
 }
 
 type CommodityCache interface {
 	IsExist(ctx context.Context, key string) bool
 	GetSpuImages(ctx context.Context, key string) (*model.SpuImages, error)
 	SetSpuImages(ctx context.Context, key string, images *model.SpuImages)
+
+	GetLockStockNum(ctx context.Context, key string) (int64, error)
+	SetLockStockNum(ctx context.Context, key string, num int64)
+	IncrLockStockNum(ctx context.Context, infos []*model.SkuBuyInfo) error
+	DecrLockStockNum(ctx context.Context, infos []*model.SkuBuyInfo) error
+	GetLockStockKey(id int64) string
+	GetStockKey(id int64) string
+	DecrStockNum(ctx context.Context, infos []*model.SkuBuyInfo) error
 }
 
 type CommodityMQ interface {

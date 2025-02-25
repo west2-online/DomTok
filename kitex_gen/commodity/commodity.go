@@ -4654,9 +4654,9 @@ var fieldIDToName_UpdateCategoryResp = map[int16]string{
 }
 
 type ListSkuInfoReq struct {
-	SkuIDs   []int64 `thrift:"skuIDs,1,required" frugal:"1,required,list<i64>" json:"skuIDs"`
-	PageNum  int64   `thrift:"pageNum,2,required" frugal:"2,required,i64" json:"pageNum"`
-	PageSize int64   `thrift:"pageSize,3,required" frugal:"3,required,i64" json:"pageSize"`
+	SkuInfos []*model.SkuVersion `thrift:"skuInfos,1,required" frugal:"1,required,list<model.SkuVersion>" json:"skuInfos"`
+	PageNum  int64               `thrift:"pageNum,2,required" frugal:"2,required,i64" json:"pageNum"`
+	PageSize int64               `thrift:"pageSize,3,required" frugal:"3,required,i64" json:"pageSize"`
 }
 
 func NewListSkuInfoReq() *ListSkuInfoReq {
@@ -4666,8 +4666,8 @@ func NewListSkuInfoReq() *ListSkuInfoReq {
 func (p *ListSkuInfoReq) InitDefault() {
 }
 
-func (p *ListSkuInfoReq) GetSkuIDs() (v []int64) {
-	return p.SkuIDs
+func (p *ListSkuInfoReq) GetSkuInfos() (v []*model.SkuVersion) {
+	return p.SkuInfos
 }
 
 func (p *ListSkuInfoReq) GetPageNum() (v int64) {
@@ -4677,8 +4677,8 @@ func (p *ListSkuInfoReq) GetPageNum() (v int64) {
 func (p *ListSkuInfoReq) GetPageSize() (v int64) {
 	return p.PageSize
 }
-func (p *ListSkuInfoReq) SetSkuIDs(val []int64) {
-	p.SkuIDs = val
+func (p *ListSkuInfoReq) SetSkuInfos(val []*model.SkuVersion) {
+	p.SkuInfos = val
 }
 func (p *ListSkuInfoReq) SetPageNum(val int64) {
 	p.PageNum = val
@@ -4700,7 +4700,7 @@ func (p *ListSkuInfoReq) DeepEqual(ano *ListSkuInfoReq) bool {
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.SkuIDs) {
+	if !p.Field1DeepEqual(ano.SkuInfos) {
 		return false
 	}
 	if !p.Field2DeepEqual(ano.PageNum) {
@@ -4712,14 +4712,14 @@ func (p *ListSkuInfoReq) DeepEqual(ano *ListSkuInfoReq) bool {
 	return true
 }
 
-func (p *ListSkuInfoReq) Field1DeepEqual(src []int64) bool {
+func (p *ListSkuInfoReq) Field1DeepEqual(src []*model.SkuVersion) bool {
 
-	if len(p.SkuIDs) != len(src) {
+	if len(p.SkuInfos) != len(src) {
 		return false
 	}
-	for i, v := range p.SkuIDs {
+	for i, v := range p.SkuInfos {
 		_src := src[i]
-		if v != _src {
+		if !v.DeepEqual(_src) {
 			return false
 		}
 	}
@@ -4741,7 +4741,7 @@ func (p *ListSkuInfoReq) Field3DeepEqual(src int64) bool {
 }
 
 var fieldIDToName_ListSkuInfoReq = map[int16]string{
-	1: "skuIDs",
+	1: "skuInfos",
 	2: "pageNum",
 	3: "pageSize",
 }
@@ -4829,9 +4829,146 @@ var fieldIDToName_ListSkuInfoResp = map[int16]string{
 	2: "skuInfos",
 }
 
+type ListSpuInfoReq struct {
+	SpuIDs []int64 `thrift:"spuIDs,1,required" frugal:"1,required,list<i64>" json:"spuIDs"`
+}
+
+func NewListSpuInfoReq() *ListSpuInfoReq {
+	return &ListSpuInfoReq{}
+}
+
+func (p *ListSpuInfoReq) InitDefault() {
+}
+
+func (p *ListSpuInfoReq) GetSpuIDs() (v []int64) {
+	return p.SpuIDs
+}
+func (p *ListSpuInfoReq) SetSpuIDs(val []int64) {
+	p.SpuIDs = val
+}
+
+func (p *ListSpuInfoReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("ListSpuInfoReq(%+v)", *p)
+}
+
+func (p *ListSpuInfoReq) DeepEqual(ano *ListSpuInfoReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.SpuIDs) {
+		return false
+	}
+	return true
+}
+
+func (p *ListSpuInfoReq) Field1DeepEqual(src []int64) bool {
+
+	if len(p.SpuIDs) != len(src) {
+		return false
+	}
+	for i, v := range p.SpuIDs {
+		_src := src[i]
+		if v != _src {
+			return false
+		}
+	}
+	return true
+}
+
+var fieldIDToName_ListSpuInfoReq = map[int16]string{
+	1: "spuIDs",
+}
+
+type ListSpuInfoResp struct {
+	Base *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+	Spus []*model.Spu    `thrift:"spus,2,required" frugal:"2,required,list<model.Spu>" json:"spus"`
+}
+
+func NewListSpuInfoResp() *ListSpuInfoResp {
+	return &ListSpuInfoResp{}
+}
+
+func (p *ListSpuInfoResp) InitDefault() {
+}
+
+var ListSpuInfoResp_Base_DEFAULT *model.BaseResp
+
+func (p *ListSpuInfoResp) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return ListSpuInfoResp_Base_DEFAULT
+	}
+	return p.Base
+}
+
+func (p *ListSpuInfoResp) GetSpus() (v []*model.Spu) {
+	return p.Spus
+}
+func (p *ListSpuInfoResp) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+func (p *ListSpuInfoResp) SetSpus(val []*model.Spu) {
+	p.Spus = val
+}
+
+func (p *ListSpuInfoResp) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *ListSpuInfoResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("ListSpuInfoResp(%+v)", *p)
+}
+
+func (p *ListSpuInfoResp) DeepEqual(ano *ListSpuInfoResp) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Spus) {
+		return false
+	}
+	return true
+}
+
+func (p *ListSpuInfoResp) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+func (p *ListSpuInfoResp) Field2DeepEqual(src []*model.Spu) bool {
+
+	if len(p.Spus) != len(src) {
+		return false
+	}
+	for i, v := range p.Spus {
+		_src := src[i]
+		if !v.DeepEqual(_src) {
+			return false
+		}
+	}
+	return true
+}
+
+var fieldIDToName_ListSpuInfoResp = map[int16]string{
+	1: "base",
+	2: "spus",
+}
+
 type DescSkuLockStockReq struct {
-	SkuID int64 `thrift:"skuID,1,required" frugal:"1,required,i64" json:"skuID"`
-	Count int64 `thrift:"count,2,required" frugal:"2,required,i64" json:"count"`
+	Infos []*model.SkuBuyInfo `thrift:"infos,1,required" frugal:"1,required,list<model.SkuBuyInfo>" json:"infos"`
 }
 
 func NewDescSkuLockStockReq() *DescSkuLockStockReq {
@@ -4841,18 +4978,11 @@ func NewDescSkuLockStockReq() *DescSkuLockStockReq {
 func (p *DescSkuLockStockReq) InitDefault() {
 }
 
-func (p *DescSkuLockStockReq) GetSkuID() (v int64) {
-	return p.SkuID
+func (p *DescSkuLockStockReq) GetInfos() (v []*model.SkuBuyInfo) {
+	return p.Infos
 }
-
-func (p *DescSkuLockStockReq) GetCount() (v int64) {
-	return p.Count
-}
-func (p *DescSkuLockStockReq) SetSkuID(val int64) {
-	p.SkuID = val
-}
-func (p *DescSkuLockStockReq) SetCount(val int64) {
-	p.Count = val
+func (p *DescSkuLockStockReq) SetInfos(val []*model.SkuBuyInfo) {
+	p.Infos = val
 }
 
 func (p *DescSkuLockStockReq) String() string {
@@ -4868,33 +4998,28 @@ func (p *DescSkuLockStockReq) DeepEqual(ano *DescSkuLockStockReq) bool {
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.SkuID) {
-		return false
-	}
-	if !p.Field2DeepEqual(ano.Count) {
+	if !p.Field1DeepEqual(ano.Infos) {
 		return false
 	}
 	return true
 }
 
-func (p *DescSkuLockStockReq) Field1DeepEqual(src int64) bool {
+func (p *DescSkuLockStockReq) Field1DeepEqual(src []*model.SkuBuyInfo) bool {
 
-	if p.SkuID != src {
+	if len(p.Infos) != len(src) {
 		return false
 	}
-	return true
-}
-func (p *DescSkuLockStockReq) Field2DeepEqual(src int64) bool {
-
-	if p.Count != src {
-		return false
+	for i, v := range p.Infos {
+		_src := src[i]
+		if !v.DeepEqual(_src) {
+			return false
+		}
 	}
 	return true
 }
 
 var fieldIDToName_DescSkuLockStockReq = map[int16]string{
-	1: "skuID",
-	2: "count",
+	1: "infos",
 }
 
 type DescSkuLockStockResp struct {
@@ -4956,8 +5081,7 @@ var fieldIDToName_DescSkuLockStockResp = map[int16]string{
 }
 
 type IncrSkuLockStockReq struct {
-	SkuID int64 `thrift:"skuID,1,required" frugal:"1,required,i64" json:"skuID"`
-	Count int64 `thrift:"count,2,required" frugal:"2,required,i64" json:"count"`
+	Infos []*model.SkuBuyInfo `thrift:"infos,1,required" frugal:"1,required,list<model.SkuBuyInfo>" json:"infos"`
 }
 
 func NewIncrSkuLockStockReq() *IncrSkuLockStockReq {
@@ -4967,18 +5091,11 @@ func NewIncrSkuLockStockReq() *IncrSkuLockStockReq {
 func (p *IncrSkuLockStockReq) InitDefault() {
 }
 
-func (p *IncrSkuLockStockReq) GetSkuID() (v int64) {
-	return p.SkuID
+func (p *IncrSkuLockStockReq) GetInfos() (v []*model.SkuBuyInfo) {
+	return p.Infos
 }
-
-func (p *IncrSkuLockStockReq) GetCount() (v int64) {
-	return p.Count
-}
-func (p *IncrSkuLockStockReq) SetSkuID(val int64) {
-	p.SkuID = val
-}
-func (p *IncrSkuLockStockReq) SetCount(val int64) {
-	p.Count = val
+func (p *IncrSkuLockStockReq) SetInfos(val []*model.SkuBuyInfo) {
+	p.Infos = val
 }
 
 func (p *IncrSkuLockStockReq) String() string {
@@ -4994,33 +5111,28 @@ func (p *IncrSkuLockStockReq) DeepEqual(ano *IncrSkuLockStockReq) bool {
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.SkuID) {
-		return false
-	}
-	if !p.Field2DeepEqual(ano.Count) {
+	if !p.Field1DeepEqual(ano.Infos) {
 		return false
 	}
 	return true
 }
 
-func (p *IncrSkuLockStockReq) Field1DeepEqual(src int64) bool {
+func (p *IncrSkuLockStockReq) Field1DeepEqual(src []*model.SkuBuyInfo) bool {
 
-	if p.SkuID != src {
+	if len(p.Infos) != len(src) {
 		return false
 	}
-	return true
-}
-func (p *IncrSkuLockStockReq) Field2DeepEqual(src int64) bool {
-
-	if p.Count != src {
-		return false
+	for i, v := range p.Infos {
+		_src := src[i]
+		if !v.DeepEqual(_src) {
+			return false
+		}
 	}
 	return true
 }
 
 var fieldIDToName_IncrSkuLockStockReq = map[int16]string{
-	1: "skuID",
-	2: "count",
+	1: "infos",
 }
 
 type IncrSkuLockStockResp struct {
@@ -5082,8 +5194,7 @@ var fieldIDToName_IncrSkuLockStockResp = map[int16]string{
 }
 
 type DescSkuStockReq struct {
-	SkuID int64 `thrift:"skuID,1,required" frugal:"1,required,i64" json:"skuID"`
-	Count int64 `thrift:"count,2,required" frugal:"2,required,i64" json:"count"`
+	Infos []*model.SkuBuyInfo `thrift:"infos,1,required" frugal:"1,required,list<model.SkuBuyInfo>" json:"infos"`
 }
 
 func NewDescSkuStockReq() *DescSkuStockReq {
@@ -5093,18 +5204,11 @@ func NewDescSkuStockReq() *DescSkuStockReq {
 func (p *DescSkuStockReq) InitDefault() {
 }
 
-func (p *DescSkuStockReq) GetSkuID() (v int64) {
-	return p.SkuID
+func (p *DescSkuStockReq) GetInfos() (v []*model.SkuBuyInfo) {
+	return p.Infos
 }
-
-func (p *DescSkuStockReq) GetCount() (v int64) {
-	return p.Count
-}
-func (p *DescSkuStockReq) SetSkuID(val int64) {
-	p.SkuID = val
-}
-func (p *DescSkuStockReq) SetCount(val int64) {
-	p.Count = val
+func (p *DescSkuStockReq) SetInfos(val []*model.SkuBuyInfo) {
+	p.Infos = val
 }
 
 func (p *DescSkuStockReq) String() string {
@@ -5120,33 +5224,28 @@ func (p *DescSkuStockReq) DeepEqual(ano *DescSkuStockReq) bool {
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.SkuID) {
-		return false
-	}
-	if !p.Field2DeepEqual(ano.Count) {
+	if !p.Field1DeepEqual(ano.Infos) {
 		return false
 	}
 	return true
 }
 
-func (p *DescSkuStockReq) Field1DeepEqual(src int64) bool {
+func (p *DescSkuStockReq) Field1DeepEqual(src []*model.SkuBuyInfo) bool {
 
-	if p.SkuID != src {
+	if len(p.Infos) != len(src) {
 		return false
 	}
-	return true
-}
-func (p *DescSkuStockReq) Field2DeepEqual(src int64) bool {
-
-	if p.Count != src {
-		return false
+	for i, v := range p.Infos {
+		_src := src[i]
+		if !v.DeepEqual(_src) {
+			return false
+		}
 	}
 	return true
 }
 
 var fieldIDToName_DescSkuStockReq = map[int16]string{
-	1: "skuID",
-	2: "count",
+	1: "infos",
 }
 
 type DescSkuStockResp struct {
@@ -5502,6 +5601,8 @@ type CommodityService interface {
 	IncrSkuLockStock(ctx context.Context, req *IncrSkuLockStockReq) (r *IncrSkuLockStockResp, err error)
 
 	DescSkuStock(ctx context.Context, req *DescSkuStockReq) (r *DescSkuStockResp, err error)
+
+	ListSpuInfo(ctx context.Context, req *ListSpuInfoReq) (r *ListSpuInfoResp, err error)
 
 	CreateCategory(ctx context.Context, req *CreateCategoryReq) (r *CreateCategoryResp, err error)
 
@@ -8441,6 +8542,122 @@ func (p *CommodityServiceDescSkuStockResult) Field0DeepEqual(src *DescSkuStockRe
 }
 
 var fieldIDToName_CommodityServiceDescSkuStockResult = map[int16]string{
+	0: "success",
+}
+
+type CommodityServiceListSpuInfoArgs struct {
+	Req *ListSpuInfoReq `thrift:"req,1" frugal:"1,default,ListSpuInfoReq" json:"req"`
+}
+
+func NewCommodityServiceListSpuInfoArgs() *CommodityServiceListSpuInfoArgs {
+	return &CommodityServiceListSpuInfoArgs{}
+}
+
+func (p *CommodityServiceListSpuInfoArgs) InitDefault() {
+}
+
+var CommodityServiceListSpuInfoArgs_Req_DEFAULT *ListSpuInfoReq
+
+func (p *CommodityServiceListSpuInfoArgs) GetReq() (v *ListSpuInfoReq) {
+	if !p.IsSetReq() {
+		return CommodityServiceListSpuInfoArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *CommodityServiceListSpuInfoArgs) SetReq(val *ListSpuInfoReq) {
+	p.Req = val
+}
+
+func (p *CommodityServiceListSpuInfoArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *CommodityServiceListSpuInfoArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("CommodityServiceListSpuInfoArgs(%+v)", *p)
+}
+
+func (p *CommodityServiceListSpuInfoArgs) DeepEqual(ano *CommodityServiceListSpuInfoArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *CommodityServiceListSpuInfoArgs) Field1DeepEqual(src *ListSpuInfoReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_CommodityServiceListSpuInfoArgs = map[int16]string{
+	1: "req",
+}
+
+type CommodityServiceListSpuInfoResult struct {
+	Success *ListSpuInfoResp `thrift:"success,0,optional" frugal:"0,optional,ListSpuInfoResp" json:"success,omitempty"`
+}
+
+func NewCommodityServiceListSpuInfoResult() *CommodityServiceListSpuInfoResult {
+	return &CommodityServiceListSpuInfoResult{}
+}
+
+func (p *CommodityServiceListSpuInfoResult) InitDefault() {
+}
+
+var CommodityServiceListSpuInfoResult_Success_DEFAULT *ListSpuInfoResp
+
+func (p *CommodityServiceListSpuInfoResult) GetSuccess() (v *ListSpuInfoResp) {
+	if !p.IsSetSuccess() {
+		return CommodityServiceListSpuInfoResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *CommodityServiceListSpuInfoResult) SetSuccess(x interface{}) {
+	p.Success = x.(*ListSpuInfoResp)
+}
+
+func (p *CommodityServiceListSpuInfoResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *CommodityServiceListSpuInfoResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("CommodityServiceListSpuInfoResult(%+v)", *p)
+}
+
+func (p *CommodityServiceListSpuInfoResult) DeepEqual(ano *CommodityServiceListSpuInfoResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *CommodityServiceListSpuInfoResult) Field0DeepEqual(src *ListSpuInfoResp) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_CommodityServiceListSpuInfoResult = map[int16]string{
 	0: "success",
 }
 

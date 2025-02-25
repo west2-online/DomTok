@@ -1,0 +1,11 @@
+# globalWhiteRemoteAddresses 定义了全局的白名单远程地址列表
+# 处于这些地址范围内的客户端可以无需额外验证访问 RocketMQ
+globalWhiteRemoteAddresses:
+  - 10.10.103.*  # 允许 IP 地址以 10.10.103 开头的所有客户端访问, k8s 常见
+  - 192.168.0.*  # 允许 IP 地址以 192.168.0 开头的所有客户端访问, docker compose 常见
+
+# accounts 部分定义了不同的账户及其相关权限配置
+accounts:
+  - accessKey: DomTok  # 账户的访问密钥
+    secretKey: DomTok  # 该账户的秘密密钥
+    admin: true  # 该账户为管理员账户，拥有访问所有资源的权限

@@ -115,6 +115,13 @@ type upyun struct {
 	Path           string
 }
 
+type rocketmq struct {
+	BrokerAddr  string `mapstructure:"brokerAddr"`
+	NameSrvAddr string `mapstructure:"nameSrvAddr"`
+	AccessKey   string `mapstructure:"accessKey"`
+	SecretKey   string `mapstructure:"secretKey"`
+}
+
 type config struct {
 	Server        server
 	Snowflake     snowflake
@@ -129,4 +136,5 @@ type config struct {
 	DefaultUser   defaultUser
 	Volcengine    volcengine
 	Upyun         upyun
+	Rocketmq      rocketmq
 }

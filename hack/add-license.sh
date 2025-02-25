@@ -22,4 +22,4 @@ LICENSEIGNORE=$(cat ${PROJECT}/.licenseignore | tr '\n' ',')
 
 ${PROJECT}/output/license-header-checker -r -a -v -i ${LICENSEIGNORE} ${PROJECT}/hack/boilerplate.go.txt . go
 
-${PROJECT}/output/license-header-checker -r -a -v -i ${LICENSEIGNORE} ${PROJECT}/hack/boilerplate.shell.txt . sh
+#${PROJECT}/output/license-header-checker -r -a -v -i ${LICENSEIGNORE} ${PROJECT}/hack/boilerplate.shell.txt . sh

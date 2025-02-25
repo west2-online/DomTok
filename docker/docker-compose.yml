@@ -98,21 +98,21 @@ services:
       - ./data/kibana:/usr/share/kibana/data
     networks:
       - domtok
-#
-#  filebeat:
-#    image: elastic/filebeat:8.4.2
-#    container_name: domtok-filebeat
-#    user: root
-#    volumes:
-#      - ../config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml # 挂载配置文件
-#      - ./data/filebeat:/usr/share/filebeat/data  # 持久化注册表文件
-#      - ../log:/usr/share/filebeat/logs  # 挂载日志目录
-#    depends_on:
-#      elasticsearch:
-#        condition: service_healthy
-#    restart: on-failure
-#    networks:
-#      - domtok
+
+  filebeat:
+    image: elastic/filebeat:8.4.2
+    container_name: domtok-filebeat
+    user: root
+    volumes:
+      - ../config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml # 挂载配置文件
+      - ./data/filebeat:/usr/share/filebeat/data  # 持久化注册表文件
+      - ../log:/usr/share/filebeat/logs  # 挂载日志目录
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - domtok
 
 #
 #    jaeger:
@@ -231,6 +231,41 @@ services:
       - ./env/kafka-ui.env
     networks:
       - domtok
+
+  rmqnamesrv:
+    image: apache/rocketmq:4.9.6
+    container_name: rmqnamesrv
+    ports:
+      - "9876:9876"
+    volumes:
+      - ./data/rocketmq/namesrv/logs:/opt/logs
+      - ./data/rocketmq/namesrv/store:/opt/store
+    command: sh mqnamesrv
+    networks:
+      domtok:
+        aliases:
+          - rmqnamesrv
+
+  rmqbroker:
+    image: apache/rocketmq:4.9.6
+    container_name: rmqbroker
+    ports:
+      - "10909:10909"
+      - "10911:10911"
+    volumes:
+      - ./data/rocketmq/broker/logs:/opt/logs
+      - ./data/rocketmq/broker/store:/opt/store
+      - ../config/rocketmq/broker.conf:/home/rocketmq/broker.conf
+      - ../config/rocketmq/plain_acl.yml:/home/rocketmq/rocketmq-4.9.6/conf/plain_acl.yml
+    env_file:
+      - ./env/rocket-broker.env
+    command: sh mqbroker -c /home/rocketmq/rocketmq-4.9.6/conf/broker.conf
+    depends_on:
+      - rmqnamesrv
+    networks:
+      domtok:
+        aliases:
+          - rmqbroker
 
 networks:
   domtok:

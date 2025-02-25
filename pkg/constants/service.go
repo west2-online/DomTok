@@ -58,4 +58,6 @@ const (
 
 	CommodityDefaultMinCost = 0.0
 	CommodityDefaultMaxCost = 1e7
+	// CommodityMaxBuyNum 指定了最大商品购买数
+	CommodityMaxBuyNum = 1000
 )
