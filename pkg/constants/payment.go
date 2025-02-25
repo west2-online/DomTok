@@ -98,5 +98,4 @@ func GetRefundStatus(code int8) string {
 	default:
 		return RefundStatusFailed
 	}
-
 }

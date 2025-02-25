@@ -1,5 +1,5 @@
 namespace go payment
-
+// TODO 后面来改注释
 include "model.thrift"
 /*
  * struct PaymentTokenRequest 支付令牌请求
@@ -74,7 +74,30 @@ struct RefundTokenResponse {
  */
 struct RefundRequest {
     1: required i64 orderID
-    2: required i64 userID
+    2: required double refundAmount
+    3: required string refundReason
+}
+
+/*
+ * struct RefundResponse 退款响应
+ * @Param refundID 退款ID
+ * @Param status 请求状态
+ */
+struct RefundResponse {
+    1: model.BaseResp base,
+    2: required i64 refundID
+    3: required i64 status
+}
+
+/*
+ * struct RefundRequest 退款请求
+ * @Param orderID 关联的商户订单号
+ * @Param userID 用户ID
+ * @Param refundAmount 退款金额
+ * @Param refundReason 退款原因
+ */
+struct RefundReviewRequest {
+    1: required i64 orderID
     3: required double refundAmount
     4: required string refundReason
 }
@@ -84,7 +107,7 @@ struct RefundRequest {
  * @Param refundID 退款ID
  * @Param status 请求状态
  */
-struct RefundResponse {
+struct RefundReviewResponse {
     1: model.BaseResp base,
     2: required i64 refundID
     3: required i64 status
@@ -100,7 +123,7 @@ struct RefundResponse {
 service PaymentService {
     PaymentResponse ProcessPayment(1: PaymentRequest request) (api.post="/api/payment/process")
     PaymentTokenResponse RequestPaymentToken(1: PaymentTokenRequest request) (api.get="/api/payment/token")
-    RefundResponse ProcessRefund(1: RefundRequest request) (api.post="/api/payment/refund")
-    RefundTokenResponse RequestRefundInfo(1: RefundTokenRequest request) (api.get="/api/payment/refund-token")
+    RefundReviewResponse ProcessRefund(1: RefundReviewRequest request) (api.post="/api/payment/process-refund")
+    RefundResponse RequestRefund(1: RefundRequest request) (api.get="/api/payment/refund")
 }
 

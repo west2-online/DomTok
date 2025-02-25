@@ -19,7 +19,6 @@ package mysql
 import (
 	"context"
 	"errors"
-
 	"gorm.io/gorm"
 
 	"github.com/west2-online/DomTok/app/payment/domain/model"
@@ -131,6 +130,15 @@ func ConvertRefundToDBModel(p *model.PaymentRefund) (*PaymentRefund, error) {
 
 func (db *paymentDB) CreateRefund(ctx context.Context, p *model.PaymentRefund) error {
 	// 将 entity 转换成 MySQL 需要的 refundOrder 结构
+	paymentOrder, err := db.GetPaymentInfo(ctx, p.OrderID)
+	if err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "CreateRefund: failed to get payment info: %v", err)
+	}
+	// 通过去表格里查询获取这四个数据，发起退款的时候前端不需要传这些东西，如果查不到就说明有错误直接报错就好
+	p.MaskedCreditCardNumber = paymentOrder.MaskedCreditCardNumber
+	p.CreditCardExpirationYear = paymentOrder.CreditCardExpirationYear
+	p.CreditCardExpirationYear = paymentOrder.CreditCardExpirationYear
+	p.UserID = paymentOrder.UserID
 	refundOrder, err := ConvertRefundToDBModel(p)
 	if err != nil {
 		logger.Errorf("CreateRefund: failed to convert refund order: %v", err)
@@ -138,7 +146,7 @@ func (db *paymentDB) CreateRefund(ctx context.Context, p *model.PaymentRefund) e
 	}
 
 	// 插入数据库
-	if err := db.client.WithContext(ctx).Create(refundOrder).Error; err != nil {
+	if err = db.client.WithContext(ctx).Create(refundOrder).Error; err != nil {
 		logger.Errorf("CreateRefund: failed to create refund order: %v", err)
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create refund: %v", err)
 	}

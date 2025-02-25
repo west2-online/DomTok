@@ -93,39 +93,39 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	return token, expTime, nil
 }
 
-// GetRefundInfo 获取退款信息 TODO
-func (uc *paymentUseCase) GetRefundInfo(ctx context.Context, orderID int64) (refundID int64, err error) {
+// CreateRefund 发起退款请求 TODO
+func (uc *paymentUseCase) CreateRefund(ctx context.Context, orderID int64) (refundStatus int64, refundID int64, err error) {
 	// 1. 检查订单是否存在
 	orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
 	if err != nil {
-		return 0, fmt.Errorf("check order existence failed: %w", err)
+		return 0, 0, fmt.Errorf("check order existence failed: %w", err)
 	}
 	if !orderExists {
-		return 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
+		return 0, 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
 	}
 	// 2. 获取用户ID
 	uid, err := uc.svc.GetUserID(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("get user id failed: %w", err)
+		return 0, 0, fmt.Errorf("get user id failed: %w", err)
 	}
 	// 3. Redis 限流检查
 	var frequencyInfo bool
 	var timeInfo bool
 	frequencyInfo, timeInfo, err = uc.svc.CheckRedisRateLimiting(ctx, uid, orderID)
 	if err != nil {
-		return 0, fmt.Errorf("check redis rate limiting failed: %w", err)
+		return 0, 0, fmt.Errorf("check redis rate limiting failed: %w", err)
 	}
 	if frequencyInfo != paymentStatus.RedisValid {
-		return 0, fmt.Errorf("too many refund requests in a short time")
+		return 0, 0, fmt.Errorf("too many refund requests in a short time")
 	}
 	if timeInfo != paymentStatus.RedisValid {
-		return 0, fmt.Errorf("refund already requested for this order in the last 24 hours")
+		return 0, 0, fmt.Errorf("refund already requested for this order in the last 24 hours")
 	}
 
 	// 4. 创建退款信息
 	refundID, err = uc.svc.CreateRefundInfo(ctx, orderID)
 	if err != nil {
-		return 0, fmt.Errorf("create refund info failed: %w", err)
+		return 0, 0, fmt.Errorf("create refund info failed: %w", err)
 	}
 	/*
 		// 5. 生成退款令牌
@@ -143,5 +143,6 @@ func (uc *paymentUseCase) GetRefundInfo(ctx context.Context, orderID int64) (ref
 
 		return token, expTime, nil
 	*/
-	return refundID, nil
+	refundStatus = paymentStatus.RefundStatusProcessingCode
+	return refundStatus, refundID, nil
 }

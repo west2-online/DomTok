@@ -27,10 +27,3 @@ func BuildTokenInfo(token string, expTime int64) *model.PaymentTokenInfo {
 		PaymentTokenExpirationTime: expTime,
 	}
 }
-
-func BuildRefundTokenInfo(token string, expTime int64) *model.RefundTokenInfo {
-	return &model.RefundTokenInfo{
-		RefundToken:               token,
-		RefundTokenExpirationTime: expTime,
-	}
-}
