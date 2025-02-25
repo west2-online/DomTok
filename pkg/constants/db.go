@@ -32,6 +32,8 @@ const (
 	OrderGoodsTableName = "order_goods"
 	SpuTableName        = "spu_info"
 	SpuImageTableName   = "spu_image"
+	CouponTableName     = "coupon_info"
+	UserCouponTableName = "user_coupon"
 
 	SpuSkuTableName        = "spu_to_sku"
 	CartTableName          = "cart"

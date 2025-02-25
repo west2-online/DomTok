@@ -67,6 +67,33 @@ type SpuToSku struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
+type Coupon struct {
+	Id             int64 `gorm:"primary_key"`
+	Uid            int64
+	Name           string
+	TypeInfo       int64
+	ConditionCost  float64
+	DiscountAmount float64
+	Discount       float64
+	RangeType      int64
+	RangeId        int64
+	Description    string
+	ExpireTime     time.Time
+	DeadlineForGet time.Time
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      gorm.DeletedAt `gorm:"index"`
+}
+
+type UserCoupon struct {
+	Uid           int64
+	CouponId      int64
+	RemainingUses int64
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	DeletedAt     gorm.DeletedAt `gorm:"index"`
+}
+
 // 对应表名
 
 func (spu *Spu) TableName() string {
@@ -83,4 +110,12 @@ func (Category) TableName() string {
 
 func (s *SpuToSku) TableName() string {
 	return constants.SpuSkuTableName
+}
+
+func (Coupon) TableName() string {
+	return constants.CouponTableName
+}
+
+func (UserCoupon) TableName() string {
+	return constants.UserCouponTableName
 }
