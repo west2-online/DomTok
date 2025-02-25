@@ -22,7 +22,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
@@ -65,6 +65,7 @@ func (c *commodityCache) IncrLockStockNum(ctx context.Context, infos []*model.Sk
 }
 
 func (c *commodityCache) DecrLockStockNum(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	// redis的事务是到最后一个操作的时候才执行全部操作的，Get这种获得值的操作就会为空值，使用Watch检测指定的key就可以避免这种情况，所以要先获取所有的key
 	keys := make([]string, 0)
 	for _, info := range infos {
 		keys = append(keys, c.GetLockStockKey(info.SkuID))

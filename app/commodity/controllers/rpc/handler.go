@@ -300,7 +300,14 @@ func (c CommodityHandler) ViewHistory(ctx context.Context, req *commodity.ViewHi
 
 func (c CommodityHandler) DescSkuLockStock(ctx context.Context, req *commodity.DescSkuLockStockReq) (r *commodity.DescSkuLockStockResp, err error) {
 	r = new(commodity.DescSkuLockStockResp)
-	err = c.useCase.DecrLockStock(ctx, req.Infos)
+	infos := make([]*model.SkuBuyInfo, 0)
+	for _, info := range req.Infos {
+		infos = append(infos, &model.SkuBuyInfo{
+			SkuID: info.SkuID,
+			Count: info.Count,
+		})
+	}
+	err = c.useCase.DecrLockStock(ctx, infos)
 	if err != nil {
 		return r, err
 	}
@@ -310,7 +317,14 @@ func (c CommodityHandler) DescSkuLockStock(ctx context.Context, req *commodity.D
 
 func (c CommodityHandler) IncrSkuLockStock(ctx context.Context, req *commodity.IncrSkuLockStockReq) (r *commodity.IncrSkuLockStockResp, err error) {
 	r = new(commodity.IncrSkuLockStockResp)
-	err = c.useCase.IncrLockStock(ctx, req.Infos)
+	infos := make([]*model.SkuBuyInfo, 0)
+	for _, info := range req.Infos {
+		infos = append(infos, &model.SkuBuyInfo{
+			SkuID: info.SkuID,
+			Count: info.Count,
+		})
+	}
+	err = c.useCase.IncrLockStock(ctx, infos)
 	if err != nil {
 		return r, err
 	}
@@ -320,7 +334,14 @@ func (c CommodityHandler) IncrSkuLockStock(ctx context.Context, req *commodity.I
 
 func (c CommodityHandler) DescSkuStock(ctx context.Context, req *commodity.DescSkuStockReq) (r *commodity.DescSkuStockResp, err error) {
 	r = new(commodity.DescSkuStockResp)
-	err = c.useCase.DecrStock(ctx, req.Infos)
+	infos := make([]*model.SkuBuyInfo, 0)
+	for _, info := range req.Infos {
+		infos = append(infos, &model.SkuBuyInfo{
+			SkuID: info.SkuID,
+			Count: info.Count,
+		})
+	}
+	err = c.useCase.DecrStock(ctx, infos)
 	if err != nil {
 		return r, err
 	}

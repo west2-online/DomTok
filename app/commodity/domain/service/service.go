@@ -25,7 +25,6 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
-	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
@@ -406,7 +405,7 @@ func (svc *CommodityService) CreateCategory(ctx context.Context, category *model
 	return nil
 }
 
-func (svc *CommodityService) Cached(ctx context.Context, infos []*modelKitex.SkuBuyInfo) bool {
+func (svc *CommodityService) Cached(ctx context.Context, infos []*model.SkuBuyInfo) bool {
 	cached := true
 
 	for _, info := range infos {

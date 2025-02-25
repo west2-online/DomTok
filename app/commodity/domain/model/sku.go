@@ -31,3 +31,8 @@ type Sku struct {
 	Stock            int64
 	LockStock        int64
 }
+
+type SkuBuyInfo struct {
+	SkuID int64
+	Count int64
+}

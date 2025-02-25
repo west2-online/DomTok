@@ -24,7 +24,6 @@ import (
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
-	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
@@ -278,15 +277,23 @@ func (db *commodityDB) UpdateCategory(ctx context.Context, category *model.Categ
 	return nil
 }
 
-func (db *commodityDB) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*modelKitex.CategoryInfo, err error) {
+func (db *commodityDB) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*model.CategoryInfo, err error) {
 	offset := (pageNum - 1) * pageSize
-	if err := db.client.WithContext(ctx).Offset(offset).Limit(pageSize).Find(&resp).Error; err != nil {
+	cs := make([]*Category, 0)
+	if err := db.client.WithContext(ctx).Offset(offset).Limit(pageSize).Find(&cs).Error; err != nil {
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to list categories: %v", err)
+	}
+	resp = make([]*model.CategoryInfo, 0)
+	for _, c := range cs {
+		resp = append(resp, &model.CategoryInfo{
+			Name:       c.Name,
+			CategoryID: c.Id,
+		})
 	}
 	return resp, nil
 }
 
-func (db *commodityDB) IncrLockStock(ctx context.Context, infos []*modelKitex.SkuBuyInfo) error {
+func (db *commodityDB) IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
 	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		for _, info := range infos {
 			var lockStock int
@@ -311,7 +318,7 @@ func (db *commodityDB) IncrLockStock(ctx context.Context, infos []*modelKitex.Sk
 	return err
 }
 
-func (db *commodityDB) DecrLockStock(ctx context.Context, infos []*modelKitex.SkuBuyInfo) error {
+func (db *commodityDB) DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
 	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		for _, info := range infos {
 			var lockStock int
@@ -336,7 +343,7 @@ func (db *commodityDB) DecrLockStock(ctx context.Context, infos []*modelKitex.Sk
 	return err
 }
 
-func (db *commodityDB) IncrStock(ctx context.Context, infos []*modelKitex.SkuBuyInfo) error {
+func (db *commodityDB) IncrStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
 	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		for _, info := range infos {
 			var stock int
@@ -358,7 +365,7 @@ func (db *commodityDB) IncrStock(ctx context.Context, infos []*modelKitex.SkuBuy
 	return err
 }
 
-func (db *commodityDB) DecrStock(ctx context.Context, infos []*modelKitex.SkuBuyInfo) error {
+func (db *commodityDB) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
 	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		for _, info := range infos {
 			var stock int

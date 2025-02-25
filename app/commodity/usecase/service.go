@@ -24,7 +24,6 @@ import (
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
-	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
@@ -89,7 +88,7 @@ func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category)
 	return err
 }
 
-func (uc *useCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*modelKitex.CategoryInfo, err error) {
+func (uc *useCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*model.CategoryInfo, err error) {
 	resp, err = uc.db.ViewCategory(ctx, pageNum, pageSize)
 	if err != nil {
 		return nil, errno.Errorf(errno.ServiceListCategoryFailed, "failed to view categories: %v", err)
@@ -227,7 +226,7 @@ func (us *useCase) ListSpuInfo(ctx context.Context, ids []int64) ([]*model.Spu, 
 	return us.db.GetSpuByIds(ctx, ids)
 }
 
-func (us *useCase) IncrLockStock(ctx context.Context, infos []*modelKitex.SkuBuyInfo) error {
+func (us *useCase) IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
 	if !us.svc.Cached(ctx, infos) {
 		return errno.Errorf(errno.RedisKeyNotExist, "useCase.IncrLockStock failed")
 	}
@@ -256,7 +255,7 @@ func (us *useCase) IncrLockStock(ctx context.Context, infos []*modelKitex.SkuBuy
 	return nil
 }
 
-func (us *useCase) DecrLockStock(ctx context.Context, infos []*modelKitex.SkuBuyInfo) error {
+func (us *useCase) DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
 	if !us.svc.Cached(ctx, infos) {
 		return errno.Errorf(errno.RedisKeyNotExist, "useCase.DecrLockStock failed")
 	}
@@ -282,6 +281,6 @@ func (us *useCase) DecrLockStock(ctx context.Context, infos []*modelKitex.SkuBuy
 	return nil
 }
 
-func (us *useCase) DecrStock(ctx context.Context, infos []*modelKitex.SkuBuyInfo) error {
+func (us *useCase) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
 	return us.db.DecrStock(ctx, infos)
 }
