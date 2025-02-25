@@ -31,6 +31,17 @@ type CommodityHandler struct {
 	useCase usecase.CommodityUseCase
 }
 
+func (c CommodityHandler) ListSpuInfo(ctx context.Context, req *commodity.ListSpuInfoReq) (r *commodity.ListSpuInfoResp, err error) {
+	r = new(commodity.ListSpuInfoResp)
+	spus, err := c.useCase.ListSpuInfo(ctx, req.SpuIDs)
+	if err != nil {
+		return nil, err
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.Spus = pack.BuildSpus(spus)
+	return r, err
+}
+
 func (c CommodityHandler) CreateSpuImage(streamServer commodity.CommodityService_CreateSpuImageServer) (err error) {
 	resp := new(commodity.CreateSpuImageResp)
 	req, err := streamServer.Recv()
@@ -288,18 +299,54 @@ func (c CommodityHandler) ViewHistory(ctx context.Context, req *commodity.ViewHi
 }
 
 func (c CommodityHandler) DescSkuLockStock(ctx context.Context, req *commodity.DescSkuLockStockReq) (r *commodity.DescSkuLockStockResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.DescSkuLockStockResp)
+	infos := make([]*model.SkuBuyInfo, 0)
+	for _, info := range req.Infos {
+		infos = append(infos, &model.SkuBuyInfo{
+			SkuID: info.SkuID,
+			Count: info.Count,
+		})
+	}
+	err = c.useCase.DecrLockStock(ctx, infos)
+	if err != nil {
+		return r, err
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return r, nil
 }
 
 func (c CommodityHandler) IncrSkuLockStock(ctx context.Context, req *commodity.IncrSkuLockStockReq) (r *commodity.IncrSkuLockStockResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.IncrSkuLockStockResp)
+	infos := make([]*model.SkuBuyInfo, 0)
+	for _, info := range req.Infos {
+		infos = append(infos, &model.SkuBuyInfo{
+			SkuID: info.SkuID,
+			Count: info.Count,
+		})
+	}
+	err = c.useCase.IncrLockStock(ctx, infos)
+	if err != nil {
+		return r, err
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return r, nil
 }
 
 func (c CommodityHandler) DescSkuStock(ctx context.Context, req *commodity.DescSkuStockReq) (r *commodity.DescSkuStockResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.DescSkuStockResp)
+	infos := make([]*model.SkuBuyInfo, 0)
+	for _, info := range req.Infos {
+		infos = append(infos, &model.SkuBuyInfo{
+			SkuID: info.SkuID,
+			Count: info.Count,
+		})
+	}
+	err = c.useCase.DecrStock(ctx, infos)
+	if err != nil {
+		return r, err
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return r, nil
 }
 
 func (c CommodityHandler) CreateCategory(ctx context.Context, req *commodity.CreateCategoryReq) (r *commodity.CreateCategoryResp, err error) {

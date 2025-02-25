@@ -14,23 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package model
+package redis
 
 import (
-	"time"
+	"fmt"
 )
 
-type Category struct {
-	Id        int64
-	Name      string
-	CreatorId int64
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
-	// gorm.Model
+func (c *commodityCache) GetLockStockKey(id int64) string {
+	return fmt.Sprintf("goods:%d:lockstock", id)
 }
 
-type CategoryInfo struct {
-	CategoryID int64
-	Name       string
+func (c *commodityCache) GetStockKey(id int64) string {
+	return fmt.Sprintf("goods:%d:stock", id)
 }

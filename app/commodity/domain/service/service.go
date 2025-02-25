@@ -404,3 +404,23 @@ func (svc *CommodityService) CreateCategory(ctx context.Context, category *model
 	}
 	return nil
 }
+
+func (svc *CommodityService) Cached(ctx context.Context, infos []*model.SkuBuyInfo) bool {
+	cached := true
+
+	for _, info := range infos {
+		key := svc.cache.GetLockStockKey(info.SkuID)
+		if !svc.cache.IsExist(ctx, key) {
+			// 没有命中就先返回错误，后续及时补数据
+			go func(id int64, k string, c context.Context) {
+				data, err := svc.db.GetSkuById(c, id)
+				if err != nil {
+					return
+				}
+				svc.cache.SetLockStockNum(c, k, data.LockStock)
+			}(info.SkuID, key, ctx)
+			cached = false
+		}
+	}
+	return cached
+}

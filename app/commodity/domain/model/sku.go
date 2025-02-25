@@ -16,21 +16,23 @@ limitations under the License.
 
 package model
 
-import (
-	"time"
-)
-
-type Category struct {
-	Id        int64
-	Name      string
-	CreatorId int64
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
-	// gorm.Model
+type Sku struct {
+	Id               int64
+	CreatorId        int64
+	Price            float64
+	Name             string
+	Description      string
+	ForSale          int
+	HistoryStock     int64
+	StyleHeadDrawing string
+	CreatedAt        int64
+	UpdatedAt        int64
+	DeletedAt        int64
+	Stock            int64
+	LockStock        int64
 }
 
-type CategoryInfo struct {
-	CategoryID int64
-	Name       string
+type SkuBuyInfo struct {
+	SkuID int64
+	Count int64
 }
