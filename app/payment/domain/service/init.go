@@ -25,10 +25,10 @@ type PaymentService struct {
 	db    repository.PaymentDB
 	sf    *utils.Snowflake
 	redis repository.PaymentRedis
-	rpc   repository.RPC
+	rpc   repository.PaymentRPC
 }
 
-func NewPaymentService(db repository.PaymentDB, sf *utils.Snowflake, redis repository.PaymentRedis, rpc repository.RPC) *PaymentService {
+func NewPaymentService(db repository.PaymentDB, sf *utils.Snowflake, redis repository.PaymentRedis, rpc repository.PaymentRPC) *PaymentService {
 	if db == nil {
 		panic("paymentService`s db should not be nil")
 	}

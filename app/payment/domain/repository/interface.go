@@ -39,6 +39,6 @@ type PaymentRedis interface {
 	// GetPaymentToken(ctx context.Context, key string) (string, error)
 }
 
-type RPC interface {
+type PaymentRPC interface {
 	PaymentIsOrderExist(ctx context.Context, orderID int64) (bool, error)
 }

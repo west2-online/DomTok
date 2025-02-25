@@ -29,7 +29,7 @@ type paymentRPC struct {
 	order orderservice.Client
 }
 
-func NewPaymentRPC(order orderservice.Client) repository.RPC {
+func NewPaymentRPC(order orderservice.Client) repository.PaymentRPC {
 	return &paymentRPC{order: order}
 }
 

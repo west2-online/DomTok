@@ -50,8 +50,8 @@ const (
 )
 
 const (
-	PaymentStatusPending    = "待支付"   // 待支付
-	PaymentStatusProcessing = "处理中"   // 处理中
+	PaymentStatusPending    = "待支付"  // 待支付
+	PaymentStatusProcessing = "处理中"  // 处理中
 	PaymentStatusSuccess    = "成功支付" // 成功支付
 	PaymentStatusFailed     = "支付失败" // 支付失败
 )
