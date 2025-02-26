@@ -21,11 +21,10 @@ import "time"
 // Order listen`s topic
 const (
 	SkuStockRollbackTopic                     = "sku-stock-rollback-topic"
-	SkuStockRollbackTopicDelayTimeLevel       = RocketMQDelay10M // 10 Min
+	SkuStockRollbackTopicDelayTimeLevel       = RocketMQDelay10M // 10 Minute
 	SkuStockRollbackTopicConsumerPullInterval = 1 * time.Second
 
 	OrderPaymentResultTopic                     = "order-payment-result-topic"
-	OrderPaymentResultTopicDelayTimeLevel       = RocketMQDelay9M
 	OrderPaymentResultTopicConsumerPullInterval = 1 * time.Second
 )
 

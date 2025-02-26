@@ -40,11 +40,12 @@ const (
 	OrderStatusPaidCode      = 1
 	OrderStatusCompletedCode = 2
 	OrderStatusCancelledCode = 3
-	OrderStatusUnpaid        = "待支付"
-	OrderStatusPaid          = "已支付"
-	OrderStatusCompleted     = "已完成"
-	OrderStatusCancelled     = "已取消"
-	OrderStatusUnknown       = "未知状态"
+
+	OrderStatusUnpaid    = "待支付"
+	OrderStatusPaid      = "已支付"
+	OrderStatusCompleted = "已完成" // 已发货已签收
+	OrderStatusCancelled = "已取消"
+	OrderStatusUnknown   = "未知状态"
 
 	OrderMqConsumerGroupFormat = "order-%s" // order-topic
 )

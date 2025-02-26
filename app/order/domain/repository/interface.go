@@ -25,17 +25,21 @@ import (
 
 // OrderDB 表示订单模块的持久化存储接口
 type OrderDB interface {
-	IsOrderExist(ctx context.Context, orderID int64) (bool, error)
 	CreateOrder(ctx context.Context, order *model.Order, goods []*model.OrderGoods) error
 	CreateOrderGoods(ctx context.Context, orderGoods []*model.OrderGoods) error
+
 	GetOrderByID(ctx context.Context, orderID int64) (*model.Order, error)
 	GetOrderGoodsByOrderID(ctx context.Context, orderID int64) ([]*model.OrderGoods, error)
 	GetOrdersByUserID(ctx context.Context, userID int64, page, size int32) ([]*model.Order, int32, error)
+	GetOrderWithGoods(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error)
+
 	UpdateOrderStatus(ctx context.Context, orderID int64, status int32) error
 	UpdateOrderAddress(ctx context.Context, orderID int64, addressID int64, addressInfo string) error
-	DeleteOrder(ctx context.Context, orderID int64) error
-	GetOrderWithGoods(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error)
 	UpdatePaymentStatus(ctx context.Context, message *model.PaymentResultMessage) error
+
+	DeleteOrder(ctx context.Context, orderID int64) error
+
+	IsOrderExist(ctx context.Context, orderID int64) (bool, error)
 	IsOrderPaid(ctx context.Context, orderID int64) (bool, error)
 }
 

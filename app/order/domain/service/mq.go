@@ -89,7 +89,7 @@ func (svc *OrderService) PaymentResultProcess(ctx context.Context, body []byte) 
 	}
 
 	// 支付成功的话
-	if pm.PaymentStatus == constants.PaymentStatusSuccess {
+	if pm.PaymentStatus == constants.PaymentStatusSuccessCode {
 		if err = svc.rpc.DescSkuStock(ctx, orderStock); err != nil {
 			logger.Errorf(err.Error())
 			return false

@@ -28,7 +28,6 @@ import (
 	"github.com/west2-online/DomTok/app/order/domain/repository"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 type orderDB struct {
@@ -58,25 +57,12 @@ func (db *orderDB) CreateOrder(ctx context.Context, o *model.Order, gs []*model.
 	})
 
 	return db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		var err error
-		defer func() {
-			if err != nil {
-				if e := tx.Rollback().Error; e != nil {
-					logger.Errorf("failed to rollback transaction: %v", e)
-				}
-			}
-		}()
-
-		if err = tx.Create(order).Error; err != nil {
+		if err := tx.Create(order).Error; err != nil {
 			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create order: %v", err)
 		}
-		if err = tx.Create(goods).Error; err != nil {
+		if err := tx.Create(goods).Error; err != nil {
 			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create goods: %v", err)
 		}
-		if err = tx.Commit().Error; err != nil {
-			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to commit order: %v", err)
-		}
-
 		return nil
 	})
 }
@@ -215,7 +201,7 @@ func (db *orderDB) IsOrderPaid(ctx context.Context, orderID int64) (bool, error)
 		return false, errno.NewErrNo(errno.InternalDatabaseErrorCode,
 			fmt.Sprintf("Failed to query the payment status of an order with order id %d, err: %v", orderID, err))
 	}
-	return status == constants.PaymentStatusSuccess, nil
+	return status == constants.PaymentStatusSuccessCode, nil
 }
 
 func (db *orderDB) UpdatePaymentStatus(ctx context.Context, message *model.PaymentResultMessage) error {

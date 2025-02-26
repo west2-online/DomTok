@@ -29,8 +29,7 @@ const (
 const (
 	ServiceOrderNotFound = 2000 + iota
 	UnknownOrderStatus
-	PaymentOrderNotExist
-	UserNotExist
+	OrderShouldNotBeChange
 )
 
 // commodity
@@ -43,4 +42,8 @@ const (
 	ServiceListCategoryFailed
 
 	ServiceUserCloseWebsocketConn
+)
+
+const (
+	PaymentOrderNotExist = 4000 + iota
 )

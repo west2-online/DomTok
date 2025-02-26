@@ -19,7 +19,10 @@ package rpc
 import (
 	"context"
 
+	"github.com/samber/lo"
+
 	"github.com/west2-online/DomTok/app/order/controllers/rpc/pack"
+	"github.com/west2-online/DomTok/app/order/domain/model"
 	"github.com/west2-online/DomTok/app/order/usecase"
 	idlmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/kitex_gen/order"
@@ -33,10 +36,21 @@ func NewOrderHandler(useCase usecase.OrderUseCase) order.OrderService {
 	return &OrderHandler{useCase: useCase}
 }
 
-// TODO：需要实现
 func (h *OrderHandler) CreateOrder(ctx context.Context, req *order.CreateOrderReq) (resp *order.CreateOrderResp, err error) {
 	resp = new(order.CreateOrderResp)
-	return resp, nil
+	baseOrderGoods := lo.Map(req.BaseOrderGoods, func(item *idlmodel.BaseOrderGoods, index int) *model.BaseOrderGoods {
+		return &model.BaseOrderGoods{
+			MerchantID:       item.MerchantID,
+			GoodsID:          item.GoodsID,
+			StyleID:          item.StyleID,
+			GoodsVersion:     item.GoodsVersion,
+			PurchaseQuantity: item.PurchaseQuantity,
+			CouponID:         item.CouponID,
+		}
+	})
+
+	resp.OrderID, err = h.useCase.CreateOrder(ctx, req.AddressID, baseOrderGoods)
+	return resp, err
 }
 
 func (h *OrderHandler) ViewOrderList(ctx context.Context, req *order.ViewOrderListReq) (resp *order.ViewOrderListResp, err error) {

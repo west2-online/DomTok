@@ -49,6 +49,7 @@ func BuildOrder(o *model.Order) *idlmodel.Order {
 
 func BuildOrderGoods(g *model.OrderGoods) *idlmodel.OrderGoods {
 	return &idlmodel.OrderGoods{
+		OrderId:            g.OrderID,
 		MerchantId:         g.MerchantID,
 		GoodsId:            g.GoodsID,
 		GoodsName:          g.GoodsName,
@@ -67,7 +68,6 @@ func BuildOrderGoods(g *model.OrderGoods) *idlmodel.OrderGoods {
 		SinglePrice:        utils.DecimalFloat64(&g.SinglePrice),
 		CouponId:           g.CouponId,
 		CouponName:         g.CouponName,
-		OrderId:            g.OrderID,
 	}
 }
 

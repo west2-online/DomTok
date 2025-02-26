@@ -47,7 +47,7 @@ func (svc *OrderService) MakeOrderByGoods(ctx context.Context, addressID int64, 
 		TotalAmountOfFreight:  decimal.NewFromFloat(0), // 待计算
 		TotalAmountOfDiscount: decimal.NewFromFloat(0), // 待计算
 		PaymentAmount:         decimal.NewFromFloat(0), // 待计算
-		PaymentStatus:         constants.PaymentStatusPending,
+		PaymentStatus:         constants.PaymentStatusPendingCode,
 		PaymentAt:             0,  // 这个值等后续被支付后才进行更新
 		PaymentStyle:          "", // 等更新
 		OrderedAt:             time.Now().UnixMilli(),
@@ -62,7 +62,7 @@ func (svc *OrderService) MakeOrderByGoods(ctx context.Context, addressID int64, 
 		item.OrderID = order.Id
 	})
 
-	if err = svc.calculateTheAmount(goods, order); err != nil {
+	if err = svc.CalculateTheAmount(goods, order); err != nil {
 		return nil, err
 	}
 
@@ -70,13 +70,22 @@ func (svc *OrderService) MakeOrderByGoods(ctx context.Context, addressID int64, 
 }
 
 // TODO 优惠券接口完善后可以考虑接入优惠券的接口来实现这个方法的功能
-func (svc *OrderService) calculateTheAmount(goods []*model.OrderGoods, order *model.Order) error {
+func (svc *OrderService) CalculateTheAmount(goods []*model.OrderGoods, order *model.Order) error {
+	// orderGoods 的  DiscountAmount PaymentAmount SinglePrice, couponName 还未赋值
 	lo.ForEach(goods, func(item *model.OrderGoods, index int) {
+		item.DiscountAmount = decimal.NewFromInt(0)
+		item.PaymentAmount = item.TotalAmount.Add(item.DiscountAmount)
+		item.SinglePrice = item.PaymentAmount.Div(decimal.NewFromInt(item.PurchaseQuantity))
+
 		order.TotalAmountOfGoods = order.TotalAmountOfGoods.Add(item.TotalAmount)
 		order.TotalAmountOfDiscount = order.TotalAmountOfDiscount.Add(item.DiscountAmount)
 		order.TotalAmountOfFreight = order.TotalAmountOfFreight.Add(item.FreightAmount)
 		order.PaymentAmount = order.PaymentAmount.Add(item.PaymentAmount)
 	})
+
+	// 全局活动, 应该调用 coupon 接口实现
+	order.CouponId = 0
+	order.CouponName = ""
 	return nil
 }
 
@@ -116,6 +125,7 @@ func (svc *OrderService) DescSkuLockStock(ctx context.Context, orderID int64, go
 	return err
 }
 
+// encodeStocks 会把 model.OrderStock 编码成二进制丢进 msg, 可以少一次 db 查询
 func (svc *OrderService) encodeStocks(stocks *model.OrderStock) ([]byte, error) {
 	var buf bytes.Buffer
 	if err := gob.NewEncoder(&buf).Encode(stocks); err != nil {
@@ -124,6 +134,7 @@ func (svc *OrderService) encodeStocks(stocks *model.OrderStock) ([]byte, error) 
 	return buf.Bytes(), nil
 }
 
+// decodeStocks 从 msg 中 unmarshal 出 model.OrderStock
 func (svc *OrderService) decodeStocks(data []byte) (*model.OrderStock, error) {
 	var stocks *model.OrderStock
 	if err := gob.NewDecoder(bytes.NewReader(data)).Decode(&stocks); err != nil {

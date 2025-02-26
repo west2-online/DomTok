@@ -70,9 +70,9 @@ func (rpc *orderRpcImpl) QueryGoodsInfo(ctx context.Context, goods []*model.Base
 		couponId := goods[index].CouponID
 		return &model.OrderGoods{
 			// OrderID:            0, 后续由 service 模块赋值
-			MerchantID: item.CreatorID,
-			GoodsID:    item.SpuID,
-			// GoodsName:          item.spuName, TODO 考虑加一个字段
+			MerchantID:         item.CreatorID,
+			GoodsID:            item.SpuID,
+			GoodsName:          item.Name,
 			StyleID:            item.SkuID,
 			StyleName:          item.Name,
 			GoodsVersion:       item.HistoryID,
@@ -84,7 +84,7 @@ func (rpc *orderRpcImpl) QueryGoodsInfo(ctx context.Context, goods []*model.Base
 			TotalAmount:        decimal.NewFromInt(int64(item.Price) * purchaseCount),
 			FreightAmount:      decimal.NewFromInt(0),
 			// DiscountAmount:     decimal.Decimal{}, 优惠券计算
-			// PaymentAmount: decimal.Decimal{}, 优惠券计算
+			//  : decimal.Decimal{}, 优惠券计算
 			// SinglePrice: decimal.Decimal{}, 最终更新
 			CouponId: couponId,
 			// CouponName: "", 后续更新

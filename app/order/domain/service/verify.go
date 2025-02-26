@@ -47,7 +47,7 @@ func (svc *OrderService) VerifyOrderStatus(status int32) func() error {
 func (svc *OrderService) VerifyAddressID(id int64) func() error {
 	return func() error {
 		if id <= 0 {
-			return errno.NewErrNo(errno.ParamVerifyErrorCode, "address id should lest than 0")
+			return errno.NewErrNo(errno.ParamVerifyErrorCode, "address id should not less than 0")
 		}
 		return nil
 	}

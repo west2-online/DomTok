@@ -37,7 +37,7 @@ elasticsearch:
   host: 127.0.0.1
 
 redis:
-  addr: domtok-redis:6379
+  addr: 127.0.0.1:6379
   password: DomTok
 
 jaeger:
