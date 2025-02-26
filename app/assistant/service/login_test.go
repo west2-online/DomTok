@@ -32,18 +32,18 @@ func TestCore_Login(t *testing.T) {
 
 		PatchConvey("success", func() {
 			ctx = context.WithValue(ctx, CtxKeyID, "id")
-			ctx = context.WithValue(ctx, CtxKeyAccessToken, "token")
+			ctx = context.WithValue(ctx, CtxKeyAuthHeader, "token")
 			err := c.Login(ctx)
 			So(err, ShouldBeNil)
 		})
 
 		PatchConvey("no id", func() {
-			ctx = context.WithValue(ctx, CtxKeyAccessToken, "token")
+			ctx = context.WithValue(ctx, CtxKeyAuthHeader, "token")
 			err := c.Login(ctx)
 			So(err, ShouldNotBeNil)
 		})
 
-		PatchConvey("no access token", func() {
+		PatchConvey("no auth header", func() {
 			ctx = context.WithValue(ctx, CtxKeyID, "id")
 			err := c.Login(ctx)
 			So(err, ShouldNotBeNil)
@@ -51,14 +51,14 @@ func TestCore_Login(t *testing.T) {
 
 		PatchConvey("id type error", func() {
 			ctx = context.WithValue(ctx, CtxKeyID, 1)
-			ctx = context.WithValue(ctx, CtxKeyAccessToken, "token")
+			ctx = context.WithValue(ctx, CtxKeyAuthHeader, "token")
 			err := c.Login(ctx)
 			So(err, ShouldNotBeNil)
 		})
 
-		PatchConvey("access token type error", func() {
+		PatchConvey("auth header type error", func() {
 			ctx = context.WithValue(ctx, CtxKeyID, "id")
-			ctx = context.WithValue(ctx, CtxKeyAccessToken, 1)
+			ctx = context.WithValue(ctx, CtxKeyAuthHeader, 1)
 			err := c.Login(ctx)
 			So(err, ShouldNotBeNil)
 		})

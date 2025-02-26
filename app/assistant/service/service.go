@@ -31,8 +31,8 @@ var Service Core
 type CtxKey string
 
 const (
-	CtxKeyID          CtxKey = "id"
-	CtxKeyInput       CtxKey = "input"
-	CtxKeyTurn        CtxKey = "turn"
-	CtxKeyAccessToken CtxKey = constants.AccessTokenHeader
+	CtxKeyID         CtxKey = "id"
+	CtxKeyInput      CtxKey = "input"
+	CtxKeyTurn       CtxKey = "turn"
+	CtxKeyAuthHeader CtxKey = constants.AuthHeader
 )
