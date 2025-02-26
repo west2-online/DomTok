@@ -50,8 +50,8 @@ func Test_updateLogger(t *testing.T) {
 		Error(errorMsg)
 
 		PatchConvey("Try open file and read all", func() {
-			logPath := fmt.Sprintf(constants.LogFilePathTemplate, targetDir, constants.LogFilePath, date, service)
-			stderrPath := fmt.Sprintf(constants.ErrorLogFilePathTemplate, targetDir, constants.LogFilePath, date, service)
+			logPath := fmt.Sprintf(constants.LogFilePathTemplate, targetDir, constants.LogFilePath, service, date)
+			stderrPath := fmt.Sprintf(constants.ErrorLogFilePathTemplate, targetDir, constants.LogFilePath, service, date)
 			logFile, err := os.Open(logPath)
 			So(err, ShouldBeNil)
 			errFile, err := os.Open(stderrPath)
@@ -98,8 +98,8 @@ func Test_updateLogger(t *testing.T) {
 func Test_scheduleUpdateLogger(t *testing.T) {
 	now := time.Now().Truncate(24 * time.Hour).Add(23 * time.Hour).Add(59 * time.Minute).Add(59 * time.Second)
 	date := now.Format("2006-01-02")
-	logPath := fmt.Sprintf(constants.LogFilePathTemplate, targetDir, constants.LogFilePath, date, service)
-	stderrPath := fmt.Sprintf(constants.ErrorLogFilePathTemplate, targetDir, constants.LogFilePath, date, service)
+	logPath := fmt.Sprintf(constants.LogFilePathTemplate, targetDir, constants.LogFilePath, service, date)
+	stderrPath := fmt.Sprintf(constants.ErrorLogFilePathTemplate, targetDir, constants.LogFilePath, service, date)
 
 	PatchConvey("Test scheduleUpdateLogger", t, func() {
 		Mock(getCurrentDirectory).Return(targetDir, nil).Build()
