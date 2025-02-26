@@ -146,3 +146,146 @@ func (uc *paymentUseCase) CreateRefund(ctx context.Context, orderID int64) (refu
 	refundStatus = paymentStatus.RefundStatusProcessingCode
 	return refundStatus, refundID, nil
 }
+
+// RefundReview 退款审核
+func (uc *paymentUseCase) RefundReview(ctx context.Context, orderID int64, passed bool) error {
+	// 1. 检查订单是否存在
+	orderExist, err := uc.svc.CheckOrderExist(ctx, orderID)
+	if err != nil {
+		return fmt.Errorf("check order existence failed: %w", err)
+	}
+	if !orderExist {
+		return fmt.Errorf("order does not exist")
+	}
+
+	// 2. 用户是否存在
+	uid, err := uc.svc.GetUserID(ctx)
+	if err != nil {
+		return fmt.Errorf("get user id failed: %w", err)
+	}
+
+	// 3. 用户是否有权限发起退款
+	hasPermission, err := uc.svc.CheckAdminPermission(ctx, uid)
+	if err != nil {
+		return fmt.Errorf("check admin permission failed: %w", err)
+	}
+	if !hasPermission {
+		return fmt.Errorf("user does not have permission to refund")
+	}
+
+	// 4. 检查退款信息是否存在
+	refund, err := uc.db.GetRefundInfoByOrderID(ctx, orderID)
+	if err != nil {
+		return fmt.Errorf("get refund info failed: %w", err)
+	}
+	if refund == nil {
+		return fmt.Errorf("refund info does not exist")
+	}
+
+	// 5. 更新退款状态为处理中
+	err = uc.db.UpdateRefundStatusByOrderIDAndStatus(ctx, orderID,
+		paymentStatus.RefundStatusPendingCode, paymentStatus.RefundStatusProcessingCode)
+	if err != nil {
+		return fmt.Errorf("update refund status failed: %w", err)
+	}
+
+	if passed {
+		err = uc.svc.Refund()
+		if err != nil {
+			return fmt.Errorf("refund failed: %w", err)
+		}
+		err = uc.db.UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction(ctx, refund)
+		if err != nil {
+			return fmt.Errorf("update refund status failed: %w", err)
+		}
+	} else {
+		err = uc.db.UpdateRefundStatusByOrderIDAndStatus(ctx, orderID,
+			paymentStatus.RefundStatusProcessingCode, paymentStatus.RefundStatusFailedCode)
+		if err != nil {
+			return fmt.Errorf("update refund status failed: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// PaymentCheckout 支付结算
+func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, token string) error {
+	// 1. 检查订单是否存在
+	orderExist, err := uc.svc.CheckOrderExist(ctx, orderID)
+	if err != nil {
+		return fmt.Errorf("check order existence failed: %w", err)
+	}
+	if !orderExist {
+		return fmt.Errorf("order does not exist")
+	}
+
+	// 2. 用户是否存在
+	uid, err := uc.svc.GetUserID(ctx)
+	if err != nil {
+		return fmt.Errorf("get user id failed: %w", err)
+	}
+
+	// 3. 支付令牌是否在 Redis 中
+	exist, err := uc.svc.CheckAndDelPaymentToken(ctx, token, uid, orderID)
+	if !exist && err == nil {
+		return fmt.Errorf("duplicate payment request")
+	}
+
+	var order *model.PaymentOrder
+	// 4.1 Redis 错误，进入第二层校验
+	if err != nil {
+		// 4.1.1 数据库中查询 status 状态
+		order, err = uc.db.GetPaymentInfo(ctx, orderID)
+		if err != nil {
+			return fmt.Errorf("get payment info failed: %w", err)
+		}
+
+		// 4.1.2 校验状态是否为待支付
+		if order.Status != paymentStatus.PaymentStatusPendingCode {
+			// 表示重复操作，返回重复支付错误
+			return fmt.Errorf("duplicate payment request")
+		}
+
+		// 4.1.3 更新支付状态为处理中
+		err = uc.db.UpdatePaymentStatus(ctx, orderID, paymentStatus.PaymentStatusProcessingCode)
+		if err != nil {
+			return fmt.Errorf("update payment status failed: %w", err)
+		}
+	}
+
+	transactionSuccess := true
+	// 5. 调用支付接口
+	err = uc.svc.Pay()
+	if err != nil {
+		transactionSuccess = false
+	}
+
+	// 如果支付成功且订单为空，则从数据库中获取订单信息-用于后续创建流水表项
+	if transactionSuccess && order == nil {
+		order, err = uc.db.GetPaymentInfo(ctx, orderID)
+		if err != nil {
+			transactionSuccess = false
+		}
+	}
+
+	// 更新支付状态为成功并创建流水表项
+	if transactionSuccess {
+		err = uc.db.UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction(ctx, order)
+		if err != nil {
+			transactionSuccess = false
+		}
+	}
+
+	if !transactionSuccess {
+		// 支付失败，更新支付状态为失败
+		errX := uc.db.UpdatePaymentStatus(ctx, orderID, paymentStatus.PaymentStatusFailedCode)
+		if errX != nil {
+			return fmt.Errorf("update payment status failed: %w", errX)
+		}
+		return fmt.Errorf("payment failed: %w", err)
+	}
+
+	// TODO: 6. 将支付结果写入 Redis
+	return nil
+}

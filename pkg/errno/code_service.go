@@ -31,6 +31,7 @@ const (
 	ServiceImgNotExist
 	ServiceSkuExist
 	PaymentOrderNotExist
+	PaymentRefundNotExist
 	UserNotExist
 	ServiceCategoryExist
 	ServiceListCategoryFailed

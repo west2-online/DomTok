@@ -228,3 +228,23 @@ func (svc *PaymentService) StoreRefundToken(ctx context.Context, token string, e
 	return paymentStatus.RedisStoreSuccess, nil
 }
 */
+
+func (svc *PaymentService) CheckAdminPermission(_ context.Context, uid int64) (bool, error) {
+	return uid == 1, nil
+}
+
+func (svc *PaymentService) CheckAndDelPaymentToken(ctx context.Context, token string, userID int64, orderID int64) (bool, error) {
+	result, err := svc.redis.CheckAndDelPaymentToken(ctx, fmt.Sprintf("payment_token:%d:%d", userID, orderID), token)
+	if err != nil {
+		return false, fmt.Errorf("failed to check and delete payment token: %w", err)
+	}
+	return result, nil
+}
+
+func (svc *PaymentService) Pay() error {
+	return nil
+}
+
+func (svc *PaymentService) Refund() error {
+	return nil
+}
