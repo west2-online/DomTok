@@ -106,7 +106,7 @@ services:
     volumes:
       - ../config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml # 挂载配置文件
       - ./data/filebeat:/usr/share/filebeat/data  # 持久化注册表文件
-      - ../log:/usr/share/filebeat/logs  # 挂载日志目录
+      - ../output/log:/usr/share/filebeat/logs  # 挂载日志目录
     depends_on:
       elasticsearch:
         condition: service_healthy

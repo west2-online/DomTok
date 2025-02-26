@@ -17,6 +17,7 @@ limitations under the License.
 package logger
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -68,13 +69,23 @@ func Fatalf(template string, args ...interface{}) {
 const permission = 0o755 // 用户具有读/写/执行权限，组用户和其它用户具有读写权限
 
 // getCurrentDirectory 会返回当前运行的目录
-func getCurrentDirectory() (string, error) {
+func getCurrentDirectory(serviceName string) (string, error) {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
 		return "", err
 	}
 
-	return strings.ReplaceAll(dir, "\\", "/"), nil
+	path := strings.ReplaceAll(dir, "\\", "/")
+	paths := strings.Split(path, "/")
+	// 在容器下运行时, 让所有日志都集中于 output/log/$(ServiceName)
+
+	fmt.Println(paths)
+	if paths[len(paths)-1] == serviceName {
+		path = path[:len(path)-len(serviceName)-1]
+		fmt.Println(path)
+	}
+
+	return path, nil
 }
 
 func checkAndOpenFile(path string) *os.File {

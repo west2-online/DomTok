@@ -20,15 +20,6 @@ CURDIR=$(pwd)
 
 # 此处只涉及 Kitex，但是 Hertz 使用这个没有影响，保留即可
 export KITEX_RUNTIME_ROOT=$CURDIR
-export KITEX_LOG_DIR="$CURDIR/log"
-
-if [ ! -d "$KITEX_LOG_DIR/app" ]; then
-    mkdir -p "$KITEX_LOG_DIR/app"
-fi
-
-if [ ! -d "$KITEX_LOG_DIR/rpc" ]; then
-    mkdir -p "$KITEX_LOG_DIR/rpc"
-fi
 
 # 参数替换，检查 ETCD_ADDR 是否已经设置，没有将会设置默认值
 : ${ETCD_ADDR:="localhost:2379"}
