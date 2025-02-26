@@ -60,3 +60,8 @@ func _requestpaymenttokenMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _requestrefundMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

@@ -36,7 +36,7 @@ const (
 
 	SpuSkuTableName        = "spu_to_sku"
 	CartTableName          = "cart"
-	PaymentTableName       = "payments"
+	PaymentTableName       = "payment_orders"
 	PaymentRefundTableName = "payment_refunds"
 	PaymentLedgerTableName = "payment_ledgers"
 )

@@ -39,8 +39,8 @@ func Register(r *server.Hertz) {
 		{
 			_payment := _api.Group("/payment", _paymentMw()...)
 			_payment.POST("/process", append(_processpaymentMw(), payment.ProcessPayment)...)
-			_payment.POST("/refund", append(_processrefundMw(), payment.ProcessRefund)...)
-			_payment.GET("/refund-token", append(_requestrefundtokenMw(), payment.RequestRefundToken)...)
+			_payment.POST("/process-refund", append(_processrefundMw(), payment.ProcessRefund)...)
+			_payment.GET("/refund", append(_requestrefundMw(), payment.RequestRefund)...)
 			_payment.GET("/token", append(_requestpaymenttokenMw(), payment.RequestPaymentToken)...)
 		}
 	}

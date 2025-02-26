@@ -75,7 +75,7 @@ func RequestPaymentToken(ctx context.Context, c *app.RequestContext) {
 }
 
 // ProcessRefund .
-// @router /api/payment/refund [POST]
+// @router /api/payment/process-refund [POST]
 func ProcessRefund(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req api.RefundRequest
@@ -84,29 +84,30 @@ func ProcessRefund(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	// TODO 这鬼地方是api. 还是 payment.？
 	resp := new(payment.RefundResponse)
 
 	c.JSON(consts.StatusOK, resp)
 }
 
-// RequestRefundToken .
-// @router /api/payment/refund-token [GET]
-func RequestRefundToken(ctx context.Context, c *app.RequestContext) {
+// RequestRefund .
+// @router /api/payment/refund [GET]
+func RequestRefund(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req api.RefundTokenRequest
+	var req api.RefundRequest
 
 	// 解析并校验请求参数
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		logger.Error("RequestRefundTokenRPC failed", zap.Error(err)) // 记录错误日志
+		logger.Error("RequestRefundRPC failed", zap.Error(err)) // 记录错误日志
 		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
 	// 调用 RPC 获取退款令牌
-	resp, err := rpc.RequestRefundRPC(ctx, &payment.RefundTokenRequest{
-		OrderID: req.OrderID,
+	resp, err := rpc.RequestRefundRPC(ctx, &payment.RefundRequest{
+		OrderID:      req.OrderID,
+		RefundAmount: req.RefundAmount,
+		RefundReason: req.RefundReason,
 	})
 	if err != nil {
 		pack.RespError(c, err)
