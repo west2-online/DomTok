@@ -50,8 +50,8 @@ func Test_updateLogger(t *testing.T) {
 		Error(errorMsg)
 
 		PatchConvey("Try open file and read all", func() {
-			logPath := fmt.Sprintf(constants.LogFilePathTemplate, targetDir, constants.LogFilePath, date, service)
-			stderrPath := fmt.Sprintf(constants.ErrorLogFilePathTemplate, targetDir, constants.LogFilePath, date, service)
+			logPath := fmt.Sprintf(constants.LogFilePathTemplate, targetDir, constants.LogFilePath, service, date)
+			stderrPath := fmt.Sprintf(constants.ErrorLogFilePathTemplate, targetDir, constants.LogFilePath, service, date)
 			logFile, err := os.Open(logPath)
 			So(err, ShouldBeNil)
 			errFile, err := os.Open(stderrPath)
@@ -88,7 +88,8 @@ func Test_updateLogger(t *testing.T) {
 				So(errFile.Close(), ShouldBeNil)
 				So(os.Remove(logPath), ShouldBeNil)
 				So(os.Remove(stderrPath), ShouldBeNil)
-				So(os.Remove(fmt.Sprintf("%s/%s/%s", targetDir, constants.LogFilePath, date)), ShouldBeNil)
+				_ = os.Remove(fmt.Sprintf("%s/%s/%s/%s", targetDir, constants.LogFilePath, service, date))
+				So(os.Remove(fmt.Sprintf("%s/%s/%s", targetDir, constants.LogFilePath, service)), ShouldBeNil)
 				_ = os.Remove(fmt.Sprintf("%s/%s", targetDir, constants.LogFilePath))
 			})
 		})
@@ -98,8 +99,8 @@ func Test_updateLogger(t *testing.T) {
 func Test_scheduleUpdateLogger(t *testing.T) {
 	now := time.Now().Truncate(24 * time.Hour).Add(23 * time.Hour).Add(59 * time.Minute).Add(59 * time.Second)
 	date := now.Format("2006-01-02")
-	logPath := fmt.Sprintf(constants.LogFilePathTemplate, targetDir, constants.LogFilePath, date, service)
-	stderrPath := fmt.Sprintf(constants.ErrorLogFilePathTemplate, targetDir, constants.LogFilePath, date, service)
+	logPath := fmt.Sprintf(constants.LogFilePathTemplate, targetDir, constants.LogFilePath, service, date)
+	stderrPath := fmt.Sprintf(constants.ErrorLogFilePathTemplate, targetDir, constants.LogFilePath, service, date)
 
 	PatchConvey("Test scheduleUpdateLogger", t, func() {
 		Mock(getCurrentDirectory).Return(targetDir, nil).Build()
@@ -114,7 +115,8 @@ func Test_scheduleUpdateLogger(t *testing.T) {
 		PatchConvey("Release resource", func() {
 			So(os.Remove(logPath), ShouldBeNil)
 			So(os.Remove(stderrPath), ShouldBeNil)
-			So(os.Remove(fmt.Sprintf("%s/%s/%s", targetDir, constants.LogFilePath, date)), ShouldBeNil)
+			_ = os.Remove(fmt.Sprintf("%s/%s/%s/%s", targetDir, constants.LogFilePath, service, date))
+			So(os.Remove(fmt.Sprintf("%s/%s/%s", targetDir, constants.LogFilePath, service)), ShouldBeNil)
 			_ = os.Remove(fmt.Sprintf("%s/%s", targetDir, constants.LogFilePath))
 		})
 	})
