@@ -112,11 +112,14 @@ func (db *paymentDB) CreatePayment(ctx context.Context, p *model.PaymentOrder) e
 
 func (db *paymentDB) UpdatePaymentStatus(ctx context.Context, orderID int64, status int) error {
 	// 更新支付状态
-	err := db.client.WithContext(ctx).Table(constants.PaymentTableName).
+	result := db.client.WithContext(ctx).Table(constants.PaymentTableName).
 		Where("order_id = ?", orderID).
-		Update("status", status).Error
-	if err != nil {
-		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update payment status: %v", err)
+		Update("status", status)
+	if result.Error != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update payment status: %v", result.Error)
+	}
+	if result.RowsAffected <= 0 {
+		return errno.Errorf(errno.PaymentOrderNotExist, "mysql: payment order not found but tried to update")
 	}
 	return nil
 }
@@ -128,11 +131,14 @@ func (db *paymentDB) UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction(ct
 	err := db.client.Transaction(func(tx *gorm.DB) error {
 		tx = tx.WithContext(ctx)
 		// 更新支付状态
-		err := tx.Table(constants.PaymentTableName).
+		result := tx.Table(constants.PaymentTableName).
 			Where("order_id = ?", order.OrderID).
-			Update("status", paymentStatus.PaymentStatusSuccessCode).Error
-		if err != nil {
-			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update payment status: %v", err)
+			Update("status", paymentStatus.PaymentStatusSuccessCode)
+		if result.Error != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update payment status: %v", result.Error)
+		}
+		if result.RowsAffected <= 0 {
+			return errno.Errorf(errno.PaymentOrderNotExist, "mysql: payment order not found but tried to update")
 		}
 
 		ledger := order.ToLedger()
@@ -222,11 +228,14 @@ func (db *paymentDB) GetRefundInfoByOrderID(ctx context.Context, orderID int64) 
 
 // UpdateRefundStatusByOrderIDAndStatus 更新退款状态
 func (db *paymentDB) UpdateRefundStatusByOrderIDAndStatus(ctx context.Context, orderID int64, prevStatus, nextStatus int) error {
-	err := db.client.WithContext(ctx).Table(constants.PaymentRefundTableName).
+	result := db.client.WithContext(ctx).Table(constants.PaymentRefundTableName).
 		Where("order_id = ?", orderID).Where("status = ?", prevStatus).
-		Update("status", nextStatus).Error
-	if err != nil {
-		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update refund status: %v", err)
+		Update("status", nextStatus)
+	if result.Error != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update refund status: %v", result.Error)
+	}
+	if result.RowsAffected <= 0 {
+		return errno.Errorf(errno.PaymentRefundNotExist, "mysql: refund order not found but tried to update")
 	}
 	return nil
 }
@@ -238,11 +247,14 @@ func (db *paymentDB) UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction(ctx
 	err := db.client.Transaction(func(tx *gorm.DB) error {
 		tx = tx.WithContext(ctx)
 		// 更新退款状态
-		err := tx.Table(constants.PaymentRefundTableName).
+		result := tx.Table(constants.PaymentRefundTableName).
 			Where("order_id = ?", refund.OrderID).
-			Update("status", paymentStatus.RefundStatusSuccessCode).Error
-		if err != nil {
-			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update refund status: %v", err)
+			Update("status", paymentStatus.RefundStatusSuccessCode)
+		if result.Error != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update refund status: %v", result.Error)
+		}
+		if result.RowsAffected <= 0 {
+			return errno.Errorf(errno.PaymentRefundNotExist, "mysql: refund order not found but tried to update")
 		}
 
 		ledger := refund.ToLedger()
