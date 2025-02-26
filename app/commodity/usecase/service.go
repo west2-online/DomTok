@@ -173,7 +173,7 @@ func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
 func (us *useCase) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
 	spu, img, err := us.svc.GetSpuFromImageId(ctx, spuImage.ImageID)
 	if err != nil {
-		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
+		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
 	}
 
 	err = us.svc.IdentifyUserInStreamCtx(ctx, spu.CreatorId)
