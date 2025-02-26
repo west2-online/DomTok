@@ -51,7 +51,7 @@ func (p *paymentRedis) loadScript() (err error) {
 	for key, value := range scripts {
 		hash, err := p.client.ScriptLoad(ctx, value.Cmd).Result()
 		if err != nil {
-			panic(fmt.Sprintf("failed to load script %s: %v", key, err))
+			return fmt.Errorf("load script %s failed: %w", key, err)
 		}
 		value.Hash = hash
 	}
