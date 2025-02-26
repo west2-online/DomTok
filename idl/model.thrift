@@ -230,7 +230,7 @@ struct PaymentTokenInfo{
     2:required i64 paymentTokenExpirationTime
 }
 
-struct RefundTokenInfo{
-    1:required string refundToken
-    2:required i64 refundTokenExpirationTime
+struct RefundResponseInfo{
+    1: required i64 refundID
+    2: required i64 status
 }

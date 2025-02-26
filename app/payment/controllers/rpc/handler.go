@@ -60,23 +60,23 @@ func (handler *PaymentHandler) RequestPaymentToken(ctx context.Context, req *pay
 	return
 }
 
-func (handler *PaymentHandler) ProcessRefund(ctx context.Context, req *payment.RefundRequest) (r *payment.RefundResponse, err error) {
+func (handler *PaymentHandler) ProcessRefund(ctx context.Context, req *payment.RefundReviewRequest) (r *payment.RefundReviewResponse, err error) {
 	return nil, err
 }
 
-func (handler *PaymentHandler) RequestRefundInfo(ctx context.Context, req *payment.RefundTokenRequest) (r *payment.RefundTokenResponse, err error) {
-	r = new(payment.RefundTokenResponse)
+func (handler *PaymentHandler) RequestRefund(ctx context.Context, req *payment.RefundRequest) (r *payment.RefundResponse, err error) {
+	r = new(payment.RefundResponse)
 	/*var token string
 	var expTime int64
 	*/
 	var refundID int64
+	var refundStatus int64
 	// 传入ctx（包含uid）和orderID,获取退款令牌和退款令牌过期时间
-	// TODO GetRefundToken
-	refundID, err = handler.useCase.GetRefundInfo(ctx, req.OrderID)
+	refundStatus, refundID, err = handler.useCase.CreateRefund(ctx, req.OrderID)
 	if err != nil {
 		return
 	}
 	r.Base = base.BuildBaseResp(err)
-	r.RefundID = refundID
+	r.RefundInfo = pack.BuildRefundTokenInfo(refundID, refundStatus)
 	return
 }

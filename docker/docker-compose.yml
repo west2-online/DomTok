@@ -65,7 +65,7 @@ services:
     env_file:
       - ./env/es.env
     healthcheck:
-      test: [ "CMD-SHELL", "curl -sf http://elasticsearch:9200/_cluster/health || exit 1" ] # ⼼跳检测，成功之后不再执⾏后⾯的退出
+      test: [ "CMD-SHELL", "curl -sf http://127.0.0.1:9200/_cluster/health || exit 1" ] # ⼼跳检测，成功之后不再执⾏后⾯的退出
       interval: 60s # ⼼跳检测间隔周期
       timeout: 10s
       retries: 3
@@ -106,7 +106,7 @@ services:
     volumes:
       - ../config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml # 挂载配置文件
       - ./data/filebeat:/usr/share/filebeat/data  # 持久化注册表文件
-      - ../log:/usr/share/filebeat/logs  # 挂载日志目录
+      - ../output/log:/usr/share/filebeat/logs  # 挂载日志目录
     depends_on:
       elasticsearch:
         condition: service_healthy
