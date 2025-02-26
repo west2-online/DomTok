@@ -278,6 +278,9 @@ func (us *useCase) DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo)
 		return nil
 	})
 
+	if err := eg.Wait(); err != nil {
+		return err
+	}
 	return nil
 }
 

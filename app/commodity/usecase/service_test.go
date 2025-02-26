@@ -1,20 +1,40 @@
+/*
+Copyright 2024 The west2-online Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package usecase
 
 import (
 	ctx "context"
 	"errors"
+	"testing"
+
 	"github.com/bytedance/mockey"
 	"github.com/olivere/elastic/v7"
+	"github.com/redis/go-redis/v9"
 	"github.com/smartystreets/goconvey/convey"
+	"gorm.io/gorm"
+
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/domain/service"
 	"github.com/west2-online/DomTok/app/commodity/infrastructure/es"
 	"github.com/west2-online/DomTok/app/commodity/infrastructure/mysql"
+	redisCommodity "github.com/west2-online/DomTok/app/commodity/infrastructure/redis"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	"github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/utils"
-	"gorm.io/gorm"
-	"testing"
 )
 
 func TestUseCase_CreateSpu(t *testing.T) {
@@ -200,8 +220,7 @@ func TestUseCase_DeleteSpu(t *testing.T) {
 
 	defer mockey.UnPatchAll()
 
-	var spuId int64
-	spuId = 1
+	var spuId int64 = 1
 	for _, tc := range testcase {
 		mockey.PatchConvey(tc.Name, t, func() {
 			svc := new(service.CommodityService)
@@ -220,7 +239,6 @@ func TestUseCase_DeleteSpu(t *testing.T) {
 			} else {
 				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
 			}
-
 		})
 	}
 }
@@ -295,7 +313,6 @@ func TestUseCase_UpdateSpu(t *testing.T) {
 				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
 			}
 		})
-
 	}
 }
 
@@ -404,8 +421,8 @@ func TestUseCase_DeleteSpuImage(t *testing.T) {
 
 	defer mockey.UnPatchAll()
 
-	var imgId int64
-	imgId = 1
+	var imgId int64 = 1
+
 	for _, tc := range testcase {
 		mockey.PatchConvey(tc.Name, t, func() {
 			svc := new(service.CommodityService)
@@ -423,7 +440,6 @@ func TestUseCase_DeleteSpuImage(t *testing.T) {
 			} else {
 				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
 			}
-
 		})
 	}
 }
@@ -473,8 +489,7 @@ func TestUseCase_ViewSpuImages(t *testing.T) {
 	offset := 0
 	limit := 5
 
-	var spuId int64
-	spuId = 1
+	var spuId int64 = 1
 
 	for _, tc := range testcase {
 		mockey.PatchConvey(tc.Name, t, func() {
@@ -523,7 +538,7 @@ func TestUseCase_ViewSpu(t *testing.T) {
 
 	testcase := []TestCase{
 		{
-			Name:                "GetSpuImagesError",
+			Name:                "GetSpuError",
 			MockSearchItemError: errors.New("SearchItemError"),
 			ExpectedError:       errors.New("usecase.ViewSpus failed: SearchItemError"),
 			ExpectedInfo:        nil,
@@ -578,6 +593,271 @@ func TestUseCase_ViewSpu(t *testing.T) {
 			}
 			convey.So(total, convey.ShouldEqual, tc.ExpectedTotal)
 			convey.So(res, convey.ShouldEqual, tc.ExpectedInfo)
+		})
+	}
+}
+
+func TestUseCase_ListSpuImages(t *testing.T) {
+	type TestCase struct {
+		Name            string
+		MockGetSpuError error
+		MockSpuInfo     []*model.Spu
+		ExpectedSpuInfo []*model.Spu
+		ExpectedError   error
+	}
+
+	ids := []int64{1, 2}
+
+	infos := []*model.Spu{
+		{
+			SpuId: 1,
+			Name:  "OppO phone",
+		},
+		{
+			SpuId: 2,
+			Name:  "Vivo phone",
+		},
+	}
+
+	testcase := []TestCase{
+		{
+			Name:            "GetSpuError",
+			MockGetSpuError: errors.New("GetSpuError"),
+			ExpectedError:   errors.New("GetSpuError"),
+			ExpectedSpuInfo: nil,
+		},
+		{
+			Name:            "GetSpuSuccessfully",
+			MockGetSpuError: nil,
+			MockSpuInfo:     infos,
+			ExpectedSpuInfo: infos,
+			ExpectedError:   nil,
+		},
+	}
+
+	defer mockey.UnPatchAll()
+
+	for _, tc := range testcase {
+		mockey.PatchConvey(tc.Name, t, func() {
+			svc := new(service.CommodityService)
+			gormDB := new(gorm.DB)
+			db := mysql.NewCommodityDB(gormDB)
+
+			us := &useCase{
+				svc: svc,
+				db:  db,
+			}
+
+			mockey.Mock(mockey.GetMethod(us.db, "GetSpuByIds")).Return(tc.ExpectedSpuInfo, tc.ExpectedError).Build()
+
+			res, err := us.ListSpuInfo(ctx.Background(), ids)
+			if err != nil {
+				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			} else {
+				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+			}
+			convey.So(res, convey.ShouldEqual, tc.ExpectedSpuInfo)
+		})
+	}
+}
+
+func TestUseCase_DecrStock(t *testing.T) {
+	type TestCase struct {
+		Name          string
+		MockError     error
+		ExpectedError error
+	}
+
+	infos := []*model.SkuBuyInfo{
+		{
+			SkuID: 1,
+			Count: 1,
+		},
+		{
+			SkuID: 2,
+			Count: 2,
+		},
+	}
+
+	defer mockey.UnPatchAll()
+
+	testCases := []TestCase{
+		{
+			Name:          "DecrStockError",
+			MockError:     errors.New("DecrStockError"),
+			ExpectedError: errors.New("DecrStockError"),
+		},
+		{
+			Name:          "DecrStockSuccess",
+			MockError:     nil,
+			ExpectedError: nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		mockey.PatchConvey(tc.Name, t, func() {
+			svc := new(service.CommodityService)
+			gormDB := new(gorm.DB)
+			db := mysql.NewCommodityDB(gormDB)
+			us := &useCase{
+				svc: svc,
+				db:  db,
+			}
+
+			mockey.Mock(mockey.GetMethod(us.db, "DecrStock")).Return(tc.MockError).Build()
+
+			err := us.DecrStock(ctx.Background(), infos)
+			if err != nil {
+				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			} else {
+				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+			}
+		})
+	}
+}
+
+func TestUseCase_DecrLockStock(t *testing.T) {
+	type TestCase struct {
+		Name               string
+		MockCached         bool
+		MockDecrCacheError error
+		MockDecrDBError    error
+		ExpectedError      error
+	}
+
+	input := []*model.SkuBuyInfo{
+		{
+			SkuID: 1,
+			Count: 1,
+		},
+		{
+			SkuID: 2,
+			Count: 2,
+		},
+	}
+
+	testCases := []TestCase{
+		{
+			Name:          "NotCached",
+			MockCached:    false,
+			ExpectedError: errors.New("[60001] useCase.DecrLockStock failed"),
+		},
+		{
+			Name:            "DecrStockInDBError",
+			MockCached:      true,
+			MockDecrDBError: errors.New("DecrStockInDBError"),
+			ExpectedError:   errors.New("usecase.DecrLockStock failed: DecrStockInDBError"),
+		},
+		{
+			Name:               "DecrStockInCacheError",
+			MockCached:         true,
+			MockDecrCacheError: errors.New("DecrStockInCacheError"),
+			ExpectedError:      errors.New("usecase.DecrLockStock failed: DecrStockInCacheError"),
+		},
+		{
+			Name:          "DecrStockSuccess",
+			MockCached:    true,
+			ExpectedError: nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		mockey.PatchConvey(tc.Name, t, func() {
+			svc := new(service.CommodityService)
+			gormDB := new(gorm.DB)
+			db := mysql.NewCommodityDB(gormDB)
+			redisCache := new(redis.Client)
+			cache := redisCommodity.NewCommodityCache(redisCache)
+
+			us := &useCase{
+				db:    db,
+				cache: cache,
+				svc:   svc,
+			}
+
+			mockey.Mock((*service.CommodityService).Cached).Return(tc.MockCached).Build()
+			mockey.Mock(mockey.GetMethod(us.db, "DecrLockStock")).ExcludeCurrentGoRoutine().Return(tc.MockDecrDBError).Build()
+			mockey.Mock(mockey.GetMethod(us.cache, "DecrLockStockNum")).ExcludeCurrentGoRoutine().Return(tc.MockDecrCacheError).Build()
+
+			err := us.DecrLockStock(ctx.Background(), input)
+			if err != nil {
+				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			} else {
+				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+			}
+		})
+	}
+}
+
+func TestUseCase_IncrLockStock(t *testing.T) {
+	type TestCase struct {
+		Name               string
+		MockCached         bool
+		MockIncrCacheError error
+		MockIncrDBError    error
+		ExpectedError      error
+	}
+
+	input := []*model.SkuBuyInfo{
+		{
+			SkuID: 1,
+			Count: 1,
+		},
+		{
+			SkuID: 2,
+			Count: 2,
+		},
+	}
+
+	testCases := []TestCase{
+		{
+			Name:          "NotCached",
+			MockCached:    false,
+			ExpectedError: errors.New("[60001] useCase.IncrLockStock failed"),
+		},
+		{
+			Name:            "IncrStockInDBError",
+			MockCached:      true,
+			MockIncrDBError: errors.New("IncrStockInDBError"),
+			ExpectedError:   errors.New("usecase.IncrLockStock failed: IncrStockInDBError"),
+		},
+		{
+			Name:               "IncrStockInCacheError",
+			MockCached:         true,
+			MockIncrCacheError: errors.New("IncrStockInCacheError"),
+			ExpectedError:      errors.New("usecase.IncrLockStock failed: IncrStockInCacheError"),
+		},
+		{
+			Name:          "IncrStockSuccess",
+			MockCached:    true,
+			ExpectedError: nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		mockey.PatchConvey(tc.Name, t, func() {
+			svc := new(service.CommodityService)
+			gormDB := new(gorm.DB)
+			db := mysql.NewCommodityDB(gormDB)
+			redisCache := new(redis.Client)
+			cache := redisCommodity.NewCommodityCache(redisCache)
+
+			us := &useCase{
+				db:    db,
+				cache: cache,
+				svc:   svc,
+			}
+
+			mockey.Mock((*service.CommodityService).Cached).Return(tc.MockCached).Build()
+			mockey.Mock(mockey.GetMethod(us.db, "IncrLockStock")).ExcludeCurrentGoRoutine().Return(tc.MockIncrDBError).Build()
+			mockey.Mock(mockey.GetMethod(us.cache, "IncrLockStockNum")).ExcludeCurrentGoRoutine().Return(tc.MockIncrCacheError).Build()
+
+			err := us.IncrLockStock(ctx.Background(), input)
+			if err != nil {
+				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			} else {
+				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+			}
 		})
 	}
 }
