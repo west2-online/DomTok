@@ -134,6 +134,17 @@ struct PriceHistory {
     5: optional i64 prevVersion;
 }
 
+/*
+* struct SkuBuyInfo 实际扣除商品
+* @Param skuID skuID
+* @Param count 购买商品数
+ */
+
+struct SkuBuyInfo {
+    1: required i64 skuID;
+    2: required i64 count;
+}
+
 struct Order {
     1: required i64 id;
     2: required string status;
@@ -219,7 +230,7 @@ struct PaymentTokenInfo{
     2:required i64 paymentTokenExpirationTime
 }
 
-struct RefundTokenInfo{
-    1:required string refundToken
-    2:required i64 refundTokenExpirationTime
+struct RefundResponseInfo{
+    1: required i64 refundID
+    2: required i64 status
 }

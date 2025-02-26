@@ -205,3 +205,33 @@ func _updatespuimageMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _listspuinfoMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _stockMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _descskulockstockMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _incrskulockstockMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _realMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _descskustockMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

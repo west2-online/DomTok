@@ -32,7 +32,7 @@ func (uc *paymentUseCase) CreatePayment(ctx context.Context, orderID int64) (*mo
 
 func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (token string, expTime int64, err error) {
 	// 1. 检查订单是否存在
-	// TODO 这个要向order模块要一个RPC接口然后再来填充
+	// TODO 记得删除注释
 	/*var orderInfo bool
 	orderInfo, err = uc.svc.CheckOrderExist(ctx, orderID)
 	if err != nil {
@@ -41,7 +41,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	if orderInfo == paymentStatus.OrderNotExist {
 		return "", 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
 	}
-
+	*/
 	// 2. 获取用户id,无需检查用户是否存在
 	// 获取用户id
 	var uid int64
@@ -66,12 +66,15 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	} else if paymentInfo == paymentStatus.PaymentExist { // 如果订单存在
 		// 获取订单的支付状态
 		payStatus, err := uc.db.GetPaymentInfo(ctx, orderID)
+		if err != nil {
+			return "", 0, fmt.Errorf("get payment info failed:%w", err)
+		}
 		// 如果订单正在支付或者已经支付完成，则拒绝进行接下来的生成令牌的活动
-		if payStatus == paymentStatus.PaymentStatusSuccess || payStatus == paymentStatus.PaymentStatusProcessing {
+		if payStatus.Status == paymentStatus.PaymentStatusSuccessCode || payStatus.Status == paymentStatus.PaymentStatusProcessingCode {
 			return "", 0, fmt.Errorf("payment is processing or has already done:%w", err)
 		}
 	}
-	*/
+
 	// 4. HMAC生成支付令牌
 	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, orderID)
 	if err != nil {
@@ -80,8 +83,6 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	}
 	var redisStatus bool
 	// 5. 存储令牌到 Redis
-	// TODO 记得删除这个测试数值
-	uid := int64(paymentStatus.TestUserID)
 	redisStatus, err = uc.svc.StorePaymentToken(ctx, token, expTime, uid, orderID)
 	if err != nil && redisStatus != paymentStatus.RedisStoreSuccess {
 		logger.Errorf("Error store payment token: orderID:%d,userID:%d,err:%v", orderID, uid, err)
@@ -91,44 +92,40 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	return token, expTime, nil
 }
 
-// TODO
-func (uc *paymentUseCase) GetRefundInfo(ctx context.Context, orderID int64) (refundID int64, err error) {
-	/*
-		// 1. 检查订单是否存在
-		orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
-		if err != nil {
-			return "", 0, fmt.Errorf("check order existence failed: %w", err)
-		}
-		if !orderExists {
-			return "", 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
-		}
-
-		// 2. 获取用户ID
-		uid, err := uc.svc.GetUserID(ctx)
-		if err != nil {
-			return "", 0, fmt.Errorf("get user id failed: %w", err)
-		}
-	*/
-	// TODO 记得删除这个测试数值
-	uid := int64(paymentStatus.TestUserID)
+// CreateRefund 发起退款请求
+func (uc *paymentUseCase) CreateRefund(ctx context.Context, orderID int64) (refundStatus int64, refundID int64, err error) {
+	// 1. 检查订单是否存在
+	// TODO记得删除注释
+	/*orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
+	if err != nil {
+		return 0, 0, fmt.Errorf("check order existence failed: %w", err)
+	}
+	if !orderExists {
+		return 0, 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
+	}*/
+	// 2. 获取用户ID
+	uid, err := uc.svc.GetUserID(ctx)
+	if err != nil {
+		return 0, 0, fmt.Errorf("get user id failed: %w", err)
+	}
 	// 3. Redis 限流检查
 	var frequencyInfo bool
 	var timeInfo bool
 	frequencyInfo, timeInfo, err = uc.svc.CheckRedisRateLimiting(ctx, uid, orderID)
 	if err != nil {
-		return 0, fmt.Errorf("check redis rate limiting failed: %w", err)
+		return 0, 0, fmt.Errorf("check redis rate limiting failed: %w", err)
 	}
 	if frequencyInfo != paymentStatus.RedisValid {
-		return 0, fmt.Errorf("too many refund requests in a short time")
+		return 0, 0, fmt.Errorf("too many refund requests in a short time")
 	}
 	if timeInfo != paymentStatus.RedisValid {
-		return 0, fmt.Errorf("refund already requested for this order in the last 24 hours")
+		return 0, 0, fmt.Errorf("refund already requested for this order in the last 24 hours")
 	}
 
 	// 4. 创建退款信息
 	refundID, err = uc.svc.CreateRefundInfo(ctx, orderID)
 	if err != nil {
-		return 0, fmt.Errorf("create refund info failed: %w", err)
+		return 0, 0, fmt.Errorf("create refund info failed: %w", err)
 	}
 	/*
 		// 5. 生成退款令牌
@@ -146,5 +143,6 @@ func (uc *paymentUseCase) GetRefundInfo(ctx context.Context, orderID int64) (ref
 
 		return token, expTime, nil
 	*/
-	return refundID, nil
+	refundStatus = paymentStatus.RefundStatusProcessingCode
+	return refundStatus, refundID, nil
 }

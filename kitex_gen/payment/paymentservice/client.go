@@ -31,8 +31,8 @@ import (
 type Client interface {
 	ProcessPayment(ctx context.Context, request *payment.PaymentRequest, callOptions ...callopt.Option) (r *payment.PaymentResponse, err error)
 	RequestPaymentToken(ctx context.Context, request *payment.PaymentTokenRequest, callOptions ...callopt.Option) (r *payment.PaymentTokenResponse, err error)
-	ProcessRefund(ctx context.Context, request *payment.RefundRequest, callOptions ...callopt.Option) (r *payment.RefundResponse, err error)
-	RequestRefundInfo(ctx context.Context, request *payment.RefundTokenRequest, callOptions ...callopt.Option) (r *payment.RefundTokenResponse, err error)
+	ProcessRefund(ctx context.Context, request *payment.RefundReviewRequest, callOptions ...callopt.Option) (r *payment.RefundReviewResponse, err error)
+	RequestRefund(ctx context.Context, request *payment.RefundRequest, callOptions ...callopt.Option) (r *payment.RefundResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -74,12 +74,12 @@ func (p *kPaymentServiceClient) RequestPaymentToken(ctx context.Context, request
 	return p.kClient.RequestPaymentToken(ctx, request)
 }
 
-func (p *kPaymentServiceClient) ProcessRefund(ctx context.Context, request *payment.RefundRequest, callOptions ...callopt.Option) (r *payment.RefundResponse, err error) {
+func (p *kPaymentServiceClient) ProcessRefund(ctx context.Context, request *payment.RefundReviewRequest, callOptions ...callopt.Option) (r *payment.RefundReviewResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.ProcessRefund(ctx, request)
 }
 
-func (p *kPaymentServiceClient) RequestRefundInfo(ctx context.Context, request *payment.RefundTokenRequest, callOptions ...callopt.Option) (r *payment.RefundTokenResponse, err error) {
+func (p *kPaymentServiceClient) RequestRefund(ctx context.Context, request *payment.RefundRequest, callOptions ...callopt.Option) (r *payment.RefundResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.RequestRefundInfo(ctx, request)
+	return p.kClient.RequestRefund(ctx, request)
 }

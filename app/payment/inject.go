@@ -21,18 +21,22 @@ import (
 	"github.com/west2-online/DomTok/app/payment/domain/service"
 	"github.com/west2-online/DomTok/app/payment/infrastructure/mysql"
 	"github.com/west2-online/DomTok/app/payment/infrastructure/redis"
+	orderRpcPkg "github.com/west2-online/DomTok/app/payment/infrastructure/rpc"
 	"github.com/west2-online/DomTok/app/payment/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/payment"
 	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 func InjectPaymentHandler() payment.PaymentService {
+	// 初始化数据库存储
 	gormDB, err := client.InitMySQL()
 	if err != nil {
 		panic(err)
 	}
+	db := mysql.NewPaymentDB(gormDB)
 
 	// 初始化 Redis 客户端
 	// 初始化 Redis，使用指定的 Redis DB
@@ -43,19 +47,23 @@ func InjectPaymentHandler() payment.PaymentService {
 	// 封装 Redis 存储对象
 	redisRepo := redis.NewPaymentRedis(redisClient)
 
+	// 初始化雪花接口
 	sf, err := utils.NewSnowflake(0, 0)
 	if err != nil {
 		panic(err)
 	}
 
-	// 初始化数据库存储
-	db := mysql.NewPaymentDB(gormDB)
-
+	// 初始化RPC，调用别的接口的服务
+	c, err := client.InitOrderRPC()
+	if err != nil {
+		logger.Fatalf("api.rpc.order InitOrderRPC failed, err is %v", err)
+	}
+	orderRpc := orderRpcPkg.NewPaymentRPC(*c)
 	// 初始化 Service，并传入 Redis
-	svc := service.NewPaymentService(db, sf, redisRepo)
+	svc := service.NewPaymentService(db, sf, redisRepo, orderRpc)
 
 	// 初始化 UseCase，并传入 Redis
-	uc := usecase.NewPaymentCase(db, svc, redisRepo)
+	uc := usecase.NewPaymentCase(db, svc, redisRepo, orderRpc)
 
 	return rpc.NewPaymentHandler(uc)
 }
