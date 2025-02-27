@@ -1052,7 +1052,8 @@ func (p *DeleteCouponResp) String() string {
 }
 
 type CreateUserCouponReq struct {
-	CouponID int64 `thrift:"couponID,1,required" form:"couponID,required" json:"couponID,required" query:"couponID,required"`
+	CouponID     int64 `thrift:"couponID,1,required" form:"couponID,required" json:"couponID,required" query:"couponID,required"`
+	RemainingUse int64 `thrift:"remaining_use,2,required" form:"remaining_use,required" json:"remaining_use,required" query:"remaining_use,required"`
 }
 
 func NewCreateUserCouponReq() *CreateUserCouponReq {
@@ -1066,8 +1067,13 @@ func (p *CreateUserCouponReq) GetCouponID() (v int64) {
 	return p.CouponID
 }
 
+func (p *CreateUserCouponReq) GetRemainingUse() (v int64) {
+	return p.RemainingUse
+}
+
 var fieldIDToName_CreateUserCouponReq = map[int16]string{
 	1: "couponID",
+	2: "remaining_use",
 }
 
 func (p *CreateUserCouponReq) Read(iprot thrift.TProtocol) (err error) {
@@ -1075,6 +1081,7 @@ func (p *CreateUserCouponReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetCouponID bool = false
+	var issetRemainingUse bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -1099,6 +1106,15 @@ func (p *CreateUserCouponReq) Read(iprot thrift.TProtocol) (err error) {
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetRemainingUse = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -1114,6 +1130,11 @@ func (p *CreateUserCouponReq) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetCouponID {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetRemainingUse {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -1145,6 +1166,17 @@ func (p *CreateUserCouponReq) ReadField1(iprot thrift.TProtocol) error {
 	p.CouponID = _field
 	return nil
 }
+func (p *CreateUserCouponReq) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.RemainingUse = _field
+	return nil
+}
 
 func (p *CreateUserCouponReq) Write(oprot thrift.TProtocol) (err error) {
 
@@ -1155,6 +1187,10 @@ func (p *CreateUserCouponReq) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 	}
@@ -1190,6 +1226,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *CreateUserCouponReq) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("remaining_use", thrift.I64, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.RemainingUse); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *CreateUserCouponReq) String() string {
@@ -1285,9 +1338,7 @@ func (p *CreateUserCouponResp) String() string {
 }
 
 type ViewCouponReq struct {
-	CouponID int64  `thrift:"couponID,1,required" form:"couponID,required" json:"couponID,required" query:"couponID,required"`
-	PageNum  *int64 `thrift:"pageNum,2,optional" form:"pageNum" json:"pageNum,omitempty" query:"pageNum"`
-	PageSize *int64 `thrift:"pageSize,3,optional" form:"pageSize" json:"pageSize,omitempty" query:"pageSize"`
+	PageNum int64 `thrift:"pageNum,1,required" form:"pageNum,required" json:"pageNum,required" query:"pageNum,required"`
 }
 
 func NewViewCouponReq() *ViewCouponReq {
@@ -1297,47 +1348,19 @@ func NewViewCouponReq() *ViewCouponReq {
 func (p *ViewCouponReq) InitDefault() {
 }
 
-func (p *ViewCouponReq) GetCouponID() (v int64) {
-	return p.CouponID
-}
-
-var ViewCouponReq_PageNum_DEFAULT int64
-
 func (p *ViewCouponReq) GetPageNum() (v int64) {
-	if !p.IsSetPageNum() {
-		return ViewCouponReq_PageNum_DEFAULT
-	}
-	return *p.PageNum
-}
-
-var ViewCouponReq_PageSize_DEFAULT int64
-
-func (p *ViewCouponReq) GetPageSize() (v int64) {
-	if !p.IsSetPageSize() {
-		return ViewCouponReq_PageSize_DEFAULT
-	}
-	return *p.PageSize
+	return p.PageNum
 }
 
 var fieldIDToName_ViewCouponReq = map[int16]string{
-	1: "couponID",
-	2: "pageNum",
-	3: "pageSize",
-}
-
-func (p *ViewCouponReq) IsSetPageNum() bool {
-	return p.PageNum != nil
-}
-
-func (p *ViewCouponReq) IsSetPageSize() bool {
-	return p.PageSize != nil
+	1: "pageNum",
 }
 
 func (p *ViewCouponReq) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetCouponID bool = false
+	var issetPageNum bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -1358,23 +1381,7 @@ func (p *ViewCouponReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetCouponID = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 2:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 3:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField3(iprot); err != nil {
-					goto ReadFieldError
-				}
+				issetPageNum = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -1391,7 +1398,7 @@ func (p *ViewCouponReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetCouponID {
+	if !issetPageNum {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -1421,29 +1428,7 @@ func (p *ViewCouponReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.CouponID = _field
-	return nil
-}
-func (p *ViewCouponReq) ReadField2(iprot thrift.TProtocol) error {
-
-	var _field *int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = &v
-	}
 	p.PageNum = _field
-	return nil
-}
-func (p *ViewCouponReq) ReadField3(iprot thrift.TProtocol) error {
-
-	var _field *int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = &v
-	}
-	p.PageSize = _field
 	return nil
 }
 
@@ -1456,14 +1441,6 @@ func (p *ViewCouponReq) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
-			goto WriteFieldError
-		}
-		if err = p.writeField2(oprot); err != nil {
-			fieldId = 2
-			goto WriteFieldError
-		}
-		if err = p.writeField3(oprot); err != nil {
-			fieldId = 3
 			goto WriteFieldError
 		}
 	}
@@ -1485,10 +1462,10 @@ WriteStructEndError:
 }
 
 func (p *ViewCouponReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("couponID", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("pageNum", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.CouponID); err != nil {
+	if err := oprot.WriteI64(p.PageNum); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1501,44 +1478,6 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *ViewCouponReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if p.IsSetPageNum() {
-		if err = oprot.WriteFieldBegin("pageNum", thrift.I64, 2); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteI64(*p.PageNum); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *ViewCouponReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if p.IsSetPageSize() {
-		if err = oprot.WriteFieldBegin("pageSize", thrift.I64, 3); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteI64(*p.PageSize); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
-}
-
 func (p *ViewCouponReq) String() string {
 	if p == nil {
 		return "<nil>"
@@ -1548,7 +1487,7 @@ func (p *ViewCouponReq) String() string {
 }
 
 type ViewCouponResp struct {
-	CouponInfo *model.Coupon `thrift:"couponInfo,1,required" form:"couponInfo,required" json:"couponInfo,required" query:"couponInfo,required"`
+	CouponInfo []*model.Coupon `thrift:"couponInfo,1,required" form:"couponInfo,required" json:"couponInfo,required" query:"couponInfo,required"`
 }
 
 func NewViewCouponResp() *ViewCouponResp {
@@ -1558,21 +1497,12 @@ func NewViewCouponResp() *ViewCouponResp {
 func (p *ViewCouponResp) InitDefault() {
 }
 
-var ViewCouponResp_CouponInfo_DEFAULT *model.Coupon
-
-func (p *ViewCouponResp) GetCouponInfo() (v *model.Coupon) {
-	if !p.IsSetCouponInfo() {
-		return ViewCouponResp_CouponInfo_DEFAULT
-	}
+func (p *ViewCouponResp) GetCouponInfo() (v []*model.Coupon) {
 	return p.CouponInfo
 }
 
 var fieldIDToName_ViewCouponResp = map[int16]string{
 	1: "couponInfo",
-}
-
-func (p *ViewCouponResp) IsSetCouponInfo() bool {
-	return p.CouponInfo != nil
 }
 
 func (p *ViewCouponResp) Read(iprot thrift.TProtocol) (err error) {
@@ -1596,7 +1526,7 @@ func (p *ViewCouponResp) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.STRUCT {
+			if fieldTypeId == thrift.LIST {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -1640,8 +1570,23 @@ RequiredFieldNotSetError:
 }
 
 func (p *ViewCouponResp) ReadField1(iprot thrift.TProtocol) error {
-	_field := model.NewCoupon()
-	if err := _field.Read(iprot); err != nil {
+	_, size, err := iprot.ReadListBegin()
+	if err != nil {
+		return err
+	}
+	_field := make([]*model.Coupon, 0, size)
+	values := make([]model.Coupon, size)
+	for i := 0; i < size; i++ {
+		_elem := &values[i]
+		_elem.InitDefault()
+
+		if err := _elem.Read(iprot); err != nil {
+			return err
+		}
+
+		_field = append(_field, _elem)
+	}
+	if err := iprot.ReadListEnd(); err != nil {
 		return err
 	}
 	p.CouponInfo = _field
@@ -1678,10 +1623,18 @@ WriteStructEndError:
 }
 
 func (p *ViewCouponResp) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("couponInfo", thrift.STRUCT, 1); err != nil {
+	if err = oprot.WriteFieldBegin("couponInfo", thrift.LIST, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := p.CouponInfo.Write(oprot); err != nil {
+	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.CouponInfo)); err != nil {
+		return err
+	}
+	for _, v := range p.CouponInfo {
+		if err := v.Write(oprot); err != nil {
+			return err
+		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1704,8 +1657,7 @@ func (p *ViewCouponResp) String() string {
 
 type ViewUserAllCouponReq struct {
 	IsIncludeExpired int64 `thrift:"isIncludeExpired,1,required" form:"isIncludeExpired,required" json:"isIncludeExpired,required" query:"isIncludeExpired,required"`
-	PageNum          int64 `thrift:"pageNum,2,required" form:"pageNum,required" json:"pageNum,required" query:"pageNum,required"`
-	PageSize         int64 `thrift:"pageSize,3,required" form:"pageSize,required" json:"pageSize,required" query:"pageSize,required"`
+	PageNum          int64 `thrift:"pageNum,3,required" form:"pageNum,required" json:"pageNum,required" query:"pageNum,required"`
 }
 
 func NewViewUserAllCouponReq() *ViewUserAllCouponReq {
@@ -1723,14 +1675,9 @@ func (p *ViewUserAllCouponReq) GetPageNum() (v int64) {
 	return p.PageNum
 }
 
-func (p *ViewUserAllCouponReq) GetPageSize() (v int64) {
-	return p.PageSize
-}
-
 var fieldIDToName_ViewUserAllCouponReq = map[int16]string{
 	1: "isIncludeExpired",
-	2: "pageNum",
-	3: "pageSize",
+	3: "pageNum",
 }
 
 func (p *ViewUserAllCouponReq) Read(iprot thrift.TProtocol) (err error) {
@@ -1739,7 +1686,6 @@ func (p *ViewUserAllCouponReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	var issetIsIncludeExpired bool = false
 	var issetPageNum bool = false
-	var issetPageSize bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -1764,21 +1710,12 @@ func (p *ViewUserAllCouponReq) Read(iprot thrift.TProtocol) (err error) {
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 2:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetPageNum = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
 		case 3:
 			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetPageSize = true
+				issetPageNum = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -1801,11 +1738,6 @@ func (p *ViewUserAllCouponReq) Read(iprot thrift.TProtocol) (err error) {
 	}
 
 	if !issetPageNum {
-		fieldId = 2
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetPageSize {
 		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
@@ -1838,17 +1770,6 @@ func (p *ViewUserAllCouponReq) ReadField1(iprot thrift.TProtocol) error {
 	p.IsIncludeExpired = _field
 	return nil
 }
-func (p *ViewUserAllCouponReq) ReadField2(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.PageNum = _field
-	return nil
-}
 func (p *ViewUserAllCouponReq) ReadField3(iprot thrift.TProtocol) error {
 
 	var _field int64
@@ -1857,7 +1778,7 @@ func (p *ViewUserAllCouponReq) ReadField3(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.PageSize = _field
+	p.PageNum = _field
 	return nil
 }
 
@@ -1870,10 +1791,6 @@ func (p *ViewUserAllCouponReq) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
-			goto WriteFieldError
-		}
-		if err = p.writeField2(oprot); err != nil {
-			fieldId = 2
 			goto WriteFieldError
 		}
 		if err = p.writeField3(oprot); err != nil {
@@ -1915,28 +1832,11 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *ViewUserAllCouponReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageNum", thrift.I64, 2); err != nil {
+func (p *ViewUserAllCouponReq) writeField3(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("pageNum", thrift.I64, 3); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI64(p.PageNum); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *ViewUserAllCouponReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageSize", thrift.I64, 3); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI64(p.PageSize); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1958,7 +1858,7 @@ func (p *ViewUserAllCouponReq) String() string {
 }
 
 type ViewUserAllCouponResp struct {
-	Coupons []*model.UserCoupon `thrift:"coupons,1,required" form:"coupons,required" json:"coupons,required" query:"coupons,required"`
+	Coupons []*model.Coupon `thrift:"coupons,1,required" form:"coupons,required" json:"coupons,required" query:"coupons,required"`
 }
 
 func NewViewUserAllCouponResp() *ViewUserAllCouponResp {
@@ -1968,7 +1868,7 @@ func NewViewUserAllCouponResp() *ViewUserAllCouponResp {
 func (p *ViewUserAllCouponResp) InitDefault() {
 }
 
-func (p *ViewUserAllCouponResp) GetCoupons() (v []*model.UserCoupon) {
+func (p *ViewUserAllCouponResp) GetCoupons() (v []*model.Coupon) {
 	return p.Coupons
 }
 
@@ -2045,8 +1945,8 @@ func (p *ViewUserAllCouponResp) ReadField1(iprot thrift.TProtocol) error {
 	if err != nil {
 		return err
 	}
-	_field := make([]*model.UserCoupon, 0, size)
-	values := make([]model.UserCoupon, size)
+	_field := make([]*model.Coupon, 0, size)
+	values := make([]model.Coupon, size)
 	for i := 0; i < size; i++ {
 		_elem := &values[i]
 		_elem.InitDefault()
@@ -10821,8 +10721,6 @@ type CommodityService interface {
 	ViewCoupon(ctx context.Context, req *ViewCouponReq) (r *ViewCouponResp, err error)
 
 	ViewUserAllCoupon(ctx context.Context, req *ViewUserAllCouponReq) (r *ViewUserAllCouponResp, err error)
-
-	UseUserCoupon(ctx context.Context, req *UseUserCouponReq) (r *UseUserCouponResp, err error)
 	// SPU
 	CreateSpu(ctx context.Context, req *CreateSpuReq) (r *CreateSpuResp, err error)
 
@@ -10932,15 +10830,6 @@ func (p *CommodityServiceClient) ViewUserAllCoupon(ctx context.Context, req *Vie
 	_args.Req = req
 	var _result CommodityServiceViewUserAllCouponResult
 	if err = p.Client_().Call(ctx, "ViewUserAllCoupon", &_args, &_result); err != nil {
-		return
-	}
-	return _result.GetSuccess(), nil
-}
-func (p *CommodityServiceClient) UseUserCoupon(ctx context.Context, req *UseUserCouponReq) (r *UseUserCouponResp, err error) {
-	var _args CommodityServiceUseUserCouponArgs
-	_args.Req = req
-	var _result CommodityServiceUseUserCouponResult
-	if err = p.Client_().Call(ctx, "UseUserCoupon", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -11151,7 +11040,6 @@ func NewCommodityServiceProcessor(handler CommodityService) *CommodityServicePro
 	self.AddToProcessorMap("CreateUserCoupon", &commodityServiceProcessorCreateUserCoupon{handler: handler})
 	self.AddToProcessorMap("ViewCoupon", &commodityServiceProcessorViewCoupon{handler: handler})
 	self.AddToProcessorMap("ViewUserAllCoupon", &commodityServiceProcessorViewUserAllCoupon{handler: handler})
-	self.AddToProcessorMap("UseUserCoupon", &commodityServiceProcessorUseUserCoupon{handler: handler})
 	self.AddToProcessorMap("CreateSpu", &commodityServiceProcessorCreateSpu{handler: handler})
 	self.AddToProcessorMap("UpdateSpu", &commodityServiceProcessorUpdateSpu{handler: handler})
 	self.AddToProcessorMap("ViewSpu", &commodityServiceProcessorViewSpu{handler: handler})
@@ -11415,54 +11303,6 @@ func (p *commodityServiceProcessorViewUserAllCoupon) Process(ctx context.Context
 		result.Success = retval
 	}
 	if err2 = oprot.WriteMessageBegin("ViewUserAllCoupon", thrift.REPLY, seqId); err2 != nil {
-		err = err2
-	}
-	if err2 = result.Write(oprot); err == nil && err2 != nil {
-		err = err2
-	}
-	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
-		err = err2
-	}
-	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
-		err = err2
-	}
-	if err != nil {
-		return
-	}
-	return true, err
-}
-
-type commodityServiceProcessorUseUserCoupon struct {
-	handler CommodityService
-}
-
-func (p *commodityServiceProcessorUseUserCoupon) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-	args := CommodityServiceUseUserCouponArgs{}
-	if err = args.Read(iprot); err != nil {
-		iprot.ReadMessageEnd()
-		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
-		oprot.WriteMessageBegin("UseUserCoupon", thrift.EXCEPTION, seqId)
-		x.Write(oprot)
-		oprot.WriteMessageEnd()
-		oprot.Flush(ctx)
-		return false, err
-	}
-
-	iprot.ReadMessageEnd()
-	var err2 error
-	result := CommodityServiceUseUserCouponResult{}
-	var retval *UseUserCouponResp
-	if retval, err2 = p.handler.UseUserCoupon(ctx, args.Req); err2 != nil {
-		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing UseUserCoupon: "+err2.Error())
-		oprot.WriteMessageBegin("UseUserCoupon", thrift.EXCEPTION, seqId)
-		x.Write(oprot)
-		oprot.WriteMessageEnd()
-		oprot.Flush(ctx)
-		return true, err2
-	} else {
-		result.Success = retval
-	}
-	if err2 = oprot.WriteMessageBegin("UseUserCoupon", thrift.REPLY, seqId); err2 != nil {
 		err = err2
 	}
 	if err2 = result.Write(oprot); err == nil && err2 != nil {
@@ -13917,302 +13757,6 @@ func (p *CommodityServiceViewUserAllCouponResult) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("CommodityServiceViewUserAllCouponResult(%+v)", *p)
-
-}
-
-type CommodityServiceUseUserCouponArgs struct {
-	Req *UseUserCouponReq `thrift:"req,1"`
-}
-
-func NewCommodityServiceUseUserCouponArgs() *CommodityServiceUseUserCouponArgs {
-	return &CommodityServiceUseUserCouponArgs{}
-}
-
-func (p *CommodityServiceUseUserCouponArgs) InitDefault() {
-}
-
-var CommodityServiceUseUserCouponArgs_Req_DEFAULT *UseUserCouponReq
-
-func (p *CommodityServiceUseUserCouponArgs) GetReq() (v *UseUserCouponReq) {
-	if !p.IsSetReq() {
-		return CommodityServiceUseUserCouponArgs_Req_DEFAULT
-	}
-	return p.Req
-}
-
-var fieldIDToName_CommodityServiceUseUserCouponArgs = map[int16]string{
-	1: "req",
-}
-
-func (p *CommodityServiceUseUserCouponArgs) IsSetReq() bool {
-	return p.Req != nil
-}
-
-func (p *CommodityServiceUseUserCouponArgs) Read(iprot thrift.TProtocol) (err error) {
-
-	var fieldTypeId thrift.TType
-	var fieldId int16
-
-	if _, err = iprot.ReadStructBegin(); err != nil {
-		goto ReadStructBeginError
-	}
-
-	for {
-		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
-		if err != nil {
-			goto ReadFieldBeginError
-		}
-		if fieldTypeId == thrift.STOP {
-			break
-		}
-
-		switch fieldId {
-		case 1:
-			if fieldTypeId == thrift.STRUCT {
-				if err = p.ReadField1(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		default:
-			if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		}
-		if err = iprot.ReadFieldEnd(); err != nil {
-			goto ReadFieldEndError
-		}
-	}
-	if err = iprot.ReadStructEnd(); err != nil {
-		goto ReadStructEndError
-	}
-
-	return nil
-ReadStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
-ReadFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_CommodityServiceUseUserCouponArgs[fieldId]), err)
-SkipFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
-
-ReadFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
-ReadStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-}
-
-func (p *CommodityServiceUseUserCouponArgs) ReadField1(iprot thrift.TProtocol) error {
-	_field := NewUseUserCouponReq()
-	if err := _field.Read(iprot); err != nil {
-		return err
-	}
-	p.Req = _field
-	return nil
-}
-
-func (p *CommodityServiceUseUserCouponArgs) Write(oprot thrift.TProtocol) (err error) {
-
-	var fieldId int16
-	if err = oprot.WriteStructBegin("UseUserCoupon_args"); err != nil {
-		goto WriteStructBeginError
-	}
-	if p != nil {
-		if err = p.writeField1(oprot); err != nil {
-			fieldId = 1
-			goto WriteFieldError
-		}
-	}
-	if err = oprot.WriteFieldStop(); err != nil {
-		goto WriteFieldStopError
-	}
-	if err = oprot.WriteStructEnd(); err != nil {
-		goto WriteStructEndError
-	}
-	return nil
-WriteStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
-WriteFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
-WriteFieldStopError:
-	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
-WriteStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
-}
-
-func (p *CommodityServiceUseUserCouponArgs) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := p.Req.Write(oprot); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
-}
-
-func (p *CommodityServiceUseUserCouponArgs) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("CommodityServiceUseUserCouponArgs(%+v)", *p)
-
-}
-
-type CommodityServiceUseUserCouponResult struct {
-	Success *UseUserCouponResp `thrift:"success,0,optional"`
-}
-
-func NewCommodityServiceUseUserCouponResult() *CommodityServiceUseUserCouponResult {
-	return &CommodityServiceUseUserCouponResult{}
-}
-
-func (p *CommodityServiceUseUserCouponResult) InitDefault() {
-}
-
-var CommodityServiceUseUserCouponResult_Success_DEFAULT *UseUserCouponResp
-
-func (p *CommodityServiceUseUserCouponResult) GetSuccess() (v *UseUserCouponResp) {
-	if !p.IsSetSuccess() {
-		return CommodityServiceUseUserCouponResult_Success_DEFAULT
-	}
-	return p.Success
-}
-
-var fieldIDToName_CommodityServiceUseUserCouponResult = map[int16]string{
-	0: "success",
-}
-
-func (p *CommodityServiceUseUserCouponResult) IsSetSuccess() bool {
-	return p.Success != nil
-}
-
-func (p *CommodityServiceUseUserCouponResult) Read(iprot thrift.TProtocol) (err error) {
-
-	var fieldTypeId thrift.TType
-	var fieldId int16
-
-	if _, err = iprot.ReadStructBegin(); err != nil {
-		goto ReadStructBeginError
-	}
-
-	for {
-		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
-		if err != nil {
-			goto ReadFieldBeginError
-		}
-		if fieldTypeId == thrift.STOP {
-			break
-		}
-
-		switch fieldId {
-		case 0:
-			if fieldTypeId == thrift.STRUCT {
-				if err = p.ReadField0(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		default:
-			if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		}
-		if err = iprot.ReadFieldEnd(); err != nil {
-			goto ReadFieldEndError
-		}
-	}
-	if err = iprot.ReadStructEnd(); err != nil {
-		goto ReadStructEndError
-	}
-
-	return nil
-ReadStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
-ReadFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_CommodityServiceUseUserCouponResult[fieldId]), err)
-SkipFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
-
-ReadFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
-ReadStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-}
-
-func (p *CommodityServiceUseUserCouponResult) ReadField0(iprot thrift.TProtocol) error {
-	_field := NewUseUserCouponResp()
-	if err := _field.Read(iprot); err != nil {
-		return err
-	}
-	p.Success = _field
-	return nil
-}
-
-func (p *CommodityServiceUseUserCouponResult) Write(oprot thrift.TProtocol) (err error) {
-
-	var fieldId int16
-	if err = oprot.WriteStructBegin("UseUserCoupon_result"); err != nil {
-		goto WriteStructBeginError
-	}
-	if p != nil {
-		if err = p.writeField0(oprot); err != nil {
-			fieldId = 0
-			goto WriteFieldError
-		}
-	}
-	if err = oprot.WriteFieldStop(); err != nil {
-		goto WriteFieldStopError
-	}
-	if err = oprot.WriteStructEnd(); err != nil {
-		goto WriteStructEndError
-	}
-	return nil
-WriteStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
-WriteFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
-WriteFieldStopError:
-	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
-WriteStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
-}
-
-func (p *CommodityServiceUseUserCouponResult) writeField0(oprot thrift.TProtocol) (err error) {
-	if p.IsSetSuccess() {
-		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := p.Success.Write(oprot); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 0 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
-}
-
-func (p *CommodityServiceUseUserCouponResult) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("CommodityServiceUseUserCouponResult(%+v)", *p)
 
 }
 

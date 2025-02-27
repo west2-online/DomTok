@@ -28,6 +28,7 @@ struct DeleteCouponResp {
 
 struct CreateUserCouponReq {
     1: required i64 couponID;
+    2: required i64 remaining_use,
 }
 
 struct CreateUserCouponResp {
@@ -35,23 +36,20 @@ struct CreateUserCouponResp {
 }
 
 struct ViewCouponReq {
-    1: required i64 couponID;
-    2: optional i64 pageNum;
-    3: optional i64 pageSize;
+    1: required i64 pageNum;
 }
 
 struct ViewCouponResp {
-    1: required model.Coupon couponInfo;
+    1: required list<model.Coupon> couponInfo;
 }
 
 struct ViewUserAllCouponReq {
     1: required i64 isIncludeExpired;
-    2: required i64 pageNum;
-    3: required i64 pageSize;
+    3: required i64 pageNum;
 }
 
 struct ViewUserAllCouponResp {
-    1: required list<model.UserCoupon> coupons;
+    1: required list<model.Coupon> coupons;
 }
 
 struct UseUserCouponReq {
@@ -283,7 +281,6 @@ service CommodityService {
     CreateUserCouponResp CreateUserCoupon(1: CreateUserCouponReq req) (api.post="/api/v1/commodity/coupon/receive");
     ViewCouponResp ViewCoupon(1: ViewCouponReq req) (api.get="/api/v1/commodity/coupon/search");
     ViewUserAllCouponResp ViewUserAllCoupon(1: ViewUserAllCouponReq req) (api.get="/api/v1/commodity/coupon/all");
-    UseUserCouponResp UseUserCoupon(1: UseUserCouponReq req) (api.post="/api/v1/commodity/coupon/use");
 
     // SPU
     CreateSpuResp CreateSpu(1: CreateSpuReq req) (api.post="/api/v1/commodity/spu/create");

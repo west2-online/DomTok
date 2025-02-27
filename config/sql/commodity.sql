@@ -28,7 +28,8 @@ CREATE TABLE `coupon_info` (
                                `expire_time` TIMESTAMP NOT NULL COMMENT '有效期',
                                 `deadline_for_get` TIMESTAMP NOT NULL COMMENT '可以领取该券的截止时间',
                                `description` VARCHAR(255) DEFAULT '' COMMENT '描述',
-                                INDEX `idx_coupon_info_range_id` (`range_id`)
+                                INDEX `idx_coupon_info_range_id` (`range_id`),
+                                INDEX `idx_coupon_info_creator_id` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 通用优惠券信息表

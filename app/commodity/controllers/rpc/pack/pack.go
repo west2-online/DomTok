@@ -56,3 +56,24 @@ func BuildSpu(spu *model.Spu) *modelKitex.Spu {
 func BuildSpus(spus []*model.Spu) []*modelKitex.Spu {
 	return base.BuildTypeList(spus, BuildSpu)
 }
+
+func BuildCoupon(coupon *model.Coupon) *modelKitex.Coupon {
+	return &modelKitex.Coupon{
+		CouponID:       coupon.Id,
+		CreatorID:      coupon.Uid,
+		DeadlineForGet: coupon.DeadlineForGet.Unix(),
+		Name:           coupon.Name,
+		TypeInfo:       int32(coupon.TypeInfo),
+		ConditionCost:  coupon.ConditionCost,
+		DiscountAmount: &coupon.DiscountAmount,
+		Discount:       &coupon.Discount,
+		RangeType:      int32(coupon.RangeType),
+		RangeId:        coupon.RangeId,
+		ExpireTime:     coupon.ExpireTime.Unix(),
+		Description:    coupon.Description,
+	}
+}
+
+func BuildCoupons(coupons []*model.Coupon) []*modelKitex.Coupon {
+	return base.BuildTypeList(coupons, BuildCoupon)
+}
