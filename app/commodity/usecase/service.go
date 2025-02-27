@@ -20,9 +20,10 @@ import (
 	"context"
 	"fmt"
 
+	"golang.org/x/sync/errgroup"
+
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
-	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
@@ -87,7 +88,7 @@ func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category)
 	return err
 }
 
-func (uc *useCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*kmodel.CategoryInfo, err error) {
+func (uc *useCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*model.CategoryInfo, err error) {
 	resp, err = uc.db.ViewCategory(ctx, pageNum, pageSize)
 	if err != nil {
 		return nil, errno.Errorf(errno.ServiceListCategoryFailed, "failed to view categories: %v", err)
@@ -172,7 +173,7 @@ func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
 func (us *useCase) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
 	spu, img, err := us.svc.GetSpuFromImageId(ctx, spuImage.ImageID)
 	if err != nil {
-		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
+		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
 	}
 
 	err = us.svc.IdentifyUserInStreamCtx(ctx, spu.CreatorId)
@@ -219,4 +220,70 @@ func (us *useCase) ViewSpus(ctx context.Context, req *commodity.ViewSpuReq) ([]*
 		return nil, 0, fmt.Errorf("usecase.ViewSpus failed: %w", err)
 	}
 	return res, total, err
+}
+
+func (us *useCase) ListSpuInfo(ctx context.Context, ids []int64) ([]*model.Spu, error) {
+	return us.db.GetSpuByIds(ctx, ids)
+}
+
+func (us *useCase) IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	if !us.svc.Cached(ctx, infos) {
+		return errno.Errorf(errno.RedisKeyNotExist, "useCase.IncrLockStock failed")
+	}
+
+	var eg errgroup.Group
+
+	eg.Go(func() error {
+		err := us.cache.IncrLockStockNum(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		err := us.db.IncrLockStock(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
+		}
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (us *useCase) DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	if !us.svc.Cached(ctx, infos) {
+		return errno.Errorf(errno.RedisKeyNotExist, "useCase.DecrLockStock failed")
+	}
+
+	var eg errgroup.Group
+
+	eg.Go(func() error {
+		err := us.cache.DecrLockStockNum(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		err := us.db.DecrLockStock(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
+		}
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (us *useCase) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	return us.db.DecrStock(ctx, infos)
 }

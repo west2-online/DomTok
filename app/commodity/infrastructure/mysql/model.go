@@ -94,6 +94,22 @@ type UserCoupon struct {
 	DeletedAt     gorm.DeletedAt `gorm:"index"`
 }
 
+type Sku struct {
+	Id               int64 `gorm:"primary_key"`
+	CreatorId        int64
+	Price            float64
+	Name             string
+	Description      string
+	ForSale          int
+	HistoryStock     int64
+	StyleHeadDrawing string
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+	DeletedAt        gorm.DeletedAt `gorm:"index"`
+	Stock            int64
+	LockStock        int64
+}
+
 // 对应表名
 
 func (spu *Spu) TableName() string {

@@ -29,3 +29,8 @@ type Category struct {
 	DeletedAt time.Time
 	// gorm.Model
 }
+
+type CategoryInfo struct {
+	CategoryID int64
+	Name       string
+}

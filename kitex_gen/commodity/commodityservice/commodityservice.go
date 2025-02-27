@@ -208,6 +208,13 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"ListSpuInfo": kitex.NewMethodInfo(
+		listSpuInfoHandler,
+		newCommodityServiceListSpuInfoArgs,
+		newCommodityServiceListSpuInfoResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 	"CreateCategory": kitex.NewMethodInfo(
 		createCategoryHandler,
 		newCommodityServiceCreateCategoryArgs,
@@ -888,6 +895,24 @@ func newCommodityServiceDescSkuStockResult() interface{} {
 	return commodity.NewCommodityServiceDescSkuStockResult()
 }
 
+func listSpuInfoHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*commodity.CommodityServiceListSpuInfoArgs)
+	realResult := result.(*commodity.CommodityServiceListSpuInfoResult)
+	success, err := handler.(commodity.CommodityService).ListSpuInfo(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newCommodityServiceListSpuInfoArgs() interface{} {
+	return commodity.NewCommodityServiceListSpuInfoArgs()
+}
+
+func newCommodityServiceListSpuInfoResult() interface{} {
+	return commodity.NewCommodityServiceListSpuInfoResult()
+}
+
 func createCategoryHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
 	realArg := arg.(*commodity.CommodityServiceCreateCategoryArgs)
 	realResult := result.(*commodity.CommodityServiceCreateCategoryResult)
@@ -1231,6 +1256,16 @@ func (p *kClient) DescSkuStock(ctx context.Context, req *commodity.DescSkuStockR
 	_args.Req = req
 	var _result commodity.CommodityServiceDescSkuStockResult
 	if err = p.c.Call(ctx, "DescSkuStock", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) ListSpuInfo(ctx context.Context, req *commodity.ListSpuInfoReq) (r *commodity.ListSpuInfoResp, err error) {
+	var _args commodity.CommodityServiceListSpuInfoArgs
+	_args.Req = req
+	var _result commodity.CommodityServiceListSpuInfoResult
+	if err = p.c.Call(ctx, "ListSpuInfo", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

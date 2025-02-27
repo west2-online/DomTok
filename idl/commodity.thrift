@@ -413,7 +413,7 @@ struct ViewCategoryResp {
 * @Param pageSize 页尺寸
  */
 struct ListSkuInfoReq {
-    1: required list<model.SkuVersion> skuVersions;
+    1: required list<model.SkuVersion> skuInfos;
     2: required i64 pageNum;
     3: required i64 pageSize;
 }
@@ -423,14 +423,22 @@ struct ListSkuInfoResp {
     2: required list<model.SkuInfo> skuInfos;
 }
 
+struct ListSpuInfoReq {
+    1: required list<i64> spuIDs;
+}
+
+struct ListSpuInfoResp {
+    1: required model.BaseResp base;
+    2: required list<model.Spu> spus;
+}
+
 /*
 * struct DescSkuLockStockReq 预扣商品
 * @Param skuID skuID
 * @Param count 购买商品数
  */
 struct DescSkuLockStockReq {
-    1: required i64 skuID;
-    2: required i64 count
+    1: required list<model.SkuBuyInfo> infos;
 }
 
 struct DescSkuLockStockResp {
@@ -443,8 +451,7 @@ struct DescSkuLockStockResp {
 * @Param count 原购买商品数
  */
 struct IncrSkuLockStockReq {
-    1: required i64 skuID;
-    2: required i64 count;
+    1: required list<model.SkuBuyInfo> infos;
 }
 
 struct IncrSkuLockStockResp {
@@ -457,8 +464,7 @@ struct IncrSkuLockStockResp {
 * @Param count 购买商品数
  */
 struct DescSkuStockReq {
-    1: required i64 skuID;
-    2: required i64 count;
+    1: required list<model.SkuBuyInfo> infos;
 }
 
 struct DescSkuStockResp {
@@ -518,6 +524,7 @@ service CommodityService {
     DescSkuLockStockResp DescSkuLockStock(1: DescSkuLockStockReq req);
     IncrSkuLockStockResp IncrSkuLockStock(1: IncrSkuLockStockReq req);
     DescSkuStockResp DescSkuStock(1: DescSkuStockReq req);
+    ListSpuInfoResp ListSpuInfo(1: ListSpuInfoReq req);
 
     //category
     CreateCategoryResp CreateCategory(1: CreateCategoryReq req);

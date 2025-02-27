@@ -54,6 +54,7 @@ type Client interface {
 	DescSkuLockStock(ctx context.Context, req *commodity.DescSkuLockStockReq, callOptions ...callopt.Option) (r *commodity.DescSkuLockStockResp, err error)
 	IncrSkuLockStock(ctx context.Context, req *commodity.IncrSkuLockStockReq, callOptions ...callopt.Option) (r *commodity.IncrSkuLockStockResp, err error)
 	DescSkuStock(ctx context.Context, req *commodity.DescSkuStockReq, callOptions ...callopt.Option) (r *commodity.DescSkuStockResp, err error)
+	ListSpuInfo(ctx context.Context, req *commodity.ListSpuInfoReq, callOptions ...callopt.Option) (r *commodity.ListSpuInfoResp, err error)
 	CreateCategory(ctx context.Context, req *commodity.CreateCategoryReq, callOptions ...callopt.Option) (r *commodity.CreateCategoryResp, err error)
 	DeleteCategory(ctx context.Context, req *commodity.DeleteCategoryReq, callOptions ...callopt.Option) (r *commodity.DeleteCategoryResp, err error)
 	ViewCategory(ctx context.Context, req *commodity.ViewCategoryReq, callOptions ...callopt.Option) (r *commodity.ViewCategoryResp, err error)
@@ -224,6 +225,11 @@ func (p *kCommodityServiceClient) IncrSkuLockStock(ctx context.Context, req *com
 func (p *kCommodityServiceClient) DescSkuStock(ctx context.Context, req *commodity.DescSkuStockReq, callOptions ...callopt.Option) (r *commodity.DescSkuStockResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.DescSkuStock(ctx, req)
+}
+
+func (p *kCommodityServiceClient) ListSpuInfo(ctx context.Context, req *commodity.ListSpuInfoReq, callOptions ...callopt.Option) (r *commodity.ListSpuInfoResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.ListSpuInfo(ctx, req)
 }
 
 func (p *kCommodityServiceClient) CreateCategory(ctx context.Context, req *commodity.CreateCategoryReq, callOptions ...callopt.Option) (r *commodity.CreateCategoryResp, err error) {
