@@ -39,7 +39,8 @@ const (
 	PaymentRefundTableName = "payment_refunds"
 	PaymentLedgerTableName = "payment_ledgers"
 
-	SkuTableName         = "sku_info"
-	SkuImagesTableName   = "sku_image"
-	SkuSaleAttrTableName = "sku_sale_attr"
+	SkuTableName             = "sku_info"
+	SkuImagesTableName       = "sku_image"
+	SkuSaleAttrTableName     = "sku_sale_attr"
+	SkuPriceHistoryTableName = "sku_price_history"
 )

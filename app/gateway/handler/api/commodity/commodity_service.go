@@ -309,7 +309,7 @@ func CreateSku(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	file, err := c.FormFile("skuImage")
+	file, err := c.FormFile("skuImages")
 	if err != nil {
 		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
@@ -355,8 +355,12 @@ func UpdateSku(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	var l int64
-	var datas [][]byte
+	var (
+		l     int64
+		datas [][]byte
+		ext   string
+		ok    bool
+	)
 
 	file, err := c.FormFile("skuImage")
 	if err != nil {
@@ -365,7 +369,7 @@ func UpdateSku(ctx context.Context, c *app.RequestContext) {
 			return
 		}
 	} else {
-		_, ok := utils.CheckImageFileType(file)
+		ext, ok = utils.CheckImageFileType(file)
 		if !ok {
 			pack.RespError(c, errno.ParamVerifyError)
 			return
@@ -385,6 +389,7 @@ func UpdateSku(ctx context.Context, c *app.RequestContext) {
 		ForSale:     req.ForSale,
 		Stock:       req.Stock,
 		BufferCount: &l,
+		Ext:         ext,
 	}, datas)
 	if err != nil {
 		pack.RespError(c, err)

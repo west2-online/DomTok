@@ -294,6 +294,7 @@ struct UpdateSkuReq {
     5: optional double price;
     6: optional i32 forSale;
     7: optional i64 bufferCount;
+    8:required string ext;
 
 }
 
@@ -328,6 +329,7 @@ struct ViewSkuImageReq {
 struct ViewSkuImageResp {
     1: required model.BaseResp base;
     2: required list<model.SkuImage> images;
+    3: required i64 total;
 }
 
 /* struct ViewSkuReq 查看sku信息
@@ -344,6 +346,7 @@ struct ViewSkuReq {
 struct ViewSkuResp {
     1: required model.BaseResp base;
     2: required list<model.Sku> skus;
+    3: required i64 total;
 }
 
 /*
@@ -433,6 +436,7 @@ struct ListSkuInfoReq {
 struct ListSkuInfoResp {
     1: required model.BaseResp base;
     2: required list<model.SkuInfo> skuInfos;
+    3: required i64 total;
 }
 
 /*

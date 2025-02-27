@@ -103,6 +103,14 @@ type SkuSaleAttr struct {
 	DeletedAt        gorm.DeletedAt `gorm:"index"`
 }
 
+type SkuPriceHistory struct {
+	Id          int64 `gorm:"primary_key"`
+	SkuId       int64
+	MarkPrice   float64
+	CreatedAt   time.Time
+	PrevVersion int64
+}
+
 // 对应表名
 
 func (spu *Spu) TableName() string {
@@ -131,4 +139,8 @@ func (SkuImages) TableName() string {
 
 func (SkuSaleAttr) TableName() string {
 	return constants.SkuSaleAttrTableName
+}
+
+func (SkuPriceHistory) TableName() string {
+	return constants.SkuPriceHistoryTableName
 }

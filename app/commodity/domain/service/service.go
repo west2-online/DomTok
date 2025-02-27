@@ -19,7 +19,6 @@ package service
 import (
 	"context"
 	"fmt"
-
 	"golang.org/x/sync/errgroup"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
@@ -291,6 +290,7 @@ func (svc *CommodityService) GetSpuImages(ctx context.Context, spuId int64, offs
 
 func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku, ext string) (int64, error) {
 	sku.SkuID = svc.nextID()
+	sku.HistoryID = svc.nextID()
 	sku.StyleHeadDrawingUrl = utils.GenerateFileName(constants.SkuDirDest, sku.SkuID) + ext
 	var eg errgroup.Group
 	eg.Go(func() error {
@@ -315,6 +315,7 @@ func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku, ext 
 
 func (svc *CommodityService) UpdateSku(ctx context.Context, sku *model.Sku, originSpu *model.Sku) error {
 	key := fmt.Sprintf("sku:%d", sku.SkuID)
+	sku.HistoryID = svc.nextID()
 
 	if err := svc.db.UpdateSku(ctx, sku); err != nil {
 		return fmt.Errorf("service.UpdateSku: update sku failed: %w", err)

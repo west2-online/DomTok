@@ -309,7 +309,6 @@ func (c CommodityHandler) UpdateSku(streamServer commodity.CommodityService_Upda
 	for i := 0; i < int(*req.BufferCount); i++ {
 		fileData, err := streamServer.Recv()
 		if err != nil {
-			logger.Errorf("rpc.UpdateSpu: receive error: %v", err)
 			r.Base = base.BuildBaseResp(err)
 			return streamServer.SendAndClose(r)
 		}
@@ -323,7 +322,7 @@ func (c CommodityHandler) UpdateSku(streamServer commodity.CommodityService_Upda
 		StyleHeadDrawing: req.GetStyleHeadDrawing(),
 		Price:            req.GetPrice(),
 		ForSale:          int(req.GetForSale()),
-	})
+	}, req.Ext)
 	if err != nil {
 		logger.Errorf("rpc.UpdateSku: update sku error: %v", err)
 		r.Base = base.BuildBaseResp(err)
@@ -357,15 +356,19 @@ func (c CommodityHandler) ViewSkuImage(ctx context.Context, req *commodity.ViewS
 		SkuID: req.SkuID,
 	}
 
-	var Images []*model.SkuImage
+	var (
+		images []*model.SkuImage
+		total  int64
+	)
 
-	if Images, err = c.useCase.ViewSkuImage(ctx, sku, req.PageNum, req.PageSize); err != nil {
+	if images, total, err = c.useCase.ViewSkuImage(ctx, sku, req.PageNum, req.PageSize); err != nil {
 		r.Base = base.BuildBaseResp(err)
 		return
 	}
 
 	r.Base = base.BuildBaseResp(nil)
-	r.Images = pack.BuildSkuImages(Images)
+	r.Images = pack.BuildSkuImages(images)
+	r.Total = total
 	return
 }
 
@@ -391,7 +394,7 @@ func (c CommodityHandler) ViewSku(ctx context.Context, req *commodity.ViewSkuReq
 		return
 	}
 
-	Skus, err := c.useCase.ViewSku(ctx, &sku, req.PageNum, req.PageSize, isSpuId)
+	Skus, total, err := c.useCase.ViewSku(ctx, &sku, req.PageNum, req.PageSize, isSpuId)
 	if err != nil {
 		r.Base = base.BuildBaseResp(err)
 		return
@@ -399,6 +402,7 @@ func (c CommodityHandler) ViewSku(ctx context.Context, req *commodity.ViewSkuReq
 
 	r.Base = base.BuildBaseResp(nil)
 	r.Skus = pack.BuildSkus(Skus)
+	r.Total = total
 	return
 }
 
@@ -426,7 +430,7 @@ func (c CommodityHandler) UploadSkuAttr(ctx context.Context, req *commodity.Uplo
 func (c CommodityHandler) ListSkuInfo(ctx context.Context, req *commodity.ListSkuInfoReq) (r *commodity.ListSkuInfoResp, err error) {
 	r = new(commodity.ListSkuInfoResp)
 
-	SkuInfos, err := c.useCase.ListSkuInfo(ctx, req.SkuIDs, req.PageNum, req.PageSize)
+	SkuInfos, total, err := c.useCase.ListSkuInfo(ctx, req.SkuIDs, req.PageNum, req.PageSize)
 	if err != nil {
 		r.Base = base.BuildBaseResp(err)
 		return
@@ -434,6 +438,7 @@ func (c CommodityHandler) ListSkuInfo(ctx context.Context, req *commodity.ListSk
 
 	r.Base = base.BuildBaseResp(nil)
 	r.SkuInfos = pack.BuildSkuInfos(SkuInfos)
+	r.Total = total
 	return
 }
 

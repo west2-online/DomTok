@@ -19,7 +19,6 @@ package mysql
 import (
 	"context"
 	"errors"
-
 	"gorm.io/gorm"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
@@ -212,12 +211,20 @@ func (db *commodityDB) CreateSku(ctx context.Context, sku *model.Sku) (err error
 		Description:      sku.Description,
 		ForSale:          sku.ForSale,
 		Stock:            sku.Stock,
+		LockStock:        sku.Stock,
 		StyleHeadDrawing: sku.StyleHeadDrawingUrl,
+		HistoryVersionId: sku.HistoryID,
 	}
 
 	skuToSpu := &SpuToSku{
 		SkuId: sku.SkuID,
 		SpuId: sku.SpuID,
+	}
+	skuPriceHistory := &SkuPriceHistory{
+		Id:          sku.HistoryID,
+		SkuId:       sku.SkuID,
+		MarkPrice:   sku.Price,
+		PrevVersion: 0,
 	}
 
 	if err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
@@ -225,6 +232,9 @@ func (db *commodityDB) CreateSku(ctx context.Context, sku *model.Sku) (err error
 			return err
 		}
 		if err := tx.Table(skuToSpu.TableName()).Create(skuToSpu).Error; err != nil {
+			return err
+		}
+		if err := tx.Table(skuPriceHistory.TableName()).Create(skuPriceHistory).Error; err != nil {
 			return err
 		}
 		return nil
@@ -244,14 +254,36 @@ func (db *commodityDB) UpdateSku(ctx context.Context, sku *model.Sku) error {
 		Price:            sku.Price,
 		ForSale:          sku.ForSale,
 		Stock:            sku.Stock,
+		HistoryVersionId: sku.HistoryID,
 	}
 
-	if err := db.client.WithContext(ctx).Table(s.TableName()).Where("id = ?", sku.SkuID).Updates(s).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errno.Errorf(errno.ServiceSkuNotExist, "mysql: sku not found")
-		}
-		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update sku: %v", err)
+	skuPriceHistory := &SkuPriceHistory{
+		Id:          sku.HistoryID,
+		SkuId:       sku.SkuID,
+		MarkPrice:   sku.Price,
+		PrevVersion: 0,
 	}
+
+	if err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Table(s.TableName()).Where("id = ?", sku.SkuID).Updates(s).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return errno.Errorf(errno.ServiceSkuNotExist, "mysql: sku not found")
+			}
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update sku: %v", err)
+		}
+		var preId int64
+		if err := tx.Table(s.TableName()).Where("id = ?", sku.SkuID).Pluck("history_version_id", &preId).Error; err != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query current history version: %v", err)
+		}
+		skuPriceHistory.PrevVersion = preId
+		if err := tx.Table(skuPriceHistory.TableName()).Create(skuPriceHistory).Error; err != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create sku price history: %v", err)
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+
 	return nil
 }
 
