@@ -272,14 +272,17 @@ func (db *commodityDB) UpdateSku(ctx context.Context, sku *model.Sku) error {
 			}
 			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update sku: %v", err)
 		}
-		var preId int64
-		if err := tx.Table(s.TableName()).Where("id = ?", sku.SkuID).Pluck("history_version_id", &preId).Error; err != nil {
-			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query current history version: %v", err)
+
+		var ret Sku
+		if err := tx.Table(s.TableName()).Where("id = ?", sku.SkuID).Find(&ret).Error; err != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get sku: %v", err)
 		}
-		skuPriceHistory.PrevVersion = preId
+
+		skuPriceHistory.PrevVersion = ret.HistoryVersionId
 		if err := tx.Table(skuPriceHistory.TableName()).Create(skuPriceHistory).Error; err != nil {
 			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create sku price history: %v", err)
 		}
+
 		return nil
 	}); err != nil {
 		return err
@@ -451,11 +454,13 @@ func (db *commodityDB) GetSkuIdBySpuID(ctx context.Context, spuId int64, pageNum
 	return skuIdsList, nil
 }
 
-func (db *commodityDB) UploadSkuAttr(ctx context.Context, sku *model.Sku, attr *model.AttrValue) error {
+func (db *commodityDB) UploadSkuAttr(ctx context.Context, sku *model.Sku, attr *model.AttrValue, id int64) error {
 	s := &SkuSaleAttr{
-		SkuId:     sku.SkuID,
-		SaleAttr:  attr.SaleAttr,
-		SaleValue: attr.SaleValue,
+		Id:               id,
+		SkuId:            sku.SkuID,
+		HistoryVersionId: sku.HistoryID,
+		SaleAttr:         attr.SaleAttr,
+		SaleValue:        attr.SaleValue,
 	}
 
 	if err := db.client.WithContext(ctx).Table(s.TableName()).Create(s).Error; err != nil {

@@ -37,7 +37,7 @@ type CommodityUseCase interface {
 	CreateSku(ctx context.Context, sku *model.Sku, ext string) (skuID int64, err error)
 	UpdateSku(ctx context.Context, sku *model.Sku, ext string) (err error)
 	DeleteSku(ctx context.Context, sku *model.Sku) (err error)
-	ViewSkuImage(ctx context.Context, sku *model.Sku, pageNum *int64, pageSize *int64) (Images []*model.SkuImage, total int64, err error)
+	ViewSkuImages(ctx context.Context, sku *model.Sku, pageNum *int64, pageSize *int64) (Images []*model.SkuImage, total int64, err error)
 	ViewSku(ctx context.Context, sku *model.Sku, pageNum *int64, pageSize *int64, isSpuId bool) (Skus []*model.Sku, total int64, err error)
 	UploadSkuAttr(ctx context.Context, attr *model.AttrValue, Sku *model.Sku) (err error)
 	ListSkuInfo(ctx context.Context, Ids []int64, pageNum int64, pageSize int64) (SkuInfos []*model.Sku, total int64, err error)

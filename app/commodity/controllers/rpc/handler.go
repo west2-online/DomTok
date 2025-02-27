@@ -361,7 +361,7 @@ func (c CommodityHandler) ViewSkuImage(ctx context.Context, req *commodity.ViewS
 		total  int64
 	)
 
-	if images, total, err = c.useCase.ViewSkuImage(ctx, sku, req.PageNum, req.PageSize); err != nil {
+	if images, total, err = c.useCase.ViewSkuImages(ctx, sku, req.PageNum, req.PageSize); err != nil {
 		r.Base = base.BuildBaseResp(err)
 		return
 	}

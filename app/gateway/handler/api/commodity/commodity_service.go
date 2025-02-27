@@ -395,7 +395,8 @@ func UpdateSku(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	pack.RespData(c, nil)
+
+	pack.RespSuccess(c)
 }
 
 // DeleteSku .
@@ -486,7 +487,7 @@ func UploadSkuAttr(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	pack.RespData(c, nil)
+	pack.RespSuccess(c)
 }
 
 // ListSkuInfo .
