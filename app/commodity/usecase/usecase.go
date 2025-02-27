@@ -43,6 +43,12 @@ type CommodityUseCase interface {
 	IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error
 	DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error
 	DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error
+
+	CreateCoupon(ctx context.Context, coupon *model.Coupon) (int64, error)
+	DeleteCoupon(ctx context.Context, coupon *model.Coupon) (err error)
+	GetCreatorCoupons(ctx context.Context, pageNum int64) (coupons []*model.Coupon, err error)
+	CreateUserCoupon(ctx context.Context, coupon *model.UserCoupon) (err error)
+	SearchUserCoupons(ctx context.Context, pageNum int64) (coupons []*model.Coupon, err error)
 }
 
 type useCase struct {
