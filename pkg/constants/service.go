@@ -16,6 +16,8 @@ limitations under the License.
 
 package constants
 
+import "time"
+
 // Service Name
 const (
 	GatewayServiceName   = "gateway"
@@ -41,6 +43,7 @@ const (
 	OrderStatusCompletedCode = 2
 	OrderStatusCancelledCode = 3
 
+	OrderExpireTime      = 10 * time.Minute
 	OrderStatusUnpaid    = "待支付"
 	OrderStatusPaid      = "已支付"
 	OrderStatusCompleted = "已完成" // 已发货已签收

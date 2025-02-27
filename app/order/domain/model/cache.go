@@ -14,13 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package types
+package model
 
-// PaymentResultMessage 是 payment 模块与 order 模块之间的 msg 格式约定, 请勿修改
-// DO NOT EDIT
-type PaymentResultMessage struct {
-	OrderID       int64  // 订单 id
-	PaymentStatus int    // 状态
-	PaymentAt     int64  // 支付时间, 毫秒级时间戳
-	PaymentStyle  string // 支付类型
+type CachePaymentStatus struct {
+	OrderID       int64
+	OrderExpire   int64 // ms 时间戳
+	PaymentStatus int8
 }

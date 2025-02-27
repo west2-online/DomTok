@@ -24,47 +24,85 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
+	"github.com/west2-online/DomTok/app/order/domain/model"
 	"github.com/west2-online/DomTok/app/order/domain/repository"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 type orderCache struct {
-	client *redis.Client
+	client                 *redis.Client
+	expire                 time.Duration
+	updatePaymentStatusLua string
 }
 
 func NewOrderCache(client *redis.Client) repository.Cache {
-	return &orderCache{client: client}
+	c := &orderCache{client: client}
+	c.loadUpdateLUAScript()
+	c.expire = constants.OrderPaymentStatusExpireTime
+	return c
 }
 
-func (cache *orderCache) SetPaymentResultRecord(ctx context.Context, orderID int64, data []byte, expire time.Duration) error {
-	key := getKey(orderID)
-	if err := cache.client.Set(ctx, key, data, expire); err != nil {
-		return errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("failed set kv to redis, err: %v", err))
+func (cache *orderCache) SetPaymentStatus(ctx context.Context, s *model.CachePaymentStatus) error {
+	exK, sK := getExpireKey(s.OrderID), getStatusKey(s.OrderID)
+	if err := cache.client.Set(ctx, exK, s.OrderExpire, cache.expire).Err(); err != nil {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("failed set key: %s to %v, err: %v", exK, sK, err))
+	}
+	if err := cache.client.Set(ctx, sK, s.PaymentStatus, cache.expire).Err(); err != nil {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("failed set key: %s to %v, err: %v", exK, sK, err))
 	}
 	return nil
 }
 
-func (cache *orderCache) GetPaymentResultRecord(ctx context.Context, orderID int64) ([]byte, bool, error) {
-	key := getKey(orderID)
-	data, err := cache.client.Get(ctx, key).Bytes()
-	if errors.Is(err, redis.Nil) {
-		return nil, false, nil
+func (cache *orderCache) GetPaymentStatus(ctx context.Context, orderID int64) (*model.CachePaymentStatus, bool, error) {
+	exK, sK := getExpireKey(orderID), getStatusKey(orderID)
+	var ex, s int64
+	var err error
+
+	if ex, err = cache.client.Get(ctx, exK).Int64(); err != nil {
+		if errors.Is(err, redis.Nil) {
+			return &model.CachePaymentStatus{}, false, nil
+		}
+		return nil, false, errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("failed get key: %s,err: %v", exK, err))
 	}
+	if s, err = cache.client.Get(ctx, sK).Int64(); err != nil {
+		if errors.Is(err, redis.Nil) {
+			return &model.CachePaymentStatus{}, false, nil
+		}
+		return nil, false, errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("failed get key: %s,err: %v", exK, err))
+	}
+
+	return &model.CachePaymentStatus{OrderExpire: ex, PaymentStatus: int8(s)}, true, nil
+}
+
+// UpdatePaymentStatus 使用 lua 脚本保证了过程的原子性
+func (cache *orderCache) UpdatePaymentStatus(ctx context.Context, s *model.CachePaymentStatus) (bool, error) {
+	exK, sK := getExpireKey(s.OrderID), getStatusKey(s.OrderID)
+	result, err := cache.client.EvalSha(ctx, cache.updatePaymentStatusLua, []string{exK, sK}, s.OrderExpire, s.PaymentStatus, cache.expire).Result()
 	if err != nil {
-		return nil, false, errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("failed get kv from redis, err: %v", err))
+		return false, errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("failed to execute lua script: %v", err))
 	}
-	return data, true, nil
+	rel, ok := result.(int64)
+	if !ok {
+		return false, errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("failed to execute lua script: %v", err))
+	}
+
+	return rel == constants.OrderCacheLuaKeyExistFlag, nil
 }
 
-func (cache *orderCache) DelPaymentResultRecord(ctx context.Context, orderID int64) error {
-	key := getKey(orderID)
-	if err := cache.client.Del(ctx, key).Err(); err != nil {
-		return errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("failed del kv from redis, err: %v", err))
+func (cache *orderCache) loadUpdateLUAScript() {
+	sha1, err := cache.client.ScriptLoad(context.Background(), constants.OrderUpdatePaymentStatusLuaScript).Result()
+	if err != nil {
+		logger.Fatalf("failed to load lua script: %v", err)
 	}
-	return nil
+	cache.updatePaymentStatusLua = sha1
 }
 
-func getKey(orderID int64) string {
-	return fmt.Sprintf(constants.OrderID2PaymentStatusFormat, orderID)
+func getExpireKey(orderID int64) string {
+	return fmt.Sprintf(constants.OrderCacheOrderExpireFormat, orderID)
+}
+
+func getStatusKey(orderID int64) string {
+	return fmt.Sprintf(constants.OrderCachePaymentStatusFormat, orderID)
 }

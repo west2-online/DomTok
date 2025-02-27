@@ -32,10 +32,11 @@ type OrderDB interface {
 	GetOrderGoodsByOrderID(ctx context.Context, orderID int64) ([]*model.OrderGoods, error)
 	GetOrdersByUserID(ctx context.Context, userID int64, page, size int32) ([]*model.Order, int32, error)
 	GetOrderWithGoods(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error)
+	GetOrderStatus(ctx context.Context, id int64) (int8, int64, error) // GetOrderStatus Return paymentStatus orderedAt error
 
 	UpdateOrderStatus(ctx context.Context, orderID int64, status int32) error
 	UpdateOrderAddress(ctx context.Context, orderID int64, addressID int64, addressInfo string) error
-	UpdatePaymentStatus(ctx context.Context, message *model.PaymentResultMessage) error
+	UpdatePaymentStatus(ctx context.Context, message *model.PaymentResult) error
 
 	DeleteOrder(ctx context.Context, orderID int64) error
 
@@ -58,7 +59,8 @@ type RPC interface {
 }
 
 type Cache interface {
-	SetPaymentResultRecord(ctx context.Context, orderID int64, data []byte, expire time.Duration) error
-	GetPaymentResultRecord(ctx context.Context, orderID int64) ([]byte, bool, error)
-	DelPaymentResultRecord(ctx context.Context, orderID int64) error
+	SetPaymentStatus(ctx context.Context, s *model.CachePaymentStatus) error
+	GetPaymentStatus(ctx context.Context, orderID int64) (*model.CachePaymentStatus, bool, error)
+	// UpdatePaymentStatus 使用 lua 脚本保证了过程的原子性
+	UpdatePaymentStatus(ctx context.Context, s *model.CachePaymentStatus) (exist bool, err error)
 }

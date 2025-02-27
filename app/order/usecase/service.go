@@ -45,7 +45,7 @@ func (uc *useCase) CreateOrder(ctx context.Context, addressID int64, baseGoods [
 		return 0, err
 	}
 
-	if err = uc.db.CreateOrder(ctx, order, goods); err != nil {
+	if err = uc.svc.CreateOrder(ctx, order, goods); err != nil {
 		return 0, err
 	}
 

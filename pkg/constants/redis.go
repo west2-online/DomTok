@@ -47,7 +47,25 @@ const (
 
 // Order
 const (
-	OrderID2PaymentStatusFormat = "oid-PStatus-%d"
+	OrderCacheOrderExpireFormat       = "order-expire-%d"
+	OrderCachePaymentStatusFormat     = "payment-status-%d"
+	OrderPaymentStatusExpireTime      = 12 * time.Minute // 大于 SkuStockRollbackTopicDelayTimeLevel 即可
+	OrderCacheLuaKeyExistFlag         = 1
+	OrderUpdatePaymentStatusLuaScript = `
+        local exK = KEYS[1]
+        local sK = KEYS[2]
+        local orderExpire = ARGV[1]
+        local status = ARGV[2]
+        local expire = tonumber(ARGV[3])
 
-	PaymentResultExpireTime = 11 * time.Minute // 大于 SkuStockRollbackTopicDelayTimeLevel 即可
+        local exist = redis.call('EXISTS', exK)
+        if exist == 0 then
+            return 0
+        end
+
+        redis.call('SET', exK, orderExpire, 'EX', expire)
+        redis.call('SET', sK, status, 'EX', expire)
+
+        return 1
+    `
 )

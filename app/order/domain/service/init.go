@@ -31,12 +31,4 @@ func (svc *OrderService) init() {
 	); err != nil {
 		logger.Fatalf("order service failde init, err: %v", err)
 	}
-
-	if err := svc.mq.SubscribeTopic(context.Background(),
-		constants.OrderPaymentResultTopic,
-		constants.OrderPaymentResultTopicConsumerPullInterval,
-		svc.PaymentResultProcess,
-	); err != nil {
-		logger.Fatalf("order service failde init, err: %v", err)
-	}
 }

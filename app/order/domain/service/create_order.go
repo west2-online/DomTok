@@ -89,6 +89,22 @@ func (svc *OrderService) CalculateTheAmount(goods []*model.OrderGoods, order *mo
 	return nil
 }
 
+func (svc *OrderService) CreateOrder(ctx context.Context, order *model.Order, goods []*model.OrderGoods) error {
+	if err := svc.db.CreateOrder(ctx, order, goods); err != nil {
+		return err
+	}
+
+	if err := svc.cache.SetPaymentStatus(ctx, &model.CachePaymentStatus{
+		OrderID:       order.Id,
+		OrderExpire:   svc.GetOrderExpireTime(order.OrderedAt),
+		PaymentStatus: order.PaymentStatus,
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // DescSkuLockStock 预扣商品
 func (svc *OrderService) DescSkuLockStock(ctx context.Context, orderID int64, goods []*model.OrderGoods) error {
 	stocks := lo.Map(goods, func(item *model.OrderGoods, index int) *model.Stock {

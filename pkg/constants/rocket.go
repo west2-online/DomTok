@@ -23,9 +23,6 @@ const (
 	SkuStockRollbackTopic                     = "sku-stock-rollback-topic"
 	SkuStockRollbackTopicDelayTimeLevel       = RocketMQDelay10M // 10 Minute
 	SkuStockRollbackTopicConsumerPullInterval = 1 * time.Second
-
-	OrderPaymentResultTopic                     = "order-payment-result-topic"
-	OrderPaymentResultTopicConsumerPullInterval = 1 * time.Second
 )
 
 const (

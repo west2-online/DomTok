@@ -16,8 +16,6 @@ limitations under the License.
 
 package model
 
-import "github.com/west2-online/DomTok/pkg/types"
-
 type MqMessage struct {
 	Body       []byte
 	DelayLevel int
@@ -39,5 +37,3 @@ func (m *MqMessage) GetDelayLevel() int {
 func (m *MqMessage) IsSetDelayLevel() bool {
 	return m.DelayLevel != 0
 }
-
-type PaymentResultMessage types.PaymentResultMessage

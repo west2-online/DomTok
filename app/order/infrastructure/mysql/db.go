@@ -120,6 +120,14 @@ func (db *orderDB) GetOrdersByUserID(ctx context.Context, userID int64, page, si
 	return orders, int32(total), nil
 }
 
+func (db *orderDB) GetOrderStatus(ctx context.Context, id int64) (int8, int64, error) {
+	o := Order{Id: id}
+	if err := db.client.WithContext(ctx).Model(&o).Select("status,ordered_at").Scan(&o).Error; err != nil {
+		return 0, 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get order status: %v", err)
+	}
+	return o.Status, o.OrderedAt, nil
+}
+
 // UpdateOrderStatus 更新订单状态
 func (db *orderDB) UpdateOrderStatus(ctx context.Context, orderID int64, status int32) error {
 	if err := db.client.WithContext(ctx).Model(&model.Order{}).
@@ -204,7 +212,7 @@ func (db *orderDB) IsOrderPaid(ctx context.Context, orderID int64) (bool, error)
 	return status == constants.PaymentStatusSuccessCode, nil
 }
 
-func (db *orderDB) UpdatePaymentStatus(ctx context.Context, message *model.PaymentResultMessage) error {
+func (db *orderDB) UpdatePaymentStatus(ctx context.Context, message *model.PaymentResult) error {
 	if err := db.client.WithContext(ctx).Model(&Order{Id: message.OrderID}).
 		Updates(map[string]interface{}{
 			"payment_status": message.PaymentStatus,

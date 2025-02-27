@@ -69,6 +69,13 @@ type BaseOrderGoods struct {
 	CouponID         int64
 }
 
+type PaymentResult struct {
+	OrderID       int64  // 订单 id
+	PaymentStatus int    // 状态
+	PaymentAt     int64  // 支付时间, 毫秒级时间戳
+	PaymentStyle  string // 支付类型
+}
+
 func OG2BOG(o *OrderGoods) *BaseOrderGoods {
 	return &BaseOrderGoods{
 		MerchantID:       o.MerchantID,

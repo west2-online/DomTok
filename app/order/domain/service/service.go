@@ -91,8 +91,8 @@ func (svc *OrderService) GetOrderStatusMsg(code int8) string {
 	return constants.GetOrderStatusMsg(code)
 }
 
-func (svc *OrderService) SetPaymentResult(ctx context.Context, orderID int64, data []byte) error {
-	return svc.cache.SetPaymentResultRecord(ctx, orderID, data, constants.PaymentResultExpireTime)
+func (svc *OrderService) GetOrderExpireTime(createAt int64) int64 {
+	return createAt + constants.OrderExpireTime.Milliseconds()
 }
 
 func (svc *OrderService) nextVal() int64 {
