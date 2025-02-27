@@ -29,12 +29,11 @@ func (uc *useCase) CreateCoupon(ctx context.Context, coupon *model.Coupon) (int6
 	if err := uc.svc.Verify(uc.svc.VerifyCoupon(coupon)); err != nil {
 		return -1, err
 	}
-	uid, err := contextLogin.GetLoginData(ctx)
+	err := uc.svc.InitCoupon(ctx, coupon)
 	if err != nil {
-		return -1, fmt.Errorf("usecase.CreateCoupon get logindata error: %w", err)
+		return -1, fmt.Errorf("usecase.CreateCoupon error: %w", err)
 	}
-	// 稍微不太规范
-	coupon.Uid = uid
+
 	couponId, err := uc.db.CreateCoupon(ctx, coupon)
 	if err != nil {
 		return -1, fmt.Errorf("usecase.CreateCoupon error: %w", err)
@@ -47,15 +46,15 @@ func (uc *useCase) DeleteCoupon(ctx context.Context, coupon *model.Coupon) (err 
 	if err != nil {
 		return fmt.Errorf("usecase.DeleteCoupon get logindata error: %w", err)
 	}
-	if uid != coupon.Uid {
-		return errno.AuthInvalid
-	}
-	e, _, err := uc.db.GetCouponById(ctx, coupon.Id)
+	e, coupon, err := uc.db.GetCouponById(ctx, coupon.Id)
 	if err != nil {
 		return fmt.Errorf("usecase.DeleteCoupon error: %w", err)
 	}
 	if !e {
 		return errno.ParamVerifyError
+	}
+	if uid != coupon.Uid {
+		return errno.AuthInvalid
 	}
 	err = uc.db.DeleteCouponById(ctx, coupon)
 	if err != nil {

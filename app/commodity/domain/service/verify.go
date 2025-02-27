@@ -50,7 +50,7 @@ func (svc *CommodityService) VerifyCoupon(coupon *model.Coupon) CommodityVerifyO
 		if coupon.DiscountAmount > coupon.ConditionCost {
 			return errno.ParamVerifyError
 		}
-		if coupon.Discount >= 1 || coupon.Discount <= 0 {
+		if coupon.Discount > 1 || coupon.Discount <= 0 {
 			return errno.ParamVerifyError
 		}
 		if coupon.ExpireTime.After(coupon.DeadlineForGet) {
@@ -66,13 +66,13 @@ func (svc *CommodityService) VerifyCoupon(coupon *model.Coupon) CommodityVerifyO
 				return fmt.Errorf("check spu exist failed or non-exist: %w", err)
 			}
 		case constants.CouponRangeTypeCategory:
-			e, err := svc.db.IsCategoryExistById(context.Background(), coupon.RangeId)
-			if err != nil {
-				return fmt.Errorf("check sku exist failed: %w", err)
-			}
-			if !e {
-				return errno.ParamVerifyError
-			}
+		//	e, err := svc.db.IsCategoryExistById(context.Background(), coupon.RangeId)
+		//	if err != nil {
+		//		return fmt.Errorf("check sku exist failed: %w", err)
+		//	}
+		//	if !e {
+		//		return errno.ParamVerifyError
+		//	}
 		default:
 			return errno.ParamVerifyError
 		}

@@ -172,7 +172,7 @@ func (c CommodityHandler) ViewCoupon(ctx context.Context, req *commodity.ViewCou
 
 func (c CommodityHandler) ViewUserAllCoupon(ctx context.Context, req *commodity.ViewUserAllCouponReq) (r *commodity.ViewUserAllCouponResp, err error) {
 	r = new(commodity.ViewUserAllCouponResp)
-	coupons, err := c.useCase.GetCreatorCoupons(ctx, req.PageNum)
+	coupons, err := c.useCase.SearchUserCoupons(ctx, req.PageNum)
 	if err != nil {
 		r.Base = base.BuildBaseResp(err)
 		return r, nil

@@ -18,6 +18,8 @@ package model
 
 import (
 	"time"
+
+	"github.com/west2-online/DomTok/pkg/constants"
 )
 
 type Coupon struct {
@@ -49,10 +51,10 @@ type AssignedCoupon struct {
 
 func (c *Coupon) CalculateDiscountPrice(originalPrice float64) float64 {
 	switch c.TypeInfo {
-	case 1:
+	case constants.CouponRangeTypeSPU:
 		// 减价格
 		return originalPrice - c.DiscountAmount
-	case 2:
+	case constants.CouponRangeTypeCategory:
 		// 打折
 		return originalPrice * c.Discount
 	default:

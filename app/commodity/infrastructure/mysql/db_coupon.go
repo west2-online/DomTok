@@ -29,6 +29,7 @@ import (
 
 func (db *commodityDB) CreateCoupon(ctx context.Context, coupon *model.Coupon) (int64, error) {
 	dbModel := &Coupon{
+		Id:             coupon.Id,
 		Uid:            coupon.Uid,
 		Name:           coupon.Name,
 		TypeInfo:       coupon.TypeInfo,

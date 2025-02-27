@@ -95,3 +95,9 @@ services:
     load-balance: false
     addr:
       - 0.0.0.0:20005
+
+  cart:
+    name: cart
+    load-balance: false
+    addr:
+      - 0.0.0.0:20006

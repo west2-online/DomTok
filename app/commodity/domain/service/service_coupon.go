@@ -19,13 +19,24 @@ package service
 import (
 	"context"
 	"fmt"
-	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
 	"sort"
 	"time"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
+	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
+	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
+
+func (svc *CommodityService) InitCoupon(ctx context.Context, coupon *model.Coupon) error {
+	uid, err := contextLogin.GetLoginData(ctx)
+	if err != nil {
+		return fmt.Errorf("service.CreateCoupon get logindata error: %w", err)
+	}
+	coupon.Uid = uid
+	coupon.Id = svc.nextID()
+	return nil
+}
 
 func (svc *CommodityService) GetCouponsByUserCoupons(ctx context.Context, userCouponList []*model.UserCoupon) (couponList []*model.Coupon, err error) {
 	couponIDs := make([]int64, 0, len(userCouponList))
@@ -75,9 +86,9 @@ func (svc *CommodityService) CalculateWithCoupon(ctx context.Context, spuList []
 	var couponsForSpu, couponsForCategory []*model.Coupon
 	for _, c := range couponList {
 		switch c.RangeType {
-		case 1: // 按 SpuId 匹配
+		case constants.CouponRangeTypeSPU: // 按 SpuId 匹配
 			couponsForSpu = append(couponsForSpu, c)
-		case 2: // 按 CategoryId 匹配
+		case constants.CouponRangeTypeCategory: // 按 CategoryId 匹配
 			couponsForCategory = append(couponsForCategory, c)
 		default:
 			continue
@@ -92,7 +103,7 @@ func (svc *CommodityService) CalculateWithCoupon(ctx context.Context, spuList []
 		return couponsForCategory[i].RangeId < couponsForCategory[j].RangeId
 	})
 
-	var matchMap = make(map[int64][]*model.Coupon)
+	matchMap := make(map[int64][]*model.Coupon)
 
 	// 将 spuList 按 SpuId 做升序排序
 	sort.Slice(spuList, func(i, j int) bool {
@@ -141,8 +152,8 @@ func (svc *CommodityService) CalculateWithCoupon(ctx context.Context, spuList []
 
 // assignCouponsByPrice 以商品价格降序为优先级，从 matchMap 中给每个 SPU 匹配优惠券
 func (svc *CommodityService) assignCoupons(spuList []*model.Spu,
-	matchMap map[int64][]*model.Coupon) (map[int64]*model.Coupon, map[int64]float64, float64) {
-
+	matchMap map[int64][]*model.Coupon,
+) (map[int64]*model.Coupon, map[int64]float64, float64) {
 	// 按 spu.Price 进行降序排序，让价格最高的商品优先匹配
 	sort.Slice(spuList, func(i, j int) bool {
 		return spuList[i].Price > spuList[j].Price
