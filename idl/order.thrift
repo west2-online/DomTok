@@ -69,6 +69,13 @@ struct IsOrderExistResp {
     2: required bool exist
 }
 
+struct UpdateOrderStatusReq {
+    1: required i64 orderID // 订单号
+    2: required i32 status // 订单状态
+    3: required i64 paymentAt // 支付时间
+    4: required string paymentStyle // 支付方式
+}
+
 service OrderService {
     CreateOrderResp CreateOrder(1:CreateOrderReq req) (api.post="/api/order/create")
     ViewOrderListResp ViewOrderList(1:ViewOrderListReq req) (api.get="/api/order/list")
@@ -77,4 +84,6 @@ service OrderService {
     ChangeDeliverAddressResp ChangeDeliverAddress(1:ChangeDeliverAddressReq req) (api.put="/api/order/change-address")
     DeleteOrderResp DeleteOrder(1:DeleteOrderReq req) (api.delete="/api/order/delete")
     IsOrderExistResp IsOrderExist(1:IsOrderExistReq req) (api.get="/api/order/exist")
+
+    UpdateOrderStatusResp UpdateOrderStatus(1:UpdateOrderStatusReq req) (api.put="/api/order/update-status")
 }
