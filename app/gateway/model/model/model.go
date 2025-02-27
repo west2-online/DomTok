@@ -5897,6 +5897,213 @@ func (p *PriceHistory) String() string {
 
 }
 
+/*
+* struct SkuBuyInfo 实际扣除商品
+* @Param skuID skuID
+* @Param count 购买商品数
+ */
+type SkuBuyInfo struct {
+	SkuID int64 `thrift:"skuID,1,required" form:"skuID,required" json:"skuID,required" query:"skuID,required"`
+	Count int64 `thrift:"count,2,required" form:"count,required" json:"count,required" query:"count,required"`
+}
+
+func NewSkuBuyInfo() *SkuBuyInfo {
+	return &SkuBuyInfo{}
+}
+
+func (p *SkuBuyInfo) InitDefault() {
+}
+
+func (p *SkuBuyInfo) GetSkuID() (v int64) {
+	return p.SkuID
+}
+
+func (p *SkuBuyInfo) GetCount() (v int64) {
+	return p.Count
+}
+
+var fieldIDToName_SkuBuyInfo = map[int16]string{
+	1: "skuID",
+	2: "count",
+}
+
+func (p *SkuBuyInfo) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetSkuID bool = false
+	var issetCount bool = false
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetSkuID = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetCount = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	if !issetSkuID {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetCount {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_SkuBuyInfo[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_SkuBuyInfo[fieldId]))
+}
+
+func (p *SkuBuyInfo) ReadField1(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.SkuID = _field
+	return nil
+}
+func (p *SkuBuyInfo) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Count = _field
+	return nil
+}
+
+func (p *SkuBuyInfo) Write(oprot thrift.TProtocol) (err error) {
+
+	var fieldId int16
+	if err = oprot.WriteStructBegin("SkuBuyInfo"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *SkuBuyInfo) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("skuID", thrift.I64, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.SkuID); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *SkuBuyInfo) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("count", thrift.I64, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.Count); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *SkuBuyInfo) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("SkuBuyInfo(%+v)", *p)
+
+}
+
 type Order struct {
 	ID                    int64   `thrift:"id,1,required" form:"id,required" json:"id,required" query:"id,required"`
 	Status                string  `thrift:"status,2,required" form:"status,required" json:"status,required" query:"status,required"`
@@ -9594,37 +9801,37 @@ func (p *PaymentTokenInfo) String() string {
 
 }
 
-type RefundTokenInfo struct {
-	RefundToken               string `thrift:"refundToken,1,required" form:"refundToken,required" json:"refundToken,required" query:"refundToken,required"`
-	RefundTokenExpirationTime int64  `thrift:"refundTokenExpirationTime,2,required" form:"refundTokenExpirationTime,required" json:"refundTokenExpirationTime,required" query:"refundTokenExpirationTime,required"`
+type RefundResponseInfo struct {
+	RefundID int64 `thrift:"refundID,1,required" form:"refundID,required" json:"refundID,required" query:"refundID,required"`
+	Status   int64 `thrift:"status,2,required" form:"status,required" json:"status,required" query:"status,required"`
 }
 
-func NewRefundTokenInfo() *RefundTokenInfo {
-	return &RefundTokenInfo{}
+func NewRefundResponseInfo() *RefundResponseInfo {
+	return &RefundResponseInfo{}
 }
 
-func (p *RefundTokenInfo) InitDefault() {
+func (p *RefundResponseInfo) InitDefault() {
 }
 
-func (p *RefundTokenInfo) GetRefundToken() (v string) {
-	return p.RefundToken
+func (p *RefundResponseInfo) GetRefundID() (v int64) {
+	return p.RefundID
 }
 
-func (p *RefundTokenInfo) GetRefundTokenExpirationTime() (v int64) {
-	return p.RefundTokenExpirationTime
+func (p *RefundResponseInfo) GetStatus() (v int64) {
+	return p.Status
 }
 
-var fieldIDToName_RefundTokenInfo = map[int16]string{
-	1: "refundToken",
-	2: "refundTokenExpirationTime",
+var fieldIDToName_RefundResponseInfo = map[int16]string{
+	1: "refundID",
+	2: "status",
 }
 
-func (p *RefundTokenInfo) Read(iprot thrift.TProtocol) (err error) {
+func (p *RefundResponseInfo) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetRefundToken bool = false
-	var issetRefundTokenExpirationTime bool = false
+	var issetRefundID bool = false
+	var issetStatus bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -9641,11 +9848,11 @@ func (p *RefundTokenInfo) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetRefundToken = true
+				issetRefundID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -9654,7 +9861,7 @@ func (p *RefundTokenInfo) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetRefundTokenExpirationTime = true
+				issetStatus = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -9671,12 +9878,12 @@ func (p *RefundTokenInfo) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetRefundToken {
+	if !issetRefundID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetRefundTokenExpirationTime {
+	if !issetStatus {
 		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
@@ -9686,7 +9893,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RefundTokenInfo[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RefundResponseInfo[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -9695,21 +9902,10 @@ ReadFieldEndError:
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 RequiredFieldNotSetError:
-	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_RefundTokenInfo[fieldId]))
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_RefundResponseInfo[fieldId]))
 }
 
-func (p *RefundTokenInfo) ReadField1(iprot thrift.TProtocol) error {
-
-	var _field string
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.RefundToken = _field
-	return nil
-}
-func (p *RefundTokenInfo) ReadField2(iprot thrift.TProtocol) error {
+func (p *RefundResponseInfo) ReadField1(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -9717,14 +9913,25 @@ func (p *RefundTokenInfo) ReadField2(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.RefundTokenExpirationTime = _field
+	p.RefundID = _field
+	return nil
+}
+func (p *RefundResponseInfo) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Status = _field
 	return nil
 }
 
-func (p *RefundTokenInfo) Write(oprot thrift.TProtocol) (err error) {
+func (p *RefundResponseInfo) Write(oprot thrift.TProtocol) (err error) {
 
 	var fieldId int16
-	if err = oprot.WriteStructBegin("RefundTokenInfo"); err != nil {
+	if err = oprot.WriteStructBegin("RefundResponseInfo"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -9754,11 +9961,11 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *RefundTokenInfo) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("refundToken", thrift.STRING, 1); err != nil {
+func (p *RefundResponseInfo) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("refundID", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.RefundToken); err != nil {
+	if err := oprot.WriteI64(p.RefundID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -9771,11 +9978,11 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *RefundTokenInfo) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("refundTokenExpirationTime", thrift.I64, 2); err != nil {
+func (p *RefundResponseInfo) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("status", thrift.I64, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.RefundTokenExpirationTime); err != nil {
+	if err := oprot.WriteI64(p.Status); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -9788,10 +9995,10 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
-func (p *RefundTokenInfo) String() string {
+func (p *RefundResponseInfo) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("RefundTokenInfo(%+v)", *p)
+	return fmt.Sprintf("RefundResponseInfo(%+v)", *p)
 
 }
