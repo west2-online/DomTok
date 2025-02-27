@@ -19,6 +19,7 @@ package rpc
 import (
 	"bytes"
 	"context"
+	"time"
 
 	"github.com/west2-online/DomTok/app/commodity/controllers/rpc/pack"
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
@@ -105,28 +106,80 @@ func (c CommodityHandler) DeleteSpuImage(ctx context.Context, req *commodity.Del
 }
 
 func (c CommodityHandler) CreateCoupon(ctx context.Context, req *commodity.CreateCouponReq) (r *commodity.CreateCouponResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.CreateCouponResp)
+	coupon := &model.Coupon{
+		Name:           req.Name,
+		TypeInfo:       int64(req.TypeInfo),
+		ConditionCost:  *req.ConditionCost,
+		DiscountAmount: *req.DiscountAmount,
+		Discount:       *req.Discount,
+		RangeType:      int64(req.RangeType),
+		RangeId:        req.RangeID,
+		Description:    *req.Description,
+		ExpireTime:     time.Unix(req.ExpireTime, 0),
+		DeadlineForGet: time.Unix(req.ExpireTime, 0),
+	}
+	couponId, err := c.useCase.CreateCoupon(ctx, coupon)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return r, nil
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.CouponID = couponId
+	return r, nil
 }
 
 func (c CommodityHandler) DeleteCoupon(ctx context.Context, req *commodity.DeleteCouponReq) (r *commodity.DeleteCouponResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.DeleteCouponResp)
+	coupon := &model.Coupon{
+		Id: req.CouponID,
+	}
+	err = c.useCase.DeleteCoupon(ctx, coupon)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return r, nil
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return r, nil
 }
 
-func (c CommodityHandler) CreateUserCoupon(ctx context.Context, req *commodity.CreateCouponReq) (r *commodity.CreateUserCouponResp, err error) {
-	// TODO implement me
-	panic("implement me")
+func (c CommodityHandler) CreateUserCoupon(ctx context.Context, req *commodity.CreateUserCouponReq) (r *commodity.CreateUserCouponResp, err error) {
+	r = new(commodity.CreateUserCouponResp)
+	userCoupon := &model.UserCoupon{
+		CouponId:      req.CouponID,
+		RemainingUses: req.RemainingUse,
+	}
+	err = c.useCase.CreateUserCoupon(ctx, userCoupon)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return r, nil
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return r, nil
 }
 
 func (c CommodityHandler) ViewCoupon(ctx context.Context, req *commodity.ViewCouponReq) (r *commodity.ViewCouponResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ViewCouponResp)
+	coupons, err := c.useCase.GetCreatorCoupons(ctx, req.PageNum)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return r, nil
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.CouponInfo = pack.BuildCoupons(coupons)
+	return r, nil
 }
 
-func (c CommodityHandler) ViewUserAllCoupon(ctx context.Context, req *commodity.ViewCouponReq) (r *commodity.ViewUserAllCouponResp, err error) {
-	// TODO implement me
-	panic("implement me")
+func (c CommodityHandler) ViewUserAllCoupon(ctx context.Context, req *commodity.ViewUserAllCouponReq) (r *commodity.ViewUserAllCouponResp, err error) {
+	r = new(commodity.ViewUserAllCouponResp)
+	coupons, err := c.useCase.GetCreatorCoupons(ctx, req.PageNum)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return r, nil
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.Coupons = pack.BuildCoupons(coupons)
+	return r, nil
 }
 
 func (c CommodityHandler) UseUserCoupon(ctx context.Context, req *commodity.UseUserCouponReq) (r *commodity.UseUserCouponResp, err error) {

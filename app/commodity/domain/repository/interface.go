@@ -48,15 +48,15 @@ type CommodityDB interface {
 	GetImagesBySpuId(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error)
 	GetSpuByIds(ctx context.Context, spuIds []int64) ([]*model.Spu, error)
 
-	CreateCoupon(ctx context.Context, coupon *model.Coupon) error
+	CreateCoupon(ctx context.Context, coupon *model.Coupon) (int64, error)
 	GetCouponById(ctx context.Context, id int64) (bool, *model.Coupon, error)
 	GetCouponsByCreatorId(ctx context.Context, uid int64, pageNum int64) ([]*model.Coupon, error)
 	DeleteCouponById(ctx context.Context, coupon *model.Coupon) error
 
 	GetCouponsByIDs(ctx context.Context, couponIDs []int64) ([]*model.Coupon, error)
-
 	CreateUserCoupon(ctx context.Context, coupon *model.UserCoupon) error
 	GetUserCouponsByUId(ctx context.Context, uid int64, pageNum int64) ([]*model.UserCoupon, error)
+	GetFullUserCouponsByUId(ctx context.Context, uid int64) ([]*model.UserCoupon, error)
 	DeleteUserCoupon(ctx context.Context, coupon *model.UserCoupon) error
 }
 

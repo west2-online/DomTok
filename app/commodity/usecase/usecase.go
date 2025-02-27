@@ -39,6 +39,12 @@ type CommodityUseCase interface {
 	DeleteSpuImage(ctx context.Context, imageId int64) error
 	ViewSpuImages(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error)
 	ViewSpus(ctx context.Context, req *commodity.ViewSpuReq) ([]*model.Spu, int64, error)
+
+	CreateCoupon(ctx context.Context, coupon *model.Coupon) (int64, error)
+	DeleteCoupon(ctx context.Context, coupon *model.Coupon) (err error)
+	GetCreatorCoupons(ctx context.Context, pageNum int64) (coupons []*model.Coupon, err error)
+	CreateUserCoupon(ctx context.Context, coupon *model.UserCoupon) (err error)
+	SearchUserCoupons(ctx context.Context, pageNum int64) (coupons []*model.Coupon, err error)
 }
 
 type useCase struct {

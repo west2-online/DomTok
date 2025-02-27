@@ -37,7 +37,6 @@ struct CreateCouponResp {
 /*
 * struct DeleteCouponReq 删除优惠券信息
 * @Param CouponID 优惠券信息ID
-* @Param UserID 用户ID
 */
 struct DeleteCouponReq {
     1: required i64 couponID;
@@ -49,10 +48,10 @@ struct DeleteCouponResp {
 
 /*
 * struct CreateUserCouponReq 用户领取优惠券
-* @Param CouponID 优惠券信息ID
 */
 struct CreateUserCouponReq {
     1: required i64 couponID;
+    2: required i64 remaining_use,
 }
 
 struct CreateUserCouponResp {
@@ -61,34 +60,28 @@ struct CreateUserCouponResp {
 
 /*
 * struct ViewCouponReq 查看优惠券信息或商家创建的优惠券
-* @Param CouponID 优惠券信息ID
 * @Param PageNum 页数
-* @Param PageSize 页面大小
 */
 struct ViewCouponReq {
-    1: required i64 couponID;
-    3: optional i64 pageNum;
+    1: required i64 pageNum;
 }
 
 struct ViewCouponResp {
     1: required model.BaseResp base;
-    2: required model.Coupon couponInfo;
+    2: required list<model.Coupon> couponInfo;
 }
 
 /*
 * struct ViewUserAllCouponReq 查看用户自己持有的优惠券
-* @Param IsIncludeExpired 是否包含过期的券
 * @Param PageNum 页数
-* @Param PageSize 页面大小
 */
 struct ViewUserAllCouponReq {
-    1: required i64 isIncludeExpired;
-    3: required i64 pageNum;
+    1: required i64 pageNum;
 }
 
 struct ViewUserAllCouponResp {
     1: required model.BaseResp base;
-    2: required list<model.UserCoupon> coupons;
+    2: required list<model.Coupon> coupons;
 }
 
 /*
@@ -496,9 +489,9 @@ service CommodityService {
     // 优惠券
     CreateCouponResp CreateCoupon(1: CreateCouponReq req);
     DeleteCouponResp DeleteCoupon(1: DeleteCouponReq req);
-    CreateUserCouponResp CreateUserCoupon(1: CreateCouponReq req);
+    CreateUserCouponResp CreateUserCoupon(1: CreateUserCouponReq req);
     ViewCouponResp ViewCoupon(1: ViewCouponReq req);
-    ViewUserAllCouponResp ViewUserAllCoupon(1: ViewCouponReq req);
+    ViewUserAllCouponResp ViewUserAllCoupon(1: ViewUserAllCouponReq req);
     UseUserCouponResp UseUserCoupon(1: UseUserCouponReq req);
 
     // SPU

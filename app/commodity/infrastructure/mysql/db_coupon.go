@@ -27,9 +27,8 @@ import (
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-func (db *commodityDB) CreateCoupon(ctx context.Context, coupon *model.Coupon) error {
+func (db *commodityDB) CreateCoupon(ctx context.Context, coupon *model.Coupon) (int64, error) {
 	dbModel := &Coupon{
-		Id:             coupon.Id,
 		Uid:            coupon.Uid,
 		Name:           coupon.Name,
 		TypeInfo:       coupon.TypeInfo,
@@ -43,9 +42,9 @@ func (db *commodityDB) CreateCoupon(ctx context.Context, coupon *model.Coupon) e
 		DeadlineForGet: coupon.DeadlineForGet,
 	}
 	if err := db.client.WithContext(ctx).Create(dbModel).Error; err != nil {
-		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create coupon: %v", err)
+		return -1, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create coupon: %v", err)
 	}
-	return nil
+	return dbModel.Id, nil
 }
 
 func (db *commodityDB) GetCouponById(ctx context.Context, id int64) (bool, *model.Coupon, error) {
@@ -168,13 +167,39 @@ func (db *commodityDB) GetUserCouponsByUId(ctx context.Context, uid int64, pageN
 	return result, nil
 }
 
+func (db *commodityDB) GetFullUserCouponsByUId(ctx context.Context, uid int64) ([]*model.UserCoupon, error) {
+	dbModel := make([]*UserCoupon, 0)
+	if err := db.client.WithContext(ctx).Where("uid = ?", uid).Find(&dbModel).Error; err != nil {
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to find user coupon: %v", err)
+	}
+	result := make([]*model.UserCoupon, 0)
+	for _, coupon := range dbModel {
+		result = append(result, &model.UserCoupon{
+			Uid:           coupon.Uid,
+			CouponId:      coupon.CouponId,
+			RemainingUses: coupon.RemainingUses,
+		})
+	}
+	return result, nil
+}
+
 func (db *commodityDB) DeleteUserCoupon(ctx context.Context, coupon *model.UserCoupon) error {
 	dbModel := &UserCoupon{
 		Uid:      coupon.Uid,
 		CouponId: coupon.CouponId,
 	}
-	if err := db.client.WithContext(ctx).Delete(dbModel).Error; err != nil {
-		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete user coupon: %v", err)
+	if err := db.client.WithContext(ctx).First(dbModel).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to find user coupon: %v", err)
+	}
+	dbModel.RemainingUses--
+	if dbModel.RemainingUses == 0 {
+		if err := db.client.WithContext(ctx).Delete(dbModel).Error; err != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete user coupon: %v", err)
+		}
+	} else {
+		if err := db.client.WithContext(ctx).Save(dbModel).Error; err != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to save user coupon: %v", err)
+		}
 	}
 	return nil
 }

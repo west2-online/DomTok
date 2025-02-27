@@ -25,15 +25,21 @@ import (
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-func (uc *useCase) CreateCoupon(ctx context.Context, coupon *model.Coupon) (err error) {
-	if err = uc.svc.Verify(uc.svc.VerifyCoupon(coupon)); err != nil {
-		return err
+func (uc *useCase) CreateCoupon(ctx context.Context, coupon *model.Coupon) (int64, error) {
+	if err := uc.svc.Verify(uc.svc.VerifyCoupon(coupon)); err != nil {
+		return -1, err
 	}
-	err = uc.db.CreateCoupon(ctx, coupon)
+	uid, err := contextLogin.GetLoginData(ctx)
 	if err != nil {
-		return fmt.Errorf("usecase.CreateCoupon error: %w", err)
+		return -1, fmt.Errorf("usecase.CreateCoupon get logindata error: %w", err)
 	}
-	return
+	// 稍微不太规范
+	coupon.Uid = uid
+	couponId, err := uc.db.CreateCoupon(ctx, coupon)
+	if err != nil {
+		return -1, fmt.Errorf("usecase.CreateCoupon error: %w", err)
+	}
+	return couponId, nil
 }
 
 func (uc *useCase) DeleteCoupon(ctx context.Context, coupon *model.Coupon) (err error) {
@@ -73,7 +79,7 @@ func (uc *useCase) GetCreatorCoupons(ctx context.Context, pageNum int64) (coupon
 	return
 }
 
-func (uc *useCase) UserGetCoupon(ctx context.Context, coupon *model.UserCoupon) (err error) {
+func (uc *useCase) CreateUserCoupon(ctx context.Context, coupon *model.UserCoupon) (err error) {
 	if err = uc.svc.Verify(uc.svc.VerifyRemainUses(coupon.RemainingUses)); err != nil {
 		return
 	}

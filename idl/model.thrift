@@ -37,21 +37,15 @@ struct Coupon {
     15: optional i64 deletedAt;
 }
 
+struct AssignedCouponSpuInfo{
+    1: required i64 spuId,
+    2: required Coupon coupon,
+    3: required double discount_price,
+}
+
 struct UserCoupon {
-    1: required i64 couponID;
-    2: required i64 creatorID;
-    3: required i64 userID;
-    4: required string name;
-    5: required i32 typeInfo;
-    6: required i64 conditionCost;
-    7: optional double discountAmount;
-    8: optional double discount;
-    9: required i64 rangeType;
-    10: required i64 rangeId;
-    11: required i64 expireAt;
-    12: required string description;
+    1: required Coupon coupon,
     13: required i64 remainUserUseCount;
-    14: required i64 createdAt;
 }
 
 struct AttrValue {
