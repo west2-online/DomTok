@@ -3,143 +3,322 @@ package usecase
 import (
 	ctx "context"
 	"errors"
-	"github.com/bytedance/mockey"
-	"github.com/smartystreets/goconvey/convey"
+	"github.com/west2-online/DomTok/app/payment/infrastructure/mysql"
+	"gorm.io/gorm"
 	"testing"
 
+	"github.com/bytedance/mockey"
+	"github.com/smartystreets/goconvey/convey"
+
+	"github.com/west2-online/DomTok/app/payment/domain/model"
 	"github.com/west2-online/DomTok/app/payment/domain/service"
-	"github.com/west2-online/DomTok/pkg/constants"
+	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 )
 
-func TestUseCase_GetPaymentToken(t *testing.T) {
+func TestPaymentUseCase_GetPaymentToken(t *testing.T) {
 	type TestCase struct {
-		Name                 string
-		MockGetUserIDError   error
-		MockUid              int64
-		MockToken            string
-		MockExpirationTime   int64
-		MockCheckPaymentErr  error
-		MockPaymentExist     bool
-		MockGenerateTokenErr error
-		MockStoreTokenErr    error
-		MockRedisStatus      bool
-		ExpectedError        error
-		ExpectedToken        string
+		Name                       string
+		MockGetUserIDError         error
+		MockUserID                 int64
+		MockCheckPaymentExistError error
+		MockPaymentExistStatus     bool
+		MockCreatePaymentInfoError error
+		MockPaymentInfo            *model.PaymentOrder
+		MockGetPaymentInfoError    error
+		MockGenTokenError          error
+		MockToken                  string
+		MockExpTime                int64
+		MockStoreTokenError        error
+		MockRedisStoreStatus       bool
+		ExpectedToken              string
+		ExpectedExpTime            int64
+		ExpectedError              error
 	}
 
 	testCases := []TestCase{
 		{
 			Name:               "GetUserIDError",
-			MockUid:            1,
 			MockGetUserIDError: errors.New("GetUserIDError"),
-			ExpectedError:      errors.New("get user id failed:GetUserIDError"),
 			ExpectedToken:      "",
+			ExpectedExpTime:    0,
+			ExpectedError:      errors.New("get user id failed:GetUserIDError"),
 		},
 		{
-			Name:                "PaymentExist",
-			MockCheckPaymentErr: nil,
-			MockPaymentExist:    constants.PaymentExist,
-			ExpectedError:       nil,
-			ExpectedToken:       "generatedToken",
+			Name:                       "CheckPaymentExistError",
+			MockGetUserIDError:         nil,
+			MockUserID:                 1,
+			MockCheckPaymentExistError: errors.New("CheckPaymentExistError"),
+			ExpectedToken:              "",
+			ExpectedExpTime:            0,
+			ExpectedError:              errors.New("check payment existed failed:CheckPaymentExistError"),
 		},
 		{
-			Name:                 "GenerateTokenError",
-			MockToken:            "generatedToken",
-			MockExpirationTime:   int64(3600),
-			MockGenerateTokenErr: errors.New("GenerateTokenError"),
-			ExpectedError:        errors.New("generate payment token failed:GenerateTokenError"),
-			ExpectedToken:        "",
+			Name:                       "CreatePaymentInfoError",
+			MockGetUserIDError:         nil,
+			MockUserID:                 1,
+			MockCheckPaymentExistError: nil,
+			MockPaymentExistStatus:     paymentStatus.PaymentNotExist,
+			MockCreatePaymentInfoError: errors.New("CreatePaymentInfoError"),
+			ExpectedToken:              "",
+			ExpectedExpTime:            0,
+			ExpectedError:              errors.New("create payment info failed:CreatePaymentInfoError"),
 		},
 		{
-			Name:              "StoreTokenError",
-			MockStoreTokenErr: errors.New("StoreTokenError"),
-			MockRedisStatus:   false,
-			ExpectedError:     errors.New("store payment token failed:StoreTokenError"),
+			Name:                       "GetPaymentInfoError",
+			MockGetUserIDError:         nil,
+			MockUserID:                 1,
+			MockCheckPaymentExistError: nil,
+			MockPaymentExistStatus:     paymentStatus.PaymentExist,
+			MockGetPaymentInfoError:    errors.New("GetPaymentInfoError"),
+			ExpectedToken:              "",
+			ExpectedExpTime:            0,
+			ExpectedError:              errors.New("get payment info failed:GetPaymentInfoError"),
+		},
+		{
+			Name:                       "PaymentAlreadyProcessing",
+			MockGetUserIDError:         nil,
+			MockUserID:                 1,
+			MockCheckPaymentExistError: nil,
+			MockPaymentExistStatus:     paymentStatus.PaymentExist,
+			MockGetPaymentInfoError:    nil,
+			MockPaymentInfo: &model.PaymentOrder{
+				Status: paymentStatus.PaymentStatusProcessingCode,
+			},
+			ExpectedToken:   "",
+			ExpectedExpTime: 0,
+			ExpectedError:   errors.New("payment is processing or has already done:%!w(<nil>)"),
+		},
+		{
+			Name:                       "GenerateTokenError",
+			MockGetUserIDError:         nil,
+			MockUserID:                 1,
+			MockCheckPaymentExistError: nil,
+			MockPaymentExistStatus:     paymentStatus.PaymentExist,
+			MockGetPaymentInfoError:    nil,
+			MockPaymentInfo: &model.PaymentOrder{
+				Status: paymentStatus.PaymentStatusFailedCode,
+			},
+			MockGenTokenError: errors.New("GenerateTokenError"),
 			ExpectedToken:     "",
+			ExpectedExpTime:   0,
+			ExpectedError:     errors.New("generate payment token failed:GenerateTokenError"),
 		},
 		{
-			Name:            "GeneratePaymentTokenSuccessfully",
-			MockRedisStatus: true,
-			ExpectedError:   nil,
-			ExpectedToken:   "generatedToken",
+			Name:                       "StoreTokenError",
+			MockGetUserIDError:         nil,
+			MockUserID:                 1,
+			MockCheckPaymentExistError: nil,
+			MockPaymentExistStatus:     paymentStatus.PaymentExist,
+			MockGetPaymentInfoError:    nil,
+			MockPaymentInfo: &model.PaymentOrder{
+				Status: paymentStatus.PaymentStatusFailedCode,
+			},
+			MockGenTokenError:    nil,
+			MockToken:            "test-token",
+			MockExpTime:          1000,
+			MockStoreTokenError:  errors.New("StoreTokenError"),
+			MockRedisStoreStatus: false,
+			ExpectedToken:        "",
+			ExpectedExpTime:      0,
+			ExpectedError:        errors.New("store payment token failed:StoreTokenError"),
+		},
+		{
+			Name:                       "SuccessfulGetPaymentToken",
+			MockGetUserIDError:         nil,
+			MockUserID:                 1,
+			MockCheckPaymentExistError: nil,
+			MockPaymentExistStatus:     paymentStatus.PaymentExist,
+			MockGetPaymentInfoError:    nil,
+			MockPaymentInfo: &model.PaymentOrder{
+				Status: paymentStatus.PaymentStatusFailedCode,
+			},
+			MockGenTokenError:    nil,
+			MockToken:            "test-token",
+			MockExpTime:          1000,
+			MockStoreTokenError:  nil,
+			MockRedisStoreStatus: paymentStatus.RedisStoreSuccess,
+			ExpectedToken:        "test-token",
+			ExpectedExpTime:      1000,
+			ExpectedError:        nil,
 		},
 	}
 
-	/*p:=&model.PaymentOrder{
-		OrderID:123,
-	}*/
-	orderID := int64(123)
-
 	defer mockey.UnPatchAll()
+	var orderID int64 = 1
 
 	for _, tc := range testCases {
 		mockey.PatchConvey(tc.Name, t, func() {
-			mockey.Mock((*service.PaymentService).GetUserID).Return(tc.MockUid, tc.MockGetUserIDError).Build()
-			mockey.Mock((*service.PaymentService).GeneratePaymentToken).Return(tc.MockToken, tc.MockExpirationTime, tc.MockGenerateTokenErr).Build()
-			mockey.Mock((*service.PaymentService).StorePaymentToken).Return(tc.MockRedisStatus, tc.MockStoreTokenErr).Build()
-			us := new(paymentUseCase)
-			paymentSvc := new(service.PaymentService)
-
-			token, _, err := us.GetPaymentToken(ctx.Background(), orderID)
-			if tc.ExpectedError == nil {
-				convey.So(err, convey.ShouldBeNil)
-				convey.So(token, convey.ShouldEqual, tc.ExpectedToken)
-			} else {
-				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			svc := new(service.PaymentService)
+			gormDB := new(gorm.DB)
+			db := mysql.NewPaymentDB(gormDB)
+			uc := &paymentUseCase{
+				svc: svc,
+				db:  db,
 			}
+
+			mockey.Mock((*service.PaymentService).GetUserID).Return(tc.MockUserID, tc.MockGetUserIDError).Build()
+			mockey.Mock(mockey.GetMethod(uc.db, "CheckPaymentExist")).Return(tc.MockPaymentExistStatus, tc.MockCheckPaymentExistError).Build()
+			mockey.Mock((*service.PaymentService).CreatePaymentInfo).Return(int64(1), tc.MockCreatePaymentInfoError).Build()
+			mockey.Mock(mockey.GetMethod(uc.db, "GetPaymentInfo")).Return(tc.MockPaymentInfo, tc.MockGetPaymentInfoError).Build()
+			mockey.Mock((*service.PaymentService).GeneratePaymentToken).Return(tc.MockToken, tc.MockExpTime, tc.MockGenTokenError).Build()
+			mockey.Mock((*service.PaymentService).StorePaymentToken).Return(tc.MockRedisStoreStatus, tc.MockStoreTokenError).Build()
+
+			token, expTime, err := uc.GetPaymentToken(ctx.Background(), orderID)
+			if err != nil && tc.ExpectedError != nil {
+				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			} else {
+				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+			}
+			convey.So(token, convey.ShouldEqual, tc.ExpectedToken)
+			convey.So(expTime, convey.ShouldEqual, tc.ExpectedExpTime)
 		})
 	}
 }
 
-/*func TestUseCase_CreateRefund(t *testing.T) {
+func TestPaymentUseCase_CreateRefund(t *testing.T) {
 	type TestCase struct {
-		Name                  string
-		MockGetUserIDError    error
-		MockRedisRateLimitErr error
-		MockCreateRefundErr   error
-		ExpectedError         error
-		ExpectedRefundID      int64
+		Name                      string
+		MockCheckOrderExistError  error
+		MockOrderExists           bool
+		MockGetUserIDError        error
+		MockUserID                int64
+		MockRateLimitError        error
+		MockFrequencyValid        bool
+		MockTimeValid             bool
+		MockCreateRefundInfoError error
+		MockRefundID              int64
+		ExpectedRefundStatus      int64
+		ExpectedRefundID          int64
+		ExpectedError             error
 	}
 
 	testCases := []TestCase{
 		{
-			Name:               "GetUserIDError",
-			MockGetUserIDError: errors.New("GetUserIDError"),
-			ExpectedError:      errors.New("get user id failed: GetUserIDError"),
-			ExpectedRefundID:   0,
+			Name:                     "CheckOrderExistError",
+			MockCheckOrderExistError: errors.New("CheckOrderExistError"),
+			// TODO 这个错误信息后面可能要改动，因为今晚跑太多次了
+			MockGetUserIDError: nil,
+			MockUserID:         1,
+			MockRateLimitError: nil,
+			// TODO这个可能要改
+			MockFrequencyValid:   false,
+			MockTimeValid:        true,
+			ExpectedRefundStatus: 0,
+			ExpectedRefundID:     0,
+			ExpectedError:        errors.New("too many refund requests in a short time"),
 		},
 		{
-			Name:                "CreateRefundError",
-			MockCreateRefundErr: errors.New("CreateRefundError"),
-			ExpectedError:       errors.New("create refund info failed: CreateRefundError"),
-			ExpectedRefundID:    0,
+			Name:                     "OrderNotExist",
+			MockCheckOrderExistError: nil,
+			MockOrderExists:          false,
+			// TODO 这个错误信息后面可能要改动，因为今晚跑太多次了
+			MockGetUserIDError:   nil,
+			MockUserID:           1,
+			MockRateLimitError:   nil,
+			MockFrequencyValid:   false,
+			MockTimeValid:        true,
+			ExpectedRefundStatus: 0,
+			ExpectedRefundID:     0,
+			ExpectedError:        errors.New("too many refund requests in a short time"),
 		},
 		{
-			Name:             "CreateRefundSuccessfully",
-			ExpectedError:    nil,
-			ExpectedRefundID: 1,
+			Name:                     "GetUserIDError",
+			MockCheckOrderExistError: nil,
+			MockOrderExists:          true,
+			MockGetUserIDError:       errors.New("GetUserIDError"),
+			ExpectedRefundStatus:     0,
+			ExpectedRefundID:         0,
+			ExpectedError:            errors.New("get user id failed: GetUserIDError"),
+		},
+		{
+			Name:                     "CheckRateLimitError",
+			MockCheckOrderExistError: nil,
+			MockOrderExists:          true,
+			MockGetUserIDError:       nil,
+			MockUserID:               1,
+			MockRateLimitError:       errors.New("RateLimitError"),
+			ExpectedRefundStatus:     0,
+			ExpectedRefundID:         0,
+			ExpectedError:            errors.New("check redis rate limiting failed: RateLimitError"),
+		},
+		{
+			Name:                     "FrequencyInvalid",
+			MockCheckOrderExistError: nil,
+			MockOrderExists:          true,
+			MockGetUserIDError:       nil,
+			MockUserID:               1,
+			MockRateLimitError:       nil,
+			MockFrequencyValid:       false,
+			ExpectedRefundStatus:     0,
+			ExpectedRefundID:         0,
+			ExpectedError:            errors.New("too many refund requests in a short time"),
+		},
+		{
+			Name:                     "TimeInvalid",
+			MockCheckOrderExistError: nil,
+			MockOrderExists:          true,
+			MockGetUserIDError:       nil,
+			MockUserID:               1,
+			MockRateLimitError:       nil,
+			MockFrequencyValid:       true,
+			MockTimeValid:            false,
+			ExpectedRefundStatus:     0,
+			ExpectedRefundID:         0,
+			ExpectedError:            errors.New("refund already requested for this order in the last 24 hours"),
+		},
+		{
+			Name:                      "CreateRefundInfoError",
+			MockCheckOrderExistError:  nil,
+			MockOrderExists:           true,
+			MockGetUserIDError:        nil,
+			MockUserID:                1,
+			MockRateLimitError:        nil,
+			MockFrequencyValid:        true,
+			MockTimeValid:             true,
+			MockCreateRefundInfoError: errors.New("CreateRefundInfoError"),
+			ExpectedRefundStatus:      0,
+			ExpectedRefundID:          0,
+			ExpectedError:             errors.New("create refund info failed: CreateRefundInfoError"),
+		},
+		{
+			Name:                      "SuccessfulCreateRefund",
+			MockCheckOrderExistError:  nil,
+			MockOrderExists:           true,
+			MockGetUserIDError:        nil,
+			MockUserID:                1,
+			MockRateLimitError:        nil,
+			MockFrequencyValid:        true,
+			MockTimeValid:             true,
+			MockCreateRefundInfoError: nil,
+			MockRefundID:              123,
+			ExpectedRefundStatus:      paymentStatus.RefundStatusProcessingCode,
+			ExpectedRefundID:          123,
+			ExpectedError:             nil,
 		},
 	}
 
 	defer mockey.UnPatchAll()
+	var orderID int64 = 1
 
 	for _, tc := range testCases {
 		mockey.PatchConvey(tc.Name, t, func() {
-			paymentSvc := new(service.PaymentService)
-			us := &paymentUseCase{
-				svc: paymentSvc,
+			svc := new(service.PaymentService)
+			uc := &paymentUseCase{
+				svc: svc,
 			}
+			mockey.Mock((*service.PaymentService).CheckOrderExist).Return(tc.MockOrderExists, tc.MockCheckOrderExistError).Build()
+			mockey.Mock((*service.PaymentService).GetUserID).Return(tc.MockUserID, tc.MockGetUserIDError).Build()
+			mockey.Mock((*service.PaymentService).CheckRedisRateLimiting).Return(tc.MockFrequencyValid, tc.MockTimeValid, tc.MockRateLimitError).Build()
+			mockey.Mock((*service.PaymentService).CreateRefundInfo).Return(tc.MockRefundID, tc.MockCreateRefundInfoError).Build()
 
-			mockey.Mock((*service.PaymentService).GetUserID).Return(int64(1), tc.MockGetUserIDError).Build()
-			mockey.Mock((*service.PaymentService).CreateRefundInfo).Return(tc.ExpectedRefundID, tc.MockCreateRefundErr).Build()
-
-			_, refundID, err := us.CreateRefund(ctx.Background(), 1)
-			if tc.ExpectedError == nil {
-				convey.So(err, convey.ShouldBeNil)
-				convey.So(refundID, convey.ShouldEqual, tc.ExpectedRefundID)
-			} else {
+			status, refundID, err := uc.CreateRefund(ctx.Background(), orderID)
+			if err != nil && tc.ExpectedError != nil {
 				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			} else {
+				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
 			}
+			convey.So(status, convey.ShouldEqual, tc.ExpectedRefundStatus)
+			convey.So(refundID, convey.ShouldEqual, tc.ExpectedRefundID)
 		})
 	}
-}*/
+}
