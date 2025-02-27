@@ -372,8 +372,8 @@ func (c CommodityHandler) ViewSkuImage(ctx context.Context, req *commodity.ViewS
 	return
 }
 
-func (c CommodityHandler) ViewSku(ctx context.Context, req *commodity.ViewSkuReq) (r *commodity.ViewSkuResp, err error) {
-	r = new(commodity.ViewSkuResp)
+func (c CommodityHandler) ViewSku(ctx context.Context, req *commodity.ViewSkuReq) (*commodity.ViewSkuResp, error) {
+	r := new(commodity.ViewSkuResp)
 
 	var (
 		isSpuId bool
@@ -389,21 +389,21 @@ func (c CommodityHandler) ViewSku(ctx context.Context, req *commodity.ViewSkuReq
 		isSpuId = true
 	}
 	if req.SkuID == nil && req.SpuID == nil {
-		err = fmt.Errorf("ViewSku failed: skuID and spuID are both nil")
+		err := fmt.Errorf("ViewSku failed: skuID and spuID are both nil")
 		r.Base = base.BuildBaseResp(err)
-		return
+		return r, err
 	}
 
 	Skus, total, err := c.useCase.ViewSku(ctx, &sku, req.PageNum, req.PageSize, isSpuId)
 	if err != nil {
 		r.Base = base.BuildBaseResp(err)
-		return
+		return r, err
 	}
 
 	r.Base = base.BuildBaseResp(nil)
 	r.Skus = pack.BuildSkus(Skus)
 	r.Total = total
-	return
+	return r, nil
 }
 
 func (c CommodityHandler) UploadSkuAttr(ctx context.Context, req *commodity.UploadSkuAttrReq) (r *commodity.UploadSkuAttrResp, err error) {
