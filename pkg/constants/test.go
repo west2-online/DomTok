@@ -19,4 +19,6 @@ package constants
 const (
 	EnvironmentStartEnv  = "DOMTOK_ENVIRONMENT_STARTED"
 	EnvironmentStartFlag = "true"
+
+	EtcdEnv = "ETCD_ADDR"
 )

@@ -32,10 +32,10 @@ func buildTestModelOrder(t *testing.T) *model.Order {
 		Id:                    rand.Int64(),
 		Status:                1,
 		Uid:                   1,
-		TotalAmountOfGoods:    decimal.NewFromFloat(100),
-		TotalAmountOfFreight:  decimal.NewFromFloat(10),
-		TotalAmountOfDiscount: decimal.NewFromFloat(10),
-		PaymentAmount:         decimal.NewFromFloat(100),
+		TotalAmountOfGoods:    decimal.NewFromFloat(100), //nolint
+		TotalAmountOfFreight:  decimal.NewFromFloat(10),  //nolint
+		TotalAmountOfDiscount: decimal.NewFromFloat(10),  //nolint
+		PaymentAmount:         decimal.NewFromFloat(100), //nolint
 		PaymentStatus:         -1,
 		PaymentAt:             0,
 		PaymentStyle:          "支付宝",
@@ -59,15 +59,15 @@ func buildTestModelOrderGoods(t *testing.T, id int64) []*model.OrderGoods {
 		StyleID:            1,
 		StyleName:          "fake style",
 		StyleHeadDrawing:   "fake drawing",
-		OriginPrice:        decimal.NewFromFloat(100),
-		SalePrice:          decimal.NewFromFloat(100),
-		SingleFreightPrice: decimal.NewFromFloat(10),
+		OriginPrice:        decimal.NewFromFloat(100), //nolint
+		SalePrice:          decimal.NewFromFloat(100), //nolint
+		SingleFreightPrice: decimal.NewFromFloat(10),  //nolint
 		PurchaseQuantity:   1,
-		TotalAmount:        decimal.NewFromFloat(110),
-		FreightAmount:      decimal.NewFromFloat(10),
+		TotalAmount:        decimal.NewFromFloat(110), //nolint
+		FreightAmount:      decimal.NewFromFloat(10),  //nolint
 		DiscountAmount:     decimal.NewFromFloat(0),
-		PaymentAmount:      decimal.NewFromFloat(110),
-		SinglePrice:        decimal.NewFromFloat(110),
+		PaymentAmount:      decimal.NewFromFloat(110), //nolint
+		SinglePrice:        decimal.NewFromFloat(110), //nolint
 		CouponId:           0,
 		CouponName:         "",
 	})

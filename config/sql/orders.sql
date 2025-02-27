@@ -1,7 +1,7 @@
 -- 订单服务
 
 -- 订单表
-CREATE TABLE `order` (
+CREATE TABLE `orders` (
                           `id` BIGINT UNSIGNED NOT NULL PRIMARY KEY COMMENT '订单ID',
                           `status` TINYINT NOT NULL COMMENT '订单状态',
                           `user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
@@ -13,7 +13,7 @@ CREATE TABLE `order` (
                           `payment_at` BIGINT DEFAULT 0 COMMENT '支付时间(毫秒级时间戳)',
                           `payment_style` VARCHAR(32) NOT NULL COMMENT '支付类型',
                           `ordered_at` BIGINT UNSIGNED NOT NULL COMMENT '下单时间(毫秒级时间戳)',
-                          `deleted_at` BIGINT UNSIGNED DEFAULT NULL COMMENT '订单删除时间(毫秒级时间戳)',
+                          `deleted_at` TIMESTAMP DEFAULT NULL COMMENT '订单删除时间',
                           `delivery_at` BIGINT UNSIGNED DEFAULT NULL COMMENT '发货时间(毫秒级时间戳)',
                           `address_id` BIGINT UNSIGNED NOT NULL COMMENT '地址信息ID',
                           `address_info` VARCHAR(255) NOT NULL COMMENT '简略地址信息',

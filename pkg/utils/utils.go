@@ -198,5 +198,6 @@ func DecimalFloat64(d *decimal.Decimal) float64 {
 }
 
 func EnvironmentEnable() bool {
-	return os.Getenv(constants.EnvironmentStartEnv) == constants.EnvironmentStartFlag
+	return os.Getenv(constants.EnvironmentStartEnv) == constants.EnvironmentStartFlag &&
+		os.Getenv(constants.EtcdEnv) != ""
 }

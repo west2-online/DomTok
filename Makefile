@@ -34,8 +34,10 @@ ES_ANALYSIS = domtok-elasticsearch
 SERVICES := gateway user commodity order cart payment assistant
 service = $(word 1, $@)
 
-EnvironmentStartEnv = DOMTOK_ENVIRONMENT_STARTED
-EnvironmentStartFlag = true
+EnvironmentStartEnv=DOMTOK_ENVIRONMENT_STARTED
+EnvironmentStartFlag=true
+EtcdAddrEnv=ETCD_ADDR
+EtcdAddr=127.0.0.1:2379
 
 .PHONY: help
 help:
@@ -228,4 +230,10 @@ with-env-test:
 with-env-test-nowait:
 	@ make env-up ;\
     	export $(EnvironmentStartEnv)=$(EnvironmentStartFlag) ;\
+    	export $(EtcdAddrEnv)=$(EtcdAddr) ;\
     	make test
+
+
+# 手动暴露环境变量
+#export DOMTOK_ENVIRONMENT_STARTED=true
+#export ETCD_ADDR=127.0.0.1:2379
