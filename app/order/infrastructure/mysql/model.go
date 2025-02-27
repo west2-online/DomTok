@@ -27,7 +27,7 @@ import (
 type Order struct {
 	Id                    int64
 	Status                int8
-	Uid                   int64
+	UserId                int64
 	TotalAmountOfGoods    decimal.Decimal `gorm:"type:decimal(15,4)"`
 	TotalAmountOfFreight  decimal.Decimal `gorm:"type:decimal(15,4)"`
 	TotalAmountOfDiscount decimal.Decimal `gorm:"type:decimal(15,4)"`
@@ -78,7 +78,7 @@ func (db *orderDB) order2Model(order *Order) *model.Order {
 	return &model.Order{
 		Id:                    order.Id,
 		Status:                order.Status,
-		Uid:                   order.Uid,
+		Uid:                   order.UserId,
 		TotalAmountOfGoods:    order.TotalAmountOfGoods,
 		TotalAmountOfFreight:  order.TotalAmountOfFreight,
 		TotalAmountOfDiscount: order.TotalAmountOfDiscount,
@@ -124,7 +124,7 @@ func (db *orderDB) model2Order(order *model.Order) *Order {
 	return &Order{
 		Id:                    order.Id,
 		Status:                order.Status,
-		Uid:                   order.Uid,
+		UserId:                order.Uid,
 		TotalAmountOfGoods:    order.TotalAmountOfGoods,
 		TotalAmountOfFreight:  order.TotalAmountOfFreight,
 		TotalAmountOfDiscount: order.TotalAmountOfDiscount,
