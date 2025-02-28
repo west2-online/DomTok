@@ -101,11 +101,15 @@ func (c *commodityCache) DecrLockStockNum(ctx context.Context, infos []*model.Sk
 func (c *commodityCache) DecrStockNum(ctx context.Context, infos []*model.SkuBuyInfo) error {
 	stockKeys := make([]string, 0)
 	lockStockKeys := make([]string, 0)
+	combineKeys := make([]string, 0)
 	for _, info := range infos {
 		stockKeys = append(stockKeys, c.GetStockKey(info.SkuID))
 		lockStockKeys = append(lockStockKeys, c.GetLockStockKey(info.SkuID))
+
+		combineKeys = append(combineKeys, c.GetStockKey(info.SkuID))
+		combineKeys = append(combineKeys, c.GetLockStockKey(info.SkuID))
 	}
-	combinedKeys := append(stockKeys, lockStockKeys...)
+
 	err := c.client.Watch(ctx, func(tx *redis.Tx) error {
 		for i := 0; i < len(infos); i++ {
 			val, err := tx.Get(ctx, stockKeys[i]).Int64()
@@ -147,7 +151,7 @@ func (c *commodityCache) DecrStockNum(ctx context.Context, infos []*model.SkuBuy
 			}
 		}
 		return nil
-	}, combinedKeys...)
+	}, combineKeys...)
 	if err != nil {
 		return err
 	}
