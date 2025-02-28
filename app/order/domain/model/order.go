@@ -71,7 +71,7 @@ type BaseOrderGoods struct {
 
 type PaymentResult struct {
 	OrderID       int64  // 订单 id
-	PaymentStatus int    // 状态
+	PaymentStatus int8   // 状态
 	PaymentAt     int64  // 支付时间, 毫秒级时间戳
 	PaymentStyle  string // 支付类型
 }

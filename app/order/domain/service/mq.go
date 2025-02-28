@@ -19,6 +19,7 @@ package service
 import (
 	"context"
 
+	"github.com/west2-online/DomTok/app/order/domain/model"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
 )
@@ -31,31 +32,41 @@ func (svc *OrderService) SkuLockStockRollback(ctx context.Context, body []byte) 
 		return true
 	}
 
-	paymentStatus, exist, err := svc.cache.GetPaymentStatus(ctx, orderStock.OrderID)
-	if err != nil {
+	var payRel model.CachePaymentStatus
+	if payRel.PaymentStatus, payRel.OrderExpire, err = svc.GetPaymentStatusAndOrderExpire(ctx, orderStock.OrderID); err != nil {
 		logger.Errorf(err.Error())
+		return false
 	}
 
-	if !exist {
-		var orderedAt int64
-		paymentStatus.PaymentStatus, orderedAt, err = svc.db.GetOrderStatus(ctx, orderStock.OrderID)
-		if err != nil {
-			logger.Errorf(err.Error())
-			return true
-		}
-		paymentStatus.OrderExpire = svc.GetOrderExpireTime(orderedAt)
-	}
-
-	if paymentStatus.PaymentStatus == constants.PaymentStatusPendingCode {
+	if payRel.PaymentStatus == constants.PaymentStatusPendingCode {
 		if err = svc.rpc.IncrSkuLockStock(ctx, orderStock); err != nil {
 			logger.Errorf(err.Error())
-
-			if e := svc.cache.SetPaymentStatus(ctx, paymentStatus); e != nil {
-				logger.Errorf(e.Error())
-			}
 			return false
 		}
 	}
 
 	return true
+}
+
+func (svc *OrderService) GetPaymentStatusAndOrderExpire(ctx context.Context, orderID int64) (status int8, expired int64, err error) {
+	paymentStatus, exist, err := svc.cache.GetPaymentStatus(ctx, orderID)
+	if err != nil {
+		logger.Errorf(err.Error())
+	}
+
+	// 获取 Status
+	if !exist {
+		var orderedAt int64
+		paymentStatus.PaymentStatus, orderedAt, err = svc.db.GetOrderStatus(ctx, orderID)
+		if err != nil {
+			return 0, 0, err
+		}
+		paymentStatus.OrderExpire = svc.calcOrderExpireTime(orderedAt)
+
+		if e := svc.cache.SetPaymentStatus(ctx, paymentStatus); e != nil {
+			logger.Errorf(e.Error())
+		}
+	}
+
+	return paymentStatus.PaymentStatus, paymentStatus.OrderExpire, nil
 }

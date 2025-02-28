@@ -144,7 +144,11 @@ func (mq *rocketMq) getProducer(topic string) (rocketmq.Producer, error) {
 // - rocketmq.PushConsumer: 消费者实例
 // - error: 若启动消费者失败，返回自定义错误
 func (mq *rocketMq) getConsumer(topic string, pullMsgInterval time.Duration) (rocketmq.PushConsumer, error) {
-	con := client.GetRocketmqPushConsumer(fmt.Sprintf(constants.OrderMqConsumerGroupFormat, topic), consumer.WithPullInterval(pullMsgInterval))
+	con := client.GetRocketmqPushConsumer(fmt.Sprintf(constants.OrderMqConsumerGroupFormat, topic),
+		consumer.WithPullInterval(pullMsgInterval),
+		consumer.WithConsumeMessageBatchMaxSize(1),
+		consumer.WithPullThresholdForTopic(1),
+	)
 	if err := con.Start(); err != nil {
 		return nil, errno.NewErrNo(errno.InternalRocketmqErrorCode, fmt.Sprintf("start rocketmq consumer failed, err: %v", err))
 	}

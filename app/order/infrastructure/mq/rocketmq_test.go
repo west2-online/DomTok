@@ -17,21 +17,48 @@ limitations under the License.
 package mq
 
 import (
+	"context"
 	"testing"
 
+	"github.com/apache/rocketmq-client-go/v2/rlog"
+	. "github.com/smartystreets/goconvey/convey"
+
+	"github.com/west2-online/DomTok/app/order/domain/model"
+	"github.com/west2-online/DomTok/app/order/domain/repository"
 	"github.com/west2-online/DomTok/config"
+	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
-func initConfig() {
+func initTest(t *testing.T) repository.MQ {
+	t.Helper()
 	config.Init("test")
+	logger.Ignore()
+	rlog.SetLogLevel("fatal")
+	return NewRocketmq()
 }
 
-// TODO
-func TestRocketMqSendAndConsume(t *testing.T) {
+var (
+	testTopic   = "test111"
+	testMsgBody = "test"
+)
+
+func TestOrder_RocketMqSendAndConsume(t *testing.T) {
 	if !utils.EnvironmentEnable() {
 		return
-	} else {
-		initConfig()
 	}
+	initTest(t)
+	mq := NewRocketmq()
+	ctx := context.Background()
+	Convey("Test rocketmq send and consume message", t, func() {
+		wait := make(chan struct{})
+		err := mq.SubscribeTopic(ctx, testTopic, 0, func(ctx context.Context, body []byte) bool {
+			close(wait)
+			return true
+		})
+		So(err, ShouldBeNil)
+		err = mq.SendSyncMsg(ctx, testTopic, &model.MqMessage{Body: []byte(testMsgBody)})
+		So(err, ShouldBeNil)
+		<-wait
+	})
 }

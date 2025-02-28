@@ -73,7 +73,7 @@ func (uc *useCase) ViewOrder(ctx context.Context, orderID int64) (*model.Order, 
 		return nil, nil, err
 	}
 
-	order, orderGoods, err := uc.db.GetOrderWithGoods(ctx, orderID)
+	order, orderGoods, err := uc.db.GetOrderAndGoods(ctx, orderID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -84,7 +84,7 @@ func (uc *useCase) ViewOrder(ctx context.Context, orderID int64) (*model.Order, 
 // CancelOrder 取消订单
 func (uc *useCase) CancelOrder(ctx context.Context, orderID int64) error {
 	// 1. 检查订单是否存在
-	exist, err := uc.db.IsOrderExist(ctx, orderID)
+	exist, _, err := uc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -110,7 +110,7 @@ func (uc *useCase) CancelOrder(ctx context.Context, orderID int64) error {
 // ChangeDeliverAddress 更改配送地址
 func (uc *useCase) ChangeDeliverAddress(ctx context.Context, orderID, addressID int64, addressInfo string) error {
 	// 1. 检查订单是否存在
-	exist, err := uc.db.IsOrderExist(ctx, orderID)
+	exist, _, err := uc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -136,7 +136,7 @@ func (uc *useCase) ChangeDeliverAddress(ctx context.Context, orderID, addressID 
 // DeleteOrder 删除订单
 func (uc *useCase) DeleteOrder(ctx context.Context, orderID int64) error {
 	// 1. 检查订单是否存在
-	exist, err := uc.db.IsOrderExist(ctx, orderID)
+	exist, _, err := uc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -148,6 +148,40 @@ func (uc *useCase) DeleteOrder(ctx context.Context, orderID int64) error {
 	return uc.db.DeleteOrder(ctx, orderID)
 }
 
-func (uc *useCase) IsOrderExist(ctx context.Context, orderID int64) (bool, error) {
+func (uc *useCase) IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error) {
 	return uc.db.IsOrderExist(ctx, orderID)
+}
+
+func (uc *useCase) OrderPaymentSuccess(ctx context.Context, req *model.PaymentResult) error {
+	// 这里不进行 orderID 是否存在的检查，因为这个方法是由 payment 服务调用的，payment 在调用之前已经检查了 orderID 的存在
+	status, expired, err := uc.svc.GetPaymentStatusAndOrderExpire(ctx, req.OrderID)
+	if err != nil {
+		return err
+	}
+
+	if uc.svc.IsEqualStatus(status, req.PaymentStatus) {
+		return nil
+	}
+
+	if err = uc.svc.UpdateOrderAsSuccess(ctx, expired, req); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (uc *useCase) OrderPaymentCancel(ctx context.Context, req *model.PaymentResult) error {
+	// 这里不进行 orderID 是否存在的检查，因为这个方法是由 payment 服务调用的，payment 在调用之前已经检查了 orderID 的存在
+	status, _, err := uc.svc.GetPaymentStatusAndOrderExpire(ctx, req.OrderID)
+	if err != nil {
+		return err
+	}
+
+	if uc.svc.IsEqualStatus(status, req.PaymentStatus) {
+		return nil
+	}
+
+	if err = uc.svc.CancelOrder(ctx, req); err != nil {
+		return err
+	}
+	return nil
 }

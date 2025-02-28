@@ -36,6 +36,8 @@ const (
 	RedisDBOrder     = 0
 	RedisDBCommodity = 1
 	RedisDBCart      = 2
+
+	RedSyncDBId = 0
 )
 
 // Redis Connection Pool Configuration
@@ -51,6 +53,7 @@ const (
 	OrderCachePaymentStatusFormat     = "payment-status-%d"
 	OrderPaymentStatusExpireTime      = 12 * time.Minute // 大于 SkuStockRollbackTopicDelayTimeLevel 即可
 	OrderCacheLuaKeyExistFlag         = 1
+	OrderLockFormat                   = "lock-order-%d"
 	OrderUpdatePaymentStatusLuaScript = `
         local exK = KEYS[1]
         local sK = KEYS[2]

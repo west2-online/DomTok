@@ -39,14 +39,17 @@ func NewOrderDB(client *gorm.DB) repository.OrderDB {
 }
 
 // IsOrderExist 检查订单是否存在
-func (db *orderDB) IsOrderExist(ctx context.Context, orderID int64) (bool, error) {
-	var count int64
+func (db *orderDB) IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error) {
+	var t int64
 	if err := db.client.WithContext(ctx).Model(&Order{}).
-		Where("id = ?", orderID).
-		Count(&count).Error; err != nil {
-		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to check order exist: %v", err)
+		Select("ordered_at").Where("id = ?", orderID).Find(&t).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, t, nil
+		}
+		return false, t, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to check order exist: %v", err)
 	}
-	return count > 0, nil
+
+	return true, t, nil
 }
 
 // CreateOrder 创建订单
@@ -170,7 +173,7 @@ func (db *orderDB) DeleteOrder(ctx context.Context, orderID int64) error {
 	return nil
 }
 
-func (db *orderDB) GetOrderWithGoods(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error) {
+func (db *orderDB) GetOrderAndGoods(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error) {
 	var order Order
 	var goods []OrderGoods
 
@@ -217,6 +220,7 @@ func (db *orderDB) IsOrderPaid(ctx context.Context, orderID int64) (bool, error)
 func (db *orderDB) UpdatePaymentStatus(ctx context.Context, message *model.PaymentResult) error {
 	if err := db.client.WithContext(ctx).Model(&Order{Id: message.OrderID}).
 		Updates(map[string]interface{}{
+			"status":         message.PaymentStatus,
 			"payment_status": message.PaymentStatus,
 			"payment_at":     message.PaymentAt,
 			"payment_style":  message.PaymentStyle,

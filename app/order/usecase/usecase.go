@@ -33,7 +33,10 @@ type OrderUseCase interface {
 	CancelOrder(ctx context.Context, orderID int64) error
 	ChangeDeliverAddress(ctx context.Context, orderID, addressID int64, addressInfo string) error
 	DeleteOrder(ctx context.Context, orderID int64) error
-	IsOrderExist(ctx context.Context, orderID int64) (bool, error)
+
+	IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error)
+	OrderPaymentSuccess(ctx context.Context, req *model.PaymentResult) error
+	OrderPaymentCancel(ctx context.Context, req *model.PaymentResult) error
 }
 
 // useCase 实现了 OrderUseCase 接口

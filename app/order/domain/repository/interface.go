@@ -31,7 +31,7 @@ type OrderDB interface {
 	GetOrderByID(ctx context.Context, orderID int64) (*model.Order, error)
 	GetOrderGoodsByOrderID(ctx context.Context, orderID int64) ([]*model.OrderGoods, error)
 	GetOrdersByUserID(ctx context.Context, userID int64, page, size int32) ([]*model.Order, int32, error)
-	GetOrderWithGoods(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error)
+	GetOrderAndGoods(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error)
 	GetOrderStatus(ctx context.Context, id int64) (int8, int64, error) // GetOrderStatus Return paymentStatus orderedAt error
 
 	UpdateOrderStatus(ctx context.Context, orderID int64, status int32) error
@@ -40,7 +40,7 @@ type OrderDB interface {
 
 	DeleteOrder(ctx context.Context, orderID int64) error
 
-	IsOrderExist(ctx context.Context, orderID int64) (bool, error)
+	IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error)
 	IsOrderPaid(ctx context.Context, orderID int64) (bool, error)
 }
 
@@ -63,4 +63,13 @@ type Cache interface {
 	GetPaymentStatus(ctx context.Context, orderID int64) (*model.CachePaymentStatus, bool, error)
 	// UpdatePaymentStatus 使用 lua 脚本保证了过程的原子性
 	UpdatePaymentStatus(ctx context.Context, s *model.CachePaymentStatus) (exist bool, err error)
+}
+
+type Locker interface {
+	LockOrder(orderID int64) error
+	UnlockOrder(orderID int64) error
+}
+
+type IDGenerator interface {
+	NextVal() (int64, error)
 }

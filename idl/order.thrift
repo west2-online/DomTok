@@ -67,13 +67,18 @@ struct IsOrderExistReq {
 struct IsOrderExistResp {
     1: required model.BaseResp base
     2: required bool exist
+    3: required i64 orderExpire
 }
 
 struct UpdateOrderStatusReq {
     1: required i64 orderID // 订单号
-    2: required i32 status // 订单状态
+    2: required i8 payment_status // 订单状态
     3: required i64 paymentAt // 支付时间
     4: required string paymentStyle // 支付方式
+}
+
+struct UpdateOrderStatusResp {
+    1: required model.BaseResp base
 }
 
 service OrderService {
@@ -85,5 +90,6 @@ service OrderService {
     DeleteOrderResp DeleteOrder(1:DeleteOrderReq req) (api.delete="/api/order/delete")
     IsOrderExistResp IsOrderExist(1:IsOrderExistReq req) (api.get="/api/order/exist")
 
-    UpdateOrderStatusResp UpdateOrderStatus(1:UpdateOrderStatusReq req) (api.put="/api/order/update-status")
+    UpdateOrderStatusResp OrderPaymentSuccess(1:UpdateOrderStatusReq req)
+    UpdateOrderStatusResp OrderPaymentCancel(1:UpdateOrderStatusReq req)
 }

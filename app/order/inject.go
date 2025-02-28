@@ -19,6 +19,7 @@ package order
 import (
 	"github.com/west2-online/DomTok/app/order/controllers/rpc"
 	"github.com/west2-online/DomTok/app/order/domain/service"
+	"github.com/west2-online/DomTok/app/order/infrastructure/locker"
 	"github.com/west2-online/DomTok/app/order/infrastructure/mq"
 	"github.com/west2-online/DomTok/app/order/infrastructure/mysql"
 	"github.com/west2-online/DomTok/app/order/infrastructure/redis"
@@ -58,7 +59,6 @@ func InjectOrderHandler() order.OrderService {
 	if err != nil {
 		logger.Fatalf("Failed to init commodity rpc client: %v", err)
 	}
-
 	rpcIns := rpcimpl.NewOrderRpcImpl(*uClient, *cClient)
 
 	// 5. 初始化 mq
@@ -71,9 +71,12 @@ func InjectOrderHandler() order.OrderService {
 	}
 	cacheIns := redis.NewOrderCache(redisClient)
 
-	svc := service.NewOrderService(db, sf, rpcIns, mqIns, cacheIns)
+	// 7.获取 locker
+	lock := locker.NewLocker(client.InitRedSync(redisClient))
+
+	// 8. 初始化 service 和 usecase
+	svc := service.NewOrderService(db, sf, rpcIns, mqIns, cacheIns, lock)
 	uc := usecase.NewOrderCase(db, svc, rpcIns)
 
-	// 4. 返回 handler
 	return rpc.NewOrderHandler(uc)
 }

@@ -14,38 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package model
 
-// 业务强相关, 范围是 1000-9999
-// User
-const (
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
-	ErrRecordNotFound
-)
+import "github.com/samber/lo"
 
-// order
-const (
-	ServiceOrderNotFound = 2000 + iota
-	UnknownOrderStatus
-	OrderShouldNotBeChange
-	ServiceOrderExpired
-	ServiceOrderStatusInvalid
-)
+func ConvertOrderGoodsToStock(goods *OrderGoods, index int) *Stock {
+	return &Stock{
+		SkuID: goods.StyleID,
+		Count: goods.PurchaseQuantity,
+	}
+}
 
-// commodity
-const (
-	ServiceSpuNotExist = 3000 + iota
-	ServiceImgNotExist
-	ServiceSkuExist
-
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
-)
-
-const (
-	PaymentOrderNotExist = 4000 + iota
-)
+func ConvertOrderGoodsToOrderStock(orderID int64, goods []*OrderGoods) *OrderStock {
+	return &OrderStock{
+		OrderID: orderID,
+		Stocks:  lo.Map(goods, ConvertOrderGoodsToStock),
+	}
+}

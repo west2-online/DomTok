@@ -100,6 +100,28 @@ func (h *OrderHandler) DeleteOrder(ctx context.Context, req *order.DeleteOrderRe
 
 func (h *OrderHandler) IsOrderExist(ctx context.Context, req *order.IsOrderExistReq) (resp *order.IsOrderExistResp, err error) {
 	resp = new(order.IsOrderExistResp)
-	resp.Exist, err = h.useCase.IsOrderExist(ctx, req.GetOrderID())
+	resp.Exist, resp.OrderExpire, err = h.useCase.IsOrderExist(ctx, req.GetOrderID())
 	return resp, err
+}
+
+func (h *OrderHandler) OrderPaymentSuccess(ctx context.Context, req *order.UpdateOrderStatusReq) (r *order.UpdateOrderStatusResp, err error) {
+	r = new(order.UpdateOrderStatusResp)
+	rel := &model.PaymentResult{
+		OrderID:       req.GetOrderID(),
+		PaymentStatus: req.GetPaymentStatus(),
+		PaymentAt:     req.GetPaymentAt(),
+		PaymentStyle:  req.GetPaymentStyle(),
+	}
+	return r, h.useCase.OrderPaymentSuccess(ctx, rel)
+}
+
+func (h *OrderHandler) OrderPaymentCancel(ctx context.Context, req *order.UpdateOrderStatusReq) (r *order.UpdateOrderStatusResp, err error) {
+	r = new(order.UpdateOrderStatusResp)
+	rel := &model.PaymentResult{
+		OrderID:       req.GetOrderID(),
+		PaymentStatus: req.GetPaymentStatus(),
+		PaymentAt:     req.GetPaymentAt(),
+		PaymentStyle:  req.GetPaymentStyle(),
+	}
+	return r, h.useCase.OrderPaymentCancel(ctx, rel)
 }

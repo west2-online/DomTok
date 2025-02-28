@@ -33,6 +33,22 @@ import (
 	"github.com/west2-online/DomTok/pkg/logger"
 )
 
+func (svc *OrderService) CreateOrder(ctx context.Context, order *model.Order, goods []*model.OrderGoods) error {
+	if err := svc.db.CreateOrder(ctx, order, goods); err != nil {
+		return err
+	}
+
+	if err := svc.cache.SetPaymentStatus(ctx, &model.CachePaymentStatus{
+		OrderID:       order.Id,
+		OrderExpire:   svc.calcOrderExpireTime(order.OrderedAt),
+		PaymentStatus: order.PaymentStatus,
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (svc *OrderService) MakeOrderByGoods(ctx context.Context, addressID int64, addressInfo string, goods []*model.OrderGoods) (*model.Order, error) {
 	userID, err := basecontext.GetLoginData(ctx)
 	if err != nil {
@@ -86,22 +102,6 @@ func (svc *OrderService) CalculateTheAmount(goods []*model.OrderGoods, order *mo
 	// 全局活动, 应该调用 coupon 接口实现
 	order.CouponId = 0
 	order.CouponName = ""
-	return nil
-}
-
-func (svc *OrderService) CreateOrder(ctx context.Context, order *model.Order, goods []*model.OrderGoods) error {
-	if err := svc.db.CreateOrder(ctx, order, goods); err != nil {
-		return err
-	}
-
-	if err := svc.cache.SetPaymentStatus(ctx, &model.CachePaymentStatus{
-		OrderID:       order.Id,
-		OrderExpire:   svc.GetOrderExpireTime(order.OrderedAt),
-		PaymentStatus: order.PaymentStatus,
-	}); err != nil {
-		return err
-	}
-
 	return nil
 }
 

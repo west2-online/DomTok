@@ -891,8 +891,9 @@ var fieldIDToName_IsOrderExistReq = map[int16]string{
 }
 
 type IsOrderExistResp struct {
-	Base  *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
-	Exist bool            `thrift:"exist,2,required" frugal:"2,required,bool" json:"exist"`
+	Base        *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+	Exist       bool            `thrift:"exist,2,required" frugal:"2,required,bool" json:"exist"`
+	OrderExpire int64           `thrift:"orderExpire,3,required" frugal:"3,required,i64" json:"orderExpire"`
 }
 
 func NewIsOrderExistResp() *IsOrderExistResp {
@@ -914,11 +915,18 @@ func (p *IsOrderExistResp) GetBase() (v *model.BaseResp) {
 func (p *IsOrderExistResp) GetExist() (v bool) {
 	return p.Exist
 }
+
+func (p *IsOrderExistResp) GetOrderExpire() (v int64) {
+	return p.OrderExpire
+}
 func (p *IsOrderExistResp) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
 func (p *IsOrderExistResp) SetExist(val bool) {
 	p.Exist = val
+}
+func (p *IsOrderExistResp) SetOrderExpire(val int64) {
+	p.OrderExpire = val
 }
 
 func (p *IsOrderExistResp) IsSetBase() bool {
@@ -944,6 +952,9 @@ func (p *IsOrderExistResp) DeepEqual(ano *IsOrderExistResp) bool {
 	if !p.Field2DeepEqual(ano.Exist) {
 		return false
 	}
+	if !p.Field3DeepEqual(ano.OrderExpire) {
+		return false
+	}
 	return true
 }
 
@@ -961,10 +972,182 @@ func (p *IsOrderExistResp) Field2DeepEqual(src bool) bool {
 	}
 	return true
 }
+func (p *IsOrderExistResp) Field3DeepEqual(src int64) bool {
+
+	if p.OrderExpire != src {
+		return false
+	}
+	return true
+}
 
 var fieldIDToName_IsOrderExistResp = map[int16]string{
 	1: "base",
 	2: "exist",
+	3: "orderExpire",
+}
+
+type UpdateOrderStatusReq struct {
+	OrderID       int64  `thrift:"orderID,1,required" frugal:"1,required,i64" json:"orderID"`
+	PaymentStatus int8   `thrift:"payment_status,2,required" frugal:"2,required,i8" json:"payment_status"`
+	PaymentAt     int64  `thrift:"paymentAt,3,required" frugal:"3,required,i64" json:"paymentAt"`
+	PaymentStyle  string `thrift:"paymentStyle,4,required" frugal:"4,required,string" json:"paymentStyle"`
+}
+
+func NewUpdateOrderStatusReq() *UpdateOrderStatusReq {
+	return &UpdateOrderStatusReq{}
+}
+
+func (p *UpdateOrderStatusReq) InitDefault() {
+}
+
+func (p *UpdateOrderStatusReq) GetOrderID() (v int64) {
+	return p.OrderID
+}
+
+func (p *UpdateOrderStatusReq) GetPaymentStatus() (v int8) {
+	return p.PaymentStatus
+}
+
+func (p *UpdateOrderStatusReq) GetPaymentAt() (v int64) {
+	return p.PaymentAt
+}
+
+func (p *UpdateOrderStatusReq) GetPaymentStyle() (v string) {
+	return p.PaymentStyle
+}
+func (p *UpdateOrderStatusReq) SetOrderID(val int64) {
+	p.OrderID = val
+}
+func (p *UpdateOrderStatusReq) SetPaymentStatus(val int8) {
+	p.PaymentStatus = val
+}
+func (p *UpdateOrderStatusReq) SetPaymentAt(val int64) {
+	p.PaymentAt = val
+}
+func (p *UpdateOrderStatusReq) SetPaymentStyle(val string) {
+	p.PaymentStyle = val
+}
+
+func (p *UpdateOrderStatusReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UpdateOrderStatusReq(%+v)", *p)
+}
+
+func (p *UpdateOrderStatusReq) DeepEqual(ano *UpdateOrderStatusReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.OrderID) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.PaymentStatus) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.PaymentAt) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.PaymentStyle) {
+		return false
+	}
+	return true
+}
+
+func (p *UpdateOrderStatusReq) Field1DeepEqual(src int64) bool {
+
+	if p.OrderID != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateOrderStatusReq) Field2DeepEqual(src int8) bool {
+
+	if p.PaymentStatus != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateOrderStatusReq) Field3DeepEqual(src int64) bool {
+
+	if p.PaymentAt != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateOrderStatusReq) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.PaymentStyle, src) != 0 {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UpdateOrderStatusReq = map[int16]string{
+	1: "orderID",
+	2: "payment_status",
+	3: "paymentAt",
+	4: "paymentStyle",
+}
+
+type UpdateOrderStatusResp struct {
+	Base *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+}
+
+func NewUpdateOrderStatusResp() *UpdateOrderStatusResp {
+	return &UpdateOrderStatusResp{}
+}
+
+func (p *UpdateOrderStatusResp) InitDefault() {
+}
+
+var UpdateOrderStatusResp_Base_DEFAULT *model.BaseResp
+
+func (p *UpdateOrderStatusResp) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return UpdateOrderStatusResp_Base_DEFAULT
+	}
+	return p.Base
+}
+func (p *UpdateOrderStatusResp) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+
+func (p *UpdateOrderStatusResp) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *UpdateOrderStatusResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UpdateOrderStatusResp(%+v)", *p)
+}
+
+func (p *UpdateOrderStatusResp) DeepEqual(ano *UpdateOrderStatusResp) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	return true
+}
+
+func (p *UpdateOrderStatusResp) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UpdateOrderStatusResp = map[int16]string{
+	1: "base",
 }
 
 type OrderService interface {
@@ -981,6 +1164,10 @@ type OrderService interface {
 	DeleteOrder(ctx context.Context, req *DeleteOrderReq) (r *DeleteOrderResp, err error)
 
 	IsOrderExist(ctx context.Context, req *IsOrderExistReq) (r *IsOrderExistResp, err error)
+
+	OrderPaymentSuccess(ctx context.Context, req *UpdateOrderStatusReq) (r *UpdateOrderStatusResp, err error)
+
+	OrderPaymentCancel(ctx context.Context, req *UpdateOrderStatusReq) (r *UpdateOrderStatusResp, err error)
 }
 
 type OrderServiceCreateOrderArgs struct {
@@ -1792,5 +1979,237 @@ func (p *OrderServiceIsOrderExistResult) Field0DeepEqual(src *IsOrderExistResp) 
 }
 
 var fieldIDToName_OrderServiceIsOrderExistResult = map[int16]string{
+	0: "success",
+}
+
+type OrderServiceOrderPaymentSuccessArgs struct {
+	Req *UpdateOrderStatusReq `thrift:"req,1" frugal:"1,default,UpdateOrderStatusReq" json:"req"`
+}
+
+func NewOrderServiceOrderPaymentSuccessArgs() *OrderServiceOrderPaymentSuccessArgs {
+	return &OrderServiceOrderPaymentSuccessArgs{}
+}
+
+func (p *OrderServiceOrderPaymentSuccessArgs) InitDefault() {
+}
+
+var OrderServiceOrderPaymentSuccessArgs_Req_DEFAULT *UpdateOrderStatusReq
+
+func (p *OrderServiceOrderPaymentSuccessArgs) GetReq() (v *UpdateOrderStatusReq) {
+	if !p.IsSetReq() {
+		return OrderServiceOrderPaymentSuccessArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *OrderServiceOrderPaymentSuccessArgs) SetReq(val *UpdateOrderStatusReq) {
+	p.Req = val
+}
+
+func (p *OrderServiceOrderPaymentSuccessArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *OrderServiceOrderPaymentSuccessArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("OrderServiceOrderPaymentSuccessArgs(%+v)", *p)
+}
+
+func (p *OrderServiceOrderPaymentSuccessArgs) DeepEqual(ano *OrderServiceOrderPaymentSuccessArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *OrderServiceOrderPaymentSuccessArgs) Field1DeepEqual(src *UpdateOrderStatusReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_OrderServiceOrderPaymentSuccessArgs = map[int16]string{
+	1: "req",
+}
+
+type OrderServiceOrderPaymentSuccessResult struct {
+	Success *UpdateOrderStatusResp `thrift:"success,0,optional" frugal:"0,optional,UpdateOrderStatusResp" json:"success,omitempty"`
+}
+
+func NewOrderServiceOrderPaymentSuccessResult() *OrderServiceOrderPaymentSuccessResult {
+	return &OrderServiceOrderPaymentSuccessResult{}
+}
+
+func (p *OrderServiceOrderPaymentSuccessResult) InitDefault() {
+}
+
+var OrderServiceOrderPaymentSuccessResult_Success_DEFAULT *UpdateOrderStatusResp
+
+func (p *OrderServiceOrderPaymentSuccessResult) GetSuccess() (v *UpdateOrderStatusResp) {
+	if !p.IsSetSuccess() {
+		return OrderServiceOrderPaymentSuccessResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *OrderServiceOrderPaymentSuccessResult) SetSuccess(x interface{}) {
+	p.Success = x.(*UpdateOrderStatusResp)
+}
+
+func (p *OrderServiceOrderPaymentSuccessResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *OrderServiceOrderPaymentSuccessResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("OrderServiceOrderPaymentSuccessResult(%+v)", *p)
+}
+
+func (p *OrderServiceOrderPaymentSuccessResult) DeepEqual(ano *OrderServiceOrderPaymentSuccessResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *OrderServiceOrderPaymentSuccessResult) Field0DeepEqual(src *UpdateOrderStatusResp) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_OrderServiceOrderPaymentSuccessResult = map[int16]string{
+	0: "success",
+}
+
+type OrderServiceOrderPaymentCancelArgs struct {
+	Req *UpdateOrderStatusReq `thrift:"req,1" frugal:"1,default,UpdateOrderStatusReq" json:"req"`
+}
+
+func NewOrderServiceOrderPaymentCancelArgs() *OrderServiceOrderPaymentCancelArgs {
+	return &OrderServiceOrderPaymentCancelArgs{}
+}
+
+func (p *OrderServiceOrderPaymentCancelArgs) InitDefault() {
+}
+
+var OrderServiceOrderPaymentCancelArgs_Req_DEFAULT *UpdateOrderStatusReq
+
+func (p *OrderServiceOrderPaymentCancelArgs) GetReq() (v *UpdateOrderStatusReq) {
+	if !p.IsSetReq() {
+		return OrderServiceOrderPaymentCancelArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *OrderServiceOrderPaymentCancelArgs) SetReq(val *UpdateOrderStatusReq) {
+	p.Req = val
+}
+
+func (p *OrderServiceOrderPaymentCancelArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *OrderServiceOrderPaymentCancelArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("OrderServiceOrderPaymentCancelArgs(%+v)", *p)
+}
+
+func (p *OrderServiceOrderPaymentCancelArgs) DeepEqual(ano *OrderServiceOrderPaymentCancelArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *OrderServiceOrderPaymentCancelArgs) Field1DeepEqual(src *UpdateOrderStatusReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_OrderServiceOrderPaymentCancelArgs = map[int16]string{
+	1: "req",
+}
+
+type OrderServiceOrderPaymentCancelResult struct {
+	Success *UpdateOrderStatusResp `thrift:"success,0,optional" frugal:"0,optional,UpdateOrderStatusResp" json:"success,omitempty"`
+}
+
+func NewOrderServiceOrderPaymentCancelResult() *OrderServiceOrderPaymentCancelResult {
+	return &OrderServiceOrderPaymentCancelResult{}
+}
+
+func (p *OrderServiceOrderPaymentCancelResult) InitDefault() {
+}
+
+var OrderServiceOrderPaymentCancelResult_Success_DEFAULT *UpdateOrderStatusResp
+
+func (p *OrderServiceOrderPaymentCancelResult) GetSuccess() (v *UpdateOrderStatusResp) {
+	if !p.IsSetSuccess() {
+		return OrderServiceOrderPaymentCancelResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *OrderServiceOrderPaymentCancelResult) SetSuccess(x interface{}) {
+	p.Success = x.(*UpdateOrderStatusResp)
+}
+
+func (p *OrderServiceOrderPaymentCancelResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *OrderServiceOrderPaymentCancelResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("OrderServiceOrderPaymentCancelResult(%+v)", *p)
+}
+
+func (p *OrderServiceOrderPaymentCancelResult) DeepEqual(ano *OrderServiceOrderPaymentCancelResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *OrderServiceOrderPaymentCancelResult) Field0DeepEqual(src *UpdateOrderStatusResp) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_OrderServiceOrderPaymentCancelResult = map[int16]string{
 	0: "success",
 }
