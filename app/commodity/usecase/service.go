@@ -20,6 +20,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/west2-online/DomTok/pkg/logger"
+
 	"golang.org/x/sync/errgroup"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
@@ -227,63 +229,164 @@ func (us *useCase) ListSpuInfo(ctx context.Context, ids []int64) ([]*model.Spu, 
 }
 
 func (us *useCase) IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	if !us.svc.Cached(ctx, infos) {
-		return errno.Errorf(errno.RedisKeyNotExist, "useCase.IncrLockStock failed")
-	}
-
-	var eg errgroup.Group
-
-	eg.Go(func() error {
-		err := us.cache.IncrLockStockNum(ctx, infos)
+	err := us.cache.IsHealthy(ctx)
+	if err != nil {
+		err = us.db.IncrLockStock(ctx, infos)
 		if err != nil {
 			return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
 		}
-		return nil
-	})
+	} else {
+		if !us.svc.Cached(ctx, infos) {
+			return errno.Errorf(errno.RedisKeyNotExist, "useCase.IncrLockStock failed")
+		}
 
-	eg.Go(func() error {
-		err := us.db.IncrLockStock(ctx, infos)
+		keys := make([]string, 0)
+
+		for _, info := range infos {
+			keys = append(keys, us.cache.GetSkuKey(info.SkuID))
+		}
+
+		err = us.cache.Lock(ctx, keys, constants.RedisNXExpireTime)
 		if err != nil {
-			return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
+			return fmt.Errorf("usecase.DecrStock failed: %w", err)
+		}
+		defer func() {
+			err = us.cache.UnLock(ctx, keys)
+			if err != nil {
+				logger.Errorf("usecase.DecrStock failed: %v", err)
+			}
+		}()
+
+		var eg errgroup.Group
+
+		eg.Go(func() error {
+			err = us.cache.IncrLockStockNum(ctx, infos)
+			if err != nil {
+				return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
+			}
+			return nil
+		})
+
+		eg.Go(func() error {
+			err = us.db.IncrLockStockInNX(ctx, infos)
+			if err != nil {
+				return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
+			}
+			return nil
+		})
+
+		if err = eg.Wait(); err != nil {
+			return err
 		}
 		return nil
-	})
-
-	if err := eg.Wait(); err != nil {
-		return err
 	}
 	return nil
 }
 
 func (us *useCase) DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	if !us.svc.Cached(ctx, infos) {
-		return errno.Errorf(errno.RedisKeyNotExist, "useCase.DecrLockStock failed")
-	}
-
-	var eg errgroup.Group
-
-	eg.Go(func() error {
-		err := us.cache.DecrLockStockNum(ctx, infos)
+	err := us.cache.IsHealthy(ctx)
+	if err != nil {
+		err = us.db.DecrLockStock(ctx, infos)
 		if err != nil {
 			return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
 		}
-		return nil
-	})
+	} else {
+		if !us.svc.Cached(ctx, infos) {
+			return errno.Errorf(errno.RedisKeyNotExist, "useCase.DecrLockStock failed")
+		}
 
-	eg.Go(func() error {
-		err := us.db.DecrLockStock(ctx, infos)
+		keys := make([]string, 0)
+
+		for _, info := range infos {
+			keys = append(keys, us.cache.GetSkuKey(info.SkuID))
+		}
+
+		err = us.cache.Lock(ctx, keys, constants.RedisNXExpireTime)
 		if err != nil {
-			return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
+			return fmt.Errorf("usecase.DecrStock failed: %w", err)
+		}
+		defer func() {
+			err = us.cache.UnLock(ctx, keys)
+			if err != nil {
+				logger.Errorf("usecase.DecrStock failed: %v", err)
+			}
+		}()
+
+		var eg errgroup.Group
+
+		eg.Go(func() error {
+			err = us.cache.DecrLockStockNum(ctx, infos)
+			if err != nil {
+				return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
+			}
+			return nil
+		})
+
+		eg.Go(func() error {
+			err = us.db.DecrLockStockInNX(ctx, infos)
+			if err != nil {
+				return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
+			}
+			return nil
+		})
+
+		if err = eg.Wait(); err != nil {
+			return err
 		}
 		return nil
-	})
-
-	if err := eg.Wait(); err != nil {
-		return err
 	}
 	return nil
 }
 
 func (us *useCase) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	return us.db.DecrStock(ctx, infos)
+	err := us.cache.IsHealthy(ctx)
+	if err != nil {
+		err = us.db.DecrStock(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("usecase.DecrStock failed: %w", err)
+		}
+	} else {
+		if !us.svc.Cached(ctx, infos) {
+			return errno.Errorf(errno.RedisKeyNotExist, "useCase.DecrStock failed")
+		}
+
+		keys := make([]string, 0)
+
+		for _, info := range infos {
+			keys = append(keys, us.cache.GetSkuKey(info.SkuID))
+		}
+
+		err = us.cache.Lock(ctx, keys, constants.RedisNXExpireTime)
+		if err != nil {
+			return fmt.Errorf("usecase.DecrStock failed: %w", err)
+		}
+		defer func() {
+			err = us.cache.UnLock(ctx, keys)
+			if err != nil {
+				logger.Errorf("usecase.DecrStock failed: %v", err)
+			}
+		}()
+
+		var eg errgroup.Group
+
+		eg.Go(func() error {
+			err = us.cache.DecrStockNum(ctx, infos)
+			if err != nil {
+				return fmt.Errorf("usecase.DecrStock failed: %w", err)
+			}
+			return nil
+		})
+
+		eg.Go(func() error {
+			err = us.db.DecrStockInNX(ctx, infos)
+			if err != nil {
+				return fmt.Errorf("usecase.DecrStock failed: %w", err)
+			}
+			return nil
+		})
+		if err = eg.Wait(); err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -410,16 +410,34 @@ func (svc *CommodityService) Cached(ctx context.Context, infos []*model.SkuBuyIn
 
 	for _, info := range infos {
 		key := svc.cache.GetLockStockKey(info.SkuID)
+		stockKey := svc.cache.GetStockKey(info.SkuID)
+
+		lockStockCached := true
+		StockCached := true
+
 		if !svc.cache.IsExist(ctx, key) {
-			// 没有命中就先返回错误，后续及时补数据
-			go func(id int64, k string, c context.Context) {
+			lockStockCached = false
+			cached = false
+		}
+		if !svc.cache.IsExist(ctx, stockKey) {
+			StockCached = false
+			cached = false
+		}
+
+		if !lockStockCached || !StockCached {
+			go func(id int64, stockKey, lockStockKey string, c context.Context) {
 				data, err := svc.db.GetSkuById(c, id)
 				if err != nil {
 					return
 				}
-				svc.cache.SetLockStockNum(c, k, data.LockStock)
-			}(info.SkuID, key, ctx)
-			cached = false
+				if !lockStockCached {
+					svc.cache.SetLockStockNum(c, lockStockKey, data.LockStock)
+				}
+
+				if !StockCached {
+					svc.cache.SetLockStockNum(c, stockKey, data.Stock)
+				}
+			}(info.SkuID, stockKey, key, ctx)
 		}
 	}
 	return cached

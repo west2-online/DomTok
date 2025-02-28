@@ -99,32 +99,55 @@ func (c *commodityCache) DecrLockStockNum(ctx context.Context, infos []*model.Sk
 }
 
 func (c *commodityCache) DecrStockNum(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	keys := make([]string, 0)
+	stockKeys := make([]string, 0)
+	lockStockKeys := make([]string, 0)
 	for _, info := range infos {
-		keys = append(keys, c.GetStockKey(info.SkuID))
+		stockKeys = append(stockKeys, c.GetStockKey(info.SkuID))
+		lockStockKeys = append(lockStockKeys, c.GetLockStockKey(info.SkuID))
 	}
+	combinedKeys := append(stockKeys, lockStockKeys...)
 	err := c.client.Watch(ctx, func(tx *redis.Tx) error {
 		for i := 0; i < len(infos); i++ {
-			val, err := tx.Get(ctx, keys[i]).Int64()
+			val, err := tx.Get(ctx, stockKeys[i]).Int64()
 			if err != nil {
 				return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.DecrStockNum failed :%v", err)
 			}
 
-			if val < 0 || val-infos[i].Count < 0 {
-				return errno.NewErrNo(errno.InsufficientStockErrorCode, "CommodityCache.DecrStockNum failed: too many goods")
+			if val <= 0 || val-infos[i].Count < 0 {
+				return errno.NewErrNo(errno.InsufficientStockErrorCode, "CommodityCache.DecrStockNum failed: too many goods for stock")
 			}
 
-			err = tx.DecrBy(ctx, keys[i], infos[i].Count).Err()
+			lockVal, err := tx.Get(ctx, lockStockKeys[i]).Int64()
 			if err != nil {
 				return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.DecrStockNum failed :%v", err)
 			}
-			err = tx.Expire(ctx, keys[i], constants.RedisStockExpireTime).Err()
+
+			if lockVal <= 0 || lockVal-infos[i].Count < 0 || val <= lockVal {
+				return errno.NewErrNo(errno.InsufficientStockErrorCode, "CommodityCache.DecrStockNum failed: too many goods for lock stock")
+			}
+
+			err = tx.DecrBy(ctx, stockKeys[i], infos[i].Count).Err()
+			if err != nil {
+				return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.DecrStockNum failed :%v", err)
+			}
+
+			err = tx.Expire(ctx, stockKeys[i], constants.RedisStockExpireTime).Err()
+			if err != nil {
+				return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.DecrStockNum failed :%v", err)
+			}
+
+			err = tx.DecrBy(ctx, lockStockKeys[i], infos[i].Count).Err()
+			if err != nil {
+				return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.DecrStockNum failed :%v", err)
+			}
+
+			err = tx.Expire(ctx, lockStockKeys[i], constants.RedisLockStockExpireTime).Err()
 			if err != nil {
 				return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.DecrStockNum failed :%v", err)
 			}
 		}
 		return nil
-	}, keys...)
+	}, combinedKeys...)
 	if err != nil {
 		return err
 	}

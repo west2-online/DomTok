@@ -274,6 +274,48 @@ struct ViewHistoryPriceResp {
     1: required list<model.PriceHistory> records;
 }
 
+
+
+// for test
+/*
+* struct DescSkuLockStockReq 预扣商品
+* @Param skuID skuID
+* @Param count 购买商品数
+ */
+struct DescSkuLockStockReq {
+    1: required list<model.SkuBuyInfo> infos;
+}
+
+struct DescSkuLockStockResp {
+    1: required model.BaseResp base;
+}
+
+/*
+* struct IncrSkuLockStockReq 回滚商品数
+* @Param skuID skuID
+* @Param count 原购买商品数
+ */
+struct IncrSkuLockStockReq {
+    1: required list<model.SkuBuyInfo> infos;
+}
+
+struct IncrSkuLockStockResp {
+    1: required model.BaseResp base;
+}
+
+/*
+* struct DescSkuStockReq 实际扣除商品
+* @Param skuID skuID
+* @Param count 购买商品数
+ */
+struct DescSkuStockReq {
+    1: required list<model.SkuBuyInfo> infos;
+}
+
+struct DescSkuStockResp {
+    1: required model.BaseResp base;
+}
+
 service CommodityService {
     // 优惠券
     CreateCouponResp CreateCoupon(1: CreateCouponReq req) (api.post="/api/v1/commodity/coupon/create");

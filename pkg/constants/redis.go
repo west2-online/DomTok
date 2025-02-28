@@ -29,6 +29,9 @@ const (
 	RedisSpuImageExpireTime  = 5 * 60 * time.Second
 	RedisLockStockExpireTime = 24 * 60 * 60 * time.Second
 	RedisStockExpireTime     = 24 * 60 * 60 * time.Second
+	RedisNXExpireTime        = 3 * time.Second
+	RedisMaxLockRetryTime    = 400 * time.Millisecond
+	RedisRetryStopTime       = 100 * time.Millisecond
 )
 
 // Redis DB Name
