@@ -231,7 +231,7 @@ func (us *useCase) IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo)
 		if err != nil {
 			return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
 		}
-		return nil
+		return err
 	} else {
 		return us.svc.IncrLockStockInNX(ctx, infos)
 	}
@@ -244,7 +244,7 @@ func (us *useCase) DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo)
 		if err != nil {
 			return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
 		}
-		return nil
+		return err
 	} else {
 		return us.svc.DecrLockStockInNX(ctx, infos)
 	}
@@ -257,8 +257,8 @@ func (us *useCase) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) err
 		if err != nil {
 			return fmt.Errorf("usecase.DecrStock failed: %w", err)
 		}
+		return err
 	} else {
 		return us.svc.DecrStockInNX(ctx, infos)
 	}
-	return nil
 }
