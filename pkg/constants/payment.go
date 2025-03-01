@@ -70,6 +70,32 @@ const (
 	RefundStatusFailed     = "退款失败"
 )
 
+const (
+	LedgerStatusPendingCode = iota
+	LedgerStatusSuccessCode
+	LedgerStatusFailedCode
+)
+
+const (
+	LedgerStatusPending = "待处理"
+	LedgerStatusSuccess = "成功"
+	LedgerStatusFailed  = "失败"
+)
+
+const (
+	LedgerTransactionTypePaymentCode = iota + 1
+	LedgerTransactionTypeRefundCode
+	LedgerTransactionTypeFeeCode
+	LedgerTransactionTypeAdjustmentCode
+)
+
+const (
+	LedgerTransactionTypePayment    = "支付"
+	LedgerTransactionTypeRefund     = "退款"
+	LedgerTransactionTypeFee        = "手续费"
+	LedgerTransactionTypeAdjustment = "调整"
+)
+
 func GetPaymentStatus(code int8) string {
 	switch code {
 	case PaymentStatusPendingCode:
@@ -97,5 +123,33 @@ func GetRefundStatus(code int8) string {
 		return RefundStatusFailed
 	default:
 		return RefundStatusFailed
+	}
+}
+
+func GetLedgerStatus(code int8) string {
+	switch code {
+	case LedgerStatusPendingCode:
+		return LedgerStatusPending
+	case LedgerStatusSuccessCode:
+		return LedgerStatusSuccess
+	case LedgerStatusFailedCode:
+		return LedgerStatusFailed
+	default:
+		return LedgerStatusFailed
+	}
+}
+
+func GetLedgerTransactionType(code int8) string {
+	switch code {
+	case LedgerTransactionTypePaymentCode:
+		return LedgerTransactionTypePayment
+	case LedgerTransactionTypeRefundCode:
+		return LedgerTransactionTypeRefund
+	case LedgerTransactionTypeFeeCode:
+		return LedgerTransactionTypeFee
+	case LedgerTransactionTypeAdjustmentCode:
+		return LedgerTransactionTypeAdjustment
+	default:
+		return LedgerTransactionTypeAdjustment
 	}
 }

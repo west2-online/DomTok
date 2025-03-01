@@ -39,7 +39,9 @@ const (
 	ServiceSpuNotExist = 3000 + iota
 	ServiceImgNotExist
 	ServiceSkuExist
-
+	PaymentOrderNotExist
+	PaymentRefundNotExist
+	UserNotExist
 	ServiceCategoryExist
 	ServiceListCategoryFailed
 
