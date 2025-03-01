@@ -39,15 +39,18 @@ const (
 	ServiceSpuNotExist = 3000 + iota
 	ServiceImgNotExist
 	ServiceSkuExist
-	PaymentOrderNotExist
-	PaymentRefundNotExist
 	UserNotExist
 	ServiceCategoryExist
 	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
 )
 
+// payment
 const (
 	PaymentOrderNotExist = 4000 + iota
+	PaymentRefundNotExist
+)
+
+// assistant
+const (
+	ServiceUserCloseWebsocketConn = 5000 + iota
 )
