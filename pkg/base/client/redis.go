@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/go-redsync/redsync/v4"
+	"github.com/go-redsync/redsync/v4/redis/goredis/v9"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/west2-online/DomTok/config"
@@ -57,4 +59,10 @@ func InitRedis(db int) (*redis.Client, error) {
 	}
 
 	return client, nil
+}
+
+func InitRedSync(client *redis.Client) *redsync.Redsync {
+	pool := goredis.NewPool(client)
+	rs := redsync.New(pool)
+	return rs
 }

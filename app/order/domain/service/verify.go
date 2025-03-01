@@ -17,6 +17,7 @@ limitations under the License.
 package service
 
 import (
+	"github.com/west2-online/DomTok/app/order/domain/model"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
@@ -37,7 +38,25 @@ func (svc *OrderService) Verify(ops ...OrderVerifyOps) error {
 func (svc *OrderService) VerifyOrderStatus(status int32) func() error {
 	return func() error {
 		if svc.GetOrderStatusMsg(int8(status)) == constants.OrderStatusUnknown {
-			return errno.NewErrNo(errno.ServiceError, "invalid order status")
+			return errno.NewErrNo(errno.UnknownOrderStatus, "invalid order status")
+		}
+		return nil
+	}
+}
+
+func (svc *OrderService) VerifyAddressID(id int64) func() error {
+	return func() error {
+		if id <= 0 {
+			return errno.NewErrNo(errno.ParamVerifyErrorCode, "address id should not less than 0")
+		}
+		return nil
+	}
+}
+
+func (svc *OrderService) VerifyBaseOrderGoods(baseGoods []*model.BaseOrderGoods) func() error {
+	return func() error {
+		if len(baseGoods) == 0 {
+			return errno.NewErrNo(errno.ParamVerifyErrorCode, "create order needed at least one goods")
 		}
 		return nil
 	}
