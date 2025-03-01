@@ -54,18 +54,20 @@ func (svc *OrderService) GetPaymentStatusAndOrderExpire(ctx context.Context, ord
 		logger.Errorf(err.Error())
 	}
 
-	// 获取 Status
-	if !exist {
-		var orderedAt int64
-		paymentStatus.PaymentStatus, orderedAt, err = svc.db.GetOrderStatus(ctx, orderID)
-		if err != nil {
-			return 0, 0, err
-		}
-		paymentStatus.OrderExpire = svc.calcOrderExpireTime(orderedAt)
+	if exist {
+		return paymentStatus.PaymentStatus, paymentStatus.OrderExpire, nil
+	}
 
-		if e := svc.cache.SetPaymentStatus(ctx, paymentStatus); e != nil {
-			logger.Errorf(e.Error())
-		}
+	// 获取 Status
+	var orderedAt int64
+	paymentStatus.PaymentStatus, orderedAt, err = svc.db.GetOrderStatus(ctx, orderID)
+	if err != nil {
+		return 0, 0, err
+	}
+	paymentStatus.OrderExpire = svc.calcOrderExpireTime(orderedAt)
+
+	if e := svc.cache.SetPaymentStatus(ctx, paymentStatus); e != nil {
+		logger.Errorf(e.Error())
 	}
 
 	return paymentStatus.PaymentStatus, paymentStatus.OrderExpire, nil

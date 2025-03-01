@@ -67,7 +67,6 @@ func (rpc *orderRpcImpl) QueryGoodsInfo(ctx context.Context, goods []*model.Base
 
 	orderGoods := lo.Map(skuInfoResp.SkuInfos, func(item *kmodel.SkuInfo, index int) *model.OrderGoods {
 		purchaseCount := goods[index].PurchaseQuantity
-		couponId := goods[index].CouponID
 		return &model.OrderGoods{
 			// OrderID:            0, 后续由 service 模块赋值
 			MerchantID:         item.CreatorID,
@@ -86,7 +85,7 @@ func (rpc *orderRpcImpl) QueryGoodsInfo(ctx context.Context, goods []*model.Base
 			// DiscountAmount:     decimal.Decimal{}, 优惠券计算
 			//  : decimal.Decimal{}, 优惠券计算
 			// SinglePrice: decimal.Decimal{}, 最终更新
-			CouponId: couponId,
+			// CouponId: couponId,
 			// CouponName: "", 后续更新
 		}
 	})

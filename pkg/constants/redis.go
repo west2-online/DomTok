@@ -49,10 +49,13 @@ const (
 
 // Order
 const (
-	OrderCacheOrderExpireFormat       = "order-expire-%d"
-	OrderCachePaymentStatusFormat     = "payment-status-%d"
-	OrderPaymentStatusExpireTime      = 12 * time.Minute // 大于 SkuStockRollbackTopicDelayTimeLevel 即可
-	OrderCacheLuaKeyExistFlag         = 1
+	OrderCacheOrderExpireFormat   = "order-expire-%d"
+	OrderCachePaymentStatusFormat = "payment-status-%d"
+	OrderPaymentStatusExpireTime  = 12 * time.Minute // 大于 SkuStockRollbackTopicDelayTimeLevel 即可
+	OrderCacheLuaKeyExistFlag     = 1
+	OrderRedSyncDefaultTTL        = 8 * time.Second
+	OrderRedSyncDefaultInterval   = 1 * time.Second
+
 	OrderLockFormat                   = "lock-order-%d"
 	OrderUpdatePaymentStatusLuaScript = `
         local exK = KEYS[1]

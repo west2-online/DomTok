@@ -19,6 +19,7 @@ package locker
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/go-redsync/redsync/v4"
 
@@ -28,16 +29,35 @@ import (
 )
 
 type locker struct {
-	rs    *redsync.Redsync
-	locks map[int64]*redsync.Mutex
-	mu    sync.Mutex
+	rs      *redsync.Redsync
+	locks   map[int64]*redsync.Mutex
+	expires map[int64]time.Time
+	mu      sync.Mutex
 }
 
 func NewLocker(rs *redsync.Redsync) repository.Locker {
-	return &locker{
-		rs:    rs,
-		locks: make(map[int64]*redsync.Mutex),
+	l := &locker{
+		rs:      rs,
+		locks:   make(map[int64]*redsync.Mutex),
+		expires: make(map[int64]time.Time),
 	}
+	l.init()
+	return l
+}
+
+func (l *locker) init() {
+	go func() {
+		time.Sleep(constants.OrderRedSyncDefaultInterval)
+		l.mu.Lock()
+		now := time.Now().UnixMilli()
+		for orderId, expire := range l.expires {
+			if now > expire.UnixMilli() {
+				delete(l.locks, orderId)
+				delete(l.expires, orderId)
+			}
+		}
+		l.mu.Unlock()
+	}()
 }
 
 func (l *locker) LockOrder(orderID int64) error {
@@ -52,6 +72,7 @@ func (l *locker) LockOrder(orderID int64) error {
 	if err := mutex.Lock(); err != nil {
 		return errno.NewErrNo(errno.InternalServiceErrorCode, fmt.Sprintf("failed to lock order: %v", err))
 	}
+	l.expires[orderID] = time.Now().Add(constants.OrderRedSyncDefaultTTL)
 	return nil
 }
 

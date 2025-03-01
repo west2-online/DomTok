@@ -47,6 +47,7 @@ func TestOrder_RocketMqSendAndConsume(t *testing.T) {
 	if !utils.EnvironmentEnable() {
 		return
 	}
+
 	initTest(t)
 	mq := NewRocketmq()
 	ctx := context.Background()
