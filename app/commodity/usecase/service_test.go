@@ -663,66 +663,11 @@ func TestUseCase_ListSpuImages(t *testing.T) {
 
 func TestUseCase_DecrStock(t *testing.T) {
 	type TestCase struct {
-		Name          string
-		MockError     error
-		ExpectedError error
-	}
-
-	infos := []*model.SkuBuyInfo{
-		{
-			SkuID: 1,
-			Count: 1,
-		},
-		{
-			SkuID: 2,
-			Count: 2,
-		},
-	}
-
-	defer mockey.UnPatchAll()
-
-	testCases := []TestCase{
-		{
-			Name:          "DecrStockError",
-			MockError:     errors.New("DecrStockError"),
-			ExpectedError: errors.New("DecrStockError"),
-		},
-		{
-			Name:          "DecrStockSuccess",
-			MockError:     nil,
-			ExpectedError: nil,
-		},
-	}
-
-	for _, tc := range testCases {
-		mockey.PatchConvey(tc.Name, t, func() {
-			svc := new(service.CommodityService)
-			gormDB := new(gorm.DB)
-			db := mysql.NewCommodityDB(gormDB)
-			us := &useCase{
-				svc: svc,
-				db:  db,
-			}
-
-			mockey.Mock(mockey.GetMethod(us.db, "DecrStock")).Return(tc.MockError).Build()
-
-			err := us.DecrStock(ctx.Background(), infos)
-			if err != nil {
-				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
-			} else {
-				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
-			}
-		})
-	}
-}
-
-func TestUseCase_DecrLockStock(t *testing.T) {
-	type TestCase struct {
-		Name               string
-		MockCached         bool
-		MockDecrCacheError error
-		MockDecrDBError    error
-		ExpectedError      error
+		Name                 string
+		MockIsHealthyError   error
+		MockServiceDecrError error
+		MockDBDecrError      error
+		ExpectedError        error
 	}
 
 	input := []*model.SkuBuyInfo{
@@ -738,25 +683,19 @@ func TestUseCase_DecrLockStock(t *testing.T) {
 
 	testCases := []TestCase{
 		{
-			Name:          "NotCached",
-			MockCached:    false,
-			ExpectedError: errors.New("[60001] useCase.DecrLockStock failed"),
+			Name:               "decrStockInDBError",
+			MockIsHealthyError: errors.New("IsHealthyError"),
+			MockDBDecrError:    errors.New("ServiceDecrError"),
+			ExpectedError:      errors.New("usecase.DecrStock failed: ServiceDecrError"),
 		},
 		{
-			Name:            "DecrStockInDBError",
-			MockCached:      true,
-			MockDecrDBError: errors.New("DecrStockInDBError"),
-			ExpectedError:   errors.New("usecase.DecrLockStock failed: DecrStockInDBError"),
+			Name:                 "ServiceDecrStockError",
+			MockIsHealthyError:   nil,
+			MockServiceDecrError: errors.New("ServiceDecrError"),
+			ExpectedError:        errors.New("ServiceDecrError"),
 		},
 		{
-			Name:               "DecrStockInCacheError",
-			MockCached:         true,
-			MockDecrCacheError: errors.New("DecrStockInCacheError"),
-			ExpectedError:      errors.New("usecase.DecrLockStock failed: DecrStockInCacheError"),
-		},
-		{
-			Name:          "DecrStockSuccess",
-			MockCached:    true,
+			Name:          "decrStockSuccess",
 			ExpectedError: nil,
 		},
 	}
@@ -774,11 +713,74 @@ func TestUseCase_DecrLockStock(t *testing.T) {
 				cache: cache,
 				svc:   svc,
 			}
+			mockey.Mock(mockey.GetMethod(us.db, "DecrStock")).Return(tc.MockDBDecrError).Build()
+			mockey.Mock((*service.CommodityService).DecrStockInNX).Return(tc.MockServiceDecrError).Build()
+			mockey.Mock(mockey.GetMethod(us.cache, "IsHealthy")).Return(tc.MockIsHealthyError).Build()
+			err := us.DecrStock(ctx.Background(), input)
+			if err != nil {
+				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			} else {
+				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+			}
+		})
+	}
+}
 
-			mockey.Mock((*service.CommodityService).Cached).Return(tc.MockCached).Build()
-			mockey.Mock(mockey.GetMethod(us.db, "DecrLockStock")).ExcludeCurrentGoRoutine().Return(tc.MockDecrDBError).Build()
-			mockey.Mock(mockey.GetMethod(us.cache, "DecrLockStockNum")).ExcludeCurrentGoRoutine().Return(tc.MockDecrCacheError).Build()
+func TestUseCase_DecrLockStock(t *testing.T) {
+	type TestCase struct {
+		Name                 string
+		MockIsHealthyError   error
+		MockServiceDecrError error
+		MockDBDecrError      error
+		ExpectedError        error
+	}
 
+	input := []*model.SkuBuyInfo{
+		{
+			SkuID: 1,
+			Count: 1,
+		},
+		{
+			SkuID: 2,
+			Count: 2,
+		},
+	}
+
+	testCases := []TestCase{
+		{
+			Name:               "decrStockInDBError",
+			MockIsHealthyError: errors.New("IsHealthyError"),
+			MockDBDecrError:    errors.New("ServiceDecrError"),
+			ExpectedError:      errors.New("usecase.DecrLockStock failed: ServiceDecrError"),
+		},
+		{
+			Name:                 "ServiceDecrStockError",
+			MockIsHealthyError:   nil,
+			MockServiceDecrError: errors.New("ServiceDecrError"),
+			ExpectedError:        errors.New("ServiceDecrError"),
+		},
+		{
+			Name:          "decrStockSuccess",
+			ExpectedError: nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		mockey.PatchConvey(tc.Name, t, func() {
+			svc := new(service.CommodityService)
+			gormDB := new(gorm.DB)
+			db := mysql.NewCommodityDB(gormDB)
+			redisCache := new(redis.Client)
+			cache := redisCommodity.NewCommodityCache(redisCache)
+
+			us := &useCase{
+				db:    db,
+				cache: cache,
+				svc:   svc,
+			}
+			mockey.Mock(mockey.GetMethod(us.db, "DecrLockStock")).Return(tc.MockDBDecrError).Build()
+			mockey.Mock((*service.CommodityService).DecrLockStockInNX).Return(tc.MockServiceDecrError).Build()
+			mockey.Mock(mockey.GetMethod(us.cache, "IsHealthy")).Return(tc.MockIsHealthyError).Build()
 			err := us.DecrLockStock(ctx.Background(), input)
 			if err != nil {
 				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
@@ -791,11 +793,11 @@ func TestUseCase_DecrLockStock(t *testing.T) {
 
 func TestUseCase_IncrLockStock(t *testing.T) {
 	type TestCase struct {
-		Name               string
-		MockCached         bool
-		MockIncrCacheError error
-		MockIncrDBError    error
-		ExpectedError      error
+		Name                 string
+		MockIsHealthyError   error
+		MockServiceIncrError error
+		MockDBIncrError      error
+		ExpectedError        error
 	}
 
 	input := []*model.SkuBuyInfo{
@@ -811,25 +813,19 @@ func TestUseCase_IncrLockStock(t *testing.T) {
 
 	testCases := []TestCase{
 		{
-			Name:          "NotCached",
-			MockCached:    false,
-			ExpectedError: errors.New("[60001] useCase.IncrLockStock failed"),
+			Name:               "IncrStockInDBError",
+			MockIsHealthyError: errors.New("IsHealthyError"),
+			MockDBIncrError:    errors.New("ServiceIncrError"),
+			ExpectedError:      errors.New("usecase.IncrLockStock failed: ServiceIncrError"),
 		},
 		{
-			Name:            "IncrStockInDBError",
-			MockCached:      true,
-			MockIncrDBError: errors.New("IncrStockInDBError"),
-			ExpectedError:   errors.New("usecase.IncrLockStock failed: IncrStockInDBError"),
-		},
-		{
-			Name:               "IncrStockInCacheError",
-			MockCached:         true,
-			MockIncrCacheError: errors.New("IncrStockInCacheError"),
-			ExpectedError:      errors.New("usecase.IncrLockStock failed: IncrStockInCacheError"),
+			Name:                 "ServiceIncrStockError",
+			MockIsHealthyError:   nil,
+			MockServiceIncrError: errors.New("ServiceIncrError"),
+			ExpectedError:        errors.New("ServiceIncrError"),
 		},
 		{
 			Name:          "IncrStockSuccess",
-			MockCached:    true,
 			ExpectedError: nil,
 		},
 	}
@@ -847,11 +843,9 @@ func TestUseCase_IncrLockStock(t *testing.T) {
 				cache: cache,
 				svc:   svc,
 			}
-
-			mockey.Mock((*service.CommodityService).Cached).Return(tc.MockCached).Build()
-			mockey.Mock(mockey.GetMethod(us.db, "IncrLockStock")).ExcludeCurrentGoRoutine().Return(tc.MockIncrDBError).Build()
-			mockey.Mock(mockey.GetMethod(us.cache, "IncrLockStockNum")).ExcludeCurrentGoRoutine().Return(tc.MockIncrCacheError).Build()
-
+			mockey.Mock(mockey.GetMethod(us.db, "IncrLockStock")).Return(tc.MockDBIncrError).Build()
+			mockey.Mock((*service.CommodityService).IncrLockStockInNX).Return(tc.MockServiceIncrError).Build()
+			mockey.Mock(mockey.GetMethod(us.cache, "IsHealthy")).Return(tc.MockIsHealthyError).Build()
 			err := us.IncrLockStock(ctx.Background(), input)
 			if err != nil {
 				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
@@ -861,56 +855,3 @@ func TestUseCase_IncrLockStock(t *testing.T) {
 		})
 	}
 }
-
-
-func TestUseCase_CreateCategory(t *testing.T){
-	type TestCase struct{
-		Name string
-		CategoryName string
-		Id int
-		MockError error
-		ExpectedError error
-	}
-	testcase:=[]TestCase{
-		{
-			Name: "CreateCategoryError",
-			MockError: errors.New("CreateCategoryError"),
-			ExpectedError: errors.New("usecase.CreateCategory faild:CreateCategoryError"),
-		},
-		{
-		Name: "CreateCategorySuccessfully",
-		Id: 1,
-		},
-	}
-	defer mockey.UnPatchAll()
-	for _,tc:=range testcase{
-		mockey.PatchConvey(tc.Name,t,func(){
-			svc:=new(service.CommodityService)
-			us := &useCase{
-				svc: svc,
-			}
-			mockey.Mock((*service.CommodityService).CreateCategory).Return(tc.Id).Build()
-			id,err:=us.CreateCategory(ctx.Background(),&model.Category{Name: tc.CategoryName})
-			if id==0{
-				convey.So(err.Error(),convey.ShouldBeFalse,tc.ExpectedError.Error())
-			}else if err!=nil{
-				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
-			}else{
-				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
-			}
-		})
-	}
-}
-
-func TestUseCase_DeleteCategory(t *testing.T){
-	
-}
-
-func TestUseCase_UpdateCategory(t *testing.T){
-	
-}
-
-func TestUseCase_ViewCategory(t *testing.T){
-	
-}
-
