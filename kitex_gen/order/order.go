@@ -21,8 +21,9 @@ package order
 import (
 	"context"
 	"fmt"
-	"github.com/west2-online/DomTok/kitex_gen/model"
 	"strings"
+
+	"github.com/west2-online/DomTok/kitex_gen/model"
 )
 
 type CreateOrderReq struct {

@@ -19,13 +19,12 @@ package mq
 import (
 	"context"
 	"fmt"
-	"github.com/apache/rocketmq-client-go/v2/rlog"
-	"github.com/west2-online/DomTok/pkg/logger"
 	"time"
 
 	"github.com/apache/rocketmq-client-go/v2"
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/apache/rocketmq-client-go/v2/rlog"
 	"github.com/samber/lo"
 
 	"github.com/west2-online/DomTok/app/order/domain/model"
@@ -33,6 +32,7 @@ import (
 	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // rocketMq 结构体封装了与 RocketMQ 交互所需的管理客户端、Broker 地址、生产者和消费者信息

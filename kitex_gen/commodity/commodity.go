@@ -27,7 +27,6 @@ import (
 	"github.com/cloudwego/kitex/pkg/streaming"
 
 	"github.com/west2-online/DomTok/kitex_gen/model"
-	"strings"
 )
 
 type CreateCouponReq struct {
@@ -882,7 +881,6 @@ var fieldIDToName_ViewUserAllCouponResp = map[int16]string{
 
 type GetCouponAndPriceReq struct {
 	GoodsList []*model.OrderGoods `thrift:"goods_list,1,required" frugal:"1,required,list<model.OrderGoods>" json:"goods_list"`
-	Timestamp int64               `thrift:"timestamp,2,required" frugal:"2,required,i64" json:"timestamp"`
 }
 
 func NewGetCouponAndPriceReq() *GetCouponAndPriceReq {
@@ -895,15 +893,8 @@ func (p *GetCouponAndPriceReq) InitDefault() {
 func (p *GetCouponAndPriceReq) GetGoodsList() (v []*model.OrderGoods) {
 	return p.GoodsList
 }
-
-func (p *GetCouponAndPriceReq) GetTimestamp() (v int64) {
-	return p.Timestamp
-}
 func (p *GetCouponAndPriceReq) SetGoodsList(val []*model.OrderGoods) {
 	p.GoodsList = val
-}
-func (p *GetCouponAndPriceReq) SetTimestamp(val int64) {
-	p.Timestamp = val
 }
 
 func (p *GetCouponAndPriceReq) String() string {
@@ -922,9 +913,6 @@ func (p *GetCouponAndPriceReq) DeepEqual(ano *GetCouponAndPriceReq) bool {
 	if !p.Field1DeepEqual(ano.GoodsList) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.Timestamp) {
-		return false
-	}
 	return true
 }
 
@@ -941,17 +929,9 @@ func (p *GetCouponAndPriceReq) Field1DeepEqual(src []*model.OrderGoods) bool {
 	}
 	return true
 }
-func (p *GetCouponAndPriceReq) Field2DeepEqual(src int64) bool {
-
-	if p.Timestamp != src {
-		return false
-	}
-	return true
-}
 
 var fieldIDToName_GetCouponAndPriceReq = map[int16]string{
 	1: "goods_list",
-	2: "timestamp",
 }
 
 type GetCouponAndPriceResp struct {

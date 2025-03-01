@@ -28,19 +28,19 @@ import (
 func (svc *OrderService) SkuLockStockRollback(ctx context.Context, body []byte) (sucRollback bool) {
 	orderStock, err := svc.decodeStocks(body)
 	if err != nil {
-		logger.Errorf(err.Error())
+		logger.Error(err.Error())
 		return true
 	}
 
 	var payRel model.CachePaymentStatus
 	if payRel.PaymentStatus, payRel.OrderExpire, err = svc.GetPaymentStatusAndOrderExpire(ctx, orderStock.OrderID); err != nil {
-		logger.Errorf(err.Error())
+		logger.Error(err.Error())
 		return false
 	}
 
 	if payRel.PaymentStatus == constants.PaymentStatusPendingCode {
 		if err = svc.rpc.RollbackSkuStock(ctx, orderStock); err != nil {
-			logger.Errorf(err.Error())
+			logger.Error(err.Error())
 			return false
 		}
 	}
@@ -51,7 +51,7 @@ func (svc *OrderService) SkuLockStockRollback(ctx context.Context, body []byte) 
 func (svc *OrderService) GetPaymentStatusAndOrderExpire(ctx context.Context, orderID int64) (status int8, expired int64, err error) {
 	paymentStatus, exist, err := svc.cache.GetPaymentStatus(ctx, orderID)
 	if err != nil {
-		logger.Errorf(err.Error())
+		logger.Error(err.Error())
 	}
 
 	if exist {
@@ -67,7 +67,7 @@ func (svc *OrderService) GetPaymentStatusAndOrderExpire(ctx context.Context, ord
 	paymentStatus.OrderExpire = svc.calcOrderExpireTime(orderedAt)
 
 	if e := svc.cache.SetPaymentStatus(ctx, paymentStatus); e != nil {
-		logger.Errorf(e.Error())
+		logger.Error(e.Error())
 	}
 
 	return paymentStatus.PaymentStatus, paymentStatus.OrderExpire, nil
