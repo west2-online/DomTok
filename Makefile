@@ -18,6 +18,7 @@ REMOTE_REPOSITORY = registry.cn-hangzhou.aliyuncs.com/west2-online/DomTok
 MODULE = github.com/west2-online/DomTok
 # 当前架构
 ARCH := $(shell uname -m)
+PREFIX = "[Makefile]"
 # 目录相关
 DIR = $(shell pwd)
 CMD = $(DIR)/cmd
@@ -33,7 +34,10 @@ ES_ANALYSIS = domtok-elasticsearch
 SERVICES := gateway user commodity order cart payment assistant
 service = $(word 1, $@)
 
-PREFIX = "[Makefile]"
+EnvironmentStartEnv=DOMTOK_ENVIRONMENT_STARTED
+EnvironmentStartFlag=true
+EtcdAddrEnv=ETCD_ADDR
+EtcdAddr=127.0.0.1:2379
 
 .PHONY: help
 help:
@@ -213,3 +217,23 @@ verify: license vet fmt import lint vulncheck tidy
 license:
 	sh ./hack/add-license.sh
 
+# 为集成测试做准备
+.PHONY: with-env-test
+with-env-test:
+	@ make env-up ;\
+		echo "waiting for env up" ;\
+		sleep 3 ;\
+		export $(EnvironmentStartEnv)=$(EnvironmentStartFlag) ;\
+		make test
+
+.PHONY: with-env-test-nowait
+with-env-test-nowait:
+	@ make env-up ;\
+    	export $(EnvironmentStartEnv)=$(EnvironmentStartFlag) ;\
+    	export $(EtcdAddrEnv)=$(EtcdAddr) ;\
+    	make test
+
+
+# 手动暴露环境变量
+#export DOMTOK_ENVIRONMENT_STARTED=true
+#export ETCD_ADDR=127.0.0.1:2379

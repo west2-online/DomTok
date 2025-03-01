@@ -19,6 +19,7 @@ package mysql
 import (
 	"context"
 	"errors"
+	"log"
 
 	"gorm.io/gorm"
 
@@ -89,6 +90,7 @@ func (db *commodityDB) CreateCategory(ctx context.Context, entity *model.Categor
 	}
 	return nil
 }
+
 
 func (db *commodityDB) DeleteCategory(ctx context.Context, category *model.Category) error {
 	if err := db.client.WithContext(ctx).Delete(Category{Id: category.Id}).Error; err != nil {
@@ -295,7 +297,7 @@ func (db *commodityDB) ViewCategory(ctx context.Context, pageNum, pageSize int) 
 	offset := (pageNum - 1) * pageSize
 	cs := make([]*Category, 0)
 	if err := db.client.WithContext(ctx).Offset(offset).Limit(pageSize).Find(&cs).Error; err != nil {
-		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to list category: %v", err)
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to list categories: %v", err)
 	}
 	resp = make([]*model.CategoryInfo, 0)
 	for _, c := range cs {
@@ -382,20 +384,29 @@ func (db *commodityDB) IncrStock(ctx context.Context, infos []*model.SkuBuyInfo)
 func (db *commodityDB) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
 	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		for _, info := range infos {
-			var stock int
-
-			if err := tx.Raw("SELECT stock FROM "+constants.SkuTableName+
-				" WHERE id = ? FOR UPDATE", info.SkuID).Scan(&stock).Error; err != nil {
-				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to stock row: %v", err)
+			var s model.SkuStock
+			if err := tx.Raw("SELECT stock, lock_stock FROM "+constants.SkuTableName+" WHERE id = ? FOR UPDATE", info.SkuID).Scan(&s).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to fetch sku stock info: %v", err)
 			}
 
-			if stock < int(info.Count) || stock <= 0 {
+			stock := s.Stock
+			lockStock := s.LockStock
+
+			if stock < info.Count || stock <= 0 {
 				return errno.Errorf(errno.InsufficientStockErrorCode, "mysql: not enough  stock to decrease (available: %d, requested: %d)", stock, info.Count)
 			}
 
-			if err := tx.Table(constants.SkuTableName).Where("id = ?", info.SkuID).
-				UpdateColumn("stock", gorm.Expr("stock - ?", info.Count)).Error; err != nil {
-				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to decrease stock: %v", err)
+			if lockStock > stock || lockStock <= 0 || lockStock-info.Count < 0 {
+				return errno.Errorf(errno.InsufficientStockErrorCode, "mysql: not enough  stock to decrease, lockStock = %d, stock = %d", lockStock, stock)
+			}
+
+			updates := map[string]interface{}{
+				"stock":      gorm.Expr("stock - ?", info.Count),
+				"lock_stock": gorm.Expr("lock_stock - ?", info.Count),
+			}
+
+			if err := tx.Table(constants.SkuTableName).Where("id = ?", info.SkuID).Updates(updates).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to decrease stock and lock stock: %v", err)
 			}
 		}
 		return nil
@@ -417,4 +428,84 @@ func (c *commodityDB) GetSkuById(ctx context.Context, id int64) (*model.Sku, err
 		Stock:     s.Stock,
 		LockStock: s.LockStock,
 	}, nil
+}
+
+func (c *commodityDB) DecrStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	err := c.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, info := range infos {
+			var s model.SkuStock
+
+			if err := tx.Raw("SELECT stock, lock_stock FROM "+constants.SkuTableName+" WHERE id = ?", info.SkuID).Scan(&s).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to fetch sku stock: %v", err)
+			}
+
+			stock := s.Stock
+			lockStock := s.LockStock
+
+			if stock < info.Count || stock <= 0 {
+				return errno.Errorf(errno.InsufficientStockErrorCode, "mysql: not enough  stock to decrease (available: %d, requested: %d)", stock, info.Count)
+			}
+			log.Println(s)
+			if lockStock > stock || lockStock <= 0 || lockStock-info.Count < 0 {
+				return errno.Errorf(errno.InsufficientStockErrorCode, "mysql: not enough  stock to decrease, lockStock = %d, stock = %d", lockStock, stock)
+			}
+
+			updates := map[string]interface{}{
+				"stock":      gorm.Expr("stock - ?", info.Count),
+				"lock_stock": gorm.Expr("lock_stock - ?", info.Count),
+			}
+
+			if err := tx.Table(constants.SkuTableName).Where("id = ?", info.SkuID).Updates(updates).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to decrease stock and lock stock: %v", err)
+			}
+		}
+		return nil
+	})
+	return err
+}
+
+func (db *commodityDB) DecrLockStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, info := range infos {
+			var lockStock int64
+
+			if err := tx.Raw("SELECT lock_stock FROM "+constants.SkuTableName+" WHERE id = ?", info.SkuID).Scan(&lockStock).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to fetch sku lock stock: %v", err)
+			}
+
+			if lockStock < info.Count || lockStock <= 0 {
+				return errno.Errorf(errno.InsufficientStockErrorCode, "mysql: not enough stock")
+			}
+
+			if err := tx.Table(constants.SkuTableName).Where("id = ?", info.SkuID).
+				UpdateColumn("lock_stock", gorm.Expr("lock_stock - ?", info.Count)).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update stock: %v", err)
+			}
+		}
+		return nil
+	})
+	return err
+}
+
+func (db *commodityDB) IncrLockStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, info := range infos {
+			var lockStock int64
+
+			if err := tx.Raw("SELECT lock_stock FROM "+constants.SkuTableName+" WHERE id = ?", info.SkuID).Scan(&lockStock).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to fetch sku lock stock: %v", err)
+			}
+
+			if lockStock < 0 {
+				return errno.Errorf(errno.InsufficientStockErrorCode, "mysql: not enough stock")
+			}
+
+			if err := tx.Table(constants.SkuTableName).Where("id = ?", info.SkuID).
+				UpdateColumn("lock_stock", gorm.Expr("lock_stock + ?", info.Count)).Error; err != nil {
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update stock: %v", err)
+			}
+		}
+		return nil
+	})
+	return err
 }

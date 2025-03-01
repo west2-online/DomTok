@@ -18,6 +18,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/olivere/elastic/v7"
 
@@ -64,6 +65,9 @@ type CommodityDB interface {
 	IncrStock(ctx context.Context, infos []*model.SkuBuyInfo) error
 	DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error
 	GetSkuById(ctx context.Context, id int64) (*model.Sku, error)
+	DecrStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error
+	DecrLockStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error
+	IncrLockStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error
 }
 
 type CommodityCache interface {
@@ -78,6 +82,10 @@ type CommodityCache interface {
 	GetLockStockKey(id int64) string
 	GetStockKey(id int64) string
 	DecrStockNum(ctx context.Context, infos []*model.SkuBuyInfo) error
+	IsHealthy(ctx context.Context) error
+	Lock(ctx context.Context, keys []string, ttl time.Duration) error
+	UnLock(ctx context.Context, keys []string) error
+	GetSkuKey(id int64) string
 }
 
 type CommodityMQ interface {

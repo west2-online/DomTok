@@ -18,31 +18,43 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/west2-online/DomTok/app/order/domain/model"
 	"github.com/west2-online/DomTok/app/order/domain/repository"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/utils"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 type OrderService struct {
-	db repository.OrderDB
-	sf *utils.Snowflake
+	db     repository.OrderDB
+	idG    repository.IDGenerator
+	rpc    repository.RPC
+	mq     repository.MQ
+	cache  repository.Cache
+	locker repository.Locker
 }
 
-func NewOrderService(db repository.OrderDB, sf *utils.Snowflake) *OrderService {
-	return &OrderService{db: db, sf: sf}
+func NewOrderService(db repository.OrderDB, sf repository.IDGenerator, rpc repository.RPC,
+	mq repository.MQ, cache repository.Cache, locker repository.Locker,
+) *OrderService {
+	if db == nil || sf == nil || rpc == nil || mq == nil || cache == nil || locker == nil {
+		logger.Fatalf("failed get new order service, all arguments should not be nil")
+	}
+	svc := &OrderService{db: db, idG: sf, rpc: rpc, mq: mq, cache: cache, locker: locker}
+	svc.init()
+	return svc
 }
 
 // IsOrderExist 检查订单是否存在
-func (svc *OrderService) IsOrderExist(ctx context.Context, orderID int64) (bool, error) {
+func (svc *OrderService) IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error) {
 	return svc.db.IsOrderExist(ctx, orderID)
 }
 
 // OrderExist 检查订单是否存在
 func (svc *OrderService) OrderExist(ctx context.Context, orderID int64) error {
-	exist, err := svc.db.IsOrderExist(ctx, orderID)
+	exist, _, err := svc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -79,16 +91,86 @@ func (svc *OrderService) ViewOrderList(ctx context.Context, userID int64, page, 
 }
 
 func (svc *OrderService) GetOrderStatusMsg(code int8) string {
-	switch code {
-	case constants.OrderStatusUnpaidCode:
-		return constants.OrderStatusUnpaid
-	case constants.OrderStatusPaidCode:
-		return constants.OrderStatusPaid
-	case constants.OrderStatusCompletedCode:
-		return constants.OrderStatusCompleted
-	case constants.OrderStatusCancelledCode:
-		return constants.OrderStatusCancelled
-	default:
-		return constants.OrderStatusUnknown
+	return constants.GetOrderStatusMsg(code)
+}
+
+func (svc *OrderService) calcOrderExpireTime(createAt int64) int64 {
+	return createAt + constants.OrderExpireTime.Milliseconds()
+}
+
+func (svc *OrderService) UpdateOrderAsSuccess(ctx context.Context, expired int64, payRel *model.PaymentResult) error {
+	if time.Now().UnixMilli() > expired {
+		return errno.NewErrNo(errno.ServiceOrderExpired, "order expired")
+	}
+
+	if payRel.PaymentStatus == constants.PaymentStatusSuccessCode {
+		return nil
+	}
+	// 尝试开始更新
+	if err := svc.locker.LockOrder(payRel.OrderID); err != nil {
+		return err
+	}
+	defer svc.logUnLock(payRel.OrderID, svc.locker.UnlockOrder)
+
+	goods, err := svc.db.GetOrderGoodsByOrderID(ctx, payRel.OrderID)
+	if err != nil {
+		return err
+	}
+
+	// 减少库存
+	orderStock := model.ConvertOrderGoodsToOrderStock(payRel.OrderID, goods)
+	if err = svc.rpc.DescSkuStock(ctx, orderStock); err != nil {
+		return err
+	}
+
+	if err = svc.db.UpdatePaymentStatus(ctx, payRel); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (svc *OrderService) CancelOrder(ctx context.Context, payRel *model.PaymentResult) error {
+	// 如果订单是失败，那说明回滚过了
+	if payRel.PaymentStatus != constants.PaymentStatusFailedCode {
+		return errno.NewErrNo(errno.ServiceOrderStatusInvalid, "failed orders cannot be canceled")
+	}
+
+	// 尝试开始回滚或者直接取消回滚
+	if err := svc.locker.LockOrder(payRel.OrderID); err != nil {
+		return err
+	}
+	defer svc.logUnLock(payRel.OrderID, svc.locker.UnlockOrder)
+
+	goods, err := svc.db.GetOrderGoodsByOrderID(ctx, payRel.OrderID)
+	if err != nil {
+		return err
+	}
+
+	// 释放锁定库存
+	orderStock := model.ConvertOrderGoodsToOrderStock(payRel.OrderID, goods)
+	if err = svc.rpc.DescSkuLockStock(ctx, orderStock); err != nil {
+		return err
+	}
+
+	if err = svc.db.UpdatePaymentStatus(ctx, payRel); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (svc *OrderService) IsEqualStatus(s1, s2 int8) bool {
+	return s1 == s2
+}
+
+func (svc *OrderService) nextVal() int64 {
+	v, _ := svc.idG.NextVal()
+	return v
+}
+
+func (svc *OrderService) logUnLock(id int64, fn func(id int64) error) {
+	if err := fn(id); err != nil {
+		logger.Errorf(err.Error())
 	}
 }

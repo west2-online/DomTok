@@ -72,6 +72,10 @@ func Init(service string, level string) {
 	control.scheduleUpdateLogger(service)
 }
 
+func Ignore() {
+	control.logger = &logger{zap.NewNop()}
+}
+
 // AddLoggerHook 会将传进的参数在每一次日志输出后执行
 func AddLoggerHook(fns ...func(zapcore.Entry) error) {
 	control.hooks = append(control.hooks, fns...)

@@ -6,8 +6,7 @@ include "model.thrift"
 
 struct CreateOrderReq {
     1: required i64 addressID; // 地址信息 ID
-    2: required string addressInfo; // 简略地址信息
-    3: required list<model.BaseOrderGoods> baseOrderGoods; // 商品列表
+    2: required list<model.BaseOrderGoods> baseOrderGoods; // 商品列表
 }
 
 struct CreateOrderResp {
@@ -68,6 +67,18 @@ struct IsOrderExistReq {
 struct IsOrderExistResp {
     1: required model.BaseResp base
     2: required bool exist
+    3: required i64 orderExpire
+}
+
+struct UpdateOrderStatusReq {
+    1: required i64 orderID // 订单号
+    2: required i8 payment_status // 订单状态
+    3: required i64 paymentAt // 支付时间
+    4: required string paymentStyle // 支付方式
+}
+
+struct UpdateOrderStatusResp {
+    1: required model.BaseResp base
 }
 
 service OrderService {
@@ -78,4 +89,7 @@ service OrderService {
     ChangeDeliverAddressResp ChangeDeliverAddress(1:ChangeDeliverAddressReq req) (api.put="/api/order/change-address")
     DeleteOrderResp DeleteOrder(1:DeleteOrderReq req) (api.delete="/api/order/delete")
     IsOrderExistResp IsOrderExist(1:IsOrderExistReq req) (api.get="/api/order/exist")
+
+    UpdateOrderStatusResp OrderPaymentSuccess(1:UpdateOrderStatusReq req)
+    UpdateOrderStatusResp OrderPaymentCancel(1:UpdateOrderStatusReq req)
 }

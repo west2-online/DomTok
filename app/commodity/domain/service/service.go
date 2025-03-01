@@ -425,17 +425,175 @@ func (svc *CommodityService) Cached(ctx context.Context, infos []*model.SkuBuyIn
 
 	for _, info := range infos {
 		key := svc.cache.GetLockStockKey(info.SkuID)
+		stockKey := svc.cache.GetStockKey(info.SkuID)
+
+		lockStockCached := true
+		StockCached := true
+
 		if !svc.cache.IsExist(ctx, key) {
-			// 没有命中就先返回错误，后续及时补数据
-			go func(id int64, k string, c context.Context) {
+			lockStockCached = false
+			cached = false
+		}
+		if !svc.cache.IsExist(ctx, stockKey) {
+			StockCached = false
+			cached = false
+		}
+
+		if !lockStockCached || !StockCached {
+			go func(id int64, stockKey, lockStockKey string, c context.Context) {
 				data, err := svc.db.GetSkuById(c, id)
 				if err != nil {
 					return
 				}
-				svc.cache.SetLockStockNum(c, k, data.LockStock)
-			}(info.SkuID, key, ctx)
-			cached = false
+				if !lockStockCached {
+					svc.cache.SetLockStockNum(c, lockStockKey, data.LockStock)
+				}
+
+				if !StockCached {
+					svc.cache.SetLockStockNum(c, stockKey, data.Stock)
+				}
+			}(info.SkuID, stockKey, key, ctx)
 		}
 	}
 	return cached
+}
+
+func (svc *CommodityService) IncrLockStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	var err error
+	if !svc.Cached(ctx, infos) {
+		return errno.Errorf(errno.RedisKeyNotExist, "CommodityService.IncrLockStockInNX failed")
+	}
+
+	keys := make([]string, 0)
+
+	for _, info := range infos {
+		keys = append(keys, svc.cache.GetSkuKey(info.SkuID))
+	}
+
+	err = svc.cache.Lock(ctx, keys, constants.RedisNXExpireTime)
+	if err != nil {
+		return fmt.Errorf("CommodityService.IncrLockStockInNX failed: %w", err)
+	}
+	defer func() {
+		err = svc.cache.UnLock(ctx, keys)
+		if err != nil {
+			logger.Errorf("CommodityService.IncrLockStockInNX failed: %v", err)
+		}
+	}()
+
+	var eg errgroup.Group
+
+	eg.Go(func() error {
+		err = svc.cache.IncrLockStockNum(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("CommodityService.IncrLockStock failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		err = svc.db.IncrLockStockInNX(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("CommodityService.IncrLockStock failed: %w", err)
+		}
+		return nil
+	})
+
+	if err = eg.Wait(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (svc *CommodityService) DecrLockStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	var err error
+	if !svc.Cached(ctx, infos) {
+		return errno.Errorf(errno.RedisKeyNotExist, "CommodityService.DecrLockStockInNX failed")
+	}
+
+	keys := make([]string, 0)
+
+	for _, info := range infos {
+		keys = append(keys, svc.cache.GetSkuKey(info.SkuID))
+	}
+
+	err = svc.cache.Lock(ctx, keys, constants.RedisNXExpireTime)
+	if err != nil {
+		return fmt.Errorf("CommodityService.DecrStockInNX failed: %w", err)
+	}
+	defer func() {
+		err = svc.cache.UnLock(ctx, keys)
+		if err != nil {
+			logger.Errorf("CommodityService.DecrStockInNX failed: %v", err)
+		}
+	}()
+
+	var eg errgroup.Group
+
+	eg.Go(func() error {
+		err = svc.cache.DecrLockStockNum(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("CommodityService.DecrLockStockInNX failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		err = svc.db.DecrLockStockInNX(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("CommodityService.DecrLockStockInNX failed: %w", err)
+		}
+		return nil
+	})
+
+	if err = eg.Wait(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (svc *CommodityService) DecrStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	var err error
+	if !svc.Cached(ctx, infos) {
+		return errno.Errorf(errno.RedisKeyNotExist, "CommodityService.DecrStockInNX failed")
+	}
+
+	keys := make([]string, 0)
+
+	for _, info := range infos {
+		keys = append(keys, svc.cache.GetSkuKey(info.SkuID))
+	}
+
+	err = svc.cache.Lock(ctx, keys, constants.RedisNXExpireTime)
+	if err != nil {
+		return fmt.Errorf("CommodityService.DecrStockInNX failed: %w", err)
+	}
+	defer func() {
+		err = svc.cache.UnLock(ctx, keys)
+		if err != nil {
+			logger.Errorf("CommodityService.DecrStockInNX failed: %v", err)
+		}
+	}()
+
+	var eg errgroup.Group
+
+	eg.Go(func() error {
+		err = svc.cache.DecrStockNum(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("CommodityService.DecrStockInNX failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		err = svc.db.DecrStockInNX(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("CommodityService.DecrStockInNX failed: %w", err)
+		}
+		return nil
+	})
+	if err = eg.Wait(); err != nil {
+		return err
+	}
+	return nil
 }

@@ -80,6 +80,20 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"OrderPaymentSuccess": kitex.NewMethodInfo(
+		orderPaymentSuccessHandler,
+		newOrderServiceOrderPaymentSuccessArgs,
+		newOrderServiceOrderPaymentSuccessResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"OrderPaymentCancel": kitex.NewMethodInfo(
+		orderPaymentCancelHandler,
+		newOrderServiceOrderPaymentCancelArgs,
+		newOrderServiceOrderPaymentCancelResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -272,6 +286,42 @@ func newOrderServiceIsOrderExistResult() interface{} {
 	return order.NewOrderServiceIsOrderExistResult()
 }
 
+func orderPaymentSuccessHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*order.OrderServiceOrderPaymentSuccessArgs)
+	realResult := result.(*order.OrderServiceOrderPaymentSuccessResult)
+	success, err := handler.(order.OrderService).OrderPaymentSuccess(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newOrderServiceOrderPaymentSuccessArgs() interface{} {
+	return order.NewOrderServiceOrderPaymentSuccessArgs()
+}
+
+func newOrderServiceOrderPaymentSuccessResult() interface{} {
+	return order.NewOrderServiceOrderPaymentSuccessResult()
+}
+
+func orderPaymentCancelHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*order.OrderServiceOrderPaymentCancelArgs)
+	realResult := result.(*order.OrderServiceOrderPaymentCancelResult)
+	success, err := handler.(order.OrderService).OrderPaymentCancel(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newOrderServiceOrderPaymentCancelArgs() interface{} {
+	return order.NewOrderServiceOrderPaymentCancelArgs()
+}
+
+func newOrderServiceOrderPaymentCancelResult() interface{} {
+	return order.NewOrderServiceOrderPaymentCancelResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -347,6 +397,26 @@ func (p *kClient) IsOrderExist(ctx context.Context, req *order.IsOrderExistReq) 
 	_args.Req = req
 	var _result order.OrderServiceIsOrderExistResult
 	if err = p.c.Call(ctx, "IsOrderExist", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) OrderPaymentSuccess(ctx context.Context, req *order.UpdateOrderStatusReq) (r *order.UpdateOrderStatusResp, err error) {
+	var _args order.OrderServiceOrderPaymentSuccessArgs
+	_args.Req = req
+	var _result order.OrderServiceOrderPaymentSuccessResult
+	if err = p.c.Call(ctx, "OrderPaymentSuccess", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) OrderPaymentCancel(ctx context.Context, req *order.UpdateOrderStatusReq) (r *order.UpdateOrderStatusResp, err error) {
+	var _args order.OrderServiceOrderPaymentCancelArgs
+	_args.Req = req
+	var _result order.OrderServiceOrderPaymentCancelResult
+	if err = p.c.Call(ctx, "OrderPaymentCancel", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
