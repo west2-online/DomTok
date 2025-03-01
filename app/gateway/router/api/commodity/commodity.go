@@ -69,7 +69,6 @@ func Register(r *server.Hertz) {
 					_image.POST("/create", append(_createskuimageMw(), commodity.CreateSkuImage)...)
 					_image.DELETE("/delete", append(_deleteskuimageMw(), commodity.DeleteSkuImage)...)
 					_image.POST("/update", append(_updateskuimageMw(), commodity.UpdateSkuImage)...)
-					_sku.GET("/list", append(_listskuinfoMw(), commodity.ListSkuInfo)...)
 					_sku.GET("/search", append(_viewskuMw(), commodity.ViewSku)...)
 					_sku.POST("/upadte", append(_updateskuMw(), commodity.UpdateSku)...)
 				}

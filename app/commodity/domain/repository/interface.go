@@ -80,7 +80,7 @@ type CommodityDB interface {
 	GetSkuImageByImageId(ctx context.Context, imageId int64) (*model.SkuImage, error)
 	GetSkuIdBySpuID(ctx context.Context, spuId int64, PageNum int, PageSize int) ([]*int64, error)
 	UploadSkuAttr(ctx context.Context, sku *model.Sku, attr *model.AttrValue, id int64) error
-	ListSkuInfo(ctx context.Context, skuId []int64, PageNum int, PageSize int) ([]*model.Sku, error)
+	ListSkuInfo(ctx context.Context, skuInfo []*model.SkuVersion, PageNum int, PageSize int) ([]*model.Sku, error)
 }
 
 type CommodityCache interface {

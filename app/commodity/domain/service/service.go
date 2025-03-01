@@ -727,44 +727,16 @@ func (svc *CommodityService) UploadSkuAttr(ctx context.Context, attr *model.Attr
 	return nil
 }
 
-func (svc *CommodityService) ListSkuInfo(ctx context.Context, ids []int64, pageNum, pageSize int64) ([]*model.Sku, int64, error) {
+func (svc *CommodityService) ListSkuInfo(ctx context.Context, skuInfo []*model.SkuVersion, pageNum, pageSize int64) ([]*model.Sku, int64, error) {
 	var (
-		remainingIDs []int64
-		skuInfos     []*model.Sku
-		total        int64
+		skuInfos []*model.Sku
+		total    int64
 	)
 
-	for i := (pageNum - 1) * pageSize; i < pageNum*pageSize; i++ {
-		key := fmt.Sprintf("sku:%d", ids[i])
-		if svc.cache.IsExist(ctx, key) {
-			s, err := svc.cache.GetSku(ctx, key)
-			if err != nil {
-				return nil, -1, fmt.Errorf("usecase.ListSkuInfo failed: %w", err)
-			}
-			skuInfos = append(skuInfos, s)
-		} else {
-			remainingIDs = append(remainingIDs, ids[i])
-		}
-	}
-
-	if len(remainingIDs) == 0 {
-		return skuInfos, -1, nil
-	}
-
-	ids = remainingIDs
-
-	result, err := svc.db.ListSkuInfo(ctx, ids, int(pageNum), int(pageSize))
+	skuInfos, err := svc.db.ListSkuInfo(ctx, skuInfo, int(pageNum), int(pageSize))
 	if err != nil {
 		return nil, -1, fmt.Errorf("usecase.ListSkuInfo failed: %w", err)
 	}
-
-	for _, s := range result {
-		key := fmt.Sprintf("sku:%d", s.SkuID)
-		svc.cache.SetSku(ctx, key, s)
-	}
-
-	skuInfos = append(skuInfos, result...)
-	total = int64(len(skuInfos))
 
 	return skuInfos, total, nil
 }

@@ -271,15 +271,6 @@ struct ViewCategoryResp {
 
  }
 
-struct ListSkuInfoReq {
-    1: required list<i64> skuIDs;
-    2: required i64 pageNum;
-    3: required i64 pageSize;
-}
-
-struct ListSkuInfoResp {
-    1: required list<model.SkuInfo> skuInfos;
-}
 
 struct ViewHistoryPriceReq {
     1: required i64 historyID;
@@ -319,7 +310,6 @@ service CommodityService {
     ViewSkuImageResp ViewSkuImage(1: ViewSkuImageReq req) (api.get="/api/v1/commodity/sku/image");
     ViewSkuResp ViewSku(1: ViewSkuReq req) (api.get="/api/v1/commodity/sku/search");
     UploadSkuAttrResp UploadSkuAttr(1: UploadSkuAttrReq req) (api.post="/api/v1/commodity/sku/attr");
-    ListSkuInfoResp ListSkuInfo(1: ListSkuInfoReq req) (api.get="/api/v1/commodity/sku/list");
     CreateSkuImageResp CreateSkuImage(1: CreateSkuImageReq req) (api.post = "/api/v1/commodity/sku/image/create");
     UpdateSkuImageResp UpdateSkuImage(1: UpdateSkuImageReq req) (api.post = "/api/v1/commodity/sku/image/update");
     DeleteSkuImageResp DeleteSkuImage(1: DeleteSkuImageReq req) (api.delete="/api/v1/commodity/sku/image/delete");

@@ -37,7 +37,6 @@ const (
 	OrderGoodsTableName = "order_goods"
 	SpuTableName        = "spu_info"
 	SpuImageTableName   = "spu_image"
-	SkuTableName        = "sku_info"
 	CouponTableName     = "coupon_info"
 	UserCouponTableName = "user_coupon"
 

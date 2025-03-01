@@ -355,12 +355,12 @@ func (us *useCase) UploadSkuAttr(ctx context.Context, attr *model.AttrValue, sku
 	return nil
 }
 
-func (us *useCase) ListSkuInfo(ctx context.Context, ids []int64, pageNum int64, pageSize int64) (skuInfos []*model.Sku, total int64, err error) {
+func (us *useCase) ListSkuInfo(ctx context.Context, skuInfo []*model.SkuVersion, pageNum int64, pageSize int64) ([]*model.Sku, int64, error) {
 	if pageNum < 1 || pageSize < 1 {
 		return nil, -1, fmt.Errorf("usecase.ListSkuInfo failed: invalid PageNum or PageSize")
 	}
 
-	skuInfos, total, err = us.svc.ListSkuInfo(ctx, ids, pageNum, pageSize)
+	skuInfos, total, err := us.svc.ListSkuInfo(ctx, skuInfo, pageNum, pageSize)
 	if err != nil {
 		return nil, -1, fmt.Errorf("usecase.ListSkuInfo failed: %w", err)
 	}

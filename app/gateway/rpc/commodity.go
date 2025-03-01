@@ -486,15 +486,3 @@ func UploadSkuAttrRPC(ctx context.Context, req *commodity.UploadSkuAttrReq) (err
 	}
 	return nil
 }
-
-func ListSkuInfo(ctx context.Context, req *commodity.ListSkuInfoReq) (skus []*model.SkuInfo, err error) {
-	resp, err := commodityClient.ListSkuInfo(ctx, req)
-	if err != nil {
-		logger.Errorf("ListSkuInfo: RPC called failed: %v", err.Error())
-		return nil, errno.InternalServiceError.WithError(err)
-	}
-	if !utils.IsSuccess(resp.Base) {
-		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
-	}
-	return resp.SkuInfos, nil
-}

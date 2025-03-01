@@ -141,3 +141,16 @@ func BuildSkuInfos(i []*model.Sku) []*modelKitex.SkuInfo {
 	}
 	return result
 }
+
+func BuildSkuPriceHistory(i []*model.SkuPriceHistory) []*modelKitex.PriceHistory {
+	result := make([]*modelKitex.PriceHistory, 0, len(i))
+	for _, v := range i {
+		result = append(result, &modelKitex.PriceHistory{
+			HistoryID: v.Id,
+			SkuID:     v.SkuId,
+			Price:     int64(v.MarkPrice),
+			CreatedAt: v.CreatedAt,
+		})
+	}
+	return result
+}

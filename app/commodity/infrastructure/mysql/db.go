@@ -445,8 +445,13 @@ func (db *commodityDB) DeleteSku(ctx context.Context, sku *model.Sku) error {
 	return nil
 }
 
-func (db *commodityDB) ListSkuInfo(ctx context.Context, skuId []int64, pageNum int, pageSize int) ([]*model.Sku, error) {
+func (db *commodityDB) ListSkuInfo(ctx context.Context, skuInfo []*model.SkuVersion, pageNum int, pageSize int) ([]*model.Sku, error) {
 	var skus []Sku
+
+	skuId := make([]int64, 0, len(skuInfo))
+	for _, v := range skuInfo {
+		skuId = append(skuId, v.SkuID)
+	}
 
 	offset := (pageNum - 1) * pageSize
 	if err := db.client.WithContext(ctx).Table((&Sku{}).TableName()).Offset(offset).Limit(pageSize).Where("id IN (?)", skuId).Find(&skus).Error; err != nil {
@@ -786,7 +791,7 @@ func (c *commodityDB) GetSkuById(ctx context.Context, id int64) (*model.Sku, err
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get sku: %v", err)
 	}
 	return &model.Sku{
-		Id:        id,
+		SkuID:     id,
 		Stock:     s.Stock,
 		LockStock: s.LockStock,
 	}, nil

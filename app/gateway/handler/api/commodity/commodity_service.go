@@ -21,6 +21,7 @@ package api
 import (
 	"context"
 	"errors"
+
 	"github.com/cloudwego/hertz/pkg/protocol"
 
 	"github.com/west2-online/DomTok/app/gateway/pack"
@@ -643,29 +644,6 @@ func UploadSkuAttr(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	pack.RespSuccess(c)
-}
-
-// ListSkuInfo .
-// @router /api/commodity/sku/list [GET]
-func ListSkuInfo(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req api.ListSkuInfoReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		pack.RespError(c, errno.ParamVerifyError.WithError(err))
-		return
-	}
-
-	resp, err := rpc.ListSkuInfo(ctx, &commodity.ListSkuInfoReq{
-		SkuIDs:   req.SkuIDs,
-		PageNum:  req.PageNum,
-		PageSize: req.PageSize,
-	})
-	if err != nil {
-		pack.RespError(c, err)
-		return
-	}
-	pack.RespData(c, resp)
 }
 
 // ViewHistory .

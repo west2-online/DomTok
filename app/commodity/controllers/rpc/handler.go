@@ -19,10 +19,10 @@ package rpc
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/samber/lo"
-	"fmt"
 
 	"github.com/west2-online/DomTok/app/commodity/controllers/rpc/pack"
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
@@ -320,7 +320,6 @@ func (c CommodityHandler) CreateSku(streamServer commodity.CommodityService_Crea
 
 	req, err := streamServer.Recv()
 	if err != nil {
-		logger.Errorf("rpc.CreateSpu: receive error: %v", err)
 		r.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(r)
 	}
@@ -328,7 +327,6 @@ func (c CommodityHandler) CreateSku(streamServer commodity.CommodityService_Crea
 	for i := 0; i < int(req.BufferCount); i++ {
 		fileData, err := streamServer.Recv()
 		if err != nil {
-			logger.Errorf("rpc.CreateSku: receive error: %v", err)
 			r.Base = base.BuildBaseResp(err)
 			return streamServer.SendAndClose(r)
 		}
@@ -345,7 +343,6 @@ func (c CommodityHandler) CreateSku(streamServer commodity.CommodityService_Crea
 		SpuID:            req.SpuID,
 	}, req.Ext)
 	if err != nil {
-		logger.Errorf("rpc.CreateSku: create sku error: %v", err)
 		r.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(r)
 	}
@@ -360,7 +357,6 @@ func (c CommodityHandler) UpdateSku(streamServer commodity.CommodityService_Upda
 
 	req, err := streamServer.Recv()
 	if err != nil {
-		logger.Errorf("rpc.UpdateSku: receive error: %v", err)
 		r.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(r)
 	}
@@ -383,7 +379,6 @@ func (c CommodityHandler) UpdateSku(streamServer commodity.CommodityService_Upda
 		ForSale:          int(req.GetForSale()),
 	}, req.Ext)
 	if err != nil {
-		logger.Errorf("rpc.UpdateSku: update sku error: %v", err)
 		r.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(r)
 	}
@@ -466,7 +461,16 @@ func (c CommodityHandler) UploadSkuAttr(ctx context.Context, req *commodity.Uplo
 func (c CommodityHandler) ListSkuInfo(ctx context.Context, req *commodity.ListSkuInfoReq) (r *commodity.ListSkuInfoResp, err error) {
 	r = new(commodity.ListSkuInfoResp)
 
-	SkuInfos, total, err := c.useCase.ListSkuInfo(ctx, req.SkuIDs, req.PageNum, req.PageSize)
+	skuInfo := make([]*model.SkuVersion, 0)
+
+	for _, info := range req.SkuInfos {
+		skuInfo = append(skuInfo, &model.SkuVersion{
+			SkuID:     info.SkuID,
+			VersionID: info.VersionID,
+		})
+	}
+
+	SkuInfos, total, err := c.useCase.ListSkuInfo(ctx, skuInfo, req.PageNum, req.PageSize)
 	if err != nil {
 		r.Base = base.BuildBaseResp(err)
 		return
@@ -482,7 +486,6 @@ func (c CommodityHandler) CreateSkuImage(streamServer commodity.CommodityService
 	resp := new(commodity.CreateSkuImageResp)
 	req, err := streamServer.Recv()
 	if err != nil {
-		logger.Errorf("rpc.CreateSkuImage: receive error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -490,7 +493,6 @@ func (c CommodityHandler) CreateSkuImage(streamServer commodity.CommodityService
 	for i := 0; i < int(req.BufferCount); i++ {
 		data, err := streamServer.Recv()
 		if err != nil {
-			logger.Errorf("rpc.CreateSkuImage: receive error: %v", err)
 			resp.Base = base.BuildBaseResp(err)
 			return streamServer.SendAndClose(resp)
 		}
@@ -500,7 +502,6 @@ func (c CommodityHandler) CreateSkuImage(streamServer commodity.CommodityService
 		SkuID: req.SkuID,
 	}, req.Data)
 	if err != nil {
-		logger.Errorf("rpc.CreateSkuImage: create sku image error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -514,7 +515,6 @@ func (c CommodityHandler) UpdateSkuImage(streamServer commodity.CommodityService
 	resp := new(commodity.UpdateSkuImageResp)
 	req, err := streamServer.Recv()
 	if err != nil {
-		logger.Errorf("rpc.UpdateSkuImage: receive error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -522,7 +522,6 @@ func (c CommodityHandler) UpdateSkuImage(streamServer commodity.CommodityService
 	for i := 0; i < int(req.BufferCount); i++ {
 		data, err := streamServer.Recv()
 		if err != nil {
-			logger.Errorf("rpc.UpdateSkuImage: receive error: %v", err)
 			resp.Base = base.BuildBaseResp(err)
 			return streamServer.SendAndClose(resp)
 		}
@@ -533,7 +532,6 @@ func (c CommodityHandler) UpdateSkuImage(streamServer commodity.CommodityService
 		ImageID: req.ImageID,
 	}, req.Data)
 	if err != nil {
-		logger.Errorf("rpc.UpdateSkuImage: update sku image error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
