@@ -43,10 +43,17 @@ type UserCoupon struct {
 	RemainingUses int64
 }
 
-type AssignedCoupon struct {
-	SpuId           int64
-	Coupon          *Coupon
-	DiscountedPrice float64
+type OrderGoods struct {
+	GoodsId            int64
+	OriginPrice        float64
+	SalePrice          float64
+	SingleFreightPrice float64
+	TotalAmount        float64
+	FreightAmount      float64
+	DiscountAmount     float64
+	SinglePrice        float64
+	CouponId           int64
+	CouponName         string
 }
 
 func (c *Coupon) CalculateDiscountPrice(originalPrice float64) float64 {
@@ -60,16 +67,4 @@ func (c *Coupon) CalculateDiscountPrice(originalPrice float64) float64 {
 	default:
 		return originalPrice
 	}
-}
-
-func ConvertMapsToAssignedCoupon(assignedMap map[int64]*Coupon, priceMap map[int64]float64) []*AssignedCoupon {
-	assignedCoupon := make([]*AssignedCoupon, 0)
-	for spuId, price := range priceMap {
-		assignedCoupon = append(assignedCoupon, &AssignedCoupon{
-			SpuId:           spuId,
-			Coupon:          assignedMap[spuId],
-			DiscountedPrice: price,
-		})
-	}
-	return assignedCoupon
 }

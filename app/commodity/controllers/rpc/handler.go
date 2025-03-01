@@ -196,9 +196,9 @@ func (c CommodityHandler) ViewUserAllCoupon(ctx context.Context, req *commodity.
 	return r, nil
 }
 
-func (c CommodityHandler) UseUserCoupon(ctx context.Context, req *commodity.UseUserCouponReq) (r *commodity.UseUserCouponResp, err error) {
-	// TODO implement me
-	panic("implement me")
+func (c CommodityHandler) GetCouponAndPrice(ctx context.Context, req *commodity.GetCouponAndPriceReq) (r *commodity.GetCouponAndPriceResp, err error) {
+	r=new(commodity.GetCouponAndPriceResp)
+	c.useCase.
 }
 
 func (c CommodityHandler) CreateSpu(streamServer commodity.CommodityService_CreateSpuServer) (err error) {

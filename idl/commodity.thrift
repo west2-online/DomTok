@@ -89,6 +89,7 @@ struct ViewUserAllCouponResp {
 */
 struct GetCouponAndPriceReq {
     1: required list<model.OrderGoods> goods_list
+    2: required i64 timestamp
 }
 
 struct GetCouponAndPriceResp {

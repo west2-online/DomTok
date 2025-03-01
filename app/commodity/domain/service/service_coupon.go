@@ -53,7 +53,7 @@ func (svc *CommodityService) GetCouponsByUserCoupons(ctx context.Context, userCo
 	return couponList, nil
 }
 
-func (svc *CommodityService) CalculateWithCoupon(ctx context.Context, spuList []*model.Spu) ([]*model.AssignedCoupon, float64, error) {
+func (svc *CommodityService) CalculateWithCoupon(ctx context.Context, goods []*model.OrderGoods) ([]*model.OrderGoods, float64, error) {
 	uid, err := contextLogin.GetLoginData(ctx)
 	if err != nil {
 		return nil, -1, fmt.Errorf("svc.GetCouponByCommoditie get logindata error: %w", err)
@@ -106,13 +106,13 @@ func (svc *CommodityService) CalculateWithCoupon(ctx context.Context, spuList []
 	matchMap := make(map[int64][]*model.Coupon)
 
 	// 将 spuList 按 SpuId 做升序排序
-	sort.Slice(spuList, func(i, j int) bool {
-		return spuList[i].SpuId < spuList[j].SpuId
+	sort.Slice(goods, func(i, j int) bool {
+		return goods[i].GoodsId < goods[j].GoodsId
 	})
 	// 构造双指针
 	i, j := 0, 0
-	for i < len(spuList) && j < len(couponsForSpu) {
-		spuId := spuList[i].SpuId
+	for i < len(goods) && j < len(couponsForSpu) {
+		spuId := goods[i].GoodsId
 		couponRangeId := couponsForSpu[j].RangeId
 		switch {
 		case spuId == couponRangeId:
@@ -125,56 +125,56 @@ func (svc *CommodityService) CalculateWithCoupon(ctx context.Context, spuList []
 		}
 	}
 
-	// 同理处理CategoryId
-	sort.Slice(spuList, func(i, j int) bool {
-		return spuList[i].CategoryId < spuList[j].CategoryId
-	})
-	i, j = 0, 0
-	for i < len(spuList) && j < len(couponsForCategory) {
-		categoryId := spuList[i].CategoryId
-		couponRangeId := couponsForCategory[j].RangeId
+	/*
+		// 同理处理CategoryId
+		sort.Slice(spuList, func(i, j int) bool {
+			return spuList[i].CategoryId < spuList[j].CategoryId
+		})
+		i, j = 0, 0
+		for i < len(spuList) && j < len(couponsForCategory) {
+			categoryId := spuList[i].CategoryId
+			couponRangeId := couponsForCategory[j].RangeId
 
-		switch {
-		case categoryId == couponRangeId:
-			spuId := spuList[i].SpuId
-			matchMap[spuId] = append(matchMap[spuId], couponsForCategory[j])
-			j++
-		case categoryId < couponRangeId:
-			i++
-		default:
-			j++
+			switch {
+			case categoryId == couponRangeId:
+				spuId := spuList[i].SpuId
+				matchMap[spuId] = append(matchMap[spuId], couponsForCategory[j])
+				j++
+			case categoryId < couponRangeId:
+				i++
+			default:
+				j++
+			}
 		}
-	}
-	assignedMap, priceMap, totalPrice := svc.assignCoupons(spuList, matchMap)
-	res := model.ConvertMapsToAssignedCoupon(assignedMap, priceMap)
-	return res, totalPrice, nil
+
+	*/
+	goodsResult, totalPrice := svc.assignCoupons(goods, matchMap)
+	return goodsResult, totalPrice, nil
 }
 
 // assignCouponsByPrice 以商品价格降序为优先级，从 matchMap 中给每个 SPU 匹配优惠券
-func (svc *CommodityService) assignCoupons(spuList []*model.Spu,
+func (svc *CommodityService) assignCoupons(goodsList []*model.OrderGoods,
 	matchMap map[int64][]*model.Coupon,
-) (map[int64]*model.Coupon, map[int64]float64, float64) {
+) ([]*model.OrderGoods, float64) {
 	// 按 spu.Price 进行降序排序，让价格最高的商品优先匹配
-	sort.Slice(spuList, func(i, j int) bool {
-		return spuList[i].Price > spuList[j].Price
+	sort.Slice(goodsList, func(i, j int) bool {
+		return goodsList[i].TotalAmount > goodsList[j].TotalAmount
 	})
 
 	// 用于标记本次交易里某张优惠券是否已被占用
 	usedCoupons := make(map[int64]bool)
 
-	assignedMap := make(map[int64]*model.Coupon)
-	priceMap := make(map[int64]float64)
 	var totalPrice float64
 
-	for _, spu := range spuList {
-		bestPrice := spu.Price
+	for _, spu := range goodsList {
+		bestPrice := spu.TotalAmount
 		var bestCoupon *model.Coupon
 
-		couponCandidates, ok := matchMap[spu.SpuId]
+		couponCandidates, ok := matchMap[spu.GoodsId]
 		// 没有可用券
 		if !ok || len(couponCandidates) == 0 {
-			totalPrice += bestPrice
-			priceMap[spu.SpuId] = bestPrice
+			totalPrice += bestPrice + spu.SingleFreightPrice
+			spu.DiscountAmount = bestPrice + spu.SingleFreightPrice
 			continue
 		}
 
@@ -187,13 +187,13 @@ func (svc *CommodityService) assignCoupons(spuList []*model.Spu,
 
 			// 判断是否可用
 			canUse := false
-			if spu.Price >= c.ConditionCost {
+			if spu.TotalAmount >= c.ConditionCost {
 				canUse = true
 			}
 
 			// 如果当前券可用，计算折后价
 			if canUse {
-				discountedPrice := c.CalculateDiscountPrice(spu.Price)
+				discountedPrice := c.CalculateDiscountPrice(spu.TotalAmount)
 				// 更优解，替换
 				if discountedPrice < bestPrice {
 					bestPrice = discountedPrice
@@ -203,13 +203,14 @@ func (svc *CommodityService) assignCoupons(spuList []*model.Spu,
 		}
 
 		if bestCoupon != nil {
-			assignedMap[spu.SpuId] = bestCoupon
+			spu.CouponId = bestCoupon.Id
+			spu.CouponName = bestCoupon.Name
 			usedCoupons[bestCoupon.Id] = true
 		}
 
-		totalPrice += bestPrice
-		priceMap[spu.SpuId] = bestPrice
+		totalPrice += bestPrice + spu.SingleFreightPrice
+		spu.DiscountAmount = bestPrice + spu.SingleFreightPrice
 	}
 
-	return assignedMap, priceMap, totalPrice
+	return goodsList, totalPrice
 }
