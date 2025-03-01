@@ -95,3 +95,14 @@ func BuildCoupon(coupon *modelKitex.Coupon) *model.Coupon {
 func BuildCoupons(coupons []*modelKitex.Coupon) []*model.Coupon {
 	return base.BuildTypeList(coupons, BuildCoupon)
 }
+
+func BuildCategory(category *modelKitex.CategoryInfo) *model.CategoryInfo {
+	return &model.CategoryInfo{
+		CategoryID: category.CategoryID,
+		Name:       category.Name,
+	}
+}
+
+func BuildCategorys(categorys []*modelKitex.CategoryInfo) []*model.CategoryInfo {
+	return base.BuildTypeList(categorys,BuildCategory)
+}

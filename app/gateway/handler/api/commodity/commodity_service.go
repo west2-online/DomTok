@@ -34,7 +34,6 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
 	api "github.com/west2-online/DomTok/app/gateway/model/api/commodity"
-	"github.com/west2-online/DomTok/app/gateway/model/model"
 )
 
 // CreateCoupon .
@@ -538,13 +537,7 @@ func ViewCategory(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
-	resp.CategoryInfo = make([]*model.CategoryInfo, len(res.CategoryInfo))
-	for i, item := range res.CategoryInfo {
-		resp.CategoryInfo[i] = &model.CategoryInfo{
-			CategoryID: item.CategoryID,
-			Name:       item.Name,
-		}
-	}
+	resp.CategoryInfo = pack.BuildCategorys(res.CategoryInfo)
 
 	pack.RespData(c, resp)
 }
