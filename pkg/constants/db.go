@@ -28,6 +28,8 @@ const (
 	CouponRangeTypeSPU      = 1
 	CouponRangeTypeCategory = 2
 	CouponPageSize          = 15
+	CouponTypeSubAmount     = 1
+	CouponTypeDiscount      = 2
 )
 
 const (

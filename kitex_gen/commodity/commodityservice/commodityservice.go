@@ -22,9 +22,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	client "github.com/cloudwego/kitex/client"
 	kitex "github.com/cloudwego/kitex/pkg/serviceinfo"
 	streaming "github.com/cloudwego/kitex/pkg/streaming"
+
 	commodity "github.com/west2-online/DomTok/kitex_gen/commodity"
 )
 

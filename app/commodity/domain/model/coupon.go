@@ -44,24 +44,33 @@ type UserCoupon struct {
 }
 
 type OrderGoods struct {
+	MerchantId         int64
 	GoodsId            int64
+	GoodsName          string
+	StyleId            int64
+	StyleName          string
+	GoodsVersion       int64
+	StyleHeadDrawing   string
 	OriginPrice        float64
 	SalePrice          float64
 	SingleFreightPrice float64
+	PurchaseQuantity   int64
 	TotalAmount        float64
 	FreightAmount      float64
 	DiscountAmount     float64
+	PaymentAmount      float64
 	SinglePrice        float64
 	CouponId           int64
 	CouponName         string
+	OrderId            int64
 }
 
 func (c *Coupon) CalculateDiscountPrice(originalPrice float64) float64 {
 	switch c.TypeInfo {
-	case constants.CouponRangeTypeSPU:
+	case constants.CouponTypeSubAmount:
 		// 减价格
 		return originalPrice - c.DiscountAmount
-	case constants.CouponRangeTypeCategory:
+	case constants.CouponTypeDiscount:
 		// 打折
 		return originalPrice * c.Discount
 	default:

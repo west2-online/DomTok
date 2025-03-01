@@ -51,7 +51,6 @@ type CommodityUseCase interface {
 	SearchUserCoupons(ctx context.Context, pageNum int64) (coupons []*model.Coupon, err error)
 	GetCouponAndPrice(ctx context.Context, goods []*model.OrderGoods) ([]*model.OrderGoods, float64, error)
 }
-
 type useCase struct {
 	db    repository.CommodityDB
 	svc   *service.CommodityService

@@ -77,3 +77,52 @@ func BuildCoupon(coupon *model.Coupon) *modelKitex.Coupon {
 func BuildCoupons(coupons []*model.Coupon) []*modelKitex.Coupon {
 	return base.BuildTypeList(coupons, BuildCoupon)
 }
+
+func ConvertOrderGoods(goods *modelKitex.OrderGoods) *model.OrderGoods {
+	return &model.OrderGoods{
+		MerchantId:         goods.MerchantId,
+		GoodsId:            goods.GoodsId,
+		GoodsName:          goods.GoodsName,
+		StyleId:            goods.StyleId,
+		StyleName:          goods.StyleName,
+		GoodsVersion:       goods.GoodsVersion,
+		StyleHeadDrawing:   goods.StyleHeadDrawing,
+		OriginPrice:        goods.OriginPrice,
+		SalePrice:          goods.SalePrice,
+		SingleFreightPrice: goods.SingleFreightPrice,
+		PurchaseQuantity:   goods.PurchaseQuantity,
+		TotalAmount:        goods.TotalAmount,
+		FreightAmount:      goods.FreightAmount,
+	}
+}
+
+func ConvertOrderGoodsList(goods []*modelKitex.OrderGoods) []*model.OrderGoods {
+	return base.BuildTypeList(goods, ConvertOrderGoods)
+}
+
+func BuildOrderGoods(goods *model.OrderGoods) *modelKitex.OrderGoods {
+	return &modelKitex.OrderGoods{
+		MerchantId:         goods.MerchantId,
+		GoodsId:            goods.GoodsId,
+		GoodsName:          goods.GoodsName,
+		StyleId:            goods.StyleId,
+		StyleName:          goods.StyleName,
+		GoodsVersion:       goods.GoodsVersion,
+		StyleHeadDrawing:   goods.StyleHeadDrawing,
+		OriginPrice:        goods.OriginPrice,
+		SalePrice:          goods.SalePrice,
+		SingleFreightPrice: goods.SingleFreightPrice,
+		PurchaseQuantity:   goods.PurchaseQuantity,
+		TotalAmount:        goods.TotalAmount,
+		FreightAmount:      goods.FreightAmount,
+		DiscountAmount:     goods.DiscountAmount,
+		PaymentAmount:      goods.PaymentAmount,
+		SinglePrice:        goods.SinglePrice,
+		CouponId:           goods.CouponId,
+		CouponName:         goods.CouponName,
+	}
+}
+
+func BuildOrderGoodsList(goods []*model.OrderGoods) []*modelKitex.OrderGoods {
+	return base.BuildTypeList(goods, BuildOrderGoods)
+}

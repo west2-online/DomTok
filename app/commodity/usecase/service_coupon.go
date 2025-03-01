@@ -121,5 +121,5 @@ func (uc *useCase) SearchUserCoupons(ctx context.Context, pageNum int64) (coupon
 }
 
 func (uc *useCase) GetCouponAndPrice(ctx context.Context, goods []*model.OrderGoods) ([]*model.OrderGoods, float64, error) {
-	return uc.svc.CalculateWithCoupon()
+	return uc.svc.CalculateWithCoupon(ctx, goods)
 }
