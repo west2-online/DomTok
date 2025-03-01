@@ -381,7 +381,6 @@ func (svc *CommodityService) IsSpuMappingExist(ctx context.Context) error {
 	return err
 }
 
-
 func (svc *CommodityService) CreateCategory(ctx context.Context, category *model.Category) error {
 	category.Id = svc.nextID()
 	if err := svc.db.CreateCategory(ctx, category); err != nil {
@@ -389,7 +388,8 @@ func (svc *CommodityService) CreateCategory(ctx context.Context, category *model
 	}
 	return nil
 }
-func (svc *CommodityService) DeleteCategory(ctx context.Context, category *model.Category)error{
+
+func (svc *CommodityService) DeleteCategory(ctx context.Context, category *model.Category) error {
 	// 判断是否存在
 	exist, err := svc.db.IsCategoryExistById(ctx, category.Id)
 	if err != nil {
@@ -404,7 +404,8 @@ func (svc *CommodityService) DeleteCategory(ctx context.Context, category *model
 	}
 	return nil
 }
-func (svc *CommodityService)UpdateCategory(ctx context.Context,category *model.Category)error{
+
+func (svc *CommodityService) UpdateCategory(ctx context.Context, category *model.Category) error {
 	// 判断是否存在
 	exist, err := svc.db.IsCategoryExistById(ctx, category.Id)
 	if err != nil {

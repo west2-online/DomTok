@@ -41,7 +41,6 @@ const (
 	ServiceImgNotExist
 	ServiceSkuExist
 
-
 	ServiceCategoryExist
 	ServiceCategorynotExist
 	ServiceListCategoryFailed

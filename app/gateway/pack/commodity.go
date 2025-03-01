@@ -104,5 +104,5 @@ func BuildCategory(category *modelKitex.CategoryInfo) *model.CategoryInfo {
 }
 
 func BuildCategorys(categorys []*modelKitex.CategoryInfo) []*model.CategoryInfo {
-	return base.BuildTypeList(categorys,BuildCategory)
+	return base.BuildTypeList(categorys, BuildCategory)
 }
