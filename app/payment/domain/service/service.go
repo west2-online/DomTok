@@ -260,12 +260,12 @@ func (svc *PaymentService) GetOrderStatus(ctx context.Context, orderID int64) (b
 	if err != nil {
 		return false, true, fmt.Errorf("failed to get order status: %w", err)
 	}
-	return exist, time.Now().Unix() > expire, nil
+	return exist, time.Now().UnixMilli() > expire, nil
 }
 
 // GetPayInfo 模拟获取支付信息
 func (svc *PaymentService) GetPayInfo(_ context.Context) (int64, string, error) {
-	return time.Now().Unix(), paymentStatus.PaymentStyleDomTok, nil
+	return time.Now().UnixMilli(), paymentStatus.PaymentStyleDomTok, nil
 }
 
 // Pay 模拟支付
@@ -275,7 +275,7 @@ func (svc *PaymentService) Pay(_ context.Context) (int64, string, error) {
 
 // Refund 模拟退款
 func (svc *PaymentService) Refund(_ context.Context) (int64, string, error) {
-	return time.Now().Unix(), paymentStatus.PaymentStyleDomTok, nil
+	return time.Now().UnixMilli(), paymentStatus.PaymentStyleDomTok, nil
 }
 
 func (svc *PaymentService) CancelOrder(ctx context.Context, orderID int64, paymentAt int64, paymentStyle string) error {
@@ -283,5 +283,5 @@ func (svc *PaymentService) CancelOrder(ctx context.Context, orderID int64, payme
 }
 
 func (svc *PaymentService) ConfirmOrder(ctx context.Context, orderID int64, paymentAt int64, paymentStyle string) error {
-	return svc.rpc.OrderPaymentCancel(ctx, orderID, paymentAt, paymentStyle)
+	return svc.rpc.OrderPaymentSuccess(ctx, orderID, paymentAt, paymentStyle)
 }

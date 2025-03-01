@@ -225,7 +225,7 @@ func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, to
 	// 3. 支付令牌是否在 Redis 中
 	exist, exp, err := uc.svc.GetExpiredAtAndDelPaymentToken(ctx, token, uid, orderID)
 	if !exist && err == nil {
-		return fmt.Errorf("duplicate payment request")
+		return fmt.Errorf("duplicate payment request, mismatched order or token has expired")
 	}
 
 	var order *model.PaymentOrder
@@ -240,7 +240,7 @@ func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, to
 		// 4.1.2 校验状态是否为待支付
 		if order.Status != paymentStatus.PaymentStatusPendingCode {
 			// 表示重复操作，返回重复支付错误
-			return fmt.Errorf("duplicate payment request")
+			return fmt.Errorf("duplicate payment request, mismatched order or token has expired")
 		}
 
 		// 4.1.3 更新支付状态为处理中
