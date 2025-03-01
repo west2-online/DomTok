@@ -506,7 +506,7 @@ func DeleteCategory(ctx context.Context, c *app.RequestContext) {
 	var req api.DeleteCategoryReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 
@@ -524,7 +524,7 @@ func ViewCategory(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewCategoryReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 
@@ -534,7 +534,7 @@ func ViewCategory(ctx context.Context, c *app.RequestContext) {
 		PageSize: req.PageSize,
 	})
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 	resp.CategoryInfo = pack.BuildCategorys(res.CategoryInfo)
@@ -549,7 +549,7 @@ func UpdateCategory(ctx context.Context, c *app.RequestContext) {
 	var req api.UpdateCategoryReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 

@@ -38,23 +38,27 @@ func NewCommodityDB(client *gorm.DB) repository.CommodityDB {
 }
 
 func (db *commodityDB) IsCategoryExistByName(ctx context.Context, name string) (bool, error) {
-    var category model.Category
-    err := db.client.WithContext(ctx).Where("name = ?", name).First(&category).Error
-    if err != nil {
-        if errors.Is(err, gorm.ErrRecordNotFound) {
-            return false, nil
-        }
-        return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
-    }
-    return true, nil
+	var category model.Category
+	err := db.client.WithContext(ctx).Where("name = ?", name).First(&category).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
+	}
+	return true, nil
 }
 
 func (db *commodityDB) IsCategoryExistById(ctx context.Context, id int64) (bool, error) {
+	if id <= 0 {
+		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "invalid category id: %d", id)
+	}
+
 	var category model.Category
 	err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, errno.Errorf(errno.ErrRecordNotFound, "mysql: ErrRecordNotFound record not found: %v", err)
+			return false, nil
 		}
 		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
 	}
