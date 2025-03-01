@@ -56,7 +56,7 @@ func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category)
 	if err != nil {
 		return err
 	}
-	//删除
+	// 删除
 	err = uc.svc.DeleteCategory(ctx, category)
 	if err != nil {
 		return err

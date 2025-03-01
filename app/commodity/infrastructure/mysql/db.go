@@ -65,6 +65,7 @@ func (db *commodityDB) IsCategoryExistById(ctx context.Context, id int64) (bool,
 	}
 	return true, nil
 }
+
 func (db *commodityDB) GetCreatorIDById(ctx context.Context, id int64) (int64, error) {
 	var category model.Category
 	if err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error; err != nil {
@@ -90,7 +91,6 @@ func (db *commodityDB) CreateCategory(ctx context.Context, entity *model.Categor
 	}
 	return nil
 }
-
 
 func (db *commodityDB) DeleteCategory(ctx context.Context, category *model.Category) error {
 	if err := db.client.WithContext(ctx).Delete(Category{Id: category.Id}).Error; err != nil {

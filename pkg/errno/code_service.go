@@ -40,7 +40,7 @@ const (
 	ServiceImgNotExist
 	ServiceSkuExist
 
-	//category
+	// category
 	ServiceCategoryExist
 	ServiceCategorynotExist
 	ServiceListCategoryFailed

@@ -297,7 +297,6 @@ func ViewUserAllCouponRPC(ctx context.Context, req *commodity.ViewUserAllCouponR
 	return resp, nil
 }
 
-
 func CreateCategoryRPC(ctx context.Context, req *commodity.CreateCategoryReq) (int64, error) {
 	resp, err := commodityClient.CreateCategory(ctx, req)
 	if err != nil {
