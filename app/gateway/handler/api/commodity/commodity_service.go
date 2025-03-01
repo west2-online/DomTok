@@ -514,6 +514,10 @@ func DeleteCategory(ctx context.Context, c *app.RequestContext) {
 	err = rpc.DeleteCategoryRPC(ctx, &commodity.DeleteCategoryReq{
 		CategoryID: req.CategoryID,
 	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
 	pack.RespData(c, resp)
 }
 
@@ -558,6 +562,10 @@ func UpdateCategory(ctx context.Context, c *app.RequestContext) {
 		CategoryID: req.CategoryID,
 		Name:       req.Name,
 	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
 	pack.RespData(c, resp)
 }
 

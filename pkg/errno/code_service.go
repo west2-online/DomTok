@@ -32,8 +32,12 @@ const (
 	ServiceSkuExist
 	PaymentOrderNotExist
 	UserNotExist
+
+	//category
 	ServiceCategoryExist
+	ServiceCategorynotExist
 	ServiceListCategoryFailed
+	ServiceCategoryCreateFail
 
 	ServiceUserCloseWebsocketConn
 )

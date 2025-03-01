@@ -46,7 +46,7 @@ func (db *commodityDB) IsCategoryExistByName(ctx context.Context, name string) (
 		}
 		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
 	}
-	return true, nil
+	return true, errno.Errorf(errno.ServiceCategoryExist, "category was found")
 }
 
 func (db *commodityDB) IsCategoryExistById(ctx context.Context, id int64) (bool, error) {
@@ -58,11 +58,21 @@ func (db *commodityDB) IsCategoryExistById(ctx context.Context, id int64) (bool,
 	err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, nil
+			return false, errno.Errorf(errno.ServiceCategorynotExist, "category not found")
 		}
 		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
 	}
 	return true, nil
+}
+func (db *commodityDB) GetCreatorIDById(ctx context.Context, id int64) (int64, error) {
+	var category model.Category
+	if err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, errno.Errorf(errno.ServiceCategorynotExist, "category not found")
+		}
+		return 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get creator ID: %v", err)
+	}
+	return category.CreatorId, nil
 }
 
 func (db *commodityDB) CreateCategory(ctx context.Context, entity *model.Category) error {
