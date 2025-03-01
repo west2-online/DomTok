@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# 该脚本适用于 Docker 及本地调试，作为执行程序前的 presetting（即 entrypoint）
-# 请不要直接执行这个脚本，这个脚本应当由 Makefile/Dockerfile 接管
-
 #! /usr/bin/env bash
 CURDIR=$(pwd)
 

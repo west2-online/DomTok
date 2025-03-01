@@ -18,6 +18,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/olivere/elastic/v7"
 
@@ -47,11 +48,25 @@ type CommodityDB interface {
 	GetImagesBySpuId(ctx context.Context, spuId int64, offset, limit int) ([]*model.SpuImage, int64, error)
 	GetSpuByIds(ctx context.Context, spuIds []int64) ([]*model.Spu, error)
 
+	CreateCoupon(ctx context.Context, coupon *model.Coupon) (int64, error)
+	GetCouponById(ctx context.Context, id int64) (bool, *model.Coupon, error)
+	GetCouponsByCreatorId(ctx context.Context, uid int64, pageNum int64) ([]*model.Coupon, error)
+	DeleteCouponById(ctx context.Context, coupon *model.Coupon) error
+
+	GetCouponsByIDs(ctx context.Context, couponIDs []int64) ([]*model.Coupon, error)
+	CreateUserCoupon(ctx context.Context, coupon *model.UserCoupon) error
+	GetUserCouponsByUId(ctx context.Context, uid int64, pageNum int64) ([]*model.UserCoupon, error)
+	GetFullUserCouponsByUId(ctx context.Context, uid int64) ([]*model.UserCoupon, error)
+	DeleteUserCoupon(ctx context.Context, coupon *model.UserCoupon) error
+
 	IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error
 	DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error
 	IncrStock(ctx context.Context, infos []*model.SkuBuyInfo) error
 	DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error
 	GetSkuById(ctx context.Context, id int64) (*model.Sku, error)
+	DecrStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error
+	DecrLockStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error
+	IncrLockStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error
 }
 
 type CommodityCache interface {
@@ -66,6 +81,10 @@ type CommodityCache interface {
 	GetLockStockKey(id int64) string
 	GetStockKey(id int64) string
 	DecrStockNum(ctx context.Context, infos []*model.SkuBuyInfo) error
+	IsHealthy(ctx context.Context) error
+	Lock(ctx context.Context, keys []string, ttl time.Duration) error
+	UnLock(ctx context.Context, keys []string) error
+	GetSkuKey(id int64) string
 }
 
 type CommodityMQ interface {
