@@ -59,18 +59,15 @@ type PaymentRefund struct {
 
 // PaymentLedger 流水信息表
 type PaymentLedger struct {
-	ID                        int64           `gorm:"primaryKey;autoIncrement;comment:支付退款的唯一标识"`
-	OrderID                   int64           `gorm:"size:64;not null;comment:关联的商户订单号"`
-	UserID                    int64           `gorm:"not null;comment:用户的唯一标识"`
-	RefundAmount              decimal.Decimal `gorm:"type:decimal(15,4);not null;comment:退款金额，单位为元"`
-	RefundReason              string          `gorm:"size:255;comment:退款原因"`
-	Status                    int64           `gorm:"not null;default:0;comment:退款状态：0-待处理，1-处理中，2-成功退款，3-退款失败"`
-	MaskedCreditCardNumber    string          `gorm:"size:19;comment:信用卡号（仅存储掩码，如 **** **** **** 1234）"`
-	CreditCardExpirationYear  int64           `gorm:"comment:信用卡到期年"`
-	CreditCardExpirationMonth int64           `gorm:"comment:信用卡到期月"`
-	CreatedAt                 time.Time       `gorm:"not null;default:CURRENT_TIMESTAMP;comment:退款申请时间"`
-	UpdatedAt                 time.Time       `gorm:"not null;default:CURRENT_TIMESTAMP;autoUpdateTime;comment:退款最后更新时间"`
-	DeletedAt                 gorm.DeletedAt  `gorm:"index;comment:退款记录删除时间"`
+	ID              int64           `gorm:"primaryKey;autoIncrement;comment:流水ID"`
+	ReferenceID     int64           `gorm:"not null;comment:关联的支付订单或退款订单ID"`
+	UserID          int64           `gorm:"not null;comment:用户ID"`
+	Amount          decimal.Decimal `gorm:"type:decimal(15,4);not null;comment:交易金额（正数表示收入，负数表示支出）"`
+	TransactionType int64           `gorm:"not null;comment:交易类型：1-支付，2-退款，3-手续费，4-调整"`
+	Status          int64           `gorm:"not null;default:0;comment:交易状态：0-待处理，1-成功，2-失败"`
+	CreatedAt       time.Time       `gorm:"not null;default:CURRENT_TIMESTAMP;comment:交易创建时间"`
+	UpdatedAt       time.Time       `gorm:"not null;default:CURRENT_TIMESTAMP;autoUpdateTime;comment:交易更新时间"`
+	DeletedAt       gorm.DeletedAt  `gorm:"index;comment:交易记录删除时间"`
 }
 
 func (PaymentOrder) TableName() string {

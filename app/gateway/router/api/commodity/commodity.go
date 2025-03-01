@@ -54,7 +54,6 @@ func Register(r *server.Hertz) {
 					_coupon.DELETE("/delete", append(_deletecouponMw(), commodity.DeleteCoupon)...)
 					_coupon.POST("/receive", append(_createusercouponMw(), commodity.CreateUserCoupon)...)
 					_coupon.GET("/search", append(_viewcouponMw(), commodity.ViewCoupon)...)
-					_coupon.POST("/use", append(_useusercouponMw(), commodity.UseUserCoupon)...)
 				}
 				{
 					_price := _commodity.Group("/price", _priceMw()...)

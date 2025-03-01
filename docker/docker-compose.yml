@@ -59,68 +59,60 @@ services:
 #    networks:
 #      - domtok
 #
-#  elasticsearch:
-#    image: elasticsearch:8.4.2
-#    container_name: domtok-elasticsearch
-#    environment:
-#      bootstrap.memory_lock: "true"
-#      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-#      discovery.type: single-node
-#      ingest.geoip.downloader.enabled: "false"
-#      TZ: Asia/Shanghai
-#      xpack.security.enabled: "false"
-#    healthcheck:
-#      test: [ "CMD-SHELL", "curl -sf http://elasticsearch:9200/_cluster/health || exit 1" ] # ⼼跳检测，成功之后不再执⾏后⾯的退出
-#      interval: 60s # ⼼跳检测间隔周期
-#      timeout: 10s
-#      retries: 3
-#      start_period: 60s # ⾸次检测延迟时间
-#    ulimits:
-#      memlock:
-#        soft: -1
-#        hard: -1
-#    volumes:
-#      - ../config/elasticsearch:/usr/share/elasticsearch/config
-#      - ./data/elasticsearch:/usr/share/elasticsearch/data
-#    ports:
-#      - "9200:9200"
-#    restart: always
-#    networks:
-#      - domtok
-#
-#  kibana:
-#    image: kibana:8.4.2
-#    container_name: domtok-kibana
-#    environment:
-#      - I18N_LOCALE=zh-CN
-#      - XPACK_GRAPH_ENABLED=true
-#      - TIMELION_ENABLED=true
-#      - XPACK_MONITORING_COLLECTION_ENABLED="true"
-#      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-#    depends_on:
-#      - elasticsearch
-#    ports:
-#      - "5601:5601"
-#    volumes:
-#      - ../config/kibana:/usr/share/kibana/config
-#      - ./data/kibana:/usr/share/kibana/data
-#    networks:
-#      - domtok
-#
-#  filebeat:
-#    image: elastic/filebeat:8.4.2
-#    container_name: domtok-filebeat
-#    user: root
-#    volumes:
-#      - ../config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml # 挂载配置文件
-#      - ./data/filebeat:/usr/share/filebeat/data  # 持久化注册表文件
-#      - ../log:/usr/share/filebeat/logs  # 挂载日志目录
-#    depends_on:
-#      elasticsearch:
-#        condition: service_healthy
-#    restart: on-failure
-#    networks:
-#      - domtok
+  elasticsearch:
+    image: elasticsearch:8.4.2
+    container_name: domtok-elasticsearch
+    env_file:
+      - ./env/es.env
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -sf http://elasticsearch:9200/_cluster/health || exit 1" ] # ⼼跳检测，成功之后不再执⾏后⾯的退出
+      interval: 60s # ⼼跳检测间隔周期
+      timeout: 10s
+      retries: 3
+      start_period: 60s # ⾸次检测延迟时间
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ../config/elasticsearch/config:/usr/share/elasticsearch/config
+      - ./data/elasticsearch:/usr/share/elasticsearch/data
+      - ../config/elasticsearch/plugins:/usr/share/elasticsearch/plugins
+    ports:
+      - "9200:9200"
+    restart: always
+    networks:
+      - domtok
+
+  kibana:
+    image: kibana:8.4.2
+    container_name: domtok-kibana
+    env_file:
+      - ./env/kibana.env
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
+    volumes:
+      - ../config/kibana:/usr/share/kibana/config
+      - ./data/kibana:/usr/share/kibana/data
+    networks:
+      - domtok
+
+  filebeat:
+    image: elastic/filebeat:8.4.2
+    container_name: domtok-filebeat
+    user: root
+    volumes:
+      - ../config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml # 挂载配置文件
+      - ./data/filebeat:/usr/share/filebeat/data  # 持久化注册表文件
+      - ../output/log:/usr/share/filebeat/logs  # 挂载日志目录
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - domtok
 
 #
 #    jaeger:
@@ -239,6 +231,41 @@ services:
       - ./env/kafka-ui.env
     networks:
       - domtok
+
+  rmqnamesrv:
+    image: apache/rocketmq:4.9.6
+    container_name: domtok-rmqnamesrv
+    ports:
+      - "9876:9876"
+    volumes:
+      - ./data/rocketmq/namesrv/logs:/opt/logs
+      - ./data/rocketmq/namesrv/store:/opt/store
+    command: sh mqnamesrv
+    networks:
+      domtok:
+        aliases:
+          - rmqnamesrv
+
+  rmqbroker:
+    image: apache/rocketmq:4.9.6
+    container_name: domtok-rmqbroker
+    ports:
+      - "10909:10909"
+      - "10911:10911"
+    volumes:
+      - ./data/rocketmq/broker/logs:/opt/logs
+      - ./data/rocketmq/broker/store:/opt/store
+      - ../config/rocketmq/broker.conf:/home/rocketmq/broker.conf
+      - ../config/rocketmq/plain_acl.yml:/home/rocketmq/rocketmq-4.9.6/conf/plain_acl.yml
+    env_file:
+      - ./env/rocket-broker.env
+    command: sh mqbroker -c /home/rocketmq/rocketmq-4.9.6/conf/broker.conf
+    depends_on:
+      - rmqnamesrv
+    networks:
+      domtok:
+        aliases:
+          - rmqbroker
 
 networks:
   domtok:

@@ -19,25 +19,38 @@ package rpc
 import (
 	"bytes"
 	"context"
+	"time"
+
+	"github.com/samber/lo"
 	"fmt"
 
 	"github.com/west2-online/DomTok/app/commodity/controllers/rpc/pack"
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
+	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/base"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 type CommodityHandler struct {
 	useCase usecase.CommodityUseCase
 }
 
+func (c CommodityHandler) ListSpuInfo(ctx context.Context, req *commodity.ListSpuInfoReq) (r *commodity.ListSpuInfoResp, err error) {
+	r = new(commodity.ListSpuInfoResp)
+	spus, err := c.useCase.ListSpuInfo(ctx, req.SpuIDs)
+	if err != nil {
+		return nil, err
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.Spus = pack.BuildSpus(spus)
+	return r, err
+}
+
 func (c CommodityHandler) CreateSpuImage(streamServer commodity.CommodityService_CreateSpuImageServer) (err error) {
 	resp := new(commodity.CreateSpuImageResp)
 	req, err := streamServer.Recv()
 	if err != nil {
-		logger.Errorf("rpc.CreateSpuImage: receive error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -45,7 +58,6 @@ func (c CommodityHandler) CreateSpuImage(streamServer commodity.CommodityService
 	for i := 0; i < int(req.BufferCount); i++ {
 		data, err := streamServer.Recv()
 		if err != nil {
-			logger.Errorf("rpc.CreateSpuImage: receive error: %v", err)
 			resp.Base = base.BuildBaseResp(err)
 			return streamServer.SendAndClose(resp)
 		}
@@ -57,7 +69,6 @@ func (c CommodityHandler) CreateSpuImage(streamServer commodity.CommodityService
 		SpuID: req.SpuID,
 	})
 	if err != nil {
-		logger.Errorf("rpc.CreateSpuImage: create spu image error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -71,7 +82,6 @@ func (c CommodityHandler) UpdateSpuImage(streamServer commodity.CommodityService
 	resp := new(commodity.UpdateSpuImageResp)
 	req, err := streamServer.Recv()
 	if err != nil {
-		logger.Errorf("rpc.UpdateSpuImage: receive error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -79,7 +89,6 @@ func (c CommodityHandler) UpdateSpuImage(streamServer commodity.CommodityService
 	for i := 0; i < int(req.BufferCount); i++ {
 		data, err := streamServer.Recv()
 		if err != nil {
-			logger.Errorf("rpc.UpdateSpuImage: receive error: %v", err)
 			resp.Base = base.BuildBaseResp(err)
 			return streamServer.SendAndClose(resp)
 		}
@@ -91,7 +100,6 @@ func (c CommodityHandler) UpdateSpuImage(streamServer commodity.CommodityService
 		ImageID: req.ImageID,
 	})
 	if err != nil {
-		logger.Errorf("rpc.UpdateSpuImage: update spu image error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -104,9 +112,8 @@ func (c CommodityHandler) DeleteSpuImage(ctx context.Context, req *commodity.Del
 	resp := new(commodity.DeleteSpuImageResp)
 	err = c.useCase.DeleteSpuImage(ctx, req.GetSpuImageID())
 	if err != nil {
-		logger.Errorf("rpc.DeleteSpuImage: delete spu image error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
-		return resp, nil
+		return resp, err
 	}
 
 	resp.Base = base.BuildBaseResp(nil)
@@ -114,28 +121,80 @@ func (c CommodityHandler) DeleteSpuImage(ctx context.Context, req *commodity.Del
 }
 
 func (c CommodityHandler) CreateCoupon(ctx context.Context, req *commodity.CreateCouponReq) (r *commodity.CreateCouponResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.CreateCouponResp)
+	coupon := &model.Coupon{
+		Name:           req.Name,
+		TypeInfo:       int64(req.TypeInfo),
+		ConditionCost:  *req.ConditionCost,
+		DiscountAmount: *req.DiscountAmount,
+		Discount:       *req.Discount,
+		RangeType:      int64(req.RangeType),
+		RangeId:        req.RangeID,
+		Description:    *req.Description,
+		ExpireTime:     time.Unix(req.ExpireTime, 0),
+		DeadlineForGet: time.Unix(req.ExpireTime, 0),
+	}
+	couponId, err := c.useCase.CreateCoupon(ctx, coupon)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return r, nil
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.CouponID = couponId
+	return r, nil
 }
 
 func (c CommodityHandler) DeleteCoupon(ctx context.Context, req *commodity.DeleteCouponReq) (r *commodity.DeleteCouponResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.DeleteCouponResp)
+	coupon := &model.Coupon{
+		Id: req.CouponID,
+	}
+	err = c.useCase.DeleteCoupon(ctx, coupon)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return r, nil
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return r, nil
 }
 
-func (c CommodityHandler) CreateUserCoupon(ctx context.Context, req *commodity.CreateCouponReq) (r *commodity.CreateUserCouponResp, err error) {
-	// TODO implement me
-	panic("implement me")
+func (c CommodityHandler) CreateUserCoupon(ctx context.Context, req *commodity.CreateUserCouponReq) (r *commodity.CreateUserCouponResp, err error) {
+	r = new(commodity.CreateUserCouponResp)
+	userCoupon := &model.UserCoupon{
+		CouponId:      req.CouponID,
+		RemainingUses: req.RemainingUse,
+	}
+	err = c.useCase.CreateUserCoupon(ctx, userCoupon)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return r, nil
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return r, nil
 }
 
 func (c CommodityHandler) ViewCoupon(ctx context.Context, req *commodity.ViewCouponReq) (r *commodity.ViewCouponResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ViewCouponResp)
+	coupons, err := c.useCase.GetCreatorCoupons(ctx, req.PageNum)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return r, nil
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.CouponInfo = pack.BuildCoupons(coupons)
+	return r, nil
 }
 
-func (c CommodityHandler) ViewUserAllCoupon(ctx context.Context, req *commodity.ViewCouponReq) (r *commodity.ViewUserAllCouponResp, err error) {
-	// TODO implement me
-	panic("implement me")
+func (c CommodityHandler) ViewUserAllCoupon(ctx context.Context, req *commodity.ViewUserAllCouponReq) (r *commodity.ViewUserAllCouponResp, err error) {
+	r = new(commodity.ViewUserAllCouponResp)
+	coupons, err := c.useCase.SearchUserCoupons(ctx, req.PageNum)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return r, nil
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.Coupons = pack.BuildCoupons(coupons)
+	return r, nil
 }
 
 func (c CommodityHandler) UseUserCoupon(ctx context.Context, req *commodity.UseUserCouponReq) (r *commodity.UseUserCouponResp, err error) {
@@ -148,7 +207,6 @@ func (c CommodityHandler) CreateSpu(streamServer commodity.CommodityService_Crea
 
 	req, err := streamServer.Recv()
 	if err != nil {
-		logger.Errorf("rpc.CreateSpu: receive error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -156,7 +214,6 @@ func (c CommodityHandler) CreateSpu(streamServer commodity.CommodityService_Crea
 	for i := 0; i < int(req.BufferCount); i++ {
 		fileData, err := streamServer.Recv()
 		if err != nil {
-			logger.Errorf("rpc.CreateSpu: receive error: %v", err)
 			resp.Base = base.BuildBaseResp(err)
 			return streamServer.SendAndClose(resp)
 		}
@@ -173,7 +230,6 @@ func (c CommodityHandler) CreateSpu(streamServer commodity.CommodityService_Crea
 		GoodsHeadDrawing: req.GoodsHeadDrawing,
 	})
 	if err != nil {
-		logger.Errorf("rpc.CreateSpu: create spu error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -188,7 +244,6 @@ func (c CommodityHandler) UpdateSpu(streamServer commodity.CommodityService_Upda
 
 	req, err := streamServer.Recv()
 	if err != nil {
-		logger.Errorf("rpc.UpdateSpu: receive error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -196,7 +251,6 @@ func (c CommodityHandler) UpdateSpu(streamServer commodity.CommodityService_Upda
 	for i := 0; i < int(*req.BufferCount); i++ {
 		fileData, err := streamServer.Recv()
 		if err != nil {
-			logger.Errorf("rpc.UpdateSpu: receive error: %v", err)
 			resp.Base = base.BuildBaseResp(err)
 			return streamServer.SendAndClose(resp)
 		}
@@ -214,7 +268,6 @@ func (c CommodityHandler) UpdateSpu(streamServer commodity.CommodityService_Upda
 		GoodsHeadDrawing: req.GetGoodsHeadDrawing(),
 	})
 	if err != nil {
-		logger.Errorf("rpc.UpdateSpu: update spu error: %v", err)
 		resp.Base = base.BuildBaseResp(err)
 		return streamServer.SendAndClose(resp)
 	}
@@ -224,17 +277,24 @@ func (c CommodityHandler) UpdateSpu(streamServer commodity.CommodityService_Upda
 }
 
 func (c CommodityHandler) ViewSpu(ctx context.Context, req *commodity.ViewSpuReq) (r *commodity.ViewSpuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ViewSpuResp)
+	res, total, err := c.useCase.ViewSpus(ctx, req)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return r, err
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.Total = total
+	r.Spus = pack.BuildSpus(res)
+	return r, err
 }
 
 func (c CommodityHandler) DeleteSpu(ctx context.Context, req *commodity.DeleteSpuReq) (r *commodity.DeleteSpuResp, err error) {
 	r = new(commodity.DeleteSpuResp)
 	err = c.useCase.DeleteSpu(ctx, req.GetSpuID())
 	if err != nil {
-		logger.Errorf("rpc.DeleteSpu: delete spu error: %v", err)
 		r.Base = base.BuildBaseResp(err)
-		return r, nil
+		return r, err
 	}
 	r.Base = base.BuildBaseResp(nil)
 	return r, nil
@@ -245,9 +305,8 @@ func (c CommodityHandler) ViewSpuImage(ctx context.Context, req *commodity.ViewS
 	offset := req.GetPageNum() * req.GetPageSize()
 	imgs, total, err := c.useCase.ViewSpuImages(ctx, req.GetSpuID(), int(offset), int(req.GetPageSize()))
 	if err != nil {
-		logger.Errorf("rpc.ViewSpuImage: view spu error: %v", err)
 		r.Base = base.BuildBaseResp(err)
-		return r, nil
+		return r, err
 	}
 
 	r.Base = base.BuildBaseResp(nil)
@@ -524,38 +583,102 @@ func (c CommodityHandler) ViewHistory(ctx context.Context, req *commodity.ViewHi
 }
 
 func (c CommodityHandler) DescSkuLockStock(ctx context.Context, req *commodity.DescSkuLockStockReq) (r *commodity.DescSkuLockStockResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.DescSkuLockStockResp)
+	infos := make([]*model.SkuBuyInfo, 0)
+	for _, info := range req.Infos {
+		infos = append(infos, &model.SkuBuyInfo{
+			SkuID: info.SkuID,
+			Count: info.Count,
+		})
+	}
+	err = c.useCase.DecrLockStock(ctx, infos)
+	if err != nil {
+		return r, err
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return r, nil
 }
 
 func (c CommodityHandler) IncrSkuLockStock(ctx context.Context, req *commodity.IncrSkuLockStockReq) (r *commodity.IncrSkuLockStockResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.IncrSkuLockStockResp)
+	infos := make([]*model.SkuBuyInfo, 0)
+	for _, info := range req.Infos {
+		infos = append(infos, &model.SkuBuyInfo{
+			SkuID: info.SkuID,
+			Count: info.Count,
+		})
+	}
+	err = c.useCase.IncrLockStock(ctx, infos)
+	if err != nil {
+		return r, err
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return r, nil
 }
 
 func (c CommodityHandler) DescSkuStock(ctx context.Context, req *commodity.DescSkuStockReq) (r *commodity.DescSkuStockResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.DescSkuStockResp)
+	infos := make([]*model.SkuBuyInfo, 0)
+	for _, info := range req.Infos {
+		infos = append(infos, &model.SkuBuyInfo{
+			SkuID: info.SkuID,
+			Count: info.Count,
+		})
+	}
+	err = c.useCase.DecrStock(ctx, infos)
+	if err != nil {
+		return r, err
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return r, nil
 }
 
 func (c CommodityHandler) CreateCategory(ctx context.Context, req *commodity.CreateCategoryReq) (r *commodity.CreateCategoryResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.CreateCategoryResp)
+	category := model.Category{
+		Name: req.Name,
+	}
+	id, err := c.useCase.CreateCategory(ctx, &category)
+	r.Base = base.BuildBaseResp(err)
+	r.CategoryID = id
+	return
 }
 
 func (c CommodityHandler) DeleteCategory(ctx context.Context, req *commodity.DeleteCategoryReq) (r *commodity.DeleteCategoryResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.DeleteCategoryResp)
+	category := model.Category{
+		Id: req.CategoryID,
+	}
+	err = c.useCase.DeleteCategory(ctx, &category)
+	r.Base = base.BuildBaseResp(err)
+	return
 }
 
 func (c CommodityHandler) ViewCategory(ctx context.Context, req *commodity.ViewCategoryReq) (r *commodity.ViewCategoryResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ViewCategoryResp)
+	cInfos, err := c.useCase.ViewCategory(ctx, int(req.PageNum), int(req.PageSize))
+	if err != nil {
+		return r, err
+	}
+
+	r.CategoryInfo = lo.Map(cInfos, func(item *model.CategoryInfo, index int) *kmodel.CategoryInfo {
+		return &kmodel.CategoryInfo{
+			CategoryID: item.CategoryID,
+			Name:       item.Name,
+		}
+	})
+	return r, nil
 }
 
 func (c CommodityHandler) UpdateCategory(ctx context.Context, req *commodity.UpdateCategoryReq) (r *commodity.UpdateCategoryResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.UpdateCategoryResp)
+	category := model.Category{
+		Id:   req.CategoryID,
+		Name: req.Name,
+	}
+	err = c.useCase.UpdateCategory(ctx, &category)
+	r.Base = base.BuildBaseResp(err)
+	return
 }
 
 func NewCommodityHandler(useCase usecase.CommodityUseCase) *CommodityHandler {

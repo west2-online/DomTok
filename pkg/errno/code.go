@@ -28,10 +28,6 @@ const (
 	SuccessMsg  = "ok"
 )
 
-const (
-	ServiceError = 10001
-)
-
 // 200xx: 参数错误，Param 打头
 const (
 	ParamVerifyErrorCode   = 20000 + iota // 参数校验失败
@@ -48,6 +44,7 @@ const (
 	AuthNoTokenCode                            // 没有 token
 	AuthNoOperatePermissionCode                // 没有操作权限
 	AuthMissingTokenCode                       // 缺少 token
+	IllegalOperatorCode                        // 不合格的操作(比如传入 payment status时传入了一个不存在的 status)
 )
 
 // 500xx: 内部错误，Internal 打头
@@ -62,8 +59,12 @@ const (
 	InternalKafkaErrorCode                   // kafka 错误
 	OSOperateErrorCode
 	IOOperateErrorCode
+	InsufficientStockErrorCode
+	InternalRPCErrorCode
+	InternalRocketmqErrorCode
 )
 
 const (
 	UpYunFileErrorCode = 60000 + iota
+	RedisKeyNotExist
 )

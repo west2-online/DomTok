@@ -37,11 +37,9 @@ struct CreateCouponResp {
 /*
 * struct DeleteCouponReq 删除优惠券信息
 * @Param CouponID 优惠券信息ID
-* @Param UserID 用户ID
 */
 struct DeleteCouponReq {
     1: required i64 couponID;
-    2: required i64 userID;
 }
 
 struct DeleteCouponResp {
@@ -50,10 +48,10 @@ struct DeleteCouponResp {
 
 /*
 * struct CreateUserCouponReq 用户领取优惠券
-* @Param CouponID 优惠券信息ID
 */
 struct CreateUserCouponReq {
     1: required i64 couponID;
+    2: required i64 remaining_use,
 }
 
 struct CreateUserCouponResp {
@@ -62,36 +60,28 @@ struct CreateUserCouponResp {
 
 /*
 * struct ViewCouponReq 查看优惠券信息或商家创建的优惠券
-* @Param CouponID 优惠券信息ID
 * @Param PageNum 页数
-* @Param PageSize 页面大小
 */
 struct ViewCouponReq {
-    1: required i64 couponID;
-    2: optional i64 pageNum;
-    3: optional i64 pageSize;
+    1: required i64 pageNum;
 }
 
 struct ViewCouponResp {
     1: required model.BaseResp base;
-    2: required model.Coupon couponInfo;
+    2: required list<model.Coupon> couponInfo;
 }
 
 /*
 * struct ViewUserAllCouponReq 查看用户自己持有的优惠券
-* @Param IsIncludeExpired 是否包含过期的券
 * @Param PageNum 页数
-* @Param PageSize 页面大小
 */
 struct ViewUserAllCouponReq {
-    1: required i64 isIncludeExpired;
-    2: required i64 pageNum;
-    3: required i64 pageSize;
+    1: required i64 pageNum;
 }
 
 struct ViewUserAllCouponResp {
     1: required model.BaseResp base;
-    2: required list<model.UserCoupon> coupons;
+    2: required list<model.Coupon> coupons;
 }
 
 /*
@@ -184,6 +174,7 @@ struct ViewSpuReq {
 struct ViewSpuResp {
     1: required model.BaseResp base;
     2: required list<model.Spu> spus;
+    3: required i64 total;
 }
 
 /*
@@ -457,7 +448,7 @@ struct ViewCategoryResp {
 * @Param pageSize 页尺寸
  */
 struct ListSkuInfoReq {
-    1: required list<i64> skuIDs;
+    1: required list<model.SkuVersion> skuInfos;
     2: required i64 pageNum;
     3: required i64 pageSize;
 }
@@ -468,14 +459,22 @@ struct ListSkuInfoResp {
     3: required i64 total;
 }
 
+struct ListSpuInfoReq {
+    1: required list<i64> spuIDs;
+}
+
+struct ListSpuInfoResp {
+    1: required model.BaseResp base;
+    2: required list<model.Spu> spus;
+}
+
 /*
 * struct DescSkuLockStockReq 预扣商品
 * @Param skuID skuID
 * @Param count 购买商品数
  */
 struct DescSkuLockStockReq {
-    1: required i64 skuID;
-    2: required i64 count
+    1: required list<model.SkuBuyInfo> infos;
 }
 
 struct DescSkuLockStockResp {
@@ -488,8 +487,7 @@ struct DescSkuLockStockResp {
 * @Param count 原购买商品数
  */
 struct IncrSkuLockStockReq {
-    1: required i64 skuID;
-    2: required i64 count;
+    1: required list<model.SkuBuyInfo> infos;
 }
 
 struct IncrSkuLockStockResp {
@@ -502,8 +500,7 @@ struct IncrSkuLockStockResp {
 * @Param count 购买商品数
  */
 struct DescSkuStockReq {
-    1: required i64 skuID;
-    2: required i64 count;
+    1: required list<model.SkuBuyInfo> infos;
 }
 
 struct DescSkuStockResp {
@@ -534,9 +531,9 @@ service CommodityService {
     // 优惠券
     CreateCouponResp CreateCoupon(1: CreateCouponReq req);
     DeleteCouponResp DeleteCoupon(1: DeleteCouponReq req);
-    CreateUserCouponResp CreateUserCoupon(1: CreateCouponReq req);
+    CreateUserCouponResp CreateUserCoupon(1: CreateUserCouponReq req);
     ViewCouponResp ViewCoupon(1: ViewCouponReq req);
-    ViewUserAllCouponResp ViewUserAllCoupon(1: ViewCouponReq req);
+    ViewUserAllCouponResp ViewUserAllCoupon(1: ViewUserAllCouponReq req);
     UseUserCouponResp UseUserCoupon(1: UseUserCouponReq req);
 
     // SPU
@@ -566,6 +563,7 @@ service CommodityService {
     DescSkuLockStockResp DescSkuLockStock(1: DescSkuLockStockReq req);
     IncrSkuLockStockResp IncrSkuLockStock(1: IncrSkuLockStockReq req);
     DescSkuStockResp DescSkuStock(1: DescSkuStockReq req);
+    ListSpuInfoResp ListSpuInfo(1: ListSpuInfoReq req);
 
     //category
     CreateCategoryResp CreateCategory(1: CreateCategoryReq req);

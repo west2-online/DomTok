@@ -20,6 +20,7 @@ import (
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/base"
+	"github.com/west2-online/DomTok/pkg/upyun"
 )
 
 func BuildImage(img *model.SpuImage) *modelKitex.SpuImage {
@@ -34,6 +35,47 @@ func BuildImage(img *model.SpuImage) *modelKitex.SpuImage {
 
 func BuildImages(imgs []*model.SpuImage) []*modelKitex.SpuImage {
 	return base.BuildTypeList(imgs, BuildImage)
+}
+
+func BuildSpu(spu *model.Spu) *modelKitex.Spu {
+	return &modelKitex.Spu{
+		SpuID:            spu.SpuId,
+		Name:             spu.Name,
+		CreatorID:        spu.CreatorId,
+		CategoryID:       spu.CategoryId,
+		Description:      spu.Description,
+		GoodsHeadDrawing: upyun.GetImageUrl(spu.GoodsHeadDrawingUrl),
+		Price:            spu.Price,
+		ForSale:          int32(spu.ForSale),
+		Shipping:         spu.Shipping,
+		CreatedAt:        spu.CreatedAt,
+		UpdatedAt:        spu.UpdatedAt,
+	}
+}
+
+func BuildSpus(spus []*model.Spu) []*modelKitex.Spu {
+	return base.BuildTypeList(spus, BuildSpu)
+}
+
+func BuildCoupon(coupon *model.Coupon) *modelKitex.Coupon {
+	return &modelKitex.Coupon{
+		CouponID:       coupon.Id,
+		CreatorID:      coupon.Uid,
+		DeadlineForGet: coupon.DeadlineForGet.Unix(),
+		Name:           coupon.Name,
+		TypeInfo:       int32(coupon.TypeInfo),
+		ConditionCost:  coupon.ConditionCost,
+		DiscountAmount: &coupon.DiscountAmount,
+		Discount:       &coupon.Discount,
+		RangeType:      int32(coupon.RangeType),
+		RangeId:        coupon.RangeId,
+		ExpireTime:     coupon.ExpireTime.Unix(),
+		Description:    coupon.Description,
+	}
+}
+
+func BuildCoupons(coupons []*model.Coupon) []*modelKitex.Coupon {
+	return base.BuildTypeList(coupons, BuildCoupon)
 }
 
 func BuildSkuImages(i []*model.SkuImage) []*modelKitex.SkuImage {

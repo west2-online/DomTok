@@ -226,6 +226,78 @@ func ViewSpuImagesRPC(ctx context.Context, req *commodity.ViewSpuImageReq) (*com
 	return resp, nil
 }
 
+func ViewSpuRPC(ctx context.Context, req *commodity.ViewSpuReq) (*commodity.ViewSpuResp, error) {
+	resp, err := commodityClient.ViewSpu(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.ViewSpuRPC ViewSpu failed, err  %v", err)
+		return nil, errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return resp, nil
+}
+
+func CreateCouponRPC(ctx context.Context, req *commodity.CreateCouponReq) (*commodity.CreateCouponResp, error) {
+	resp, err := commodityClient.CreateCoupon(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.CreateCouponRPC CreateCoupon failed, err: %v", err)
+		return nil, errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return resp, nil
+}
+
+func DeleteCouponRPC(ctx context.Context, req *commodity.DeleteCouponReq) error {
+	resp, err := commodityClient.DeleteCoupon(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.DeleteCouponRPC DeleteCoupon failed, err: %v", err)
+		return errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return nil
+}
+
+func CreateUserCouponRPC(ctx context.Context, req *commodity.CreateUserCouponReq) error {
+	resp, err := commodityClient.CreateUserCoupon(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.CreateUserCouponRPC CreateUserCoupon failed, err: %v", err)
+		return errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return nil
+}
+
+func ViewCouponRPC(ctx context.Context, req *commodity.ViewCouponReq) (*commodity.ViewCouponResp, error) {
+	resp, err := commodityClient.ViewCoupon(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.ViewCouponRPC ViewCoupon failed, err: %v", err)
+		return nil, errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return resp, nil
+}
+
+func ViewUserAllCouponRPC(ctx context.Context, req *commodity.ViewUserAllCouponReq) (*commodity.ViewUserAllCouponResp, error) {
+	resp, err := commodityClient.ViewUserAllCoupon(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.ViewUserAllCouponRPC ViewUserAllCoupon failed, err: %v", err)
+		return nil, errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return resp, nil
+}
+
 func CreateSkuRPC(ctx context.Context, req *commodity.CreateSkuReq, files [][]byte) (skuID int64, err error) {
 	stream, err := commodityStreamClient.CreateSku(ctx)
 	if err != nil {

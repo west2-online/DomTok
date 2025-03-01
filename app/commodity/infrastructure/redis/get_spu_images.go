@@ -25,7 +25,7 @@ import (
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-func (c commodityCache) GetSpuImages(ctx context.Context, key string) (*model.SpuImages, error) {
+func (c *commodityCache) GetSpuImages(ctx context.Context, key string) (*model.SpuImages, error) {
 	dataJSON, err := c.client.Get(ctx, key).Result()
 	if err != nil {
 		return nil, errno.Errorf(errno.InternalRedisErrorCode, "commodityCache.GetSpuImages faile: %v", err)

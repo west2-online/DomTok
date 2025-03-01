@@ -42,13 +42,30 @@ func CreateCoupon(ctx context.Context, c *app.RequestContext) {
 	var req api.CreateCouponReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	// 调用 RPC 创建优惠券
+	res, err := rpc.CreateCouponRPC(ctx, &commodity.CreateCouponReq{
+		Name:           req.Name,
+		TypeInfo:       req.TypeInfo,
+		ConditionCost:  req.ConditionCost,
+		DiscountAmount: req.DiscountAmount,
+		Discount:       req.Discount,
+		RangeType:      req.RangeType,
+		RangeID:        req.RangeID,
+		Description:    req.Description,
+		ExpireTime:     req.ExpireTime,
+	})
+	if err != nil {
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.CreateCouponResp)
-
-	c.JSON(consts.StatusOK, resp)
+	resp.CouponID = res.CouponID
+	pack.RespData(c, resp.CouponID)
 }
 
 // DeleteCoupon .
@@ -58,13 +75,20 @@ func DeleteCoupon(ctx context.Context, c *app.RequestContext) {
 	var req api.DeleteCouponReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.DeleteCouponResp)
+	// 调用 RPC 删除优惠券
+	err = rpc.DeleteCouponRPC(ctx, &commodity.DeleteCouponReq{
+		CouponID: req.CouponID,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	pack.RespSuccess(c)
 }
 
 // CreateUserCoupon .
@@ -74,13 +98,21 @@ func CreateUserCoupon(ctx context.Context, c *app.RequestContext) {
 	var req api.CreateUserCouponReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.CreateUserCouponResp)
+	// 调用 RPC 领取优惠券
+	err = rpc.CreateUserCouponRPC(ctx, &commodity.CreateUserCouponReq{
+		CouponID:     req.CouponID,
+		RemainingUse: req.RemainingUse,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	pack.RespSuccess(c)
 }
 
 // ViewCoupon .
@@ -90,13 +122,22 @@ func ViewCoupon(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewCouponReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	// 调用 RPC 获取商家创建的优惠券
+	res, err := rpc.ViewCouponRPC(ctx, &commodity.ViewCouponReq{
+		PageNum: req.PageNum,
+	})
+	if err != nil {
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.ViewCouponResp)
-
-	c.JSON(consts.StatusOK, resp)
+	resp.CouponInfo = pack.BuildCoupons(res.CouponInfo)
+	pack.RespList(c, resp.CouponInfo)
 }
 
 // ViewUserAllCoupon .
@@ -106,29 +147,22 @@ func ViewUserAllCoupon(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewUserAllCouponReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	// 调用 RPC 获取用户所有优惠券
+	res, err := rpc.ViewUserAllCouponRPC(ctx, &commodity.ViewUserAllCouponReq{
+		PageNum: req.PageNum,
+	})
+	if err != nil {
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.ViewUserAllCouponResp)
-
-	c.JSON(consts.StatusOK, resp)
-}
-
-// UseUserCoupon .
-// @router /api/commodity/coupon/use [POST]
-func UseUserCoupon(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req api.UseUserCouponReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
-		return
-	}
-
-	resp := new(api.UseUserCouponResp)
-
-	c.JSON(consts.StatusOK, resp)
+	resp.Coupons = pack.BuildCoupons(res.Coupons)
+	pack.RespList(c, resp.Coupons)
 }
 
 // CreateSpu .
@@ -238,13 +272,30 @@ func ViewSpu(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewSpuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	res, err := rpc.ViewSpuRPC(ctx, &commodity.ViewSpuReq{
+		KeyWord:    req.KeyWord,
+		CategoryID: req.CategoryID,
+		SpuID:      req.SpuID,
+		MinCost:    req.MinCost,
+		MaxCost:    req.MaxCost,
+		IsShipping: req.IsShipping,
+		PageSize:   req.PageSize,
+		PageNum:    req.PageNum,
+	})
+	if err != nil {
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.ViewSpuResp)
+	resp.Total = res.Total
+	resp.Spus = pack.BuildSpus(res.Spus)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.RespData(c, resp)
 }
 
 // DeleteSpu .

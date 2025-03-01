@@ -32,10 +32,11 @@ import (
 )
 
 type controlLogger struct {
-	mu     sync.RWMutex
-	logger *logger
-	hooks  []func(zapcore.Entry) error
-	done   atomic.Bool
+	mu      sync.RWMutex
+	logger  *logger
+	hooks   []func(zapcore.Entry) error
+	done    atomic.Bool
+	svcName string
 }
 
 type logger struct {
@@ -65,9 +66,14 @@ func Init(service string, level string) {
 		panic("server should not be empty")
 	}
 
+	control.svcName = service
 	logLevel = parseLevel(level)
 	control.updateLogger(service)
 	control.scheduleUpdateLogger(service)
+}
+
+func Ignore() {
+	control.logger = &logger{zap.NewNop()}
 }
 
 // AddLoggerHook 会将传进的参数在每一次日志输出后执行
@@ -99,14 +105,14 @@ func (l *controlLogger) updateLogger(service string) {
 	var pwd string
 
 	// 获取当前目录
-	if pwd, err = getCurrentDirectory(); err != nil {
+	if pwd, err = getCurrentDirectory(l.svcName); err != nil {
 		panic(err)
 	}
 
 	// 设置文件输出的位置
 	date := time.Now().Format("2006-01-02")
-	logPath := fmt.Sprintf(constants.LogFilePathTemplate, pwd, constants.LogFilePath, date, service)
-	stderrPath := fmt.Sprintf(constants.ErrorLogFilePathTemplate, pwd, constants.LogFilePath, date, service)
+	logPath := fmt.Sprintf(constants.LogFilePathTemplate, pwd, constants.LogFilePath, service, date)
+	stderrPath := fmt.Sprintf(constants.ErrorLogFilePathTemplate, pwd, constants.LogFilePath, service, date)
 
 	// 打开文件,并设置无引用时关闭文件
 	logFileHandler.Store(checkAndOpenFile(logPath))

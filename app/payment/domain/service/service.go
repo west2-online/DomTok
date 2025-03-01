@@ -42,7 +42,7 @@ func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64)
 	paymentOrder := &model.PaymentOrder{
 		ID:      paymentID,
 		OrderID: orderID,
-		Status:  paymentStatus.PaymentStatusPending, // 设定初始状态
+		Status:  paymentStatus.PaymentStatusPendingCode, // 设定初始状态
 	}
 
 	// 3. 存入数据库
@@ -64,29 +64,33 @@ func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error)
 	return uid, nil
 }
 
-// TODO 后面完善这个接口，要发起RPC请求向order模块申请数据库的查询，所以后面再来写
+// CheckOrderExist 检查订单是否存在（调用Order模块的接口）
 func (svc *PaymentService) CheckOrderExist(ctx context.Context, orderID int64) (orderInfo bool, err error) {
-	return paymentStatus.OrderNotExist, nil
+	userInfo, err := svc.rpc.PaymentIsOrderExist(ctx, orderID)
+	if err != nil {
+		return false, fmt.Errorf("failed to check order existence: %w", err)
+	}
+	return userInfo, nil
 }
 
 // GeneratePaymentToken HMAC生成支付令牌
-func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int64) (string, int64, error) {
+func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int64) (token string, expirationTime int64, err error) {
 	// 1. 设定过期时间为15分钟后, 即现在时间加上15分钟之后的秒级时间戳
-	expirationTime := time.Now().Add(paymentStatus.ExpirationDuration).Unix()
+	expirationTime = time.Now().Add(paymentStatus.ExpirationDuration).Unix()
 	logger.Infof("Generating payment token, orderID: %d, expirationTime: %d", orderID, expirationTime)
 	// 2. 获取 HMAC 密钥（可以从环境变量或配置文件获取）
 	secretKey := []byte(paymentStatus.PaymentSecretKey)
 
 	// 3. 计算 HMAC-SHA256 哈希
 	h := hmac.New(sha256.New, secretKey)
-	_, err := h.Write([]byte(fmt.Sprintf("%d:%d", orderID, expirationTime)))
+	_, err = h.Write([]byte(fmt.Sprintf("%d:%d", orderID, expirationTime)))
 	if err != nil {
 		logger.Infof("failed to generate payment HMAC token, orderID: %d, expirationTime: %d", orderID, expirationTime)
 		return "", 0, fmt.Errorf("failed to generate payment HMAC token: %w", err)
 	}
 
 	// 4. 生成十六进制编码的 HMAC 签名
-	token := hex.EncodeToString(h.Sum(nil))
+	token = hex.EncodeToString(h.Sum(nil))
 	// logger.Infof("Generated payment HAMC token successfully, orderID: %d, expirationTime: %d", orderID, expirationTime)
 	// 5. 返回令牌和过期时间
 	return token, expirationTime, nil
@@ -157,7 +161,7 @@ func (svc *PaymentService) CreateRefundInfo(ctx context.Context, orderID int64) 
 	refundOrder := &model.PaymentRefund{
 		ID:      refundID,
 		OrderID: orderID,
-		Status:  paymentStatus.RefundStatusPending, // 设定初始状态
+		Status:  paymentStatus.RefundStatusPendingCode, // 设定初始状态
 	}
 
 	// 3. 存入数据库
@@ -168,6 +172,14 @@ func (svc *PaymentService) CreateRefundInfo(ctx context.Context, orderID int64) 
 
 	// 4. 返回退款 ID
 	return refundID, nil
+}
+
+func (svc *PaymentService) GetPaymentStatusMsg(code int8) string {
+	return paymentStatus.GetPaymentStatus(code)
+}
+
+func (svc *PaymentService) GetRefundStatusMsg(code int8) string {
+	return paymentStatus.GetRefundStatus(code)
 }
 
 /*func (svc *PaymentService) GenerateRefundToken(ctx context.Context, refundID int64) (string, int64, error) {

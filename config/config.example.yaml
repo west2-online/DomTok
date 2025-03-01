@@ -37,7 +37,7 @@ elasticsearch:
   host: 127.0.0.1
 
 redis:
-  addr: domtok-redis:6379
+  addr: 127.0.0.1:6379
   password: DomTok
 
 jaeger:
@@ -50,33 +50,38 @@ kafka:
   password: domtok-password
 
 upyun:
-    bucket: "w2-domtok"
-    operator: "penqee"
-    password: ""
-    token-secret: ""
-    token-timeout: 60
-    uss-domain: "http://w2-domtok.test.upcdn.net" # 测试域名
-    download-domain: ""
+  bucket: "w2-domtok"
+  operator: "penqee"
+  password: ""
+  token-secret: ""
+  token-timeout: 60
+  uss-domain: "http://w2-domtok.test.upcdn.net" # 测试域名
+  download-domain: ""
 
+rocketmq:
+  brokerAddr: 127.0.0.1:10911 # 端口定义于 ../docker/docker=-compose.yml
+  nameSrvAddr: 127.0.0.1:9876 # 同上
+  accessKey: DomTok # 定义于 ./rocketmq/plain_acl.yml
+  secretKey: DomTok # 同上
 
 services:
   template:
     name: template
     load-balance: false
     addr:
-    - 127.0.0.1:10001
+      - 127.0.0.1:10001
 
   gateway:
     name: gateway
     load-balance: false
     addr:
-    - 0.0.0.0:20001
+      - 0.0.0.0:20001
 
   user:
     name: user
     load-balance: false
     addr:
-    - 0.0.0.0:20002
+      - 0.0.0.0:20002
 
   order:
     name: order
@@ -95,3 +100,9 @@ services:
     load-balance: false
     addr:
       - 0.0.0.0:20005
+
+  cart:
+    name: cart
+    load-balance: false
+    addr:
+      - 0.0.0.0:20006

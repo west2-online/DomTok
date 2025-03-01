@@ -54,3 +54,44 @@ func BuildSpuImage(img *modelKitex.SpuImage) *model.SpuImage {
 func BuildSpuImages(imgs []*modelKitex.SpuImage) []*model.SpuImage {
 	return base.BuildTypeList(imgs, BuildSpuImage)
 }
+
+func BuildSpu(spu *modelKitex.Spu) *model.Spu {
+	return &model.Spu{
+		SpuID:            spu.SpuID,
+		Name:             spu.Name,
+		CreatorID:        spu.CreatorID,
+		CreatedAt:        spu.CreatedAt,
+		UpdatedAt:        spu.UpdatedAt,
+		CategoryID:       spu.CategoryID,
+		Description:      spu.Description,
+		GoodsHeadDrawing: spu.GoodsHeadDrawing,
+		Price:            spu.Price,
+		ForSale:          spu.ForSale,
+		Shipping:         spu.Shipping,
+	}
+}
+
+func BuildSpus(spus []*modelKitex.Spu) []*model.Spu {
+	return base.BuildTypeList(spus, BuildSpu)
+}
+
+func BuildCoupon(coupon *modelKitex.Coupon) *model.Coupon {
+	return &model.Coupon{
+		CouponID:       coupon.CouponID,
+		CreatorID:      coupon.CreatorID,
+		DeadlineForGet: coupon.DeadlineForGet,
+		Name:           coupon.Name,
+		TypeInfo:       coupon.TypeInfo,
+		ConditionCost:  coupon.ConditionCost,
+		DiscountAmount: coupon.DiscountAmount,
+		Discount:       coupon.Discount,
+		RangeType:      coupon.RangeType,
+		RangeId:        coupon.RangeId,
+		ExpireTime:     coupon.ExpireTime,
+		Description:    coupon.Description,
+	}
+}
+
+func BuildCoupons(coupons []*modelKitex.Coupon) []*model.Coupon {
+	return base.BuildTypeList(coupons, BuildCoupon)
+}

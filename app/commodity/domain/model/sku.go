@@ -31,6 +31,7 @@ type Sku struct {
 	ForSale             int
 	SpuID               int64
 	Stock               int64
+	HistoryStock     int64
 	CreatedAt           int64
 	UpdatedAt           int64
 	DeletedAt           int64
@@ -47,3 +48,13 @@ type SkuImage struct {
 	CreatedAt int64
 	DeletedAt int64
 }
+
+
+type SkuBuyInfo struct {
+	SkuID int64
+	Count int64
+}
+
+type SkuStock struct {
+	Stock     int64 `gorm:"column:stock"`
+	LockStock int64 `gorm:"column:lock_stock"`
