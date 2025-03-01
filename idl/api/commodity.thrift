@@ -274,6 +274,7 @@ struct ViewHistoryPriceResp {
     1: required list<model.PriceHistory> records;
 }
 
+
 service CommodityService {
     // 优惠券
     CreateCouponResp CreateCoupon(1: CreateCouponReq req) (api.post="/api/v1/commodity/coupon/create");

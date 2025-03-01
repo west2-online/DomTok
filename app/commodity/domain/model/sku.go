@@ -36,3 +36,8 @@ type SkuBuyInfo struct {
 	SkuID int64
 	Count int64
 }
+
+type SkuStock struct {
+	Stock     int64 `gorm:"column:stock"`
+	LockStock int64 `gorm:"column:lock_stock"`
+}
