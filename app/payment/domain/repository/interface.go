@@ -41,10 +41,14 @@ type PaymentRedis interface {
 	CheckRedisDayKey(ctx context.Context, key string) (bool, error)
 	SetRedisDayKey(ctx context.Context, key string, value string, expiration int) error
 	SetRefundToken(ctx context.Context, key string, token string, duration time.Duration) error
-	CheckAndDelPaymentToken(ctx context.Context, key string, value string) (bool, error)
+	CheckAndDelPaymentToken(ctx context.Context, key string, value string) (exist bool, err error)
+	GetTTLAndDelPaymentToken(ctx context.Context, key string, value string) (exist bool, ttl time.Duration, err error)
 	// GetPaymentToken(ctx context.Context, key string) (string, error)
 }
 
 type PaymentRPC interface {
 	PaymentIsOrderExist(ctx context.Context, orderID int64) (bool, error)
+	GetOrderStatus(ctx context.Context, orderID int64) (exist bool, expire int64, err error)
+	OrderPaymentCancel(ctx context.Context, orderID int64, paymentAt int64, paymentStyle string) error
+	OrderPaymentSuccess(ctx context.Context, orderID int64, paymentAt int64, paymentStyle string) error
 }

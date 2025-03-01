@@ -153,3 +153,7 @@ func GetLedgerTransactionType(code int8) string {
 		return LedgerTransactionTypeAdjustment
 	}
 }
+
+const (
+	PaymentStyleDomTok = "DomTok"
+)

@@ -134,12 +134,16 @@ func (uc *paymentUseCase) CreateRefund(ctx context.Context, orderID int64) (refu
 // RefundReview 退款审核
 func (uc *paymentUseCase) RefundReview(ctx context.Context, orderID int64, passed bool) error {
 	// 1. 检查订单是否存在
-	orderExist, err := uc.svc.CheckOrderExist(ctx, orderID)
+	orderExist, orderExpired, err := uc.svc.GetOrderStatus(ctx, orderID)
 	if err != nil {
 		return fmt.Errorf("check order existence failed: %w", err)
 	}
+	// 订单不存在或者订单已经过期
 	if !orderExist {
 		return fmt.Errorf("order does not exist")
+	}
+	if orderExpired {
+		return fmt.Errorf("order has expired")
 	}
 
 	// 2. 用户是否存在
@@ -174,9 +178,13 @@ func (uc *paymentUseCase) RefundReview(ctx context.Context, orderID int64, passe
 	}
 
 	if passed {
-		err = uc.svc.Refund()
+		refundAt, style, err := uc.svc.Refund(ctx)
 		if err != nil {
 			return fmt.Errorf("refund failed: %w", err)
+		}
+		err = uc.svc.CancelOrder(ctx, orderID, refundAt, style)
+		if err != nil {
+			return fmt.Errorf("cancel order failed: %w", err)
 		}
 		err = uc.db.UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction(ctx, refund)
 		if err != nil {
@@ -196,12 +204,16 @@ func (uc *paymentUseCase) RefundReview(ctx context.Context, orderID int64, passe
 // PaymentCheckout 支付结算
 func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, token string) error {
 	// 1. 检查订单是否存在
-	orderExist, err := uc.svc.CheckOrderExist(ctx, orderID)
+	orderExist, orderExpired, err := uc.svc.GetOrderStatus(ctx, orderID)
 	if err != nil {
 		return fmt.Errorf("check order existence failed: %w", err)
 	}
+	// 订单不存在或者订单已经过期
 	if !orderExist {
 		return fmt.Errorf("order does not exist")
+	}
+	if orderExpired {
+		return fmt.Errorf("order has expired")
 	}
 
 	// 2. 用户是否存在
@@ -211,7 +223,7 @@ func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, to
 	}
 
 	// 3. 支付令牌是否在 Redis 中
-	exist, err := uc.svc.CheckAndDelPaymentToken(ctx, token, uid, orderID)
+	exist, exp, err := uc.svc.GetExpiredAtAndDelPaymentToken(ctx, token, uid, orderID)
 	if !exist && err == nil {
 		return fmt.Errorf("duplicate payment request")
 	}
@@ -238,9 +250,48 @@ func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, to
 		}
 	}
 
+	var rollbackBeforePay func() error
+	if order == nil {
+		// Redis 未出错，则需要回滚 Redis
+		rollbackBeforePay = func() error {
+			errRollback := uc.svc.PutBackPaymentToken(ctx, token, uid, orderID, exp)
+			if errRollback != nil {
+				return fmt.Errorf("rollback payment token failed: %w", errRollback)
+			}
+			return nil
+		}
+	} else {
+		// Redis出错，则需要回滚数据库
+		rollbackBeforePay = func() error {
+			errRollback := uc.db.UpdatePaymentStatus(ctx, orderID, paymentStatus.PaymentStatusPendingCode)
+			if errRollback != nil {
+				return fmt.Errorf("rollback payment status failed: %w", errRollback)
+			}
+			return nil
+		}
+	}
+
+	// 临时挂起支付信息，用于预确认订单
+	payAt, style, err := uc.svc.GetPayInfo(ctx)
+	if err != nil {
+		return fmt.Errorf("get pay info failed: %w", err)
+	}
+
+	err = uc.svc.ConfirmOrder(ctx, orderID, payAt, style)
+	// 确认订单失败，回滚 Redis 或数据库
+	if err != nil {
+		rollbackErr := rollbackBeforePay()
+		if rollbackErr != nil {
+			return fmt.Errorf("rollback failed: %w", rollbackErr)
+		}
+		return fmt.Errorf("confirm order failed: %w", err)
+	}
+
 	transactionSuccess := true
 	// 5. 调用支付接口
-	err = uc.svc.Pay()
+	// 此时的支付信息为确认订单的应填支付信息
+	// 真实场景下应当更新订单的相关字段，由于支付过程为模拟，故此处不做处理
+	_, _, err = uc.svc.Pay(ctx)
 	if err != nil {
 		transactionSuccess = false
 	}
@@ -270,6 +321,6 @@ func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, to
 		return fmt.Errorf("payment failed: %w", err)
 	}
 
-	// TODO: 6. 将支付结果写入 Redis
+	// 6. 将支付结果写入 Redis(Unused)
 	return nil
 }

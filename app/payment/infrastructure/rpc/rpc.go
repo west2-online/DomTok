@@ -23,6 +23,8 @@ import (
 	"github.com/west2-online/DomTok/app/payment/domain/repository"
 	orderrpc "github.com/west2-online/DomTok/kitex_gen/order"
 	"github.com/west2-online/DomTok/kitex_gen/order/orderservice"
+	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 type paymentRPC struct {
@@ -43,4 +45,49 @@ func (rpc *paymentRPC) PaymentIsOrderExist(ctx context.Context, orderID int64) (
 	}
 	orderExistInfo = resp.Exist
 	return orderExistInfo, nil
+}
+
+func (rpc *paymentRPC) GetOrderStatus(ctx context.Context, orderID int64) (exist bool, expire int64, err error) {
+	resp, err := rpc.order.IsOrderExist(ctx, &orderrpc.IsOrderExistReq{OrderID: orderID})
+	if err != nil {
+		return false, -1, fmt.Errorf("rpc.order.IsOrderExist: %w", err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return false, -1, fmt.Errorf("rpc.order.IsOrderExist: %v", resp.Base.Msg)
+	}
+	return resp.Exist, resp.OrderExpire, nil
+}
+
+func (rpc *paymentRPC) OrderPaymentCancel(ctx context.Context, orderID int64, paymentAt int64, paymentStyle string) error {
+	req := &orderrpc.UpdateOrderStatusReq{
+		OrderID:       orderID,
+		PaymentStatus: constants.PaymentStatusFailedCode,
+		PaymentAt:     paymentAt,
+		PaymentStyle:  paymentStyle,
+	}
+	resp, err := rpc.order.OrderPaymentCancel(ctx, req)
+	if err != nil {
+		return fmt.Errorf("rpc.order.CancelOrder: %w", err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return fmt.Errorf("rpc.order.CancelOrder: %v", resp.Base.Msg)
+	}
+	return nil
+}
+
+func (rpc *paymentRPC) OrderPaymentSuccess(ctx context.Context, orderID int64, paymentAt int64, paymentStyle string) error {
+	req := &orderrpc.UpdateOrderStatusReq{
+		OrderID:       orderID,
+		PaymentStatus: constants.PaymentStatusSuccessCode,
+		PaymentAt:     paymentAt,
+		PaymentStyle:  paymentStyle,
+	}
+	resp, err := rpc.order.OrderPaymentSuccess(ctx, req)
+	if err != nil {
+		return fmt.Errorf("rpc.order.ConfirmOrder: %w", err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return fmt.Errorf("rpc.order.ConfirmOrder: %v", resp.Base.Msg)
+	}
+	return nil
 }

@@ -24,7 +24,8 @@ import (
 type ScriptKey string
 
 const (
-	CheckAndDelScript ScriptKey = "CheckAndDel"
+	CheckAndDelScript  ScriptKey = "CheckAndDel"
+	GetTTLAndDelScript ScriptKey = "GetTTLAndDel"
 )
 
 type _Script struct {
@@ -41,6 +42,17 @@ if exists == 1 and redis.call("GET", KEYS[1]) == ARGV[1] then
 	return 1
 end
 return 0
+`,
+	},
+	GetTTLAndDelScript: {
+		Cmd: `
+local exists = redis.call("EXISTS", KEYS[1])
+if exists == 1 and redis.call("GET", KEYS[1]) == ARGV[1] then
+	local ttl = redis.call("TTL", KEYS[1])
+	redis.call("DEL", KEYS[1])
+	return {ttl, 1}
+end
+return {-1, 0}
 `,
 	},
 }

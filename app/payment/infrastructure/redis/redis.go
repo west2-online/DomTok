@@ -92,3 +92,24 @@ func (p *paymentRedis) CheckAndDelPaymentToken(ctx context.Context, key string, 
 	}
 	return exist == 1, nil
 }
+
+func (p *paymentRedis) GetTTLAndDelPaymentToken(ctx context.Context, key string, value string) (bool, time.Duration, error) {
+	// 执行脚本
+	result, err := p.execScript(ctx, GetTTLAndDelScript, []string{key}, value)
+	if err != nil {
+		return false, -1, fmt.Errorf("failed to get ttl and delete refund token: %w", err)
+	}
+	res, ok := result.([]interface{})
+	if !ok || len(res) != 2 {
+		return false, -1, fmt.Errorf("failed to convert result to [2]interface{}")
+	}
+	redisTTL, ok := res[0].(int64)
+	if !ok {
+		return false, -1, fmt.Errorf("failed to convert ttl to int64")
+	}
+	redisExist, ok := res[1].(int64)
+	if !ok {
+		return false, -1, fmt.Errorf("failed to convert exist to int64")
+	}
+	return redisExist == 1, time.Duration(redisTTL) * time.Second, nil
+}

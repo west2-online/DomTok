@@ -241,10 +241,47 @@ func (svc *PaymentService) CheckAndDelPaymentToken(ctx context.Context, token st
 	return result, nil
 }
 
-func (svc *PaymentService) Pay() error {
-	return nil
+func (svc *PaymentService) GetExpiredAtAndDelPaymentToken(ctx context.Context,
+	token string, userId int64, orderID int64,
+) (exist bool, exp time.Time, err error) {
+	exist, ttl, err := svc.redis.GetTTLAndDelPaymentToken(ctx, fmt.Sprintf("payment_token:%d:%d", userId, orderID), token)
+	if err != nil {
+		return false, time.Time{}, fmt.Errorf("failed to get and delete payment token: %w", err)
+	}
+	return exist, time.Now().Add(ttl), nil
 }
 
-func (svc *PaymentService) Refund() error {
-	return nil
+func (svc *PaymentService) PutBackPaymentToken(ctx context.Context, token string, userID int64, orderID int64, exp time.Time) error {
+	return svc.redis.SetPaymentToken(ctx, fmt.Sprintf("payment_token:%d:%d", userID, orderID), token, time.Until(exp))
+}
+
+func (svc *PaymentService) GetOrderStatus(ctx context.Context, orderID int64) (bool, bool, error) {
+	exist, expire, err := svc.rpc.GetOrderStatus(ctx, orderID)
+	if err != nil {
+		return false, true, fmt.Errorf("failed to get order status: %w", err)
+	}
+	return exist, time.Now().Unix() > expire, nil
+}
+
+// GetPayInfo 模拟获取支付信息
+func (svc *PaymentService) GetPayInfo(_ context.Context) (int64, string, error) {
+	return time.Now().Unix(), paymentStatus.PaymentStyleDomTok, nil
+}
+
+// Pay 模拟支付
+func (svc *PaymentService) Pay(_ context.Context) (int64, string, error) {
+	return time.Now().Unix(), paymentStatus.PaymentStyleDomTok, nil
+}
+
+// Refund 模拟退款
+func (svc *PaymentService) Refund(_ context.Context) (int64, string, error) {
+	return time.Now().Unix(), paymentStatus.PaymentStyleDomTok, nil
+}
+
+func (svc *PaymentService) CancelOrder(ctx context.Context, orderID int64, paymentAt int64, paymentStyle string) error {
+	return svc.rpc.OrderPaymentCancel(ctx, orderID, paymentAt, paymentStyle)
+}
+
+func (svc *PaymentService) ConfirmOrder(ctx context.Context, orderID int64, paymentAt int64, paymentStyle string) error {
+	return svc.rpc.OrderPaymentCancel(ctx, orderID, paymentAt, paymentStyle)
 }
