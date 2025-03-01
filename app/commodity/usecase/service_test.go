@@ -861,3 +861,56 @@ func TestUseCase_IncrLockStock(t *testing.T) {
 		})
 	}
 }
+
+
+func TestUseCase_CreateCategory(t *testing.T){
+	type TestCase struct{
+		Name string
+		CategoryName string
+		Id int
+		MockError error
+		ExpectedError error
+	}
+	testcase:=[]TestCase{
+		{
+			Name: "CreateCategoryError",
+			MockError: errors.New("CreateCategoryError"),
+			ExpectedError: errors.New("usecase.CreateCategory faild:CreateCategoryError"),
+		},
+		{
+		Name: "CreateCategorySuccessfully",
+		Id: 1,
+		},
+	}
+	defer mockey.UnPatchAll()
+	for _,tc:=range testcase{
+		mockey.PatchConvey(tc.Name,t,func(){
+			svc:=new(service.CommodityService)
+			us := &useCase{
+				svc: svc,
+			}
+			mockey.Mock((*service.CommodityService).CreateCategory).Return(tc.Id).Build()
+			id,err:=us.CreateCategory(ctx.Background(),&model.Category{Name: tc.CategoryName})
+			if id==0{
+				convey.So(err.Error(),convey.ShouldBeFalse,tc.ExpectedError.Error())
+			}else if err!=nil{
+				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			}else{
+				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+			}
+		})
+	}
+}
+
+func TestUseCase_DeleteCategory(t *testing.T){
+	
+}
+
+func TestUseCase_UpdateCategory(t *testing.T){
+	
+}
+
+func TestUseCase_ViewCategory(t *testing.T){
+	
+}
+

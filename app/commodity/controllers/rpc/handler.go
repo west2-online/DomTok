@@ -407,10 +407,10 @@ func (c CommodityHandler) DescSkuStock(ctx context.Context, req *commodity.DescS
 
 func (c CommodityHandler) CreateCategory(ctx context.Context, req *commodity.CreateCategoryReq) (r *commodity.CreateCategoryResp, err error) {
 	r = new(commodity.CreateCategoryResp)
-	category := model.Category{
+	category := &model.Category{
 		Name: req.Name,
 	}
-	id, err := c.useCase.CreateCategory(ctx, &category)
+	id, err := c.useCase.CreateCategory(ctx, category)
 	r.Base = base.BuildBaseResp(err)
 	r.CategoryID = id
 	return
@@ -418,10 +418,10 @@ func (c CommodityHandler) CreateCategory(ctx context.Context, req *commodity.Cre
 
 func (c CommodityHandler) DeleteCategory(ctx context.Context, req *commodity.DeleteCategoryReq) (r *commodity.DeleteCategoryResp, err error) {
 	r = new(commodity.DeleteCategoryResp)
-	category := model.Category{
+	category := &model.Category{
 		Id: req.CategoryID,
 	}
-	err = c.useCase.DeleteCategory(ctx, &category)
+	err = c.useCase.DeleteCategory(ctx, category)
 	r.Base = base.BuildBaseResp(err)
 	return
 }
@@ -444,11 +444,11 @@ func (c CommodityHandler) ViewCategory(ctx context.Context, req *commodity.ViewC
 
 func (c CommodityHandler) UpdateCategory(ctx context.Context, req *commodity.UpdateCategoryReq) (r *commodity.UpdateCategoryResp, err error) {
 	r = new(commodity.UpdateCategoryResp)
-	category := model.Category{
+	category := &model.Category{
 		Id:   req.CategoryID,
 		Name: req.Name,
 	}
-	err = c.useCase.UpdateCategory(ctx, &category)
+	err = c.useCase.UpdateCategory(ctx, category)
 	r.Base = base.BuildBaseResp(err)
 	return
 }
