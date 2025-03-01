@@ -21,7 +21,6 @@ package api
 import (
 	"context"
 	"errors"
-
 	"github.com/cloudwego/hertz/pkg/protocol"
 
 	"github.com/west2-online/DomTok/app/gateway/pack"
@@ -441,6 +440,111 @@ func ViewSkuImage(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	pack.RespData(c, images)
+}
+
+// CreateSkuImage .
+// @router /api/v1/commodity/sku/image/create [POST]
+func CreateSkuImage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.CreateSkuImageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	resp := new(commodity.CreateSkuImageResp)
+
+	file, err := c.FormFile("skuImage")
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	_, ok := utils.CheckImageFileType(file)
+	if !ok {
+		pack.RespError(c, errno.ParamVerifyError)
+		return
+	}
+
+	datas, err := utils.FileToBytes(file)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	id, err := rpc.CreateSkuImageRPC(ctx, &commodity.CreateSkuImageReq{
+		BufferCount: int64(len(datas)),
+		SkuID:       req.SkuID,
+	}, datas)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	resp.ImageID = id
+	pack.RespData(c, resp)
+}
+
+// UpdateSkuImage .
+// @router /api/v1/commodity/sku/image/update [POST]
+func UpdateSkuImage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.UpdateSkuImageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	file, err := c.FormFile("skuImage")
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	_, ok := utils.CheckImageFileType(file)
+	if !ok {
+		pack.RespError(c, errno.ParamVerifyError)
+		return
+	}
+
+	datas, err := utils.FileToBytes(file)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	err = rpc.UpdateSkuImageRPC(ctx, &commodity.UpdateSkuImageReq{
+		BufferCount: int64(len(datas)),
+		ImageID:     req.ImageID,
+	}, datas)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespSuccess(c)
+}
+
+// DeleteSkuImage .
+// @router /api/v1/commodity/sku/image/delete [DELETE]
+func DeleteSkuImage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.DeleteSkuImageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	err = rpc.DeleteSkuImageRPC(ctx, &commodity.DeleteSkuImageReq{
+		SkuImageID: req.SkuImageID,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespSuccess(c)
 }
 
 // ViewSku .

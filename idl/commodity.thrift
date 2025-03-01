@@ -276,6 +276,17 @@ struct CreateSkuResp {
     2: required i64 skuID;
 }
 
+struct CreateSkuImageReq {
+    1: required binary data;
+    2: required i64 skuID;
+    3: required i64 bufferCount;
+}
+
+struct CreateSkuImageResp {
+    1: required model.BaseResp base;
+    2: required i64 imageID;
+}
+
 /*
 * struct UpdateSkuReq 更新sku请求
 * @Param skuID skuID
@@ -302,6 +313,16 @@ struct UpdateSkuResp {
     1: required model.BaseResp base;
 }
 
+struct UpdateSkuImageReq {
+    1: required binary data;
+    2: required i64 imageID;
+    3: required i64 bufferCount;
+}
+
+struct UpdateSkuImageResp {
+    1: required model.BaseResp base;
+}
+
 /*
 * struct DeleteSkuReq 删除sku请求
 * @Param skuID skuID
@@ -311,6 +332,14 @@ struct DeleteSkuReq {
 }
 
 struct DeleteSkuResp {
+    1: required model.BaseResp base;
+}
+
+struct DeleteSkuImageReq {
+    1: required i64 skuImageID;
+}
+
+struct DeleteSkuImageResp {
     1: required model.BaseResp base;
 }
 
@@ -529,6 +558,9 @@ service CommodityService {
     UploadSkuAttrResp UploadSkuAttr(1: UploadSkuAttrReq req);
     ListSkuInfoResp ListSkuInfo(1: ListSkuInfoReq req);
     ViewHistoryPriceResp ViewHistory(1: ViewHistoryPriceReq req)
+    CreateSkuImageResp CreateSkuImage(1: CreateSkuImageReq req) (streaming.mode="client");
+    UpdateSkuImageResp UpdateSkuImage(1: UpdateSkuImageReq req) (streaming.mode="client");
+    DeleteSkuImageResp DeleteSkuImage(1: DeleteSkuImageReq req);
 
     //供订单服务调用
     DescSkuLockStockResp DescSkuLockStock(1: DescSkuLockStockReq req);

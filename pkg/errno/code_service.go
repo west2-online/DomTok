@@ -30,6 +30,7 @@ const (
 	ServiceSkuExist
 
 	ServiceSkuNotExist
+	ServiceSkuImageNotExist
 	ServiceSkuAttrNotExist
 	PaymentOrderNotExist
 	UserNotExist

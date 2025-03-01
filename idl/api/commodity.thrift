@@ -163,6 +163,14 @@ struct CreateSkuResp {
     1: required i64 skuID;
 }
 
+struct CreateSkuImageReq {
+    1: required i64 skuID;
+}
+
+struct CreateSkuImageResp {
+    1: required i64 imageID;
+}
+
 struct UpdateSkuReq {
     1: required i64 skuID;
     2: optional double shipping;
@@ -177,6 +185,13 @@ struct UpdateSkuResp {
 
 }
 
+struct UpdateSkuImageReq {
+    1: required i64 imageID;
+}
+
+struct UpdateSkuImageResp {
+}
+
 
 struct DeleteSkuReq {
     1: required i64 skuID;
@@ -184,6 +199,13 @@ struct DeleteSkuReq {
 
 struct DeleteSkuResp {
 
+}
+
+struct DeleteSkuImageReq {
+    1: required i64 skuImageID;
+}
+
+struct DeleteSkuImageResp {
 }
 
 struct ViewSkuImageReq {
@@ -299,6 +321,9 @@ service CommodityService {
     ViewSkuResp ViewSku(1: ViewSkuReq req) (api.get="/api/v1/commodity/sku/search");
     UploadSkuAttrResp UploadSkuAttr(1: UploadSkuAttrReq req) (api.post="/api/v1/commodity/sku/attr");
     ListSkuInfoResp ListSkuInfo(1: ListSkuInfoReq req) (api.get="/api/v1/commodity/sku/list");
+    CreateSkuImageResp CreateSkuImage(1: CreateSkuImageReq req) (api.post = "/api/v1/commodity/sku/image/create");
+    UpdateSkuImageResp UpdateSkuImage(1: UpdateSkuImageReq req) (api.post = "/api/v1/commodity/sku/image/update");
+    DeleteSkuImageResp DeleteSkuImage(1: DeleteSkuImageReq req) (api.delete="/api/v1/commodity/sku/image/delete");
     ViewHistoryPriceResp ViewHistory(1: ViewHistoryPriceReq req) (api.get="/api/v1/commodity/price/history")
 
     //category

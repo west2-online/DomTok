@@ -349,29 +349,6 @@ func (c CommodityHandler) DeleteSku(ctx context.Context, req *commodity.DeleteSk
 	return
 }
 
-func (c CommodityHandler) ViewSkuImage(ctx context.Context, req *commodity.ViewSkuImageReq) (r *commodity.ViewSkuImageResp, err error) {
-	r = new(commodity.ViewSkuImageResp)
-
-	sku := &model.Sku{
-		SkuID: req.SkuID,
-	}
-
-	var (
-		images []*model.SkuImage
-		total  int64
-	)
-
-	if images, total, err = c.useCase.ViewSkuImages(ctx, sku, req.PageNum, req.PageSize); err != nil {
-		r.Base = base.BuildBaseResp(err)
-		return
-	}
-
-	r.Base = base.BuildBaseResp(nil)
-	r.Images = pack.BuildSkuImages(images)
-	r.Total = total
-	return
-}
-
 func (c CommodityHandler) ViewSku(ctx context.Context, req *commodity.ViewSkuReq) (*commodity.ViewSkuResp, error) {
 	r := new(commodity.ViewSkuResp)
 
@@ -438,6 +415,105 @@ func (c CommodityHandler) ListSkuInfo(ctx context.Context, req *commodity.ListSk
 
 	r.Base = base.BuildBaseResp(nil)
 	r.SkuInfos = pack.BuildSkuInfos(SkuInfos)
+	r.Total = total
+	return
+}
+
+func (c CommodityHandler) CreateSkuImage(streamServer commodity.CommodityService_CreateSkuImageServer) (err error) {
+	resp := new(commodity.CreateSkuImageResp)
+	req, err := streamServer.Recv()
+	if err != nil {
+		logger.Errorf("rpc.CreateSkuImage: receive error: %v", err)
+		resp.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(resp)
+	}
+
+	for i := 0; i < int(req.BufferCount); i++ {
+		data, err := streamServer.Recv()
+		if err != nil {
+			logger.Errorf("rpc.CreateSkuImage: receive error: %v", err)
+			resp.Base = base.BuildBaseResp(err)
+			return streamServer.SendAndClose(resp)
+		}
+		req.Data = bytes.Join([][]byte{req.Data, data.Data}, []byte(""))
+	}
+	id, err := c.useCase.CreateSkuImage(streamServer.Context(), &model.SkuImage{
+		SkuID: req.SkuID,
+	}, req.Data)
+	if err != nil {
+		logger.Errorf("rpc.CreateSkuImage: create sku image error: %v", err)
+		resp.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(resp)
+	}
+
+	resp.Base = base.BuildBaseResp(nil)
+	resp.ImageID = id
+	return streamServer.SendAndClose(resp)
+}
+
+func (c CommodityHandler) UpdateSkuImage(streamServer commodity.CommodityService_UpdateSkuImageServer) (err error) {
+	resp := new(commodity.UpdateSkuImageResp)
+	req, err := streamServer.Recv()
+	if err != nil {
+		logger.Errorf("rpc.UpdateSkuImage: receive error: %v", err)
+		resp.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(resp)
+	}
+
+	for i := 0; i < int(req.BufferCount); i++ {
+		data, err := streamServer.Recv()
+		if err != nil {
+			logger.Errorf("rpc.UpdateSkuImage: receive error: %v", err)
+			resp.Base = base.BuildBaseResp(err)
+			return streamServer.SendAndClose(resp)
+		}
+		req.Data = bytes.Join([][]byte{req.Data, data.Data}, []byte(""))
+	}
+
+	err = c.useCase.UpdateSkuImage(streamServer.Context(), &model.SkuImage{
+		ImageID: req.ImageID,
+	}, req.Data)
+	if err != nil {
+		logger.Errorf("rpc.UpdateSkuImage: update sku image error: %v", err)
+		resp.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(resp)
+	}
+
+	resp.Base = base.BuildBaseResp(nil)
+	return streamServer.SendAndClose(resp)
+}
+
+func (c CommodityHandler) DeleteSkuImage(ctx context.Context, req *commodity.DeleteSkuImageReq) (r *commodity.DeleteSkuImageResp, err error) {
+	r = new(commodity.DeleteSkuImageResp)
+
+	if err = c.useCase.DeleteSkuImage(ctx, req.SkuImageID); err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	return
+}
+
+func (c CommodityHandler) ViewSkuImage(ctx context.Context, req *commodity.ViewSkuImageReq) (r *commodity.ViewSkuImageResp, err error) {
+	r = new(commodity.ViewSkuImageResp)
+
+	sku := &model.Sku{
+		SkuID: req.SkuID,
+	}
+
+	var (
+		images []*model.SkuImage
+		total  int64
+	)
+
+	if images, total, err = c.useCase.ViewSkuImages(ctx, sku, req.PageNum, req.PageSize); err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	r.Images = pack.BuildSkuImages(images)
 	r.Total = total
 	return
 }

@@ -66,6 +66,10 @@ func Register(r *server.Hertz) {
 					_sku.POST("/create", append(_createskuMw(), commodity.CreateSku)...)
 					_sku.DELETE("/delete", append(_deleteskuMw(), commodity.DeleteSku)...)
 					_sku.GET("/image", append(_viewskuimageMw(), commodity.ViewSkuImage)...)
+					_image := _sku.Group("/image", _imageMw()...)
+					_image.POST("/create", append(_createskuimageMw(), commodity.CreateSkuImage)...)
+					_image.DELETE("/delete", append(_deleteskuimageMw(), commodity.DeleteSkuImage)...)
+					_image.POST("/update", append(_updateskuimageMw(), commodity.UpdateSkuImage)...)
 					_sku.GET("/list", append(_listskuinfoMw(), commodity.ListSkuInfo)...)
 					_sku.GET("/search", append(_viewskuMw(), commodity.ViewSku)...)
 					_sku.POST("/upadte", append(_updateskuMw(), commodity.UpdateSku)...)
@@ -77,11 +81,11 @@ func Register(r *server.Hertz) {
 					_spu.GET("/search", append(_viewspuMw(), commodity.ViewSpu)...)
 					_spu.POST("/update", append(_updatespuMw(), commodity.UpdateSpu)...)
 					{
-						_image := _spu.Group("/image", _imageMw()...)
-						_image.POST("/create", append(_createspuimageMw(), commodity.CreateSpuImage)...)
-						_image.DELETE("/delete", append(_deletespuimageMw(), commodity.DeleteSpuImage)...)
-						_image.GET("/search", append(_viewspuimageMw(), commodity.ViewSpuImage)...)
-						_image.POST("/update", append(_updatespuimageMw(), commodity.UpdateSpuImage)...)
+						_image0 := _spu.Group("/image", _image0Mw()...)
+						_image0.POST("/create", append(_createspuimageMw(), commodity.CreateSpuImage)...)
+						_image0.DELETE("/delete", append(_deletespuimageMw(), commodity.DeleteSpuImage)...)
+						_image0.GET("/search", append(_viewspuimageMw(), commodity.ViewSpuImage)...)
+						_image0.POST("/update", append(_updatespuimageMw(), commodity.UpdateSpuImage)...)
 					}
 				}
 			}

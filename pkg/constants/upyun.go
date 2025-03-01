@@ -20,5 +20,6 @@ const (
 	SpuDirDest      = "/spu/"
 	SpuImageDirDest = "/spu_image/"
 
-	SkuDirDest = "/sku/"
+	SkuDirDest      = "/sku/"
+	SkuImageDirDest = "/sku_image/"
 )

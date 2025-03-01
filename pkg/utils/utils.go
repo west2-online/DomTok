@@ -186,7 +186,7 @@ func GenerateFileName(path string, id int64) string {
 	second := currentTime.Second()
 	nanoSecond := currentTime.Nanosecond()
 	return strings.Join([]string{
-		config.Upyun.UssDomain, path,
+		config.Upyun.UssDomain, "/", config.Upyun.Bucket, path,
 		fmt.Sprintf("%d_%d%02d%02d_%02d%02d%02d%03d.", id, year, month, day, hour, minute, second, nanoSecond),
 	}, "")
 }

@@ -191,20 +191,6 @@ func (us *useCase) DeleteSku(ctx context.Context, sku *model.Sku) (err error) {
 	return nil
 }
 
-func (us *useCase) ViewSkuImages(ctx context.Context, sku *model.Sku, pageNum *int64, pageSize *int64) (images []*model.SkuImage, total int64, err error) {
-	pNum, pSize := us.svc.NormalizePagination(pageNum, pageSize)
-
-	if pNum < 1 || pSize < 1 {
-		return nil, -1, fmt.Errorf("usecase.ViewSkuImage failed: invalid PageNum or PageSize")
-	}
-
-	images, total, err = us.svc.ViewSkuImages(ctx, sku, pNum, pSize)
-	if err != nil {
-		return nil, -1, fmt.Errorf("usecase.ViewSkuImage failed: %w", err)
-	}
-	return images, total, nil
-}
-
 func (us *useCase) ViewSku(ctx context.Context, sku *model.Sku, pageNum *int64, pageSize *int64, isSpuId bool) (skus []*model.Sku, total int64, err error) {
 	pNum, pSize := us.svc.NormalizePagination(pageNum, pageSize)
 	if pNum < 1 || pSize < 1 {
@@ -259,4 +245,68 @@ func (us *useCase) ListSkuInfo(ctx context.Context, ids []int64, pageNum int64, 
 		return nil, -1, fmt.Errorf("usecase.ListSkuInfo failed: %w", err)
 	}
 	return skuInfos, total, nil
+}
+
+func (us *useCase) CreateSkuImage(ctx context.Context, skuImage *model.SkuImage, data []byte) (int64, error) {
+	ret, err := us.db.GetSkuBySkuId(ctx, skuImage.SkuID)
+	if err != nil {
+		return 0, fmt.Errorf("usecase.CreateSkuImage failed: %w", err)
+	}
+	if err := us.svc.IdentifyUserInStreamCtx(ctx, ret.CreatorID); err != nil {
+		return 0, fmt.Errorf("usecase.CreateSkuImage failed: %w", err)
+	}
+
+	id, err := us.svc.CreateSkuImage(ctx, skuImage, data)
+	if err != nil {
+		return 0, fmt.Errorf("usecase.CreateSkuImage failed: %w", err)
+	}
+	return id, nil
+}
+
+func (us *useCase) UpdateSkuImage(ctx context.Context, skuImage *model.SkuImage, data []byte) (err error) {
+	sku, img, err := us.svc.GetSkuFromImageId(ctx, skuImage.ImageID)
+	if err != nil {
+		return fmt.Errorf("usecase.UpdateSkuImage failed: %w", err)
+	}
+
+	if err := us.svc.IdentifyUserInStreamCtx(ctx, sku.CreatorID); err != nil {
+		return fmt.Errorf("usecase.UpdateSkuImage failed: %w", err)
+	}
+
+	skuImage.Url = utils.GenerateFileName(constants.SkuImageDirDest, skuImage.ImageID)
+	err = us.svc.UpdateSkuImage(ctx, skuImage, img, data)
+	if err != nil {
+		return fmt.Errorf("usecase.UpdateSkuImage failed: %w", err)
+	}
+	return nil
+}
+
+func (us *useCase) ViewSkuImages(ctx context.Context, sku *model.Sku, pageNum *int64, pageSize *int64) (images []*model.SkuImage, total int64, err error) {
+	pNum, pSize := us.svc.NormalizePagination(pageNum, pageSize)
+
+	if pNum < 1 || pSize < 1 {
+		return nil, -1, fmt.Errorf("usecase.ViewSkuImage failed: invalid PageNum or PageSize")
+	}
+
+	images, total, err = us.svc.ViewSkuImages(ctx, sku, pNum, pSize)
+	if err != nil {
+		return nil, -1, fmt.Errorf("usecase.ViewSkuImage failed: %w", err)
+	}
+	return images, total, nil
+}
+
+func (us *useCase) DeleteSkuImage(ctx context.Context, imageId int64) (err error) {
+	sku, img, err := us.svc.GetSkuFromImageId(ctx, imageId)
+	if err != nil {
+		return fmt.Errorf("usecase.DeleteSkuImage failed: %w", err)
+	}
+
+	if err := us.svc.IdentifyUser(ctx, sku.CreatorID); err != nil {
+		return fmt.Errorf("usecase.DeleteSkuImage failed: %w", err)
+	}
+
+	if err = us.svc.DeleteSkuImage(ctx, imageId, img.Url); err != nil {
+		return fmt.Errorf("usecase.DeleteSkuImage failed: %w", err)
+	}
+	return nil
 }
