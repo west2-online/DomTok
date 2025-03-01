@@ -21,9 +21,8 @@ package order
 import (
 	"context"
 
-	"github.com/samber/lo"
-
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/samber/lo"
 
 	api "github.com/west2-online/DomTok/app/gateway/model/api/order"
 	hmodel "github.com/west2-online/DomTok/app/gateway/model/model"
@@ -50,7 +49,6 @@ func CreateOrder(ctx context.Context, c *app.RequestContext) {
 			GoodsID:          item.GoodsID,
 			StyleID:          item.StyleID,
 			PurchaseQuantity: item.PurchaseQuantity,
-			CouponID:         item.CouponID,
 			GoodsVersion:     item.GoodsVersion,
 		}
 	})

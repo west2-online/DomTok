@@ -19,6 +19,8 @@ package mq
 import (
 	"context"
 	"fmt"
+	"github.com/apache/rocketmq-client-go/v2/rlog"
+	"github.com/west2-online/DomTok/pkg/logger"
 	"time"
 
 	"github.com/apache/rocketmq-client-go/v2"
@@ -40,6 +42,7 @@ type rocketMq struct {
 }
 
 func NewRocketmq() repository.MQ {
+	rlog.SetLogLevel("fatal")
 	mq := &rocketMq{
 		producers: make(map[string]rocketmq.Producer),
 		consumers: make([]rocketmq.PushConsumer, 0),
@@ -61,7 +64,7 @@ func (mq *rocketMq) SendSyncMsg(ctx context.Context, topic string, msgs ...*mode
 	if err != nil {
 		return err
 	}
-
+	logger.Infof("[DEBUG] send msg to topic: %s", topic)
 	if _, err = producer.SendSync(ctx, convertMsg(topic, msgs...)...); err != nil {
 		return errno.NewErrNo(errno.InternalRocketmqErrorCode, fmt.Sprintf("failed to send sync msg, err: %v", err))
 	}
@@ -84,6 +87,7 @@ func (mq *rocketMq) SubscribeTopic(ctx context.Context, topic string, pullMsgInt
 
 	err = con.Subscribe(topic, consumer.MessageSelector{}, func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
 		for _, msg := range msgs {
+			logger.Infof("[DEBUG] receive msg: %s", string(msg.Body))
 			if !fn(ctx, msg.Body) {
 				return consumer.ConsumeRetryLater, nil
 			}

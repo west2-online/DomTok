@@ -53,8 +53,8 @@ type MQ interface {
 type RPC interface {
 	GetAddressInfo(ctx context.Context, addressId int64) (string, error)
 	QueryGoodsInfo(ctx context.Context, goods []*model.BaseOrderGoods) ([]*model.OrderGoods, error)
-	DescSkuLockStock(ctx context.Context, stocks *model.OrderStock) error
-	IncrSkuLockStock(ctx context.Context, stocks *model.OrderStock) error
+	WithholdSkuStock(ctx context.Context, stocks *model.OrderStock) error
+	RollbackSkuStock(ctx context.Context, stocks *model.OrderStock) error
 	DescSkuStock(ctx context.Context, stocks *model.OrderStock) error
 }
 

@@ -20,7 +20,6 @@ package model
 
 import (
 	"fmt"
-
 	"github.com/apache/thrift/lib/go/thrift"
 )
 
@@ -9019,10 +9018,8 @@ type BaseOrderGoods struct {
 	StyleID int64 `thrift:"styleID,3,required" form:"styleID,required" json:"styleID,required" query:"styleID,required"`
 	// 购买数量
 	PurchaseQuantity int64 `thrift:"purchaseQuantity,4,required" form:"purchaseQuantity,required" json:"purchaseQuantity,required" query:"purchaseQuantity,required"`
-	// 优惠券 ID
-	CouponID int64 `thrift:"couponID,5" form:"couponID" json:"couponID" query:"couponID"`
 	// 商品历史号
-	GoodsVersion int64 `thrift:"goodsVersion,6,required" form:"goodsVersion,required" json:"goodsVersion,required" query:"goodsVersion,required"`
+	GoodsVersion int64 `thrift:"goodsVersion,5,required" form:"goodsVersion,required" json:"goodsVersion,required" query:"goodsVersion,required"`
 }
 
 func NewBaseOrderGoods() *BaseOrderGoods {
@@ -9048,10 +9045,6 @@ func (p *BaseOrderGoods) GetPurchaseQuantity() (v int64) {
 	return p.PurchaseQuantity
 }
 
-func (p *BaseOrderGoods) GetCouponID() (v int64) {
-	return p.CouponID
-}
-
 func (p *BaseOrderGoods) GetGoodsVersion() (v int64) {
 	return p.GoodsVersion
 }
@@ -9061,8 +9054,7 @@ var fieldIDToName_BaseOrderGoods = map[int16]string{
 	2: "goodsID",
 	3: "styleID",
 	4: "purchaseQuantity",
-	5: "couponID",
-	6: "goodsVersion",
+	5: "goodsVersion",
 }
 
 func (p *BaseOrderGoods) Read(iprot thrift.TProtocol) (err error) {
@@ -9130,14 +9122,6 @@ func (p *BaseOrderGoods) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 6:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField6(iprot); err != nil {
-					goto ReadFieldError
-				}
 				issetGoodsVersion = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -9176,7 +9160,7 @@ func (p *BaseOrderGoods) Read(iprot thrift.TProtocol) (err error) {
 	}
 
 	if !issetGoodsVersion {
-		fieldId = 6
+		fieldId = 5
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -9249,17 +9233,6 @@ func (p *BaseOrderGoods) ReadField5(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.CouponID = _field
-	return nil
-}
-func (p *BaseOrderGoods) ReadField6(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
 	p.GoodsVersion = _field
 	return nil
 }
@@ -9289,10 +9262,6 @@ func (p *BaseOrderGoods) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField5(oprot); err != nil {
 			fieldId = 5
-			goto WriteFieldError
-		}
-		if err = p.writeField6(oprot); err != nil {
-			fieldId = 6
 			goto WriteFieldError
 		}
 	}
@@ -9382,24 +9351,7 @@ WriteFieldEndError:
 }
 
 func (p *BaseOrderGoods) writeField5(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("couponID", thrift.I64, 5); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI64(p.CouponID); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
-}
-
-func (p *BaseOrderGoods) writeField6(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("goodsVersion", thrift.I64, 6); err != nil {
+	if err = oprot.WriteFieldBegin("goodsVersion", thrift.I64, 5); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI64(p.GoodsVersion); err != nil {
@@ -9410,9 +9362,9 @@ func (p *BaseOrderGoods) writeField6(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
 }
 
 func (p *BaseOrderGoods) String() string {

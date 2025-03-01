@@ -45,7 +45,6 @@ func (h *OrderHandler) CreateOrder(ctx context.Context, req *order.CreateOrderRe
 			StyleID:          item.StyleID,
 			GoodsVersion:     item.GoodsVersion,
 			PurchaseQuantity: item.PurchaseQuantity,
-			CouponID:         item.CouponID,
 		}
 	})
 

@@ -20,10 +20,8 @@ package orderservice
 
 import (
 	"context"
-
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
-
 	order "github.com/west2-online/DomTok/kitex_gen/order"
 )
 

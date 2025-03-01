@@ -20,7 +20,6 @@ package order
 
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
-
 	order "github.com/west2-online/DomTok/app/gateway/handler/api/order"
 )
 

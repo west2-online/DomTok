@@ -116,14 +116,14 @@ func (svc *OrderService) DescSkuLockStock(ctx context.Context, orderID int64, go
 	}
 
 	// 尝试预扣库存
-	if err := svc.rpc.DescSkuLockStock(ctx, orderStock); err != nil {
+	if err := svc.rpc.WithholdSkuStock(ctx, orderStock); err != nil {
 		return err
 	}
 
 	var err error
 	defer func() { // 如果操作出错了尝试进行回滚, 由于刚刚调用 DescSkuLockStock成功, 所以这里回滚大概率是成功的
 		if err != nil {
-			if e := svc.rpc.IncrSkuLockStock(ctx, orderStock); e != nil {
+			if e := svc.rpc.RollbackSkuStock(ctx, orderStock); e != nil {
 				logger.Errorf("failed to rollback for incr sku lock stock,rollbackErr: %v, caused_err: %v", e, err)
 			}
 		}

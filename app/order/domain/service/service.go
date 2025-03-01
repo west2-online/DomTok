@@ -149,7 +149,7 @@ func (svc *OrderService) CancelOrder(ctx context.Context, payRel *model.PaymentR
 
 	// 释放锁定库存
 	orderStock := model.ConvertOrderGoodsToOrderStock(payRel.OrderID, goods)
-	if err = svc.rpc.DescSkuLockStock(ctx, orderStock); err != nil {
+	if err = svc.rpc.RollbackSkuStock(ctx, orderStock); err != nil {
 		return err
 	}
 
