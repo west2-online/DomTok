@@ -74,23 +74,23 @@ func (svc *PaymentService) CheckOrderExist(ctx context.Context, orderID int64) (
 }
 
 // GeneratePaymentToken HMAC生成支付令牌
-func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int64) (string, int64, error) {
+func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int64) (token string, expirationTime int64, err error) {
 	// 1. 设定过期时间为15分钟后, 即现在时间加上15分钟之后的秒级时间戳
-	expirationTime := time.Now().Add(paymentStatus.ExpirationDuration).Unix()
+	expirationTime = time.Now().Add(paymentStatus.ExpirationDuration).Unix()
 	logger.Infof("Generating payment token, orderID: %d, expirationTime: %d", orderID, expirationTime)
 	// 2. 获取 HMAC 密钥（可以从环境变量或配置文件获取）
 	secretKey := []byte(paymentStatus.PaymentSecretKey)
 
 	// 3. 计算 HMAC-SHA256 哈希
 	h := hmac.New(sha256.New, secretKey)
-	_, err := h.Write([]byte(fmt.Sprintf("%d:%d", orderID, expirationTime)))
+	_, err = h.Write([]byte(fmt.Sprintf("%d:%d", orderID, expirationTime)))
 	if err != nil {
 		logger.Infof("failed to generate payment HMAC token, orderID: %d, expirationTime: %d", orderID, expirationTime)
 		return "", 0, fmt.Errorf("failed to generate payment HMAC token: %w", err)
 	}
 
 	// 4. 生成十六进制编码的 HMAC 签名
-	token := hex.EncodeToString(h.Sum(nil))
+	token = hex.EncodeToString(h.Sum(nil))
 	// logger.Infof("Generated payment HAMC token successfully, orderID: %d, expirationTime: %d", orderID, expirationTime)
 	// 5. 返回令牌和过期时间
 	return token, expirationTime, nil

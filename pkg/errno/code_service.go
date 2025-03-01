@@ -17,17 +17,26 @@ limitations under the License.
 package errno
 
 // 业务强相关, 范围是 1000-9999
+// User
 const (
-	// User
 	ServiceWrongPassword = 1000 + iota
 	ServiceUserExist
 	ServiceUserNotExist
-
 	ErrRecordNotFound
+)
 
-	// order
-	ServiceOrderNotFound
-	ServiceSpuNotExist
+// order
+const (
+	ServiceOrderNotFound = 2000 + iota
+	UnknownOrderStatus
+	OrderShouldNotBeChange
+	ServiceOrderExpired
+	ServiceOrderStatusInvalid
+)
+
+// commodity
+const (
+	ServiceSpuNotExist = 3000 + iota
 	ServiceImgNotExist
 	ServiceSkuExist
 	PaymentOrderNotExist
@@ -37,4 +46,8 @@ const (
 	ServiceListCategoryFailed
 
 	ServiceUserCloseWebsocketConn
+)
+
+const (
+	PaymentOrderNotExist = 4000 + iota
 )

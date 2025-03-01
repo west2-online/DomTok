@@ -25,6 +25,37 @@ import (
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
+func (uc *useCase) CreateOrder(ctx context.Context, addressID int64, baseGoods []*model.BaseOrderGoods) (int64, error) {
+	if err := uc.svc.Verify(uc.svc.VerifyAddressID(addressID), uc.svc.VerifyBaseOrderGoods(baseGoods)); err != nil {
+		return 0, err
+	}
+
+	addressInfo, err := uc.rpc.GetAddressInfo(ctx, addressID)
+	if err != nil {
+		return 0, err
+	}
+
+	goods, err := uc.rpc.QueryGoodsInfo(ctx, baseGoods)
+	if err != nil {
+		return 0, err
+	}
+
+	order, err := uc.svc.MakeOrderByGoods(ctx, addressID, addressInfo, goods)
+	if err != nil {
+		return 0, err
+	}
+
+	if err = uc.svc.CreateOrder(ctx, order, goods); err != nil {
+		return 0, err
+	}
+
+	if err = uc.svc.DescSkuLockStock(ctx, order.Id, goods); err != nil {
+		return 0, err
+	}
+
+	return order.Id, nil
+}
+
 // ViewOrderList 获取订单列表
 func (uc *useCase) ViewOrderList(ctx context.Context, page, size int32) ([]*model.Order, []*model.OrderGoods, int32, error) {
 	// 从 RPC 上下文中获取用户ID
@@ -42,7 +73,7 @@ func (uc *useCase) ViewOrder(ctx context.Context, orderID int64) (*model.Order, 
 		return nil, nil, err
 	}
 
-	order, orderGoods, err := uc.db.GetOrderWithGoods(ctx, orderID)
+	order, orderGoods, err := uc.db.GetOrderAndGoods(ctx, orderID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -53,7 +84,7 @@ func (uc *useCase) ViewOrder(ctx context.Context, orderID int64) (*model.Order, 
 // CancelOrder 取消订单
 func (uc *useCase) CancelOrder(ctx context.Context, orderID int64) error {
 	// 1. 检查订单是否存在
-	exist, err := uc.db.IsOrderExist(ctx, orderID)
+	exist, _, err := uc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -69,7 +100,7 @@ func (uc *useCase) CancelOrder(ctx context.Context, orderID int64) error {
 
 	// 3. 只有待支付的订单可以取消
 	if order.Status != constants.OrderStatusUnpaidCode {
-		return errno.NewErrNo(errno.ServiceError, "order cannot be canceled")
+		return errno.NewErrNo(errno.IllegalOperatorCode, "order cannot be canceled")
 	}
 
 	// 4. 更新订单状态为已取消
@@ -79,7 +110,7 @@ func (uc *useCase) CancelOrder(ctx context.Context, orderID int64) error {
 // ChangeDeliverAddress 更改配送地址
 func (uc *useCase) ChangeDeliverAddress(ctx context.Context, orderID, addressID int64, addressInfo string) error {
 	// 1. 检查订单是否存在
-	exist, err := uc.db.IsOrderExist(ctx, orderID)
+	exist, _, err := uc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -95,7 +126,7 @@ func (uc *useCase) ChangeDeliverAddress(ctx context.Context, orderID, addressID 
 
 	// 3. 已完成/取消的订单不能修改地址
 	if order.Status >= constants.OrderStatusCompletedCode {
-		return errno.NewErrNo(errno.ServiceError, "order cannot change address")
+		return errno.NewErrNo(errno.IllegalOperatorCode, "order cannot change address")
 	}
 
 	// 4. 更新地址信息
@@ -105,7 +136,7 @@ func (uc *useCase) ChangeDeliverAddress(ctx context.Context, orderID, addressID 
 // DeleteOrder 删除订单
 func (uc *useCase) DeleteOrder(ctx context.Context, orderID int64) error {
 	// 1. 检查订单是否存在
-	exist, err := uc.db.IsOrderExist(ctx, orderID)
+	exist, _, err := uc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -117,6 +148,40 @@ func (uc *useCase) DeleteOrder(ctx context.Context, orderID int64) error {
 	return uc.db.DeleteOrder(ctx, orderID)
 }
 
-func (uc *useCase) IsOrderExist(ctx context.Context, orderID int64) (bool, error) {
+func (uc *useCase) IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error) {
 	return uc.db.IsOrderExist(ctx, orderID)
+}
+
+func (uc *useCase) OrderPaymentSuccess(ctx context.Context, req *model.PaymentResult) error {
+	// 这里不进行 orderID 是否存在的检查，因为这个方法是由 payment 服务调用的，payment 在调用之前已经检查了 orderID 的存在
+	status, expired, err := uc.svc.GetPaymentStatusAndOrderExpire(ctx, req.OrderID)
+	if err != nil {
+		return err
+	}
+
+	if uc.svc.IsEqualStatus(status, req.PaymentStatus) {
+		return nil
+	}
+
+	if err = uc.svc.UpdateOrderAsSuccess(ctx, expired, req); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (uc *useCase) OrderPaymentCancel(ctx context.Context, req *model.PaymentResult) error {
+	// 这里不进行 orderID 是否存在的检查，因为这个方法是由 payment 服务调用的，payment 在调用之前已经检查了 orderID 的存在
+	status, _, err := uc.svc.GetPaymentStatusAndOrderExpire(ctx, req.OrderID)
+	if err != nil {
+		return err
+	}
+
+	if uc.svc.IsEqualStatus(status, req.PaymentStatus) {
+		return nil
+	}
+
+	if err = uc.svc.CancelOrder(ctx, req); err != nil {
+		return err
+	}
+	return nil
 }

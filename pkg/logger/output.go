@@ -17,7 +17,6 @@ limitations under the License.
 package logger
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -77,12 +76,10 @@ func getCurrentDirectory(serviceName string) (string, error) {
 
 	path := strings.ReplaceAll(dir, "\\", "/")
 	paths := strings.Split(path, "/")
-	// 在容器下运行时, 让所有日志都集中于 output/log/$(ServiceName)
 
-	fmt.Println(paths)
+	// 在容器下运行时, 让所有日志都集中于 output/log/$(ServiceName)
 	if paths[len(paths)-1] == serviceName {
 		path = path[:len(path)-len(serviceName)-1]
-		fmt.Println(path)
 	}
 
 	return path, nil

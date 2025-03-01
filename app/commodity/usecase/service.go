@@ -20,8 +20,6 @@ import (
 	"context"
 	"fmt"
 
-	"golang.org/x/sync/errgroup"
-
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
@@ -173,7 +171,7 @@ func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
 func (us *useCase) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
 	spu, img, err := us.svc.GetSpuFromImageId(ctx, spuImage.ImageID)
 	if err != nil {
-		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
+		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
 	}
 
 	err = us.svc.IdentifyUserInStreamCtx(ctx, spu.CreatorId)
@@ -227,60 +225,40 @@ func (us *useCase) ListSpuInfo(ctx context.Context, ids []int64) ([]*model.Spu, 
 }
 
 func (us *useCase) IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	if !us.svc.Cached(ctx, infos) {
-		return errno.Errorf(errno.RedisKeyNotExist, "useCase.IncrLockStock failed")
-	}
-
-	var eg errgroup.Group
-
-	eg.Go(func() error {
-		err := us.cache.IncrLockStockNum(ctx, infos)
+	err := us.cache.IsHealthy(ctx)
+	if err != nil {
+		err = us.db.IncrLockStock(ctx, infos)
 		if err != nil {
 			return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
 		}
-		return nil
-	})
-
-	eg.Go(func() error {
-		err := us.db.IncrLockStock(ctx, infos)
-		if err != nil {
-			return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
-		}
-		return nil
-	})
-
-	if err := eg.Wait(); err != nil {
 		return err
+	} else {
+		return us.svc.IncrLockStockInNX(ctx, infos)
 	}
-	return nil
 }
 
 func (us *useCase) DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	if !us.svc.Cached(ctx, infos) {
-		return errno.Errorf(errno.RedisKeyNotExist, "useCase.DecrLockStock failed")
+	err := us.cache.IsHealthy(ctx)
+	if err != nil {
+		err = us.db.DecrLockStock(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
+		}
+		return err
+	} else {
+		return us.svc.DecrLockStockInNX(ctx, infos)
 	}
-
-	var eg errgroup.Group
-
-	eg.Go(func() error {
-		err := us.cache.DecrLockStockNum(ctx, infos)
-		if err != nil {
-			return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
-		}
-		return nil
-	})
-
-	eg.Go(func() error {
-		err := us.db.DecrLockStock(ctx, infos)
-		if err != nil {
-			return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
-		}
-		return nil
-	})
-
-	return nil
 }
 
 func (us *useCase) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	return us.db.DecrStock(ctx, infos)
+	err := us.cache.IsHealthy(ctx)
+	if err != nil {
+		err = us.db.DecrStock(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("usecase.DecrStock failed: %w", err)
+		}
+		return err
+	} else {
+		return us.svc.DecrStockInNX(ctx, infos)
+	}
 }

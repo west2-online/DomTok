@@ -127,22 +127,6 @@ func (uc *paymentUseCase) CreateRefund(ctx context.Context, orderID int64) (refu
 	if err != nil {
 		return 0, 0, fmt.Errorf("create refund info failed: %w", err)
 	}
-	/*
-		// 5. 生成退款令牌
-		token, expTime, err = uc.svc.GenerateRefundToken(ctx, orderID)
-		if err != nil {
-			return "", 0, fmt.Errorf("generate refund token failed: %w", err)
-		}
-
-		// 6. 存储令牌到 Redis
-		var redisStatus bool
-		redisStatus, err = uc.svc.StoreRefundToken(ctx, token, expTime, uid, orderID)
-		if err != nil || redisStatus != paymentStatus.RedisStoreSuccess {
-			return "", 0, fmt.Errorf("store refund token failed: %w", err)
-		}
-
-		return token, expTime, nil
-	*/
 	refundStatus = paymentStatus.RefundStatusProcessingCode
 	return refundStatus, refundID, nil
 }
