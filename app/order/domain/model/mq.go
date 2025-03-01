@@ -14,38 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package model
 
-// 业务强相关, 范围是 1000-9999
-// User
-const (
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
-	ErrRecordNotFound
-)
+type MqMessage struct {
+	Body       []byte
+	DelayLevel int
+}
 
-// order
-const (
-	ServiceOrderNotFound = 2000 + iota
-	UnknownOrderStatus
-	OrderShouldNotBeChange
-	ServiceOrderExpired
-	ServiceOrderStatusInvalid
-)
+func NewMqMessage(body []byte) *MqMessage {
+	return &MqMessage{Body: body}
+}
 
-// commodity
-const (
-	ServiceSpuNotExist = 3000 + iota
-	ServiceImgNotExist
-	ServiceSkuExist
+func (m *MqMessage) WithDelayLevel(level int) *MqMessage {
+	m.DelayLevel = level
+	return m
+}
 
-	ServiceCategoryExist
-	ServiceListCategoryFailed
+func (m *MqMessage) GetDelayLevel() int {
+	return m.DelayLevel
+}
 
-	ServiceUserCloseWebsocketConn
-)
-
-const (
-	PaymentOrderNotExist = 4000 + iota
-)
+func (m *MqMessage) IsSetDelayLevel() bool {
+	return m.DelayLevel != 0
+}

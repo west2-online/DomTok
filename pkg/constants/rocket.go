@@ -14,38 +14,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package constants
 
-// 业务强相关, 范围是 1000-9999
-// User
+import "time"
+
+// Order listen`s topic
 const (
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
-	ErrRecordNotFound
-)
-
-// order
-const (
-	ServiceOrderNotFound = 2000 + iota
-	UnknownOrderStatus
-	OrderShouldNotBeChange
-	ServiceOrderExpired
-	ServiceOrderStatusInvalid
-)
-
-// commodity
-const (
-	ServiceSpuNotExist = 3000 + iota
-	ServiceImgNotExist
-	ServiceSkuExist
-
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
+	SkuStockRollbackTopic                     = "sku-stock-rollback-topic"
+	SkuStockRollbackTopicDelayTimeLevel       = RocketMQDelay10M // 10 Minute
+	SkuStockRollbackTopicConsumerPullInterval = 1 * time.Second
 )
 
 const (
-	PaymentOrderNotExist = 4000 + iota
+	RocketMQDelay1S = iota + 1
+	RocketMQDelay5S
+	RocketMQDelay10S
+	RocketMQDelay30S
+	RocketMQDelay1M
+	RocketMQDelay2M
+	RocketMQDelay3M
+	RocketMQDelay4M
+	RocketMQDelay5M
+	RocketMQDelay6M
+	RocketMQDelay7M
+	RocketMQDelay8M
+	RocketMQDelay9M
+	RocketMQDelay10M
+	RocketMQDelay20M
+	RocketMQDelay30M
+	RocketMQDelay1H
+	RocketMQDelay2H
 )

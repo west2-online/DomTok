@@ -14,38 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package model
 
-// 业务强相关, 范围是 1000-9999
-// User
-const (
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
-	ErrRecordNotFound
-)
+type Stock struct {
+	SkuID int64
+	Count int64
+}
 
-// order
-const (
-	ServiceOrderNotFound = 2000 + iota
-	UnknownOrderStatus
-	OrderShouldNotBeChange
-	ServiceOrderExpired
-	ServiceOrderStatusInvalid
-)
-
-// commodity
-const (
-	ServiceSpuNotExist = 3000 + iota
-	ServiceImgNotExist
-	ServiceSkuExist
-
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
-)
-
-const (
-	PaymentOrderNotExist = 4000 + iota
-)
+type OrderStock struct {
+	OrderID int64
+	Stocks  []*Stock
+}

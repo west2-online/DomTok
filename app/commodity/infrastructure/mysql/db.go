@@ -63,7 +63,7 @@ func (db *commodityDB) IsCategoryExistById(ctx context.Context, id int64) (bool,
 }
 
 func (db *commodityDB) CreateCategory(ctx context.Context, entity *model.Category) error {
-	model := Category{
+	m := Category{
 		Id:        entity.Id,
 		Name:      entity.Name,
 		CreatorId: entity.CreatorId,
@@ -71,7 +71,7 @@ func (db *commodityDB) CreateCategory(ctx context.Context, entity *model.Categor
 		UpdatedAt: entity.UpdatedAt,
 		DeletedAt: gorm.DeletedAt{},
 	}
-	if err := db.client.WithContext(ctx).Create(model).Error; err != nil {
+	if err := db.client.WithContext(ctx).Create(m).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create category: %v", err)
 	}
 	return nil

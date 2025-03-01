@@ -14,38 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package errno
+package service
 
-// 业务强相关, 范围是 1000-9999
-// User
-const (
-	ServiceWrongPassword = 1000 + iota
-	ServiceUserExist
-	ServiceUserNotExist
-	ErrRecordNotFound
+import (
+	"context"
+
+	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
-// order
-const (
-	ServiceOrderNotFound = 2000 + iota
-	UnknownOrderStatus
-	OrderShouldNotBeChange
-	ServiceOrderExpired
-	ServiceOrderStatusInvalid
-)
-
-// commodity
-const (
-	ServiceSpuNotExist = 3000 + iota
-	ServiceImgNotExist
-	ServiceSkuExist
-
-	ServiceCategoryExist
-	ServiceListCategoryFailed
-
-	ServiceUserCloseWebsocketConn
-)
-
-const (
-	PaymentOrderNotExist = 4000 + iota
-)
+func (svc *OrderService) init() {
+	if err := svc.mq.SubscribeTopic(context.Background(),
+		constants.SkuStockRollbackTopic,
+		constants.SkuStockRollbackTopicConsumerPullInterval,
+		svc.SkuLockStockRollback,
+	); err != nil {
+		logger.Fatalf("order service failde init, err: %v", err)
+	}
+}

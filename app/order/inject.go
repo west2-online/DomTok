@@ -19,12 +19,17 @@ package order
 import (
 	"github.com/west2-online/DomTok/app/order/controllers/rpc"
 	"github.com/west2-online/DomTok/app/order/domain/service"
+	"github.com/west2-online/DomTok/app/order/infrastructure/locker"
+	"github.com/west2-online/DomTok/app/order/infrastructure/mq"
 	"github.com/west2-online/DomTok/app/order/infrastructure/mysql"
+	"github.com/west2-online/DomTok/app/order/infrastructure/redis"
+	rpcimpl "github.com/west2-online/DomTok/app/order/infrastructure/rpc"
 	"github.com/west2-online/DomTok/app/order/usecase"
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/kitex_gen/order"
 	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
@@ -44,9 +49,34 @@ func InjectOrderHandler() order.OrderService {
 
 	// 3. 初始化各层依赖
 	db := mysql.NewOrderDB(gormDB)
-	svc := service.NewOrderService(db, sf)
-	uc := usecase.NewOrderCase(db, svc)
 
-	// 4. 返回 handler
+	// 4. 初始化 rpc 接口实现实例
+	uClient, err := client.InitUserRPC()
+	if err != nil {
+		logger.Fatalf("Failed to init user rpc client: %v", err)
+	}
+	cClient, err := client.InitCommodityRPC()
+	if err != nil {
+		logger.Fatalf("Failed to init commodity rpc client: %v", err)
+	}
+	rpcIns := rpcimpl.NewOrderRpcImpl(*uClient, *cClient)
+
+	// 5. 初始化 mq
+	mqIns := mq.NewRocketmq()
+
+	// 6. 初始化 cache
+	redisClient, err := client.NewRedisClient(constants.RedisDBOrder)
+	if err != nil {
+		logger.Fatalf("Failed to init redis client: %v", err)
+	}
+	cacheIns := redis.NewOrderCache(redisClient)
+
+	// 7.获取 locker
+	lock := locker.NewLocker(client.InitRedSync(redisClient))
+
+	// 8. 初始化 service 和 usecase
+	svc := service.NewOrderService(db, sf, rpcIns, mqIns, cacheIns, lock)
+	uc := usecase.NewOrderCase(db, svc, rpcIns)
+
 	return rpc.NewOrderHandler(uc)
 }
