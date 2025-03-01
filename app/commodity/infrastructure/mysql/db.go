@@ -281,7 +281,7 @@ func (db *commodityDB) ViewCategory(ctx context.Context, pageNum, pageSize int) 
 	offset := (pageNum - 1) * pageSize
 	cs := make([]*Category, 0)
 	if err := db.client.WithContext(ctx).Offset(offset).Limit(pageSize).Find(&cs).Error; err != nil {
-		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to list categories: %v", err)
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to list category: %v", err)
 	}
 	resp = make([]*model.CategoryInfo, 0)
 	for _, c := range cs {
