@@ -46,7 +46,7 @@ func (db *paymentDB) CheckPaymentExist(ctx context.Context, orderID int64) (paym
 	err = db.client.WithContext(ctx).Table(constants.PaymentTableName).Where("order_id = ?", orderID).First(&paymentOrder).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return paymentStatus.PaymentNotExist, errno.Errorf(errno.ServicePaymentOrderNotExist, "payment order not found")
+			return paymentStatus.PaymentNotExist, nil
 		}
 		// 这里报错了就不是业务错误了, 而是服务级别的错误
 		return paymentStatus.PaymentNotExist, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment order: %v", err)
@@ -60,7 +60,7 @@ func (db *paymentDB) GetPaymentInfo(ctx context.Context, orderID int64) (*model.
 	err := db.client.WithContext(ctx).Table(constants.PaymentTableName).Where("order_id = ?", orderID).First(&paymentOrder).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errno.Errorf(errno.ServicePaymentOrderNotExist, "payment order not found")
+			return nil, nil
 		}
 		// 这里报错了就不是业务错误了, 而是服务级别的错误
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment order_id: %v", err)

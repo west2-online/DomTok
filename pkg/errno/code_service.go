@@ -61,7 +61,7 @@ const (
 // assistant
 const (
 	ServiceUserCloseWebsocketConn = 5000 + iota
-	ServicePaymentOrderNotExist = 4000 + iota
+	ServicePaymentOrderNotExist   = 4000 + iota
 	ServiceStorePaymentRedisTokenFailed
 	ServiceCreatePaymentIDFailed
 	ServiceCreatePaymentOrderFailed
