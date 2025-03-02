@@ -321,6 +321,6 @@ func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, to
 		return fmt.Errorf("payment failed: %w", err)
 	}
 
-	// 6. 将支付结果写入 Redis(Unused)
+	// 6. 将支付结果写入 Redis(未开放查看支付结果接口，故此处不做处理)
 	return nil
 }
