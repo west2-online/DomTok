@@ -270,7 +270,7 @@ func (svc *PaymentService) GetPayInfo(_ context.Context) (int64, string, error) 
 
 // Pay 模拟支付
 func (svc *PaymentService) Pay(_ context.Context) (int64, string, error) {
-	return time.Now().Unix(), paymentStatus.PaymentStyleDomTok, nil
+	return time.Now().UnixMilli(), paymentStatus.PaymentStyleDomTok, nil
 }
 
 // Refund 模拟退款
