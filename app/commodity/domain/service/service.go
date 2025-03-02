@@ -209,6 +209,10 @@ func (svc *CommodityService) DeleteAllSpuImages(ctx context.Context, spuId int64
 		return fmt.Errorf("service.DeleteAllSpuImages: delete spuImages failed: %w", err)
 	}
 
+	if len(ids) < 1 {
+		return nil
+	}
+
 	for i := 0; i < len(ids); i++ {
 		eg.Go(func() error {
 			if err = upyun.DeleteImg(urls[i]); err != nil {
@@ -597,4 +601,298 @@ func (svc *CommodityService) DecrStockInNX(ctx context.Context, infos []*model.S
 		return err
 	}
 	return nil
+}
+
+func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku, ext string) (int64, error) {
+	sku.SkuID = svc.nextID()
+	sku.HistoryID = svc.nextID()
+	sku.StyleHeadDrawingUrl = utils.GenerateFileName(constants.SkuDirDest, sku.SkuID) + ext
+	var eg errgroup.Group
+	eg.Go(func() error {
+		if err := svc.db.CreateSku(ctx, sku); err != nil {
+			return fmt.Errorf("service.CreateSku: create sku failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		if err := upyun.UploadImg(sku.StyleHeadDrawing, sku.StyleHeadDrawingUrl); err != nil {
+			return fmt.Errorf("service.UploadImg: upload image failed: %w", err)
+		}
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		return 0, err
+	}
+	return sku.SkuID, nil
+}
+
+func (svc *CommodityService) UpdateSku(ctx context.Context, sku *model.Sku, originSpu *model.Sku) error {
+	key := fmt.Sprintf("sku:%d", sku.SkuID)
+	sku.HistoryID = svc.nextID()
+
+	if len(sku.StyleHeadDrawing) > 0 {
+		var eg errgroup.Group
+		eg.Go(func() error {
+			err := upyun.DeleteImg(originSpu.StyleHeadDrawingUrl)
+			if err != nil {
+				return errno.UpYunFileError.WithMessage(err.Error())
+			}
+			return nil
+		})
+
+		eg.Go(func() error {
+			err := upyun.UploadImg(sku.StyleHeadDrawing, sku.StyleHeadDrawingUrl)
+			if err != nil {
+				return errno.UpYunFileError.WithMessage(err.Error())
+			}
+			return nil
+		})
+
+		if err := eg.Wait(); err != nil {
+			return err
+		}
+	}
+
+	if err := svc.db.UpdateSku(ctx, sku); err != nil {
+		return fmt.Errorf("service.UpdateSku: update sku failed: %w", err)
+	}
+
+	if svc.cache.IsExist(ctx, key) {
+		err := svc.cache.DeleteSku(ctx, key)
+		if err != nil {
+			return fmt.Errorf("service.UpdateSku: delete sku cache failed: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func (svc *CommodityService) DeleteSku(ctx context.Context, sku *model.Sku) error {
+	err := svc.db.DeleteSku(ctx, sku)
+	if err != nil {
+		return fmt.Errorf("usecase.DeleteSku failed: %w", err)
+	}
+
+	key := fmt.Sprintf("sku:%d", sku.SkuID)
+	if svc.cache.IsExist(ctx, key) {
+		err = svc.cache.DeleteSku(ctx, key)
+		if err != nil {
+			return fmt.Errorf("usecase.DeleteSku failed: %w", err)
+		}
+	}
+
+	err = upyun.DeleteImg(sku.StyleHeadDrawingUrl)
+	if err != nil {
+		return errno.UpYunFileError.WithMessage(err.Error())
+	}
+
+	return nil
+}
+
+func (svc *CommodityService) ViewSku(ctx context.Context, skuIds []*int64, pageNum, pageSize int) ([]*model.Sku, int64, error) {
+	var remainingIDs []*int64
+	var skus []*model.Sku
+	for _, id := range skuIds {
+		key := fmt.Sprintf("sku:%d", *id)
+		if svc.cache.IsExist(ctx, key) {
+			s, err := svc.cache.GetSku(ctx, key)
+			if err != nil {
+				return nil, -1, fmt.Errorf("usecase.ViewSku failed: %w", err)
+			}
+			skus = append(skus, s)
+		} else {
+			remainingIDs = append(remainingIDs, id)
+		}
+	}
+	if len(remainingIDs) == 0 {
+		return skus, -1, nil
+	}
+
+	skuIds = remainingIDs
+
+	result, err := svc.db.ViewSku(ctx, skuIds, pageNum, pageSize)
+	if err != nil {
+		return nil, -1, fmt.Errorf("usecase.ViewSku failed: %w", err)
+	}
+
+	for _, s := range result {
+		key := fmt.Sprintf("sku:%d", s.SkuID)
+		svc.cache.SetSku(ctx, key, s)
+	}
+
+	skus = append(skus, result...)
+	total := int64(len(skus))
+	return skus, total, nil
+}
+
+func (svc *CommodityService) UploadSkuAttr(ctx context.Context, attr *model.AttrValue, sku *model.Sku) error {
+	key := fmt.Sprintf("sku:%d", sku.SkuID)
+	id := svc.nextID()
+
+	if err := svc.db.UploadSkuAttr(ctx, sku, attr, id); err != nil {
+		return fmt.Errorf("usecase.UploadSkuAttr failed: %w", err)
+	}
+
+	if svc.cache.IsExist(ctx, key) {
+		ret, err := svc.cache.GetSku(ctx, key)
+		if err != nil {
+			return fmt.Errorf("usecase.UploadSkuAttr failed: %w", err)
+		}
+		ret.SaleAttr = append(ret.SaleAttr, attr)
+		svc.cache.SetSku(ctx, key, ret)
+	}
+
+	return nil
+}
+
+func (svc *CommodityService) ListSkuInfo(ctx context.Context, skuInfo []*model.SkuVersion, pageNum, pageSize int64) ([]*model.Sku, int64, error) {
+	var (
+		skuInfos []*model.Sku
+		total    int64
+	)
+
+	skuInfos, err := svc.db.ListSkuInfo(ctx, skuInfo, int(pageNum), int(pageSize))
+	if err != nil {
+		return nil, -1, fmt.Errorf("usecase.ListSkuInfo failed: %w", err)
+	}
+
+	return skuInfos, total, nil
+}
+
+func (svc *CommodityService) CreateSkuImage(ctx context.Context, skuImage *model.SkuImage, data []byte) (int64, error) {
+	skuImage.ImageID = svc.nextID()
+	skuImage.Url = utils.GenerateFileName(constants.SkuImageDirDest, skuImage.ImageID)
+	var eg errgroup.Group
+
+	eg.Go(func() error {
+		if err := upyun.UploadImg(data, skuImage.Url); err != nil {
+			return fmt.Errorf("service.CreateSkuImage: upload skuImage failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		if err := svc.db.CreateSkuImage(ctx, skuImage); err != nil {
+			return fmt.Errorf("service.CreateSkuImage: create skuImage failed: %w", err)
+		}
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		return 0, err
+	}
+
+	return skuImage.ImageID, nil
+}
+
+func (svc *CommodityService) UpdateSkuImage(ctx context.Context, skuImage *model.SkuImage, originSkuImages *model.SkuImage, data []byte) error {
+	var eg errgroup.Group
+
+	eg.Go(func() error {
+		err := upyun.DeleteImg(originSkuImages.Url)
+		if err != nil {
+			return errno.UpYunFileError.WithMessage(err.Error())
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		err := upyun.UploadImg(data, skuImage.Url)
+		if err != nil {
+			return errno.UpYunFileError.WithMessage(err.Error())
+		}
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		return err
+	}
+
+	if err := svc.db.UpdateSkuImage(ctx, skuImage); err != nil {
+		return fmt.Errorf("service.UpdateSkuImage: update skuImage failed: %w", err)
+	}
+
+	return nil
+}
+
+func (svc *CommodityService) ViewSkuImages(ctx context.Context, sku *model.Sku, pageNum, pageSize int) ([]*model.SkuImage, int64, error) {
+	offset := pageNum * pageSize
+	key := fmt.Sprintf("skuImgs:%d:%d", sku.SkuID, offset)
+	if svc.cache.IsExist(ctx, key) {
+		ret, err := svc.cache.GetSkuImages(ctx, key)
+		if err != nil {
+			return nil, -1, fmt.Errorf("service.GetSkuImages failed: %w", err)
+		}
+		return ret, -1, nil
+	}
+
+	images, err := svc.db.ViewSkuImage(ctx, sku, pageNum, pageSize)
+	if err != nil {
+		return nil, -1, fmt.Errorf("usecase.ViewSkuImage failed: %w", err)
+	}
+
+	svc.cache.SetSkuImages(ctx, key, images)
+	total := int64(len(images))
+
+	return images, total, nil
+}
+
+func (svc *CommodityService) DeleteSkuImage(ctx context.Context, imageId int64, url string) error {
+	if err := svc.db.DeleteSkuImage(ctx, imageId); err != nil {
+		return fmt.Errorf("service.DeleteSkuImage: delete skuImage failed: %w", err)
+	}
+
+	if err := upyun.DeleteImg(url); err != nil {
+		return fmt.Errorf("service.DeleteSkuImage: delete skuImage failed: %w", err)
+	}
+
+	return nil
+}
+
+func (svc *CommodityService) GetSkuIdBySpuID(ctx context.Context, spuID int64, pageNum int, pageSize int) ([]*int64, error) {
+	skuIds, err := svc.db.GetSkuIdBySpuID(ctx, spuID, pageNum, pageSize)
+	if err != nil {
+		return nil, fmt.Errorf("service.GetSkuIdBySpuID: get sku id by spu id failed: %w", err)
+	}
+	return skuIds, nil
+}
+
+func (svc *CommodityService) SetCreatorID(ctx context.Context, sku *model.Sku) error {
+	uid, err := contextLogin.GetLoginData(ctx)
+	if err != nil {
+		return errno.Errorf(errno.AuthNoTokenCode, "no token find")
+	}
+	sku.CreatorID = uid
+	return nil
+}
+
+func (svc *CommodityService) NormalizePagination(pageNum, pageSize *int64) (int, int) {
+	var (
+		pNum  int64
+		pSize int64
+	)
+
+	if pageNum != nil && *pageNum > 0 {
+		pNum = *pageNum
+	}
+	if pageSize != nil && *pageSize > 0 {
+		pSize = *pageSize
+	}
+
+	return int(pNum), int(pSize)
+}
+
+func (svc *CommodityService) GetSkuFromImageId(ctx context.Context, imageId int64) (*model.Sku, *model.SkuImage, error) {
+	img, err := svc.db.GetSkuImageByImageId(ctx, imageId)
+	if err != nil {
+		return nil, nil, fmt.Errorf("service.GetSkuFromImageId: get image info failed: %w", err)
+	}
+
+	ret, err := svc.db.GetSkuBySkuId(ctx, img.SkuID)
+	if err != nil {
+		return nil, nil, fmt.Errorf("service.GetSkuFromImageId: get sku info failed: %w", err)
+	}
+	return ret, img, nil
 }

@@ -356,13 +356,43 @@ func CreateSku(ctx context.Context, c *app.RequestContext) {
 	var req api.CreateSkuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.CreateSkuResp)
+	file, err := c.FormFile("skuImages")
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	ext, ok := utils.CheckImageFileType(file)
+	if !ok {
+		pack.RespError(c, errno.ParamVerifyError)
+		return
+	}
+
+	datas, err := utils.FileToBytes(file)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	skuID, err := rpc.CreateSkuRPC(ctx, &commodity.CreateSkuReq{
+		Name:        req.Name,
+		Description: req.Description,
+		Price:       req.Price,
+		ForSale:     req.ForSale,
+		SpuID:       req.SpuID,
+		Stock:       req.Stock,
+		BufferCount: int64(len(datas)),
+		Ext:         ext,
+	}, datas)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, skuID)
 }
 
 // UpdateSku .
@@ -372,13 +402,52 @@ func UpdateSku(ctx context.Context, c *app.RequestContext) {
 	var req api.UpdateSkuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.UpdateSkuResp)
+	var (
+		l     int64
+		datas [][]byte
+		ext   string
+		ok    bool
+	)
 
-	c.JSON(consts.StatusOK, resp)
+	file, err := c.FormFile("skuImage")
+	if err != nil {
+		if !errors.Is(err, protocol.ErrMissingFile) {
+			pack.RespError(c, errno.ParamVerifyError.WithError(err))
+			return
+		}
+	} else {
+		ext, ok = utils.CheckImageFileType(file)
+		if !ok {
+			pack.RespError(c, errno.ParamVerifyError)
+			return
+		}
+		datas, err = utils.FileToBytes(file)
+		if err != nil {
+			pack.RespError(c, err)
+			return
+		}
+		l = int64(len(datas))
+	}
+
+	err = rpc.UpdateSkuRPC(ctx, &commodity.UpdateSkuReq{
+		SkuID:       req.SkuID,
+		Description: req.Description,
+		Price:       req.Price,
+		ForSale:     req.ForSale,
+		Stock:       req.Stock,
+		BufferCount: &l,
+		Ext:         ext,
+	}, datas)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespSuccess(c)
 }
 
 // DeleteSku .
@@ -388,13 +457,18 @@ func DeleteSku(ctx context.Context, c *app.RequestContext) {
 	var req api.DeleteSkuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.DeleteSkuResp)
-
-	c.JSON(consts.StatusOK, resp)
+	err = rpc.DeleteSkuRPC(ctx, &commodity.DeleteSkuReq{
+		SkuID: req.SkuID,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, nil)
 }
 
 // ViewSkuImage .
@@ -404,13 +478,125 @@ func ViewSkuImage(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewSkuImageReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.ViewSkuImageResp)
+	images, err := rpc.ViewSkuImageRPC(ctx, &commodity.ViewSkuImageReq{
+		SkuID:    req.SkuID,
+		PageNum:  req.PageNum,
+		PageSize: req.PageSize,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, images)
+}
 
-	c.JSON(consts.StatusOK, resp)
+// CreateSkuImage .
+// @router /api/v1/commodity/sku/image/create [POST]
+func CreateSkuImage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.CreateSkuImageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	resp := new(commodity.CreateSkuImageResp)
+
+	file, err := c.FormFile("skuImage")
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	_, ok := utils.CheckImageFileType(file)
+	if !ok {
+		pack.RespError(c, errno.ParamVerifyError)
+		return
+	}
+
+	datas, err := utils.FileToBytes(file)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	id, err := rpc.CreateSkuImageRPC(ctx, &commodity.CreateSkuImageReq{
+		BufferCount: int64(len(datas)),
+		SkuID:       req.SkuID,
+	}, datas)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	resp.ImageID = id
+	pack.RespData(c, resp)
+}
+
+// UpdateSkuImage .
+// @router /api/v1/commodity/sku/image/update [POST]
+func UpdateSkuImage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.UpdateSkuImageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	file, err := c.FormFile("skuImage")
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	_, ok := utils.CheckImageFileType(file)
+	if !ok {
+		pack.RespError(c, errno.ParamVerifyError)
+		return
+	}
+
+	datas, err := utils.FileToBytes(file)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	err = rpc.UpdateSkuImageRPC(ctx, &commodity.UpdateSkuImageReq{
+		BufferCount: int64(len(datas)),
+		ImageID:     req.ImageID,
+	}, datas)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespSuccess(c)
+}
+
+// DeleteSkuImage .
+// @router /api/v1/commodity/sku/image/delete [DELETE]
+func DeleteSkuImage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.DeleteSkuImageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	err = rpc.DeleteSkuImageRPC(ctx, &commodity.DeleteSkuImageReq{
+		SkuImageID: req.SkuImageID,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespSuccess(c)
 }
 
 // ViewSku .
@@ -420,13 +606,21 @@ func ViewSku(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewSkuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.ViewSkuResp)
-
-	c.JSON(consts.StatusOK, resp)
+	skus, err := rpc.ViewSkuRPC(ctx, &commodity.ViewSkuReq{
+		SkuID:    req.SkuID,
+		SpuID:    req.SpuID,
+		PageNum:  req.PageNum,
+		PageSize: req.PageSize,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, skus)
 }
 
 // UploadSkuAttr .
@@ -436,29 +630,20 @@ func UploadSkuAttr(ctx context.Context, c *app.RequestContext) {
 	var req api.UploadSkuAttrReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.UploadSkuAttrResp)
-
-	c.JSON(consts.StatusOK, resp)
-}
-
-// ListSkuInfo .
-// @router /api/commodity/sku/list [GET]
-func ListSkuInfo(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req api.ListSkuInfoReq
-	err = c.BindAndValidate(&req)
+	err = rpc.UploadSkuAttrRPC(ctx, &commodity.UploadSkuAttrReq{
+		SkuID:     req.SkuID,
+		SaleAttr:  req.SaleAttr,
+		SaleValue: req.SaleValue,
+	})
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
-
-	resp := new(api.ListSkuInfoResp)
-
-	c.JSON(consts.StatusOK, resp)
+	pack.RespSuccess(c)
 }
 
 // ViewHistory .
