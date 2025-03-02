@@ -29,7 +29,8 @@ type PaymentUseCase interface {
 	CreatePayment(ctx context.Context, orderID int64) (*model.PaymentOrder, error)
 	GetPaymentToken(ctx context.Context, orderID int64) (string, int64, error)
 	CreateRefund(ctx context.Context, orderID int64) (int64, int64, error)
-	// ProcessRefund
+	RefundReview(ctx context.Context, orderID int64, passed bool) error
+	PaymentCheckout(ctx context.Context, orderID int64, token string) error
 	// RequestRefundToken
 }
 

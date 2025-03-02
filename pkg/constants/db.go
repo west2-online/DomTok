@@ -44,7 +44,7 @@ const (
 	CartTableName          = "cart"
 	PaymentTableName       = "payment_orders"
 	PaymentRefundTableName = "payment_refunds"
-	PaymentLedgerTableName = "payment_ledgers"
+	PaymentLedgerTableName = "payment_ledger"
 
 	SkuTableName             = "sku_info"
 	SkuImagesTableName       = "sku_image"

@@ -46,22 +46,27 @@ func _processpaymentMw() []app.HandlerFunc {
 	return nil
 }
 
-func _processrefundMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _requestrefundtokenMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
 func _requestpaymenttokenMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
 func _requestrefundMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _refundMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _refundreviewMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _requestpaymentcheckoutMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
