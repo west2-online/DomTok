@@ -18,13 +18,12 @@ package service
 
 import (
 	"context"
-	"time"
-
 	"github.com/west2-online/DomTok/app/order/domain/model"
 	"github.com/west2-online/DomTok/app/order/domain/repository"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
+	"time"
 )
 
 type OrderService struct {
@@ -99,12 +98,13 @@ func (svc *OrderService) calcOrderExpireTime(createAt int64) int64 {
 }
 
 func (svc *OrderService) UpdateOrderAsSuccess(ctx context.Context, expired int64, payRel *model.PaymentResult) error {
-	if time.Now().UnixMilli() > expired {
-		return errno.NewErrNo(errno.ServiceOrderExpired, "order expired")
+	// 对状态的一层校验
+	if payRel.PaymentStatus != constants.PaymentStatusSuccessCode {
+		return errno.NewErrNo(errno.ServiceOrderStatusInvalid, "success orders cannot be updated again")
 	}
 
-	if payRel.PaymentStatus == constants.PaymentStatusSuccessCode {
-		return nil
+	if time.Now().UnixMilli() > expired {
+		return errno.NewErrNo(errno.ServiceOrderExpired, "order expired")
 	}
 	// 尝试开始更新
 	if err := svc.locker.LockOrder(payRel.OrderID); err != nil {
@@ -124,6 +124,10 @@ func (svc *OrderService) UpdateOrderAsSuccess(ctx context.Context, expired int64
 	}
 
 	if err = svc.db.UpdatePaymentStatus(ctx, payRel); err != nil {
+		return err
+	}
+
+	if _, err = svc.cache.UpdatePaymentStatus(ctx, &model.CachePaymentStatus{}); err != nil {
 		return err
 	}
 
@@ -154,6 +158,10 @@ func (svc *OrderService) CancelOrder(ctx context.Context, payRel *model.PaymentR
 	}
 
 	if err = svc.db.UpdatePaymentStatus(ctx, payRel); err != nil {
+		return err
+	}
+
+	if _, err = svc.cache.UpdatePaymentStatus(ctx, &model.CachePaymentStatus{}); err != nil {
 		return err
 	}
 

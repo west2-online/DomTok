@@ -61,7 +61,6 @@ type RPC interface {
 type Cache interface {
 	SetPaymentStatus(ctx context.Context, s *model.CachePaymentStatus) error
 	GetPaymentStatus(ctx context.Context, orderID int64) (*model.CachePaymentStatus, bool, error)
-	// UpdatePaymentStatus 使用 lua 脚本保证了过程的原子性
 	UpdatePaymentStatus(ctx context.Context, s *model.CachePaymentStatus) (exist bool, err error)
 }
 

@@ -187,7 +187,7 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
-	"DescSkuLockStock": kitex.NewMethodInfo(
+	"WithholdSkuStock": kitex.NewMethodInfo(
 		descSkuLockStockHandler,
 		newCommodityServiceDescSkuLockStockArgs,
 		newCommodityServiceDescSkuLockStockResult,
@@ -1235,7 +1235,7 @@ func (p *kClient) DescSkuLockStock(ctx context.Context, req *commodity.DescSkuLo
 	var _args commodity.CommodityServiceDescSkuLockStockArgs
 	_args.Req = req
 	var _result commodity.CommodityServiceDescSkuLockStockResult
-	if err = p.c.Call(ctx, "DescSkuLockStock", &_args, &_result); err != nil {
+	if err = p.c.Call(ctx, "WithholdSkuStock", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

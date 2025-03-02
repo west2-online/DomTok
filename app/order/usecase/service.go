@@ -49,7 +49,7 @@ func (uc *useCase) CreateOrder(ctx context.Context, addressID int64, baseGoods [
 		return 0, err
 	}
 
-	if err = uc.svc.DescSkuLockStock(ctx, order.Id, goods); err != nil {
+	if err = uc.svc.WithholdSkuStock(ctx, order.Id, goods); err != nil {
 		return 0, err
 	}
 
