@@ -343,7 +343,7 @@ func TestOrderDB_GetOrdersByUserID(t *testing.T) {
 
 	Convey("TestOrderDB_GetOrdersByUserID", t, func() {
 		// 清理之前的测试数据
-		err := _db.(*orderDB).client.WithContext(ctx).Where("user_id = ?", 1).Delete(&Order{}).Error
+		err := _db.DeleteOrder(ctx, 1)
 		So(err, ShouldBeNil)
 
 		// 创建多个测试订单
