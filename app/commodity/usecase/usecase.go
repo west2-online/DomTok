@@ -50,7 +50,7 @@ type CommodityUseCase interface {
 	CreateUserCoupon(ctx context.Context, coupon *model.UserCoupon) (err error)
 	SearchUserCoupons(ctx context.Context, pageNum int64) (coupons []*model.Coupon, err error)
 
-	CreateSku(ctx context.Context, sku *model.Sku, ext string) (skuID int64, err error)
+	CreateSku(ctx context.Context, sku *model.Sku, ext string) (s *model.Sku, err error)
 	UpdateSku(ctx context.Context, sku *model.Sku, ext string) (err error)
 	DeleteSku(ctx context.Context, sku *model.Sku) (err error)
 	ViewSku(ctx context.Context, sku *model.Sku, pageNum *int64, pageSize *int64, isSpuId bool) (Skus []*model.Sku, total int64, err error)

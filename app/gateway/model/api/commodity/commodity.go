@@ -6081,7 +6081,7 @@ func (p *CreateSkuReq) String() string {
 }
 
 type CreateSkuResp struct {
-	SkuID int64 `thrift:"skuID,1,required" form:"skuID,required" json:"skuID,required" query:"skuID,required"`
+	SkuInfo *model.SkuInfo `thrift:"skuInfo,1,required" form:"skuInfo,required" json:"skuInfo,required" query:"skuInfo,required"`
 }
 
 func NewCreateSkuResp() *CreateSkuResp {
@@ -6091,18 +6091,27 @@ func NewCreateSkuResp() *CreateSkuResp {
 func (p *CreateSkuResp) InitDefault() {
 }
 
-func (p *CreateSkuResp) GetSkuID() (v int64) {
-	return p.SkuID
+var CreateSkuResp_SkuInfo_DEFAULT *model.SkuInfo
+
+func (p *CreateSkuResp) GetSkuInfo() (v *model.SkuInfo) {
+	if !p.IsSetSkuInfo() {
+		return CreateSkuResp_SkuInfo_DEFAULT
+	}
+	return p.SkuInfo
 }
 
 var fieldIDToName_CreateSkuResp = map[int16]string{
-	1: "skuID",
+	1: "skuInfo",
+}
+
+func (p *CreateSkuResp) IsSetSkuInfo() bool {
+	return p.SkuInfo != nil
 }
 
 func (p *CreateSkuResp) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetSkuID bool = false
+	var issetSkuInfo bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -6119,11 +6128,11 @@ func (p *CreateSkuResp) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.STRUCT {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetSkuID = true
+				issetSkuInfo = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -6140,7 +6149,7 @@ func (p *CreateSkuResp) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetSkuID {
+	if !issetSkuInfo {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -6163,14 +6172,11 @@ RequiredFieldNotSetError:
 }
 
 func (p *CreateSkuResp) ReadField1(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
+	_field := model.NewSkuInfo()
+	if err := _field.Read(iprot); err != nil {
 		return err
-	} else {
-		_field = v
 	}
-	p.SkuID = _field
+	p.SkuInfo = _field
 	return nil
 }
 
@@ -6203,10 +6209,10 @@ WriteStructEndError:
 }
 
 func (p *CreateSkuResp) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("skuID", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("skuInfo", thrift.STRUCT, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.SkuID); err != nil {
+	if err := p.SkuInfo.Write(oprot); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {

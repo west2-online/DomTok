@@ -298,65 +298,65 @@ func ViewUserAllCouponRPC(ctx context.Context, req *commodity.ViewUserAllCouponR
 	return resp, nil
 }
 
-func CreateSkuRPC(ctx context.Context, req *commodity.CreateSkuReq, files [][]byte) (skuID int64, err error) {
+func CreateSkuRPC(ctx context.Context, req *commodity.CreateSkuReq, files [][]byte) (sku *model.SkuInfo, err error) {
 	stream, err := commodityStreamClient.CreateSku(ctx)
 	if err != nil {
 		logger.Errorf("rpc.CreateSkuRPC: RPC called failed: %v", err.Error())
-		return 0, errno.InternalServiceError.WithMessage(err.Error())
+		return nil, errno.InternalServiceError.WithMessage(err.Error())
 	}
 
 	err = stream.Send(req)
 	if err != nil {
 		logger.Errorf("rpc.CreateSkuRPC: RPC called failed: %v", err.Error())
-		return 0, errno.InternalServiceError.WithMessage(err.Error())
+		return nil, errno.InternalServiceError.WithMessage(err.Error())
 	}
 
 	for _, file := range files {
 		err = stream.Send(&commodity.CreateSkuReq{StyleHeadDrawing: file})
 		if err != nil {
 			logger.Errorf("rpc.CreateSkuRPC CreateSku failed, err  %v", err)
-			return 0, errno.InternalServiceError.WithMessage(err.Error())
+			return nil, errno.InternalServiceError.WithMessage(err.Error())
 		}
 	}
 
 	resp, err := stream.CloseAndRecv()
 	if err != nil {
 		logger.Errorf("rpc.CreateSkuRPC: RPC called failed: %v", err.Error())
-		return -1, errno.InternalServiceError.WithMessage(err.Error())
+		return nil, errno.InternalServiceError.WithMessage(err.Error())
 	}
 	if !utils.IsSuccess(resp.Base) {
-		return -1, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
-	return resp.SkuID, nil
+	return resp.SkuInfo, nil
 }
 
 func CreateSkuImageRPC(ctx context.Context, req *commodity.CreateSkuImageReq, files [][]byte) (id int64, err error) {
 	stream, err := commodityStreamClient.CreateSkuImage(ctx)
 	if err != nil {
 		logger.Errorf("rpc.CreateSkuImageRPC: RPC called failed: %v", err.Error())
-		return 0, errno.InternalServiceError.WithMessage(err.Error())
+		return -1, errno.InternalServiceError.WithMessage(err.Error())
 	}
 	err = stream.Send(req)
 	if err != nil {
 		logger.Errorf("rpc.CreateSkuImageRPC: RPC called failed: %v", err.Error())
-		return 0, errno.InternalServiceError.WithMessage(err.Error())
+		return -1, errno.InternalServiceError.WithMessage(err.Error())
 	}
 
 	for _, file := range files {
 		err = stream.Send(&commodity.CreateSkuImageReq{Data: file})
 		if err != nil {
 			logger.Errorf("rpc.CreateSkuImageRPC CreateSkuImage failed, err  %v", err)
-			return 0, errno.InternalServiceError.WithMessage(err.Error())
+			return -1, errno.InternalServiceError.WithMessage(err.Error())
 		}
 	}
 
 	resp, err := stream.CloseAndRecv()
 	if err != nil {
 		logger.Errorf("rpc.CreateSkuImageRPC: RPC called failed: %v", err.Error())
-		return 0, errno.InternalServiceError.WithMessage(err.Error())
+		return -1, errno.InternalServiceError.WithMessage(err.Error())
 	}
 	if !utils.IsSuccess(resp.Base) {
-		return 0, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return -1, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	return resp.ImageID, nil
 }
@@ -389,7 +389,7 @@ func UpdateSkuRPC(ctx context.Context, req *commodity.UpdateSkuReq, files [][]by
 	}
 
 	if !utils.IsSuccess(resp.Base) {
-		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	return nil
 }
@@ -422,7 +422,7 @@ func UpdateSkuImageRPC(ctx context.Context, req *commodity.UpdateSkuImageReq, fi
 	}
 
 	if !utils.IsSuccess(resp.Base) {
-		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	return nil
 }
@@ -434,7 +434,7 @@ func DeleteSkuRPC(ctx context.Context, req *commodity.DeleteSkuReq) (err error) 
 		return errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsSuccess(resp.Base) {
-		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	return nil
 }
@@ -446,7 +446,7 @@ func DeleteSkuImageRPC(ctx context.Context, req *commodity.DeleteSkuImageReq) (e
 		return errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsSuccess(resp.Base) {
-		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	return nil
 }
@@ -458,7 +458,7 @@ func ViewSkuImageRPC(ctx context.Context, req *commodity.ViewSkuImageReq) (image
 		return nil, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsSuccess(resp.Base) {
-		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	return resp.Images, nil
 }
@@ -470,7 +470,7 @@ func ViewSkuRPC(ctx context.Context, req *commodity.ViewSkuReq) (sku []*model.Sk
 		return nil, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsSuccess(resp.Base) {
-		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	return resp.Skus, nil
 }
@@ -482,7 +482,7 @@ func UploadSkuAttrRPC(ctx context.Context, req *commodity.UploadSkuAttrReq) (err
 		return errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsSuccess(resp.Base) {
-		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	return nil
 }

@@ -333,7 +333,7 @@ func (c CommodityHandler) CreateSku(streamServer commodity.CommodityService_Crea
 		req.StyleHeadDrawing = bytes.Join([][]byte{req.StyleHeadDrawing, fileData.StyleHeadDrawing}, []byte(""))
 	}
 
-	id, err := c.useCase.CreateSku(streamServer.Context(), &model.Sku{
+	sku, err := c.useCase.CreateSku(streamServer.Context(), &model.Sku{
 		Name:             req.Name,
 		Stock:            req.Stock,
 		Description:      req.Description,
@@ -344,15 +344,15 @@ func (c CommodityHandler) CreateSku(streamServer commodity.CommodityService_Crea
 	}, req.Ext)
 	if err != nil {
 		r.Base = base.BuildBaseResp(err)
+		r.SkuInfo = pack.BuildSkuInfo(nil)
 		return streamServer.SendAndClose(r)
 	}
-
-	r.Base = base.BuildBaseResp(nil)
-	r.SkuID = id
+	r.Base = base.BuildSuccessResp()
+	r.SkuInfo = pack.BuildSkuInfo(sku)
 	return streamServer.SendAndClose(r)
 }
 
-func (c CommodityHandler) UpdateSku(streamServer commodity.CommodityService_UpdateSkuServer) (rr error) {
+func (c CommodityHandler) UpdateSku(streamServer commodity.CommodityService_UpdateSkuServer) (err error) {
 	r := new(commodity.UpdateSkuResp)
 
 	req, err := streamServer.Recv()
