@@ -57,7 +57,6 @@ func NewEsCommodityClient() (*elastic.Client, error) {
 	esConn := fmt.Sprintf("http://%s", config.Elasticsearch.Addr)
 	client, err := elastic.NewClient(
 		elastic.SetURL(esConn),
-		elastic.SetSniff(false),
 	)
 	if err != nil {
 		return nil, errno.NewErrNo(errno.InternalESErrorCode, fmt.Sprintf("es clint failed,error: %v", err))
