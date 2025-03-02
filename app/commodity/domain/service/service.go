@@ -398,7 +398,7 @@ func (svc *CommodityService) DeleteCategory(ctx context.Context, category *model
 }
 
 func (svc *CommodityService) UpdateCategory(ctx context.Context, category *model.Category) error {
-	err:= svc.db.UpdateCategory(ctx, category)
+	err := svc.db.UpdateCategory(ctx, category)
 	if err != nil {
 		return fmt.Errorf("update category failed: %w", err)
 	}
