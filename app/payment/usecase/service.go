@@ -19,6 +19,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
@@ -46,27 +47,27 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	var uid int64
 	uid, err = uc.svc.GetUserID(ctx)
 	if err != nil {
-		return "", 0, fmt.Errorf("get user id failed:%v", err)
+		return "", 0, fmt.Errorf("get user id failed:%w", err)
 	}
 
 	// 3. 检查订单支付信息
 	var paymentInfo bool
 	paymentInfo, err = uc.db.CheckPaymentExist(ctx, orderID)
 	if err != nil {
-		return "", 0, fmt.Errorf("check payment existed failed:%v", err)
+		return "", 0, fmt.Errorf("check payment existed failed:%w", err)
 	}
 	if paymentInfo == paymentStatus.PaymentNotExist { // 如果订单不存在
 		// 创建支付订单
 		// TODO 待完善
 		_, err := uc.svc.CreatePaymentInfo(ctx, orderID)
 		if err != nil {
-			return "", 0, fmt.Errorf("create payment info failed:%v", err)
+			return "", 0, fmt.Errorf("create payment info failed:%w", err)
 		}
 	} else if paymentInfo == paymentStatus.PaymentExist { // 如果订单存在
 		// 获取订单的支付状态
 		payStatus, err := uc.db.GetPaymentInfo(ctx, orderID)
 		if err != nil {
-			return "", 0, fmt.Errorf("get payment info failed:%v", err)
+			return "", 0, fmt.Errorf("get payment info failed:%w", err)
 		}
 		// 如果订单正在支付或者已经支付完成，则拒绝进行接下来的生成令牌的活动
 		if payStatus.Status == paymentStatus.PaymentStatusSuccessCode || payStatus.Status == paymentStatus.PaymentStatusProcessingCode {

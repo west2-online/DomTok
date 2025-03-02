@@ -18,12 +18,12 @@ package redis
 
 import (
 	"context"
-	"github.com/west2-online/DomTok/pkg/errno"
 	"time"
 
 	"github.com/redis/go-redis/v9"
 
 	"github.com/west2-online/DomTok/app/payment/domain/repository"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 type paymentRedis struct {
@@ -43,8 +43,8 @@ func (p *paymentRedis) IncrRedisKey(ctx context.Context, key string, expiration 
 	// 自增键值
 	count, err := p.client.Incr(ctx, key).Result()
 	if err != nil {
-		return 0, errno.Errorf(errno.ServiceIncrementRedisKeyFailed, "failed to increment key %s: %v", key, err)
-		//return 0, fmt.Errorf("failed to increment key %s: %w", key, err)
+		return 0, errno.Errorf(errno.InternalRedisErrorCode, "failed to increment key %s: %v", key, err)
+		// return 0, fmt.Errorf("failed to increment key %s: %w", key, err)
 	}
 	return count, nil
 }
@@ -53,7 +53,7 @@ func (p *paymentRedis) CheckRedisDayKey(ctx context.Context, key string) (bool, 
 	// exists返回1表示key存在，返回0表示key不存在
 	exists, err := p.client.Exists(ctx, key).Result()
 	if err != nil {
-		return false, errno.Errorf(errno.ServiceCheck24hExistFailed, "failed to check 24h existence of key %s: %v", key, err)
+		return false, errno.Errorf(errno.InternalRedisErrorCode, "failed to check 24h existence of key %s: %v", key, err)
 	}
 	return exists == 1, nil
 }
@@ -62,7 +62,7 @@ func (p *paymentRedis) CheckRedisDayKey(ctx context.Context, key string) (bool, 
 func (p *paymentRedis) SetRedisDayKey(ctx context.Context, key string, value string, expiration int) error {
 	err := p.client.Set(ctx, key, value, time.Duration(expiration)*time.Second).Err()
 	if err != nil {
-		return errno.Errorf(errno.ServiceSetRedisKeyFailed, "failed to set key %s in Redis: %v", key, err)
+		return errno.Errorf(errno.InternalRedisErrorCode, "failed to set key %s in Redis: %v", key, err)
 	}
 	return nil
 }
