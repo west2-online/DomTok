@@ -264,7 +264,7 @@ struct CreateSkuReq {
 
 struct CreateSkuResp {
     1: required model.BaseResp base;
-    2: required i64 skuID;
+    2: required model.SkuInfo skuInfo;
 }
 
 struct CreateSkuImageReq {

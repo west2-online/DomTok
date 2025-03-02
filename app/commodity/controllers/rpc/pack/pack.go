@@ -124,6 +124,14 @@ func BuildSkus(i []*model.Sku) []*modelKitex.Sku {
 	return result
 }
 
+func BuildSkuInfo(sku *model.Sku) *modelKitex.SkuInfo {
+	result := &modelKitex.SkuInfo{
+		SkuID:     sku.SkuID,
+		HistoryID: sku.HistoryID,
+	}
+	return result
+}
+
 func BuildSkuInfos(i []*model.Sku) []*modelKitex.SkuInfo {
 	result := make([]*modelKitex.SkuInfo, 0, len(i)) // 预分配容量
 	for _, v := range i {

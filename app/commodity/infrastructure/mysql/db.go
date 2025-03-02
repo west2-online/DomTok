@@ -359,15 +359,19 @@ func (db *commodityDB) UpdateSku(ctx context.Context, sku *model.Sku) error {
 	return nil
 }
 
-func (db *commodityDB) ViewSku(ctx context.Context, skuIds []*int64, pageNum int, pageSize int) ([]*model.Sku, error) {
-	var skus []Sku
+func (db *commodityDB) ViewSku(ctx context.Context, skuIds []*int64, pageNum int, pageSize int) ([]*model.Sku, int64, error) {
+	var (
+		skus  []Sku
+		total int64
+	)
 
 	offset := (pageNum - 1) * pageSize
-	if err := db.client.WithContext(ctx).Table((&Sku{}).TableName()).Offset(offset).Limit(pageSize).Where("id IN (?)", skuIds).Find(&skus).Error; err != nil {
+	if err := db.client.WithContext(ctx).Table((&Sku{}).TableName()).Offset(offset).Limit(pageSize).
+		Where("id IN (?)", skuIds).Find(&skus).Count(&total).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errno.Errorf(errno.ServiceSkuNotExist, "mysql: sku not found")
+			return nil, 0, errno.Errorf(errno.ServiceSkuNotExist, "mysql: sku not found")
 		}
-		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to view sku: %v", err)
+		return nil, 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to view sku: %v", err)
 	}
 
 	skuIDList := make([]int64, 0, len(skus))
@@ -377,15 +381,15 @@ func (db *commodityDB) ViewSku(ctx context.Context, skuIds []*int64, pageNum int
 
 	var skuToSpuList []SpuToSku
 	if err := db.client.WithContext(ctx).Table((&SpuToSku{}).TableName()).Where("sku_id IN (?)", skuIDList).Find(&skuToSpuList).Error; err != nil {
-		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get sku to spu: %v", err)
+		return nil, 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get sku to spu: %v", err)
 	}
 
 	var skuSaleAttrs []SkuSaleAttr
 	if err := db.client.WithContext(ctx).Table((&SkuSaleAttr{}).TableName()).Where("sku_id IN (?)", skuIDList).Find(&skuSaleAttrs).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errno.Errorf(errno.ServiceSkuAttrNotExist, "mysql: sku sale attr not found")
+			return nil, 0, errno.Errorf(errno.ServiceSkuAttrNotExist, "mysql: sku sale attr not found")
 		}
-		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get sku sale attr: %v", err)
+		return nil, 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get sku sale attr: %v", err)
 	}
 
 	result := make([]*model.Sku, 0, len(skus))
@@ -426,7 +430,7 @@ func (db *commodityDB) ViewSku(ctx context.Context, skuIds []*int64, pageNum int
 		})
 	}
 
-	return result, nil
+	return result, total, nil
 }
 
 func (db *commodityDB) DeleteSku(ctx context.Context, sku *model.Sku) error {
@@ -526,19 +530,23 @@ func (db *commodityDB) UpdateSkuImage(ctx context.Context, skuImage *model.SkuIm
 	return nil
 }
 
-func (db *commodityDB) ViewSkuImage(ctx context.Context, sku *model.Sku, pageNum int, pageSize int) ([]*model.SkuImage, error) {
+func (db *commodityDB) ViewSkuImage(ctx context.Context, sku *model.Sku, pageNum int, pageSize int) ([]*model.SkuImage, int64, error) {
 	s := &SkuImages{
 		SkuId: sku.SkuID,
 	}
 
-	var Images []SkuImages
+	var (
+		Images []SkuImages
+		total  int64
+	)
 
 	offset := (pageNum - 1) * pageSize
-	if err := db.client.WithContext(ctx).Table(s.TableName()).Offset(offset).Limit(pageSize).Where("sku_id = ?", s.SkuId).Find(&Images).Error; err != nil {
+	if err := db.client.WithContext(ctx).Table(s.TableName()).Offset(offset).Limit(pageSize).
+		Where("sku_id = ?", s.SkuId).Find(&Images).Count(&total).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errno.Errorf(errno.ServiceSkuNotExist, "mysql: sku not found")
+			return nil, 0, errno.Errorf(errno.ServiceSkuNotExist, "mysql: sku not found")
 		}
-		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to view sku image: %v", err)
+		return nil, 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to view sku image: %v", err)
 	}
 
 	result := make([]*model.SkuImage, 0, len(Images))
@@ -551,7 +559,7 @@ func (db *commodityDB) ViewSkuImage(ctx context.Context, sku *model.Sku, pageNum
 		})
 	}
 
-	return result, nil
+	return result, total, nil
 }
 
 func (db *commodityDB) DeleteSkuImage(ctx context.Context, imageId int64) error {
@@ -567,6 +575,14 @@ func (db *commodityDB) DeleteSkuImage(ctx context.Context, imageId int64) error 
 	}
 
 	return nil
+}
+
+func (db *commodityDB) IsSpuExist(ctx context.Context, spuId int64) (bool, error) {
+	var cnt int64
+	if err := db.client.WithContext(ctx).Table(constants.SpuTableName).Where("id = ?", spuId).Count(&cnt).Error; err != nil {
+		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get count: %v", err)
+	}
+	return cnt != 0, nil
 }
 
 func (db *commodityDB) GetSkuBySkuId(ctx context.Context, skuId int64) (*model.Sku, error) {

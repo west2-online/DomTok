@@ -263,18 +263,26 @@ func (us *useCase) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) err
 	}
 }
 
-func (us *useCase) CreateSku(ctx context.Context, sku *model.Sku, ext string) (skuID int64, err error) {
+func (us *useCase) CreateSku(ctx context.Context, sku *model.Sku, ext string) (s *model.Sku, err error) {
 	loginData, err := contextLogin.GetStreamLoginData(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("usecase.CreateSku failed: %w", err)
+		return nil, fmt.Errorf("usecase.CreateSku failed: %w", err)
 	}
 	sku.CreatorID = loginData
 
-	skuID, err = us.svc.CreateSku(ctx, sku, ext)
+	ok, err := us.db.IsSpuExist(ctx, sku.SpuID)
 	if err != nil {
-		return -1, fmt.Errorf("usecase.CreateSku failed: %w", err)
+		return nil, fmt.Errorf("usecase.CreateSku: check spu exist failed: %w", err)
 	}
-	return skuID, nil
+	if !ok {
+		return nil, errno.NewErrNo(errno.ServiceSpuNotExist, "spu does not exist")
+	}
+
+	s, err = us.svc.CreateSku(ctx, sku, ext)
+	if err != nil {
+		return nil, fmt.Errorf("usecase.CreateSku failed: %w", err)
+	}
+	return s, nil
 }
 
 func (us *useCase) UpdateSku(ctx context.Context, sku *model.Sku, ext string) (err error) {
@@ -305,7 +313,7 @@ func (us *useCase) DeleteSku(ctx context.Context, sku *model.Sku) (err error) {
 		return fmt.Errorf("service.UpdateSku: %w", err)
 	}
 
-	if err = us.svc.DeleteSku(ctx, sku); err != nil {
+	if err = us.svc.DeleteSku(ctx, ret); err != nil {
 		return fmt.Errorf("usecase.DeleteSku failed: %w", err)
 	}
 	return nil
