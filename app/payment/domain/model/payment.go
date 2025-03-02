@@ -18,6 +18,8 @@ package model
 
 import (
 	"github.com/shopspring/decimal"
+
+	"github.com/west2-online/DomTok/pkg/constants"
 )
 
 // PaymentOrder 支付订单表（删除了三个时间）
@@ -54,4 +56,22 @@ type PaymentLedger struct {
 	Amount          decimal.Decimal `gorm:"type:decimal(15,4);not null;comment:交易金额（正数表示收入，负数表示支出）"`
 	TransactionType int64           `gorm:"not null;comment:交易类型：1-支付，2-退款，3-手续费，4-调整"`
 	Status          int64           `gorm:"not null;default:0;comment:交易状态：0-待处理，1-成功，2-失败"`
+}
+
+func (p *PaymentOrder) ToLedger() *PaymentLedger {
+	return &PaymentLedger{
+		ReferenceID:     p.ID,
+		UserID:          p.UserID,
+		Amount:          p.Amount,
+		TransactionType: constants.LedgerTransactionTypePaymentCode,
+	}
+}
+
+func (p *PaymentRefund) ToLedger() *PaymentLedger {
+	return &PaymentLedger{
+		ReferenceID:     p.ID,
+		UserID:          p.UserID,
+		Amount:          p.RefundAmount,
+		TransactionType: constants.LedgerTransactionTypeRefundCode,
+	}
 }

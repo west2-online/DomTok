@@ -22,6 +22,7 @@ const (
 	ServiceWrongPassword = 1000 + iota
 	ServiceUserExist
 	ServiceUserNotExist
+
 	ErrRecordNotFound
 )
 
@@ -45,13 +46,21 @@ const (
 	ServiceSkuAttrNotExist
 
 	ServiceCategoryExist
+	ServiceCategorynotExist
 	ServiceListCategoryFailed
 
-	ServiceUserCloseWebsocketConn
+	ServiceCategoryCreateFail
 )
 
 // payment
 const (
+	PaymentOrderNotExist = 4000 + iota
+	PaymentRefundNotExist
+)
+
+// assistant
+const (
+	ServiceUserCloseWebsocketConn = 5000 + iota
 	ServicePaymentOrderNotExist = 4000 + iota
 	ServiceStorePaymentRedisTokenFailed
 	ServiceCreatePaymentIDFailed

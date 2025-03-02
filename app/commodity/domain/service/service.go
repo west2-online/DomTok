@@ -385,9 +385,17 @@ func (svc *CommodityService) IsSpuMappingExist(ctx context.Context) error {
 	return err
 }
 
-func (svc *CommodityService) DeleteCategory(ctx context.Context, category *model.Category) (err error) {
+func (svc *CommodityService) CreateCategory(ctx context.Context, category *model.Category) error {
+	category.Id = svc.nextID()
+	if err := svc.db.CreateCategory(ctx, category); err != nil {
+		return fmt.Errorf("create category failed: %w", err)
+	}
+	return nil
+}
+
+func (svc *CommodityService) DeleteCategory(ctx context.Context, category *model.Category) error {
 	// 判断是否存在
-	exist, err := svc.db.IsCategoryExistByName(ctx, category.Name)
+	exist, err := svc.db.IsCategoryExistById(ctx, category.Id)
 	if err != nil {
 		return fmt.Errorf("check category exist failed: %w", err)
 	}
@@ -401,12 +409,20 @@ func (svc *CommodityService) DeleteCategory(ctx context.Context, category *model
 	return nil
 }
 
-func (svc *CommodityService) CreateCategory(ctx context.Context, category *model.Category) error {
-	category.Id = svc.nextID()
-	if err := svc.db.CreateCategory(ctx, category); err != nil {
-		return fmt.Errorf("create category failed: %w", err)
+func (svc *CommodityService) UpdateCategory(ctx context.Context, category *model.Category) error {
+	// 判断是否存在
+	exist, err := svc.db.IsCategoryExistById(ctx, category.Id)
+	if err != nil {
+		return fmt.Errorf("check category exist failed: %w", err)
 	}
-	return nil
+	if !exist {
+		return errno.NewErrNo(errno.ServiceUserNotExist, "category does not exist")
+	}
+	err = svc.db.UpdateCategory(ctx, category)
+	if err != nil {
+		return fmt.Errorf("update category failed: %w", err)
+	}
+	return err
 }
 
 func (svc *CommodityService) Cached(ctx context.Context, infos []*model.SkuBuyInfo) bool {

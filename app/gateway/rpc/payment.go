@@ -69,3 +69,33 @@ func RequestRefundRPC(ctx context.Context, req *payment.RefundRequest) (response
 	// 返回退款令牌信息（退款ID）
 	return resp.RefundInfo, nil
 }
+
+func RequestRefundReviewRPC(ctx context.Context, req *payment.RefundReviewRequest) (err error) {
+	resp, err := paymentClient.RefundReview(ctx, req)
+	if err != nil {
+		logger.Errorf("RequestRefundReviewRPC: RPC call failed: %v", err.Error())
+		return errno.InternalServiceError.WithError(err)
+	}
+
+	if !utils.IsSuccess(resp.Base) {
+		logger.Errorf("RequestRefundReviewRPC: Business error: %s", resp.Base.Msg)
+		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+
+	return nil
+}
+
+func RequestPaymentCheckoutRPC(ctx context.Context, req *payment.PaymentCheckoutRequest) (err error) {
+	resp, err := paymentClient.RequestPaymentCheckout(ctx, req)
+	if err != nil {
+		logger.Errorf("RequestPaymentCheckoutRPC: RPC call failed: %v", err.Error())
+		return errno.InternalServiceError.WithError(err)
+	}
+
+	if !utils.IsSuccess(resp.Base) {
+		logger.Errorf("RequestPaymentCheckoutRPC: Business error: %s", resp.Base.Msg)
+		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+
+	return nil
+}

@@ -43,27 +43,42 @@ func (db *commodityDB) IsCategoryExistByName(ctx context.Context, name string) (
 	err := db.client.WithContext(ctx).Where("Name = ?", name).First(&category).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, errno.Errorf(errno.ErrRecordNotFound, "mysql: ErrRecordNotFound record not found: %v", err)
+			return false, nil
 		}
 		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
 	}
-	return true, nil
+	return true, errno.Errorf(errno.ServiceCategoryExist, "category was found")
 }
 
 func (db *commodityDB) IsCategoryExistById(ctx context.Context, id int64) (bool, error) {
+	if id <= 0 {
+		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "invalid category id: %d", id)
+	}
+
 	var category model.Category
 	err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, errno.Errorf(errno.ErrRecordNotFound, "mysql: ErrRecordNotFound record not found: %v", err)
+			return false, errno.Errorf(errno.ServiceCategorynotExist, "category not found")
 		}
 		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
 	}
 	return true, nil
 }
 
+func (db *commodityDB) GetCreatorIDById(ctx context.Context, id int64) (int64, error) {
+	var category model.Category
+	if err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, errno.Errorf(errno.ServiceCategorynotExist, "category not found")
+		}
+		return 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get creator ID: %v", err)
+	}
+	return category.CreatorId, nil
+}
+
 func (db *commodityDB) CreateCategory(ctx context.Context, entity *model.Category) error {
-	m := Category{
+	c := Category{
 		Id:        entity.Id,
 		Name:      entity.Name,
 		CreatorId: entity.CreatorId,
@@ -71,7 +86,7 @@ func (db *commodityDB) CreateCategory(ctx context.Context, entity *model.Categor
 		UpdatedAt: entity.UpdatedAt,
 		DeletedAt: gorm.DeletedAt{},
 	}
-	if err := db.client.WithContext(ctx).Create(m).Error; err != nil {
+	if err := db.client.WithContext(ctx).Create(&c).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create category: %v", err)
 	}
 	return nil

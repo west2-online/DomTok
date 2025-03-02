@@ -229,3 +229,60 @@ func (svc *PaymentService) StoreRefundToken(ctx context.Context, token string, e
 	return paymentStatus.RedisStoreSuccess, nil
 }
 */
+
+func (svc *PaymentService) CheckAdminPermission(_ context.Context, uid int64) (bool, error) {
+	return uid == 1, nil
+}
+
+func (svc *PaymentService) CheckAndDelPaymentToken(ctx context.Context, token string, userID int64, orderID int64) (bool, error) {
+	result, err := svc.redis.CheckAndDelPaymentToken(ctx, fmt.Sprintf("payment_token:%d:%d", userID, orderID), token)
+	if err != nil {
+		return false, fmt.Errorf("failed to check and delete payment token: %w", err)
+	}
+	return result, nil
+}
+
+func (svc *PaymentService) GetExpiredAtAndDelPaymentToken(ctx context.Context,
+	token string, userId int64, orderID int64,
+) (exist bool, exp time.Time, err error) {
+	exist, ttl, err := svc.redis.GetTTLAndDelPaymentToken(ctx, fmt.Sprintf("payment_token:%d:%d", userId, orderID), token)
+	if err != nil {
+		return false, time.Time{}, fmt.Errorf("failed to get and delete payment token: %w", err)
+	}
+	return exist, time.Now().Add(ttl), nil
+}
+
+func (svc *PaymentService) PutBackPaymentToken(ctx context.Context, token string, userID int64, orderID int64, exp time.Time) error {
+	return svc.redis.SetPaymentToken(ctx, fmt.Sprintf("payment_token:%d:%d", userID, orderID), token, time.Until(exp))
+}
+
+func (svc *PaymentService) GetOrderStatus(ctx context.Context, orderID int64) (bool, bool, error) {
+	exist, expire, err := svc.rpc.GetOrderStatus(ctx, orderID)
+	if err != nil {
+		return false, true, fmt.Errorf("failed to get order status: %w", err)
+	}
+	return exist, time.Now().UnixMilli() > expire, nil
+}
+
+// GetPayInfo 模拟获取支付信息
+func (svc *PaymentService) GetPayInfo(_ context.Context) (int64, string, error) {
+	return time.Now().UnixMilli(), paymentStatus.PaymentStyleDomTok, nil
+}
+
+// Pay 模拟支付
+func (svc *PaymentService) Pay(_ context.Context) (int64, string, error) {
+	return time.Now().UnixMilli(), paymentStatus.PaymentStyleDomTok, nil
+}
+
+// Refund 模拟退款
+func (svc *PaymentService) Refund(_ context.Context) (int64, string, error) {
+	return time.Now().UnixMilli(), paymentStatus.PaymentStyleDomTok, nil
+}
+
+func (svc *PaymentService) CancelOrder(ctx context.Context, orderID int64, paymentAt int64, paymentStyle string) error {
+	return svc.rpc.OrderPaymentCancel(ctx, orderID, paymentAt, paymentStyle)
+}
+
+func (svc *PaymentService) ConfirmOrder(ctx context.Context, orderID int64, paymentAt int64, paymentStyle string) error {
+	return svc.rpc.OrderPaymentSuccess(ctx, orderID, paymentAt, paymentStyle)
+}
