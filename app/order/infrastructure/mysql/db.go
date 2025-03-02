@@ -181,7 +181,7 @@ func (db *orderDB) GetOrderAndGoods(ctx context.Context, orderID int64) (*model.
 
 	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// 1. 先查询订单
-		if err := tx.Table("orders").First(&order, orderID).Error; err != nil {
+		if err := tx.Model(&Order{}).First(&order, orderID).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return errno.NewErrNo(errno.ServiceOrderNotFound, fmt.Sprintf("can't find order by id: %d", orderID))
 			}
