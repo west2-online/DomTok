@@ -9,7 +9,8 @@ include "../model.thrift"
 struct AddGoodsIntoCartRequest{
     1: required i64 sku_id,
     2: required i64 shop_id,
-    3: required i64 count,
+    3: required i64 version_id
+    4: required i64 count,
 }
 
 struct AddGoodsIntoCartResponse{
@@ -25,7 +26,7 @@ struct ShowCartGoodsListRequest{
 
 struct ShowCartGoodsListResponse{
     1: required model.BaseResp base,
-    2: required list<model.Sku> goods_list,
+    2: required list<model.CartGoods> goods_list,
     3: required i64 goods_count,
 }
 
@@ -68,4 +69,5 @@ service CartService {
     ShowCartGoodsListResponse ShowCartGoodsList(1: ShowCartGoodsListRequest req) (api.get="/api/v1/cart/show")
     UpdateCartGoodsResponse UpdateCartGoods(1: UpdateCartGoodsRequest req) (api.put="/api/v1/cart/update")
     DeleteCartGoodsResponse DeleteCartGoods(1: DeleteCartGoodsRequest req) (api.delete="/api/v1/cart/delete")
+    DeleteAllCartGoodsResponse DeleteAllCartGoods(1:DeleteAllCartGoodsRequest req)(api.get="/api/v1/cart/empty")
 }

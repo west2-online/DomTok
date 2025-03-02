@@ -35,8 +35,9 @@ type Store struct {
 }
 
 type Sku struct {
-	SkuID int64 `json:"sku_id"`
-	Count int64 `json:"count"`
+	SkuID     int64 `json:"sku_id"`
+	VersionID int64 `json:"version_id"`
+	Count     int64 `json:"count"`
 }
 
 // SortStoresByUpdatedAt 对CartJson进行降序排序（最近的时间在前）
@@ -78,8 +79,9 @@ func (cart *CartJson) InsertSku(info *GoodInfo) {
 			// skuID 不存在，插入新的 sku
 			store.Goods = append([]Sku{
 				{
-					SkuID: info.SkuId,
-					Count: info.Count,
+					SkuID:     info.SkuId,
+					Count:     info.Count,
+					VersionID: info.VersionId,
 				},
 			}, store.Goods...)
 		}
@@ -94,8 +96,9 @@ func (cart *CartJson) InsertSku(info *GoodInfo) {
 			StoreID: info.ShopId,
 			Goods: []Sku{
 				{
-					SkuID: info.SkuId,
-					Count: info.Count,
+					SkuID:     info.SkuId,
+					Count:     info.Count,
+					VersionID: info.VersionId,
 				},
 			},
 			UpdatedAt: time.Now(),
@@ -114,4 +117,18 @@ func (cart *CartJson) GetRecentNStores(n int) *CartJson {
 		cartJson.Store = cart.Store
 	}
 	return cartJson
+}
+
+func ConvertCartJsonToCartGoods(json *CartJson) []*CartGoods {
+	list := make([]*CartGoods, 0)
+	for _, store := range json.Store {
+		for _, good := range store.Goods {
+			list = append(list, &CartGoods{
+				SkuID:            good.SkuID,
+				GoodsVersion:     good.VersionID,
+				PurchaseQuantity: good.Count,
+			})
+		}
+	}
+	return list
 }

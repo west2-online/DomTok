@@ -3697,3 +3697,223 @@ var fieldIDToName_RefundResponseInfo = map[int16]string{
 	1: "refundID",
 	2: "status",
 }
+
+type CartGoods struct {
+	MerchantId       int64   `thrift:"merchantId,1,required" frugal:"1,required,i64" json:"merchantId"`
+	GoodsId          int64   `thrift:"goodsId,2,required" frugal:"2,required,i64" json:"goodsId"`
+	GoodsName        string  `thrift:"goodsName,3,required" frugal:"3,required,string" json:"goodsName"`
+	SkuId            int64   `thrift:"skuId,4,required" frugal:"4,required,i64" json:"skuId"`
+	SkuName          string  `thrift:"skuName,5,required" frugal:"5,required,string" json:"skuName"`
+	GoodsVersion     int64   `thrift:"goodsVersion,6,required" frugal:"6,required,i64" json:"goodsVersion"`
+	StyleHeadDrawing string  `thrift:"styleHeadDrawing,7,required" frugal:"7,required,string" json:"styleHeadDrawing"`
+	PurchaseQuantity int64   `thrift:"purchaseQuantity,11,required" frugal:"11,required,i64" json:"purchaseQuantity"`
+	TotalAmount      float64 `thrift:"totalAmount,12,required" frugal:"12,required,double" json:"totalAmount"`
+	DiscountAmount   float64 `thrift:"discountAmount,14,required" frugal:"14,required,double" json:"discountAmount"`
+}
+
+func NewCartGoods() *CartGoods {
+	return &CartGoods{}
+}
+
+func (p *CartGoods) InitDefault() {
+}
+
+func (p *CartGoods) GetMerchantId() (v int64) {
+	return p.MerchantId
+}
+
+func (p *CartGoods) GetGoodsId() (v int64) {
+	return p.GoodsId
+}
+
+func (p *CartGoods) GetGoodsName() (v string) {
+	return p.GoodsName
+}
+
+func (p *CartGoods) GetSkuId() (v int64) {
+	return p.SkuId
+}
+
+func (p *CartGoods) GetSkuName() (v string) {
+	return p.SkuName
+}
+
+func (p *CartGoods) GetGoodsVersion() (v int64) {
+	return p.GoodsVersion
+}
+
+func (p *CartGoods) GetStyleHeadDrawing() (v string) {
+	return p.StyleHeadDrawing
+}
+
+func (p *CartGoods) GetPurchaseQuantity() (v int64) {
+	return p.PurchaseQuantity
+}
+
+func (p *CartGoods) GetTotalAmount() (v float64) {
+	return p.TotalAmount
+}
+
+func (p *CartGoods) GetDiscountAmount() (v float64) {
+	return p.DiscountAmount
+}
+func (p *CartGoods) SetMerchantId(val int64) {
+	p.MerchantId = val
+}
+func (p *CartGoods) SetGoodsId(val int64) {
+	p.GoodsId = val
+}
+func (p *CartGoods) SetGoodsName(val string) {
+	p.GoodsName = val
+}
+func (p *CartGoods) SetSkuId(val int64) {
+	p.SkuId = val
+}
+func (p *CartGoods) SetSkuName(val string) {
+	p.SkuName = val
+}
+func (p *CartGoods) SetGoodsVersion(val int64) {
+	p.GoodsVersion = val
+}
+func (p *CartGoods) SetStyleHeadDrawing(val string) {
+	p.StyleHeadDrawing = val
+}
+func (p *CartGoods) SetPurchaseQuantity(val int64) {
+	p.PurchaseQuantity = val
+}
+func (p *CartGoods) SetTotalAmount(val float64) {
+	p.TotalAmount = val
+}
+func (p *CartGoods) SetDiscountAmount(val float64) {
+	p.DiscountAmount = val
+}
+
+func (p *CartGoods) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("CartGoods(%+v)", *p)
+}
+
+func (p *CartGoods) DeepEqual(ano *CartGoods) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.MerchantId) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.GoodsId) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.GoodsName) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.SkuId) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.SkuName) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.GoodsVersion) {
+		return false
+	}
+	if !p.Field7DeepEqual(ano.StyleHeadDrawing) {
+		return false
+	}
+	if !p.Field11DeepEqual(ano.PurchaseQuantity) {
+		return false
+	}
+	if !p.Field12DeepEqual(ano.TotalAmount) {
+		return false
+	}
+	if !p.Field14DeepEqual(ano.DiscountAmount) {
+		return false
+	}
+	return true
+}
+
+func (p *CartGoods) Field1DeepEqual(src int64) bool {
+
+	if p.MerchantId != src {
+		return false
+	}
+	return true
+}
+func (p *CartGoods) Field2DeepEqual(src int64) bool {
+
+	if p.GoodsId != src {
+		return false
+	}
+	return true
+}
+func (p *CartGoods) Field3DeepEqual(src string) bool {
+
+	if strings.Compare(p.GoodsName, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *CartGoods) Field4DeepEqual(src int64) bool {
+
+	if p.SkuId != src {
+		return false
+	}
+	return true
+}
+func (p *CartGoods) Field5DeepEqual(src string) bool {
+
+	if strings.Compare(p.SkuName, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *CartGoods) Field6DeepEqual(src int64) bool {
+
+	if p.GoodsVersion != src {
+		return false
+	}
+	return true
+}
+func (p *CartGoods) Field7DeepEqual(src string) bool {
+
+	if strings.Compare(p.StyleHeadDrawing, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *CartGoods) Field11DeepEqual(src int64) bool {
+
+	if p.PurchaseQuantity != src {
+		return false
+	}
+	return true
+}
+func (p *CartGoods) Field12DeepEqual(src float64) bool {
+
+	if p.TotalAmount != src {
+		return false
+	}
+	return true
+}
+func (p *CartGoods) Field14DeepEqual(src float64) bool {
+
+	if p.DiscountAmount != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_CartGoods = map[int16]string{
+	1:  "merchantId",
+	2:  "goodsId",
+	3:  "goodsName",
+	4:  "skuId",
+	5:  "skuName",
+	6:  "goodsVersion",
+	7:  "styleHeadDrawing",
+	11: "purchaseQuantity",
+	12: "totalAmount",
+	14: "discountAmount",
+}

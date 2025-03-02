@@ -14,33 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package mq
+package db
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
-	"github.com/west2-online/DomTok/pkg/constants"
-	"github.com/west2-online/DomTok/pkg/kafka"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-func (c *KafkaAdapter) send(ctx context.Context, msg []*kafka.Message) (err error) {
-	if !c.done.Load() {
-		err = c.mq.SetWriter(constants.KafkaCartTopic, true)
-		if err != nil {
-			return err
-		}
-		c.done.Swap(true)
-	}
-	errs := c.mq.Send(ctx, constants.KafkaCartTopic, msg)
-	if len(errs) != 0 {
-		var errMsg string
-		for _, e := range errs {
-			errMsg = strings.Join([]string{errMsg, e.Error(), ";"}, "")
-		}
-		err = fmt.Errorf("mq.Send: send msg failed, errs: %v", errMsg)
-		return err
+func (c *DBAdapter) DeleteCart(ctx context.Context, uid int64) error {
+	model := Cart{UserId: uid}
+	if err := c.client.WithContext(ctx).Delete(&model).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "db.DeleteCart error: %v", err)
 	}
 	return nil
 }

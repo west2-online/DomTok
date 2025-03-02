@@ -171,6 +171,6 @@ func (svc *OrderService) nextVal() int64 {
 
 func (svc *OrderService) logUnLock(id int64, fn func(id int64) error) {
 	if err := fn(id); err != nil {
-		logger.Errorf(err.Error())
+		logger.Error(err.Error())
 	}
 }

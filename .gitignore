@@ -38,7 +38,6 @@ dumped_hertz_remote_config.json
 /config/redis
 /config/grafana
 /config/jaeger
-/config/prometheus
 /config/sql
 /docker/data/*
 /config/config.yaml

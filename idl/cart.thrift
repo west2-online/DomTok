@@ -11,7 +11,8 @@ namespace go cart
 struct AddGoodsIntoCartRequest{
     1: required i64 skuId,
     2: required i64 shop_id,
-    3: required i64 count,
+    3: required i64 version_id
+    4: required i64 count,
 }
 
 struct AddGoodsIntoCartResponse{
@@ -27,7 +28,7 @@ struct ShowCartGoodsListRequest{
 
 struct ShowCartGoodsListResponse{
     1: required model.BaseResp base,
-    2: required list<model.Sku> goodsList,
+    2: required list<model.CartGoods> goodsList,
     3: required i64 goodsCount,
 }
 
