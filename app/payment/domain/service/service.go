@@ -27,6 +27,7 @@ import (
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	loginData "github.com/west2-online/DomTok/pkg/base/context"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
 )
 
@@ -48,7 +49,7 @@ func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64)
 	// 3. 存入数据库
 	err = svc.db.CreatePayment(ctx, paymentOrder)
 	if err != nil {
-		return 0, fmt.Errorf("failed to create payment order: %w", err)
+		return 0, fmt.Errorf("failed to create refund order: %w", err)
 	}
 
 	// 4. 返回支付 ID
@@ -115,8 +116,7 @@ func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, 
 	if err != nil {
 		logger.Infof("failed to store payment token in redis, orderID: %d, userID: %d", orderID, userID)
 		return paymentStatus.RedisStoreFailed, fmt.Errorf("failed to store payment token in redis: %w", err)
-	}
-	// 4. 返回成功状态码
+	} // 4. 返回成功状态码
 	return paymentStatus.RedisStoreSuccess, nil
 }
 
@@ -130,7 +130,7 @@ func (svc *PaymentService) CheckRedisRateLimiting(ctx context.Context, uid int64
 		return false, false, fmt.Errorf("check refund request limit failed: %w", err)
 	}
 	if count > paymentStatus.RedisCheckTimesInMinute {
-		return false, false, fmt.Errorf("too many refund requests in a short time")
+		return false, false, errno.Errorf(errno.ServiceRedisTimeLimited, "too many refund requests in a short time")
 	}
 
 	// 检查 24 小时内是否已申请过退款
@@ -140,7 +140,7 @@ func (svc *PaymentService) CheckRedisRateLimiting(ctx context.Context, uid int64
 		return false, false, fmt.Errorf("check refund request history failed: %w", err)
 	}
 	if exists {
-		return true, false, fmt.Errorf("refund already requested for this order in the last 24 hours")
+		return true, false, errno.Errorf(errno.ServiceRedisTimeLimited, "refund already requested for this order in the last 24 hours")
 	}
 	// 记录订单退款请求，设置 24 小时过期
 	err = svc.redis.SetRedisDayKey(ctx, dayKey, paymentStatus.RedisDayPlaceholder, paymentStatus.RedisDay)

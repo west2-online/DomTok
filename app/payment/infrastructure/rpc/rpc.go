@@ -18,7 +18,6 @@ package rpc
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/west2-online/DomTok/app/payment/domain/repository"
 	orderrpc "github.com/west2-online/DomTok/kitex_gen/order"
@@ -40,8 +39,14 @@ func (rpc *paymentRPC) PaymentIsOrderExist(ctx context.Context, orderID int64) (
 		OrderID: orderID,
 	}
 	resp, err := rpc.order.IsOrderExist(ctx, orderRpcReq)
-	if err != nil {
+	/*if err != nil {
 		return false, fmt.Errorf("rpc.order.IsOrderExist: %w", err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return false, fmt.Errorf("rpc.order.IsOrderExist: %v", resp.Base.Msg)
+	}*/
+	if err = utils.ProcessRpcError("payment.IsOrderExist", resp, err); err != nil {
+		return false, err
 	}
 	orderExistInfo = resp.Exist
 	return orderExistInfo, nil
