@@ -36,54 +36,49 @@ func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category)
 	if exist {
 		return 0, errno.NewErrNo(errno.ServiceUserExist, "category  exist")
 	}
-
-	if err = uc.svc.CreateCategory(ctx, category); err != nil {
-		return 0, fmt.Errorf("create category failed: %w", err)
+	category.CreatorId, err = contextLogin.GetLoginData(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("get category creatorid failed: %w", err)
 	}
-
+	if err = uc.svc.CreateCategory(ctx, category); err != nil {
+		return 0, fmt.Errorf("mysql create category failed: %w", err)
+	}
 	return category.Id, nil
 }
 
 func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category) (err error) {
-	// 判断是否存在
-	exist, err := uc.db.IsCategoryExistById(ctx, category.Id)
-	if err != nil {
-		return fmt.Errorf("check category exist failed: %w", err)
-	}
-	if !exist {
-		return errno.NewErrNo(errno.ServiceUserNotExist, "category does not exist")
-	}
 	// 判断用户是否有权限
+	category.CreatorId, err = uc.db.GetCreatorIDById(ctx, category.Id)
+	if err != nil {
+		return err
+	}
 	err = uc.svc.IdentifyUser(ctx, category.CreatorId)
 	if err != nil {
-		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
+		return err
 	}
-	err = uc.db.DeleteCategory(ctx, category)
+	// 删除
+	err = uc.svc.DeleteCategory(ctx, category)
 	if err != nil {
-		return fmt.Errorf("delete category failed: %w", err)
+		return err
 	}
 	return nil
 }
 
 func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category) (err error) {
-	// 判断是否存在
-	exist, err := uc.db.IsCategoryExistById(ctx, category.Id)
-	if err != nil {
-		return fmt.Errorf("check category exist failed: %w", err)
-	}
-	if !exist {
-		return errno.NewErrNo(errno.ServiceUserNotExist, "category does not exist")
-	}
 	// 判断用户是否有权限
+	category.CreatorId, err = uc.db.GetCreatorIDById(ctx, category.Id)
+	if err != nil {
+		return err
+	}
 	err = uc.svc.IdentifyUser(ctx, category.CreatorId)
 	if err != nil {
-		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
+		return err
 	}
-	err = uc.db.UpdateCategory(ctx, category)
+	err = uc.svc.UpdateCategory(ctx, category)
 	if err != nil {
-		return fmt.Errorf("update category failed: %w", err)
+		return err
 	}
-	return err
+	return nil
 }
 
 func (uc *useCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*model.CategoryInfo, err error) {

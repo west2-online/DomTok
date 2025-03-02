@@ -22,6 +22,7 @@ const (
 	ServiceWrongPassword = 1000 + iota
 	ServiceUserExist
 	ServiceUserNotExist
+
 	ErrRecordNotFound
 )
 
@@ -45,7 +46,10 @@ const (
 	ServiceSkuAttrNotExist
 
 	ServiceCategoryExist
+	ServiceCategorynotExist
 	ServiceListCategoryFailed
+
+	ServiceCategoryCreateFail
 )
 
 // payment
