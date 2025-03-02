@@ -659,11 +659,8 @@ func (db *commodityDB) UpdateCategory(ctx context.Context, category *model.Categ
 func (db *commodityDB) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*model.CategoryInfo, err error) {
 	offset := (pageNum - 1) * pageSize
 	cs := make([]*Category, 0)
-	if err := db.client.WithContext(ctx).Table(constants.CategoryTableName).Offset(offset).Limit(pageSize).Find(&cs).Error; err != nil {
+	if err := db.client.WithContext(ctx).Offset(offset).Limit(pageSize).Find(&cs).Error; err != nil {
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to list categories: %v", err)
-	}
-	if len(cs) == 0 {
-		return nil, errno.Errorf(errno.ServiceCategorynotExist, "not any category")
 	}
 	resp = make([]*model.CategoryInfo, 0)
 	for _, c := range cs {

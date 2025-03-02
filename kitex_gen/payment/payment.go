@@ -686,9 +686,8 @@ var fieldIDToName_RefundResponse = map[int16]string{
 }
 
 type RefundReviewRequest struct {
-	OrderID      int64   `thrift:"orderID,1,required" frugal:"1,required,i64" json:"orderID"`
-	RefundAmount float64 `thrift:"refundAmount,3,required" frugal:"3,required,double" json:"refundAmount"`
-	RefundReason string  `thrift:"refundReason,4,required" frugal:"4,required,string" json:"refundReason"`
+	OrderID int64 `thrift:"orderID,1,required" frugal:"1,required,i64" json:"orderID"`
+	Passed  bool  `thrift:"passed,2,required" frugal:"2,required,bool" json:"passed"`
 }
 
 func NewRefundReviewRequest() *RefundReviewRequest {
@@ -702,21 +701,14 @@ func (p *RefundReviewRequest) GetOrderID() (v int64) {
 	return p.OrderID
 }
 
-func (p *RefundReviewRequest) GetRefundAmount() (v float64) {
-	return p.RefundAmount
-}
-
-func (p *RefundReviewRequest) GetRefundReason() (v string) {
-	return p.RefundReason
+func (p *RefundReviewRequest) GetPassed() (v bool) {
+	return p.Passed
 }
 func (p *RefundReviewRequest) SetOrderID(val int64) {
 	p.OrderID = val
 }
-func (p *RefundReviewRequest) SetRefundAmount(val float64) {
-	p.RefundAmount = val
-}
-func (p *RefundReviewRequest) SetRefundReason(val string) {
-	p.RefundReason = val
+func (p *RefundReviewRequest) SetPassed(val bool) {
+	p.Passed = val
 }
 
 func (p *RefundReviewRequest) String() string {
@@ -735,10 +727,7 @@ func (p *RefundReviewRequest) DeepEqual(ano *RefundReviewRequest) bool {
 	if !p.Field1DeepEqual(ano.OrderID) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.RefundAmount) {
-		return false
-	}
-	if !p.Field4DeepEqual(ano.RefundReason) {
+	if !p.Field2DeepEqual(ano.Passed) {
 		return false
 	}
 	return true
@@ -751,16 +740,9 @@ func (p *RefundReviewRequest) Field1DeepEqual(src int64) bool {
 	}
 	return true
 }
-func (p *RefundReviewRequest) Field3DeepEqual(src float64) bool {
+func (p *RefundReviewRequest) Field2DeepEqual(src bool) bool {
 
-	if p.RefundAmount != src {
-		return false
-	}
-	return true
-}
-func (p *RefundReviewRequest) Field4DeepEqual(src string) bool {
-
-	if strings.Compare(p.RefundReason, src) != 0 {
+	if p.Passed != src {
 		return false
 	}
 	return true
@@ -768,14 +750,11 @@ func (p *RefundReviewRequest) Field4DeepEqual(src string) bool {
 
 var fieldIDToName_RefundReviewRequest = map[int16]string{
 	1: "orderID",
-	3: "refundAmount",
-	4: "refundReason",
+	2: "passed",
 }
 
 type RefundReviewResponse struct {
-	Base     *model.BaseResp `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
-	RefundID int64           `thrift:"refundID,2,required" frugal:"2,required,i64" json:"refundID"`
-	Status   int64           `thrift:"status,3,required" frugal:"3,required,i64" json:"status"`
+	Base *model.BaseResp `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
 }
 
 func NewRefundReviewResponse() *RefundReviewResponse {
@@ -793,22 +772,8 @@ func (p *RefundReviewResponse) GetBase() (v *model.BaseResp) {
 	}
 	return p.Base
 }
-
-func (p *RefundReviewResponse) GetRefundID() (v int64) {
-	return p.RefundID
-}
-
-func (p *RefundReviewResponse) GetStatus() (v int64) {
-	return p.Status
-}
 func (p *RefundReviewResponse) SetBase(val *model.BaseResp) {
 	p.Base = val
-}
-func (p *RefundReviewResponse) SetRefundID(val int64) {
-	p.RefundID = val
-}
-func (p *RefundReviewResponse) SetStatus(val int64) {
-	p.Status = val
 }
 
 func (p *RefundReviewResponse) IsSetBase() bool {
@@ -831,12 +796,6 @@ func (p *RefundReviewResponse) DeepEqual(ano *RefundReviewResponse) bool {
 	if !p.Field1DeepEqual(ano.Base) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.RefundID) {
-		return false
-	}
-	if !p.Field3DeepEqual(ano.Status) {
-		return false
-	}
 	return true
 }
 
@@ -847,25 +806,135 @@ func (p *RefundReviewResponse) Field1DeepEqual(src *model.BaseResp) bool {
 	}
 	return true
 }
-func (p *RefundReviewResponse) Field2DeepEqual(src int64) bool {
-
-	if p.RefundID != src {
-		return false
-	}
-	return true
-}
-func (p *RefundReviewResponse) Field3DeepEqual(src int64) bool {
-
-	if p.Status != src {
-		return false
-	}
-	return true
-}
 
 var fieldIDToName_RefundReviewResponse = map[int16]string{
 	1: "base",
-	2: "refundID",
-	3: "status",
+}
+
+type PaymentCheckoutRequest struct {
+	OrderID int64  `thrift:"orderID,1,required" frugal:"1,required,i64" json:"orderID"`
+	Token   string `thrift:"token,2,required" frugal:"2,required,string" json:"token"`
+}
+
+func NewPaymentCheckoutRequest() *PaymentCheckoutRequest {
+	return &PaymentCheckoutRequest{}
+}
+
+func (p *PaymentCheckoutRequest) InitDefault() {
+}
+
+func (p *PaymentCheckoutRequest) GetOrderID() (v int64) {
+	return p.OrderID
+}
+
+func (p *PaymentCheckoutRequest) GetToken() (v string) {
+	return p.Token
+}
+func (p *PaymentCheckoutRequest) SetOrderID(val int64) {
+	p.OrderID = val
+}
+func (p *PaymentCheckoutRequest) SetToken(val string) {
+	p.Token = val
+}
+
+func (p *PaymentCheckoutRequest) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("PaymentCheckoutRequest(%+v)", *p)
+}
+
+func (p *PaymentCheckoutRequest) DeepEqual(ano *PaymentCheckoutRequest) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.OrderID) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Token) {
+		return false
+	}
+	return true
+}
+
+func (p *PaymentCheckoutRequest) Field1DeepEqual(src int64) bool {
+
+	if p.OrderID != src {
+		return false
+	}
+	return true
+}
+func (p *PaymentCheckoutRequest) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Token, src) != 0 {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_PaymentCheckoutRequest = map[int16]string{
+	1: "orderID",
+	2: "token",
+}
+
+type PaymentCheckoutResponse struct {
+	Base *model.BaseResp `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
+}
+
+func NewPaymentCheckoutResponse() *PaymentCheckoutResponse {
+	return &PaymentCheckoutResponse{}
+}
+
+func (p *PaymentCheckoutResponse) InitDefault() {
+}
+
+var PaymentCheckoutResponse_Base_DEFAULT *model.BaseResp
+
+func (p *PaymentCheckoutResponse) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return PaymentCheckoutResponse_Base_DEFAULT
+	}
+	return p.Base
+}
+func (p *PaymentCheckoutResponse) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+
+func (p *PaymentCheckoutResponse) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *PaymentCheckoutResponse) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("PaymentCheckoutResponse(%+v)", *p)
+}
+
+func (p *PaymentCheckoutResponse) DeepEqual(ano *PaymentCheckoutResponse) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	return true
+}
+
+func (p *PaymentCheckoutResponse) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_PaymentCheckoutResponse = map[int16]string{
+	1: "base",
 }
 
 type PaymentService interface {
@@ -873,7 +942,9 @@ type PaymentService interface {
 
 	RequestPaymentToken(ctx context.Context, request *PaymentTokenRequest) (r *PaymentTokenResponse, err error)
 
-	ProcessRefund(ctx context.Context, request *RefundReviewRequest) (r *RefundReviewResponse, err error)
+	RequestPaymentCheckout(ctx context.Context, request *PaymentCheckoutRequest) (r *PaymentCheckoutResponse, err error)
+
+	RefundReview(ctx context.Context, request *RefundReviewRequest) (r *RefundReviewResponse, err error)
 
 	RequestRefund(ctx context.Context, request *RefundRequest) (r *RefundResponse, err error)
 }
@@ -1110,41 +1181,41 @@ var fieldIDToName_PaymentServiceRequestPaymentTokenResult = map[int16]string{
 	0: "success",
 }
 
-type PaymentServiceProcessRefundArgs struct {
-	Request *RefundReviewRequest `thrift:"request,1" frugal:"1,default,RefundReviewRequest" json:"request"`
+type PaymentServiceRequestPaymentCheckoutArgs struct {
+	Request *PaymentCheckoutRequest `thrift:"request,1" frugal:"1,default,PaymentCheckoutRequest" json:"request"`
 }
 
-func NewPaymentServiceProcessRefundArgs() *PaymentServiceProcessRefundArgs {
-	return &PaymentServiceProcessRefundArgs{}
+func NewPaymentServiceRequestPaymentCheckoutArgs() *PaymentServiceRequestPaymentCheckoutArgs {
+	return &PaymentServiceRequestPaymentCheckoutArgs{}
 }
 
-func (p *PaymentServiceProcessRefundArgs) InitDefault() {
+func (p *PaymentServiceRequestPaymentCheckoutArgs) InitDefault() {
 }
 
-var PaymentServiceProcessRefundArgs_Request_DEFAULT *RefundReviewRequest
+var PaymentServiceRequestPaymentCheckoutArgs_Request_DEFAULT *PaymentCheckoutRequest
 
-func (p *PaymentServiceProcessRefundArgs) GetRequest() (v *RefundReviewRequest) {
+func (p *PaymentServiceRequestPaymentCheckoutArgs) GetRequest() (v *PaymentCheckoutRequest) {
 	if !p.IsSetRequest() {
-		return PaymentServiceProcessRefundArgs_Request_DEFAULT
+		return PaymentServiceRequestPaymentCheckoutArgs_Request_DEFAULT
 	}
 	return p.Request
 }
-func (p *PaymentServiceProcessRefundArgs) SetRequest(val *RefundReviewRequest) {
+func (p *PaymentServiceRequestPaymentCheckoutArgs) SetRequest(val *PaymentCheckoutRequest) {
 	p.Request = val
 }
 
-func (p *PaymentServiceProcessRefundArgs) IsSetRequest() bool {
+func (p *PaymentServiceRequestPaymentCheckoutArgs) IsSetRequest() bool {
 	return p.Request != nil
 }
 
-func (p *PaymentServiceProcessRefundArgs) String() string {
+func (p *PaymentServiceRequestPaymentCheckoutArgs) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("PaymentServiceProcessRefundArgs(%+v)", *p)
+	return fmt.Sprintf("PaymentServiceRequestPaymentCheckoutArgs(%+v)", *p)
 }
 
-func (p *PaymentServiceProcessRefundArgs) DeepEqual(ano *PaymentServiceProcessRefundArgs) bool {
+func (p *PaymentServiceRequestPaymentCheckoutArgs) DeepEqual(ano *PaymentServiceRequestPaymentCheckoutArgs) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1156,7 +1227,7 @@ func (p *PaymentServiceProcessRefundArgs) DeepEqual(ano *PaymentServiceProcessRe
 	return true
 }
 
-func (p *PaymentServiceProcessRefundArgs) Field1DeepEqual(src *RefundReviewRequest) bool {
+func (p *PaymentServiceRequestPaymentCheckoutArgs) Field1DeepEqual(src *PaymentCheckoutRequest) bool {
 
 	if !p.Request.DeepEqual(src) {
 		return false
@@ -1164,45 +1235,45 @@ func (p *PaymentServiceProcessRefundArgs) Field1DeepEqual(src *RefundReviewReque
 	return true
 }
 
-var fieldIDToName_PaymentServiceProcessRefundArgs = map[int16]string{
+var fieldIDToName_PaymentServiceRequestPaymentCheckoutArgs = map[int16]string{
 	1: "request",
 }
 
-type PaymentServiceProcessRefundResult struct {
-	Success *RefundReviewResponse `thrift:"success,0,optional" frugal:"0,optional,RefundReviewResponse" json:"success,omitempty"`
+type PaymentServiceRequestPaymentCheckoutResult struct {
+	Success *PaymentCheckoutResponse `thrift:"success,0,optional" frugal:"0,optional,PaymentCheckoutResponse" json:"success,omitempty"`
 }
 
-func NewPaymentServiceProcessRefundResult() *PaymentServiceProcessRefundResult {
-	return &PaymentServiceProcessRefundResult{}
+func NewPaymentServiceRequestPaymentCheckoutResult() *PaymentServiceRequestPaymentCheckoutResult {
+	return &PaymentServiceRequestPaymentCheckoutResult{}
 }
 
-func (p *PaymentServiceProcessRefundResult) InitDefault() {
+func (p *PaymentServiceRequestPaymentCheckoutResult) InitDefault() {
 }
 
-var PaymentServiceProcessRefundResult_Success_DEFAULT *RefundReviewResponse
+var PaymentServiceRequestPaymentCheckoutResult_Success_DEFAULT *PaymentCheckoutResponse
 
-func (p *PaymentServiceProcessRefundResult) GetSuccess() (v *RefundReviewResponse) {
+func (p *PaymentServiceRequestPaymentCheckoutResult) GetSuccess() (v *PaymentCheckoutResponse) {
 	if !p.IsSetSuccess() {
-		return PaymentServiceProcessRefundResult_Success_DEFAULT
+		return PaymentServiceRequestPaymentCheckoutResult_Success_DEFAULT
 	}
 	return p.Success
 }
-func (p *PaymentServiceProcessRefundResult) SetSuccess(x interface{}) {
-	p.Success = x.(*RefundReviewResponse)
+func (p *PaymentServiceRequestPaymentCheckoutResult) SetSuccess(x interface{}) {
+	p.Success = x.(*PaymentCheckoutResponse)
 }
 
-func (p *PaymentServiceProcessRefundResult) IsSetSuccess() bool {
+func (p *PaymentServiceRequestPaymentCheckoutResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
-func (p *PaymentServiceProcessRefundResult) String() string {
+func (p *PaymentServiceRequestPaymentCheckoutResult) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("PaymentServiceProcessRefundResult(%+v)", *p)
+	return fmt.Sprintf("PaymentServiceRequestPaymentCheckoutResult(%+v)", *p)
 }
 
-func (p *PaymentServiceProcessRefundResult) DeepEqual(ano *PaymentServiceProcessRefundResult) bool {
+func (p *PaymentServiceRequestPaymentCheckoutResult) DeepEqual(ano *PaymentServiceRequestPaymentCheckoutResult) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1214,7 +1285,7 @@ func (p *PaymentServiceProcessRefundResult) DeepEqual(ano *PaymentServiceProcess
 	return true
 }
 
-func (p *PaymentServiceProcessRefundResult) Field0DeepEqual(src *RefundReviewResponse) bool {
+func (p *PaymentServiceRequestPaymentCheckoutResult) Field0DeepEqual(src *PaymentCheckoutResponse) bool {
 
 	if !p.Success.DeepEqual(src) {
 		return false
@@ -1222,7 +1293,123 @@ func (p *PaymentServiceProcessRefundResult) Field0DeepEqual(src *RefundReviewRes
 	return true
 }
 
-var fieldIDToName_PaymentServiceProcessRefundResult = map[int16]string{
+var fieldIDToName_PaymentServiceRequestPaymentCheckoutResult = map[int16]string{
+	0: "success",
+}
+
+type PaymentServiceRefundReviewArgs struct {
+	Request *RefundReviewRequest `thrift:"request,1" frugal:"1,default,RefundReviewRequest" json:"request"`
+}
+
+func NewPaymentServiceRefundReviewArgs() *PaymentServiceRefundReviewArgs {
+	return &PaymentServiceRefundReviewArgs{}
+}
+
+func (p *PaymentServiceRefundReviewArgs) InitDefault() {
+}
+
+var PaymentServiceRefundReviewArgs_Request_DEFAULT *RefundReviewRequest
+
+func (p *PaymentServiceRefundReviewArgs) GetRequest() (v *RefundReviewRequest) {
+	if !p.IsSetRequest() {
+		return PaymentServiceRefundReviewArgs_Request_DEFAULT
+	}
+	return p.Request
+}
+func (p *PaymentServiceRefundReviewArgs) SetRequest(val *RefundReviewRequest) {
+	p.Request = val
+}
+
+func (p *PaymentServiceRefundReviewArgs) IsSetRequest() bool {
+	return p.Request != nil
+}
+
+func (p *PaymentServiceRefundReviewArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("PaymentServiceRefundReviewArgs(%+v)", *p)
+}
+
+func (p *PaymentServiceRefundReviewArgs) DeepEqual(ano *PaymentServiceRefundReviewArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Request) {
+		return false
+	}
+	return true
+}
+
+func (p *PaymentServiceRefundReviewArgs) Field1DeepEqual(src *RefundReviewRequest) bool {
+
+	if !p.Request.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_PaymentServiceRefundReviewArgs = map[int16]string{
+	1: "request",
+}
+
+type PaymentServiceRefundReviewResult struct {
+	Success *RefundReviewResponse `thrift:"success,0,optional" frugal:"0,optional,RefundReviewResponse" json:"success,omitempty"`
+}
+
+func NewPaymentServiceRefundReviewResult() *PaymentServiceRefundReviewResult {
+	return &PaymentServiceRefundReviewResult{}
+}
+
+func (p *PaymentServiceRefundReviewResult) InitDefault() {
+}
+
+var PaymentServiceRefundReviewResult_Success_DEFAULT *RefundReviewResponse
+
+func (p *PaymentServiceRefundReviewResult) GetSuccess() (v *RefundReviewResponse) {
+	if !p.IsSetSuccess() {
+		return PaymentServiceRefundReviewResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *PaymentServiceRefundReviewResult) SetSuccess(x interface{}) {
+	p.Success = x.(*RefundReviewResponse)
+}
+
+func (p *PaymentServiceRefundReviewResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *PaymentServiceRefundReviewResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("PaymentServiceRefundReviewResult(%+v)", *p)
+}
+
+func (p *PaymentServiceRefundReviewResult) DeepEqual(ano *PaymentServiceRefundReviewResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *PaymentServiceRefundReviewResult) Field0DeepEqual(src *RefundReviewResponse) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_PaymentServiceRefundReviewResult = map[int16]string{
 	0: "success",
 }
 

@@ -50,9 +50,16 @@ const (
 	ServiceListCategoryFailed
 	ServiceCategoryCreateFail
 
-	ServiceUserCloseWebsocketConn
+	ServiceCategoryCreateFail
 )
 
+// payment
 const (
 	PaymentOrderNotExist = 4000 + iota
+	PaymentRefundNotExist
+)
+
+// assistant
+const (
+	ServiceUserCloseWebsocketConn = 5000 + iota
 )
