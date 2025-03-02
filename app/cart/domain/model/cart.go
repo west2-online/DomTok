@@ -16,6 +16,8 @@ limitations under the License.
 
 package model
 
+import "github.com/shopspring/decimal"
+
 type Cart struct {
 	UserId  int64
 	SkuJson string
@@ -25,4 +27,26 @@ type GoodInfo struct {
 	SkuId  int64
 	ShopId int64
 	Count  int64
+}
+
+type CartGoods struct {
+	//OrderID            int64
+	MerchantID int64
+	GoodsID    int64
+	GoodsName  string
+	SkuID      int64
+	SkuName    string
+	//GoodsVersion       int64
+	//StyleHeadDrawing   string
+	//OriginPrice        decimal.Decimal
+	//SalePrice          decimal.Decimal
+	//SingleFreightPrice decimal.Decimal
+	PurchaseQuantity int64
+	TotalAmount      decimal.Decimal
+	//FreightAmount      decimal.Decimal
+	DiscountAmount decimal.Decimal
+	//PaymentAmount      decimal.Decimal // 应付金额
+	//SinglePrice        decimal.Decimal
+	//CouponId           int64
+	//CouponName         string
 }
