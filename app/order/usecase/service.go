@@ -61,7 +61,7 @@ func (uc *useCase) ViewOrderList(ctx context.Context, page, size int32) ([]*mode
 	// 从 RPC 上下文中获取用户ID
 	userID, err := basecontext.GetLoginData(ctx)
 	if err != nil {
-		return nil, nil, 0, errno.NewErrNo(errno.AuthInvalidCode, "invalid user id")
+		return nil, nil, 0, err
 	}
 
 	return uc.svc.ViewOrderList(ctx, userID, page, size)
@@ -72,7 +72,7 @@ func (uc *useCase) ViewOrder(ctx context.Context, orderID int64) (*model.Order, 
 	// 1. 获取当前登录用户ID
 	userID, err := basecontext.GetLoginData(ctx)
 	if err != nil {
-		return nil, nil, errno.NewErrNo(errno.AuthInvalidCode, "invalid user id")
+		return nil, nil, err
 	}
 
 	// 2. 检查订单是否存在
@@ -99,7 +99,7 @@ func (uc *useCase) CancelOrder(ctx context.Context, orderID int64) error {
 	// 1. 获取当前登录用户ID
 	userID, err := basecontext.GetLoginData(ctx)
 	if err != nil {
-		return errno.NewErrNo(errno.AuthInvalidCode, "invalid user id")
+		return err
 	}
 
 	// 2. 检查订单是否存在
@@ -136,7 +136,7 @@ func (uc *useCase) ChangeDeliverAddress(ctx context.Context, orderID, addressID 
 	// 1. 获取当前登录用户ID
 	userID, err := basecontext.GetLoginData(ctx)
 	if err != nil {
-		return errno.NewErrNo(errno.AuthInvalidCode, "invalid user id")
+		return err
 	}
 
 	// 2. 检查订单是否存在
@@ -173,7 +173,7 @@ func (uc *useCase) DeleteOrder(ctx context.Context, orderID int64) error {
 	// 1. 获取当前登录用户ID
 	userID, err := basecontext.GetLoginData(ctx)
 	if err != nil {
-		return errno.NewErrNo(errno.AuthInvalidCode, "invalid user id")
+		return err
 	}
 
 	// 2. 检查订单是否存在
