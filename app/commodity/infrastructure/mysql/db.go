@@ -54,7 +54,7 @@ func (db *commodityDB) GetCategoryById(ctx context.Context, id int64) (*model.Ca
 	var category *model.Category
 	if err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errno.Errorf(errno.ServiceCategorynotExist, "category not found")
+			return nil, errno.Errorf(errno.ServiceCategorynotExist, "category already exist")
 		}
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get category %v", err)
 	}
