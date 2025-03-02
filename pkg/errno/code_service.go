@@ -53,14 +53,8 @@ const (
 
 // payment
 const (
-	PaymentOrderNotExist = 4000 + iota
-	PaymentRefundNotExist
-)
-
-// assistant
-const (
-	ServiceUserCloseWebsocketConn = 5000 + iota
-	ServicePaymentOrderNotExist   = 4000 + iota
+	ServicePaymentOrderNotExist = 4000 + iota
+	ServicePaymentRefundNotExist
 	ServiceStorePaymentRedisTokenFailed
 	ServiceCreatePaymentIDFailed
 	ServiceCreatePaymentOrderFailed
@@ -71,4 +65,9 @@ const (
 	ServiceCreateRefundIDFailed
 	ServiceCreateRefundFailed
 	ServicePaymentIsProcessing
+)
+
+// assistant
+const (
+	ServiceUserCloseWebsocketConn = 5000 + iota
 )

@@ -236,7 +236,7 @@ func (svc *PaymentService) CheckAdminPermission(_ context.Context, uid int64) (b
 func (svc *PaymentService) CheckAndDelPaymentToken(ctx context.Context, token string, userID int64, orderID int64) (bool, error) {
 	result, err := svc.redis.CheckAndDelPaymentToken(ctx, fmt.Sprintf("payment_token:%d:%d", userID, orderID), token)
 	if err != nil {
-		return false, fmt.Errorf("failed to check and delete payment token: %w", err)
+		return false, err
 	}
 	return result, nil
 }
@@ -246,7 +246,7 @@ func (svc *PaymentService) GetExpiredAtAndDelPaymentToken(ctx context.Context,
 ) (exist bool, exp time.Time, err error) {
 	exist, ttl, err := svc.redis.GetTTLAndDelPaymentToken(ctx, fmt.Sprintf("payment_token:%d:%d", userId, orderID), token)
 	if err != nil {
-		return false, time.Time{}, fmt.Errorf("failed to get and delete payment token: %w", err)
+		return false, time.Time{}, err
 	}
 	return exist, time.Now().Add(ttl), nil
 }
@@ -258,7 +258,7 @@ func (svc *PaymentService) PutBackPaymentToken(ctx context.Context, token string
 func (svc *PaymentService) GetOrderStatus(ctx context.Context, orderID int64) (bool, bool, error) {
 	exist, expire, err := svc.rpc.GetOrderStatus(ctx, orderID)
 	if err != nil {
-		return false, true, fmt.Errorf("failed to get order status: %w", err)
+		return false, true, err
 	}
 	return exist, time.Now().UnixMilli() > expire, nil
 }
