@@ -542,7 +542,6 @@ func ViewCategory(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	resp.CategoryInfo = pack.BuildCategorys(res.CategoryInfo)
-
 	pack.RespData(c, resp)
 }
 
