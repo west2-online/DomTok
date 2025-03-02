@@ -96,7 +96,7 @@ func (us *useCase) CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err
 	}
 	spu.CreatorId = loginData
 
-	if err = us.svc.Verify(us.svc.VerifyForSaleStatus(spu.ForSale)); err != nil {
+	if err = us.svc.Verify(us.svc.VerifyForSaleStatus(spu.ForSale), us.svc.VerifyCategoryId(ctx, spu.CategoryId)); err != nil {
 		return 0, fmt.Errorf("usecase.CreateSpu verify failed: %w", err)
 	}
 
@@ -154,6 +154,12 @@ func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
 
 	if err = us.svc.Verify(us.svc.VerifyForSaleStatus(spu.ForSale)); err != nil {
 		return fmt.Errorf("usecase.UpdateSpu verify failed: %w", err)
+	}
+
+	if spu.CategoryId != 0 {
+		if err = us.svc.Verify(us.svc.VerifyCategoryId(ctx, spu.CategoryId)); err != nil {
+			return fmt.Errorf("usecase.UpdateSpu verify failed: %w", err)
+		}
 	}
 
 	spu.GoodsHeadDrawingUrl = utils.GenerateFileName(constants.SpuDirDest, spu.SpuId)
