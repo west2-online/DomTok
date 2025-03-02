@@ -33,14 +33,16 @@ type UseCase struct {
 	DB    repository.PersistencePort
 	Cache repository.CachePort
 	MQ    repository.MqPort
+	Rpc   repository.RpcPort
 	svc   *service.CartService
 }
 
-func NewCartCase(db repository.PersistencePort, cache repository.CachePort, mq repository.MqPort, svc *service.CartService) *UseCase {
+func NewCartCase(db repository.PersistencePort, cache repository.CachePort, mq repository.MqPort, rpc repository.RpcPort, svc *service.CartService) *UseCase {
 	return &UseCase{
 		DB:    db,
 		Cache: cache,
 		MQ:    mq,
 		svc:   svc,
+		Rpc:   rpc,
 	}
 }

@@ -43,9 +43,10 @@ func AddGoodsIntoCart(ctx context.Context, c *app.RequestContext) {
 	}
 
 	err = rpc.AddGoodsIntoCartRPC(ctx, &cart.AddGoodsIntoCartRequest{
-		SkuId:  req.SkuID,
-		ShopId: req.ShopID,
-		Count:  req.Count,
+		SkuId:     req.SkuID,
+		ShopId:    req.ShopID,
+		Count:     req.Count,
+		VersionId: req.VersionID,
 	})
 	if err != nil {
 		pack.RespError(c, err)
@@ -65,9 +66,15 @@ func ShowCartGoodsList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(api.ShowCartGoodsListResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	// resp := new(api.ShowCartGoodsListResponse)
+	err = rpc.ShowCartGoodsRPC(ctx, &cart.ShowCartGoodsListRequest{
+		PageNum: req.PageNum,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespSuccess(c)
 }
 
 // UpdateCartGoods .

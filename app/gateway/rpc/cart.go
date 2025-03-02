@@ -46,3 +46,16 @@ func AddGoodsIntoCartRPC(ctx context.Context, req *cart.AddGoodsIntoCartRequest)
 	}
 	return nil
 }
+
+func ShowCartGoodsRPC(ctx context.Context, req *cart.ShowCartGoodsListRequest) (err error) {
+	resp, err := cartClient.ShowCartGoodsList(ctx, req)
+	if err != nil {
+		logger.Errorf("ShowCartGoodsRPC RPC called failed: %v", err.Error())
+		return errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		// 对外暴露的信息，实际错误的log已经在rpc server通过mw打印了
+		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return nil
+}

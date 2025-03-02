@@ -39,3 +39,7 @@ type MqPort interface {
 	SendAddGoods(ctx context.Context, uid int64, goods *model.GoodInfo) error
 	ConsumeAddGoods(ctx context.Context) <-chan *kafka.Message
 }
+
+type RpcPort interface {
+	GetGoodsInfo(ctx context.Context, cartGoods []*model.CartGoods) ([]*model.CartGoods, error)
+}

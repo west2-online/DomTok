@@ -14,22 +14,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package mq
-
-import (
-	"sync/atomic"
-
-	"github.com/west2-online/DomTok/pkg/kafka"
-)
-
-// KafkaAdapter 这里不是mqAdapter的原因是我们调用的是在pkg封装的kafka
-type KafkaAdapter struct {
-	mq   *kafka.Kafka
-	done atomic.Bool // topic并发的标记
-}
-
-func NewKafkaAdapter(mq *kafka.Kafka) *KafkaAdapter {
-	return &KafkaAdapter{
-		mq: mq,
-	}
-}
+package rpc

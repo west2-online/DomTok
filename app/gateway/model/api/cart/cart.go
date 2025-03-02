@@ -32,9 +32,10 @@ import (
 * @Param count 数量
  */
 type AddGoodsIntoCartRequest struct {
-	SkuID  int64 `thrift:"sku_id,1,required" form:"sku_id,required" json:"sku_id,required" query:"sku_id,required"`
-	ShopID int64 `thrift:"shop_id,2,required" form:"shop_id,required" json:"shop_id,required" query:"shop_id,required"`
-	Count  int64 `thrift:"count,3,required" form:"count,required" json:"count,required" query:"count,required"`
+	SkuID     int64 `thrift:"sku_id,1,required" form:"sku_id,required" json:"sku_id,required" query:"sku_id,required"`
+	ShopID    int64 `thrift:"shop_id,2,required" form:"shop_id,required" json:"shop_id,required" query:"shop_id,required"`
+	VersionID int64 `thrift:"version_id,3,required" form:"version_id,required" json:"version_id,required" query:"version_id,required"`
+	Count     int64 `thrift:"count,4,required" form:"count,required" json:"count,required" query:"count,required"`
 }
 
 func NewAddGoodsIntoCartRequest() *AddGoodsIntoCartRequest {
@@ -52,6 +53,10 @@ func (p *AddGoodsIntoCartRequest) GetShopID() (v int64) {
 	return p.ShopID
 }
 
+func (p *AddGoodsIntoCartRequest) GetVersionID() (v int64) {
+	return p.VersionID
+}
+
 func (p *AddGoodsIntoCartRequest) GetCount() (v int64) {
 	return p.Count
 }
@@ -59,7 +64,8 @@ func (p *AddGoodsIntoCartRequest) GetCount() (v int64) {
 var fieldIDToName_AddGoodsIntoCartRequest = map[int16]string{
 	1: "sku_id",
 	2: "shop_id",
-	3: "count",
+	3: "version_id",
+	4: "count",
 }
 
 func (p *AddGoodsIntoCartRequest) Read(iprot thrift.TProtocol) (err error) {
@@ -68,6 +74,7 @@ func (p *AddGoodsIntoCartRequest) Read(iprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	var issetSkuID bool = false
 	var issetShopID bool = false
+	var issetVersionID bool = false
 	var issetCount bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
@@ -107,6 +114,15 @@ func (p *AddGoodsIntoCartRequest) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetVersionID = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 4:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
 				issetCount = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -134,8 +150,13 @@ func (p *AddGoodsIntoCartRequest) Read(iprot thrift.TProtocol) (err error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetCount {
+	if !issetVersionID {
 		fieldId = 3
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetCount {
+		fieldId = 4
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -186,6 +207,17 @@ func (p *AddGoodsIntoCartRequest) ReadField3(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
+	p.VersionID = _field
+	return nil
+}
+func (p *AddGoodsIntoCartRequest) ReadField4(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
 	p.Count = _field
 	return nil
 }
@@ -207,6 +239,10 @@ func (p *AddGoodsIntoCartRequest) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField3(oprot); err != nil {
 			fieldId = 3
+			goto WriteFieldError
+		}
+		if err = p.writeField4(oprot); err != nil {
+			fieldId = 4
 			goto WriteFieldError
 		}
 	}
@@ -262,10 +298,10 @@ WriteFieldEndError:
 }
 
 func (p *AddGoodsIntoCartRequest) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("count", thrift.I64, 3); err != nil {
+	if err = oprot.WriteFieldBegin("version_id", thrift.I64, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.Count); err != nil {
+	if err := oprot.WriteI64(p.VersionID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -276,6 +312,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
+func (p *AddGoodsIntoCartRequest) writeField4(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("count", thrift.I64, 4); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.Count); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
 func (p *AddGoodsIntoCartRequest) String() string {
@@ -594,9 +647,9 @@ func (p *ShowCartGoodsListRequest) String() string {
 }
 
 type ShowCartGoodsListResponse struct {
-	Base       *model.BaseResp `thrift:"base,1,required" form:"base,required" json:"base,required" query:"base,required"`
-	GoodsList  []*model.Sku    `thrift:"goods_list,2,required" form:"goods_list,required" json:"goods_list,required" query:"goods_list,required"`
-	GoodsCount int64           `thrift:"goods_count,3,required" form:"goods_count,required" json:"goods_count,required" query:"goods_count,required"`
+	Base       *model.BaseResp    `thrift:"base,1,required" form:"base,required" json:"base,required" query:"base,required"`
+	GoodsList  []*model.CartGoods `thrift:"goods_list,2,required" form:"goods_list,required" json:"goods_list,required" query:"goods_list,required"`
+	GoodsCount int64              `thrift:"goods_count,3,required" form:"goods_count,required" json:"goods_count,required" query:"goods_count,required"`
 }
 
 func NewShowCartGoodsListResponse() *ShowCartGoodsListResponse {
@@ -615,7 +668,7 @@ func (p *ShowCartGoodsListResponse) GetBase() (v *model.BaseResp) {
 	return p.Base
 }
 
-func (p *ShowCartGoodsListResponse) GetGoodsList() (v []*model.Sku) {
+func (p *ShowCartGoodsListResponse) GetGoodsList() (v []*model.CartGoods) {
 	return p.GoodsList
 }
 
@@ -740,8 +793,8 @@ func (p *ShowCartGoodsListResponse) ReadField2(iprot thrift.TProtocol) error {
 	if err != nil {
 		return err
 	}
-	_field := make([]*model.Sku, 0, size)
-	values := make([]model.Sku, size)
+	_field := make([]*model.CartGoods, 0, size)
+	values := make([]model.CartGoods, size)
 	for i := 0; i < size; i++ {
 		_elem := &values[i]
 		_elem.InitDefault()
