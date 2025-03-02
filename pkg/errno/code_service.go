@@ -67,4 +67,6 @@ const (
 	ServiceRedisTimeLimited
 	ServiceCreateRefundIDFailed
 	ServiceCreateRefundFailed
+	ServiceGetPaymentInfoFailed
+	ServicePaymentFailed
 )
