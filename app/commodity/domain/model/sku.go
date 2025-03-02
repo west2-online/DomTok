@@ -16,20 +16,37 @@ limitations under the License.
 
 package model
 
+type AttrValue struct {
+	SaleAttr  string
+	SaleValue string
+}
+
 type Sku struct {
-	Id               int64
-	CreatorId        int64
-	Price            float64
-	Name             string
-	Description      string
-	ForSale          int
-	HistoryStock     int64
-	StyleHeadDrawing string
-	CreatedAt        int64
-	UpdatedAt        int64
-	DeletedAt        int64
-	Stock            int64
-	LockStock        int64
+	SkuID               int64
+	Name                string
+	CreatorID           int64
+	Description         string
+	StyleHeadDrawing    []byte
+	Price               float64
+	ForSale             int
+	SpuID               int64
+	Stock               int64
+	HistoryStock        int64
+	CreatedAt           int64
+	UpdatedAt           int64
+	DeletedAt           int64
+	SaleAttr            []*AttrValue
+	HistoryID           int64
+	LockStock           int64
+	StyleHeadDrawingUrl string
+}
+
+type SkuImage struct {
+	ImageID   int64
+	SkuID     int64
+	Url       string
+	CreatedAt int64
+	DeletedAt int64
 }
 
 type SkuBuyInfo struct {
@@ -40,4 +57,17 @@ type SkuBuyInfo struct {
 type SkuStock struct {
 	Stock     int64 `gorm:"column:stock"`
 	LockStock int64 `gorm:"column:lock_stock"`
+}
+
+type SkuVersion struct {
+	SkuID     int64
+	VersionID int64
+}
+
+type SkuPriceHistory struct {
+	Id          int64
+	SkuId       int64
+	MarkPrice   float64
+	CreatedAt   int64
+	PrevVersion int64
 }
