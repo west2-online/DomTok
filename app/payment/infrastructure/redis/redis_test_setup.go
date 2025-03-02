@@ -34,6 +34,10 @@ func _EnvSetup() {
 		if err != nil {
 			panic(err)
 		}
+		err = _cli.loadScript()
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 	logger.Ignore()
