@@ -248,20 +248,34 @@ struct DeleteSpuImageResp {
 * @Param stock 库存
 */
 struct CreateSkuReq {
-    1: optional list<binary> skuImages;
-    2: required string name;
-    3: required i64 stock;
-    4: required string description;
-    5: required string styleHeadDrawing;
-    6: required double price;
-    7: required i32 forSale;
-    8: required i64 spuID;
+
+    1: required string name;
+    2: required i64 stock;
+    3: required string description;
+    4: required binary styleHeadDrawing;
+    5: required double price;
+    6: required i32 forSale;
+    7: required i64 spuID;
+    8: required i64 bufferCount;
+    9:required string ext;
+
 
 }
 
 struct CreateSkuResp {
     1: required model.BaseResp base;
     2: required i64 skuID;
+}
+
+struct CreateSkuImageReq {
+    1: required binary data;
+    2: required i64 skuID;
+    3: required i64 bufferCount;
+}
+
+struct CreateSkuImageResp {
+    1: required model.BaseResp base;
+    2: required i64 imageID;
 }
 
 /*
@@ -277,15 +291,26 @@ struct CreateSkuResp {
 struct UpdateSkuReq {
     1: required i64 skuID;
     2: optional i64 stock;
-    3: optional list<binary> skuImages;
-    4: optional string description;
-    5: optional string styleHeadDrawing;
-    6: optional double price;
-    7: optional i32 forSale;
+    3: optional string description;
+    4: optional binary styleHeadDrawing;
+    5: optional double price;
+    6: optional i32 forSale;
+    7: optional i64 bufferCount;
+    8:required string ext;
 
 }
 
 struct UpdateSkuResp {
+    1: required model.BaseResp base;
+}
+
+struct UpdateSkuImageReq {
+    1: required binary data;
+    2: required i64 imageID;
+    3: required i64 bufferCount;
+}
+
+struct UpdateSkuImageResp {
     1: required model.BaseResp base;
 }
 
@@ -298,6 +323,14 @@ struct DeleteSkuReq {
 }
 
 struct DeleteSkuResp {
+    1: required model.BaseResp base;
+}
+
+struct DeleteSkuImageReq {
+    1: required i64 skuImageID;
+}
+
+struct DeleteSkuImageResp {
     1: required model.BaseResp base;
 }
 
@@ -316,6 +349,7 @@ struct ViewSkuImageReq {
 struct ViewSkuImageResp {
     1: required model.BaseResp base;
     2: required list<model.SkuImage> images;
+    3: required i64 total;
 }
 
 /* struct ViewSkuReq 查看sku信息
@@ -332,6 +366,7 @@ struct ViewSkuReq {
 struct ViewSkuResp {
     1: required model.BaseResp base;
     2: required list<model.Sku> skus;
+    3: required i64 total;
 }
 
 /*
@@ -421,6 +456,7 @@ struct ListSkuInfoReq {
 struct ListSkuInfoResp {
     1: required model.BaseResp base;
     2: required list<model.SkuInfo> skuInfos;
+    3: required i64 total;
 }
 
 struct ListSpuInfoReq {
@@ -511,14 +547,17 @@ service CommodityService {
     DeleteSpuImageResp DeleteSpuImage(1: DeleteSpuImageReq req);
 
     //SKU
-    CreateSkuResp CreateSku(1: CreateSkuReq req);
-    UpdateSkuResp UpdateSku(1: UpdateSkuReq req);
+    CreateSkuResp CreateSku(1: CreateSkuReq req) (streaming.mode="client");
+    UpdateSkuResp UpdateSku(1: UpdateSkuReq req) (streaming.mode="client");
     DeleteSkuResp DeleteSku(1: DeleteSkuReq req);
     ViewSkuImageResp ViewSkuImage(1: ViewSkuImageReq req);
     ViewSkuResp ViewSku(1: ViewSkuReq req);
     UploadSkuAttrResp UploadSkuAttr(1: UploadSkuAttrReq req);
     ListSkuInfoResp ListSkuInfo(1: ListSkuInfoReq req);
     ViewHistoryPriceResp ViewHistory(1: ViewHistoryPriceReq req)
+    CreateSkuImageResp CreateSkuImage(1: CreateSkuImageReq req) (streaming.mode="client");
+    UpdateSkuImageResp UpdateSkuImage(1: UpdateSkuImageReq req) (streaming.mode="client");
+    DeleteSkuImageResp DeleteSkuImage(1: DeleteSkuImageReq req);
 
     //供订单服务调用
     DescSkuLockStockResp DescSkuLockStock(1: DescSkuLockStockReq req);

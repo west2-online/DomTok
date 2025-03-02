@@ -19,15 +19,13 @@ package rpc
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"time"
-
-	"github.com/samber/lo"
 
 	"github.com/west2-online/DomTok/app/commodity/controllers/rpc/pack"
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/app/commodity/usecase"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
-	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/base"
 )
 
@@ -314,39 +312,264 @@ func (c CommodityHandler) ViewSpuImage(ctx context.Context, req *commodity.ViewS
 	return
 }
 
-func (c CommodityHandler) CreateSku(ctx context.Context, req *commodity.CreateSkuReq) (r *commodity.CreateSkuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+func (c CommodityHandler) CreateSku(streamServer commodity.CommodityService_CreateSkuServer) (err error) {
+	r := new(commodity.CreateSkuResp)
+
+	req, err := streamServer.Recv()
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(r)
+	}
+
+	for i := 0; i < int(req.BufferCount); i++ {
+		fileData, err := streamServer.Recv()
+		if err != nil {
+			r.Base = base.BuildBaseResp(err)
+			return streamServer.SendAndClose(r)
+		}
+		req.StyleHeadDrawing = bytes.Join([][]byte{req.StyleHeadDrawing, fileData.StyleHeadDrawing}, []byte(""))
+	}
+
+	id, err := c.useCase.CreateSku(streamServer.Context(), &model.Sku{
+		Name:             req.Name,
+		Stock:            req.Stock,
+		Description:      req.Description,
+		StyleHeadDrawing: req.StyleHeadDrawing,
+		Price:            req.Price,
+		ForSale:          int(req.ForSale),
+		SpuID:            req.SpuID,
+	}, req.Ext)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(r)
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	r.SkuID = id
+	return streamServer.SendAndClose(r)
 }
 
-func (c CommodityHandler) UpdateSku(ctx context.Context, req *commodity.UpdateSkuReq) (r *commodity.UpdateSkuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+func (c CommodityHandler) UpdateSku(streamServer commodity.CommodityService_UpdateSkuServer) (rr error) {
+	r := new(commodity.UpdateSkuResp)
+
+	req, err := streamServer.Recv()
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(r)
+	}
+
+	for i := 0; i < int(*req.BufferCount); i++ {
+		fileData, err := streamServer.Recv()
+		if err != nil {
+			r.Base = base.BuildBaseResp(err)
+			return streamServer.SendAndClose(r)
+		}
+		req.StyleHeadDrawing = bytes.Join([][]byte{req.StyleHeadDrawing, fileData.StyleHeadDrawing}, []byte(""))
+	}
+
+	err = c.useCase.UpdateSku(streamServer.Context(), &model.Sku{
+		SkuID:            req.SkuID,
+		Stock:            req.GetStock(),
+		Description:      req.GetDescription(),
+		StyleHeadDrawing: req.GetStyleHeadDrawing(),
+		Price:            req.GetPrice(),
+		ForSale:          int(req.GetForSale()),
+	}, req.Ext)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(r)
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	return streamServer.SendAndClose(r)
 }
 
 func (c CommodityHandler) DeleteSku(ctx context.Context, req *commodity.DeleteSkuReq) (r *commodity.DeleteSkuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.DeleteSkuResp)
+
+	sku := &model.Sku{
+		SkuID: req.SkuID,
+	}
+
+	if err = c.useCase.DeleteSku(ctx, sku); err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	return
 }
 
-func (c CommodityHandler) ViewSkuImage(ctx context.Context, req *commodity.ViewSkuImageReq) (r *commodity.ViewSkuImageResp, err error) {
-	// TODO implement me
-	panic("implement me")
-}
+func (c CommodityHandler) ViewSku(ctx context.Context, req *commodity.ViewSkuReq) (*commodity.ViewSkuResp, error) {
+	r := new(commodity.ViewSkuResp)
 
-func (c CommodityHandler) ViewSku(ctx context.Context, req *commodity.ViewSkuReq) (r *commodity.ViewSkuResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	var (
+		isSpuId bool
+		sku     model.Sku
+	)
+
+	if req.SkuID != nil {
+		sku.SkuID = *req.SkuID
+		isSpuId = false
+	}
+	if req.SpuID != nil {
+		sku.SpuID = *req.SpuID
+		isSpuId = true
+	}
+	if req.SkuID == nil && req.SpuID == nil {
+		err := fmt.Errorf("ViewSku failed: skuID and spuID are both nil")
+		r.Base = base.BuildBaseResp(err)
+		return r, err
+	}
+
+	Skus, total, err := c.useCase.ViewSku(ctx, &sku, req.PageNum, req.PageSize, isSpuId)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return r, err
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	r.Skus = pack.BuildSkus(Skus)
+	r.Total = total
+	return r, nil
 }
 
 func (c CommodityHandler) UploadSkuAttr(ctx context.Context, req *commodity.UploadSkuAttrReq) (r *commodity.UploadSkuAttrResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.UploadSkuAttrResp)
+
+	attr := &model.AttrValue{
+		SaleAttr:  req.SaleAttr,
+		SaleValue: req.SaleValue,
+	}
+
+	sku := &model.Sku{
+		SkuID: *req.SkuID,
+	}
+
+	if err = c.useCase.UploadSkuAttr(ctx, attr, sku); err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	return
 }
 
 func (c CommodityHandler) ListSkuInfo(ctx context.Context, req *commodity.ListSkuInfoReq) (r *commodity.ListSkuInfoResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ListSkuInfoResp)
+
+	skuInfo := make([]*model.SkuVersion, 0)
+
+	for _, info := range req.SkuInfos {
+		skuInfo = append(skuInfo, &model.SkuVersion{
+			SkuID:     info.SkuID,
+			VersionID: info.VersionID,
+		})
+	}
+
+	SkuInfos, total, err := c.useCase.ListSkuInfo(ctx, skuInfo, req.PageNum, req.PageSize)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	r.SkuInfos = pack.BuildSkuInfos(SkuInfos)
+	r.Total = total
+	return
+}
+
+func (c CommodityHandler) CreateSkuImage(streamServer commodity.CommodityService_CreateSkuImageServer) (err error) {
+	resp := new(commodity.CreateSkuImageResp)
+	req, err := streamServer.Recv()
+	if err != nil {
+		resp.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(resp)
+	}
+
+	for i := 0; i < int(req.BufferCount); i++ {
+		data, err := streamServer.Recv()
+		if err != nil {
+			resp.Base = base.BuildBaseResp(err)
+			return streamServer.SendAndClose(resp)
+		}
+		req.Data = bytes.Join([][]byte{req.Data, data.Data}, []byte(""))
+	}
+	id, err := c.useCase.CreateSkuImage(streamServer.Context(), &model.SkuImage{
+		SkuID: req.SkuID,
+	}, req.Data)
+	if err != nil {
+		resp.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(resp)
+	}
+
+	resp.Base = base.BuildBaseResp(nil)
+	resp.ImageID = id
+	return streamServer.SendAndClose(resp)
+}
+
+func (c CommodityHandler) UpdateSkuImage(streamServer commodity.CommodityService_UpdateSkuImageServer) (err error) {
+	resp := new(commodity.UpdateSkuImageResp)
+	req, err := streamServer.Recv()
+	if err != nil {
+		resp.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(resp)
+	}
+
+	for i := 0; i < int(req.BufferCount); i++ {
+		data, err := streamServer.Recv()
+		if err != nil {
+			resp.Base = base.BuildBaseResp(err)
+			return streamServer.SendAndClose(resp)
+		}
+		req.Data = bytes.Join([][]byte{req.Data, data.Data}, []byte(""))
+	}
+
+	err = c.useCase.UpdateSkuImage(streamServer.Context(), &model.SkuImage{
+		ImageID: req.ImageID,
+	}, req.Data)
+	if err != nil {
+		resp.Base = base.BuildBaseResp(err)
+		return streamServer.SendAndClose(resp)
+	}
+
+	resp.Base = base.BuildBaseResp(nil)
+	return streamServer.SendAndClose(resp)
+}
+
+func (c CommodityHandler) DeleteSkuImage(ctx context.Context, req *commodity.DeleteSkuImageReq) (r *commodity.DeleteSkuImageResp, err error) {
+	r = new(commodity.DeleteSkuImageResp)
+
+	if err = c.useCase.DeleteSkuImage(ctx, req.SkuImageID); err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	return
+}
+
+func (c CommodityHandler) ViewSkuImage(ctx context.Context, req *commodity.ViewSkuImageReq) (r *commodity.ViewSkuImageResp, err error) {
+	r = new(commodity.ViewSkuImageResp)
+
+	sku := &model.Sku{
+		SkuID: req.SkuID,
+	}
+
+	var (
+		images []*model.SkuImage
+		total  int64
+	)
+
+	if images, total, err = c.useCase.ViewSkuImages(ctx, sku, req.PageNum, req.PageSize); err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+
+	r.Base = base.BuildBaseResp(nil)
+	r.Images = pack.BuildSkuImages(images)
+	r.Total = total
+	return
 }
 
 func (c CommodityHandler) ViewHistory(ctx context.Context, req *commodity.ViewHistoryPriceReq) (r *commodity.ViewHistoryPriceResp, err error) {
@@ -407,10 +630,10 @@ func (c CommodityHandler) DescSkuStock(ctx context.Context, req *commodity.DescS
 
 func (c CommodityHandler) CreateCategory(ctx context.Context, req *commodity.CreateCategoryReq) (r *commodity.CreateCategoryResp, err error) {
 	r = new(commodity.CreateCategoryResp)
-	category := model.Category{
+	category := &model.Category{
 		Name: req.Name,
 	}
-	id, err := c.useCase.CreateCategory(ctx, &category)
+	id, err := c.useCase.CreateCategory(ctx, category)
 	r.Base = base.BuildBaseResp(err)
 	r.CategoryID = id
 	return
@@ -418,37 +641,29 @@ func (c CommodityHandler) CreateCategory(ctx context.Context, req *commodity.Cre
 
 func (c CommodityHandler) DeleteCategory(ctx context.Context, req *commodity.DeleteCategoryReq) (r *commodity.DeleteCategoryResp, err error) {
 	r = new(commodity.DeleteCategoryResp)
-	category := model.Category{
+	category := &model.Category{
 		Id: req.CategoryID,
 	}
-	err = c.useCase.DeleteCategory(ctx, &category)
+	err = c.useCase.DeleteCategory(ctx, category)
 	r.Base = base.BuildBaseResp(err)
 	return
 }
 
 func (c CommodityHandler) ViewCategory(ctx context.Context, req *commodity.ViewCategoryReq) (r *commodity.ViewCategoryResp, err error) {
 	r = new(commodity.ViewCategoryResp)
-	cInfos, err := c.useCase.ViewCategory(ctx, int(req.PageNum), int(req.PageSize))
-	if err != nil {
-		return r, err
-	}
-
-	r.CategoryInfo = lo.Map(cInfos, func(item *model.CategoryInfo, index int) *kmodel.CategoryInfo {
-		return &kmodel.CategoryInfo{
-			CategoryID: item.CategoryID,
-			Name:       item.Name,
-		}
-	})
+	Infos, err := c.useCase.ViewCategory(ctx, int(req.PageNum), int(req.PageSize))
+	r.Base = base.BuildBaseResp(err)
+	r.CategoryInfo = pack.BuildCategorys(Infos)
 	return r, nil
 }
 
 func (c CommodityHandler) UpdateCategory(ctx context.Context, req *commodity.UpdateCategoryReq) (r *commodity.UpdateCategoryResp, err error) {
 	r = new(commodity.UpdateCategoryResp)
-	category := model.Category{
+	category := &model.Category{
 		Id:   req.CategoryID,
 		Name: req.Name,
 	}
-	err = c.useCase.UpdateCategory(ctx, &category)
+	err = c.useCase.UpdateCategory(ctx, category)
 	r.Base = base.BuildBaseResp(err)
 	return
 }

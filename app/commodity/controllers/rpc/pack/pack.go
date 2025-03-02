@@ -77,3 +77,91 @@ func BuildCoupon(coupon *model.Coupon) *modelKitex.Coupon {
 func BuildCoupons(coupons []*model.Coupon) []*modelKitex.Coupon {
 	return base.BuildTypeList(coupons, BuildCoupon)
 }
+
+func BuildSkuImages(i []*model.SkuImage) []*modelKitex.SkuImage {
+	result := make([]*modelKitex.SkuImage, 0, len(i))
+	for _, v := range i {
+		result = append(result, &modelKitex.SkuImage{
+			ImageID:   v.ImageID,
+			SkuID:     v.SkuID,
+			Url:       v.Url,
+			CreatedAt: v.CreatedAt,
+			DeletedAt: &v.DeletedAt,
+		})
+	}
+	return result
+}
+
+func BuildSkus(i []*model.Sku) []*modelKitex.Sku {
+	result := make([]*modelKitex.Sku, 0, len(i))
+	for _, v := range i {
+		attr := make([]*modelKitex.AttrValue, 0, len(v.SaleAttr))
+		for _, value := range v.SaleAttr {
+			attr = append(attr, &modelKitex.AttrValue{
+				SaleAttr:  value.SaleAttr,
+				SaleValue: value.SaleValue,
+			})
+		}
+
+		result = append(result, &modelKitex.Sku{
+			SkuID:            v.SkuID,
+			CreatorID:        v.CreatorID,
+			Price:            v.Price,
+			Name:             v.Name,
+			Description:      v.Description,
+			ForSale:          int32(v.ForSale),
+			Stock:            v.Stock,
+			StyleHeadDrawing: v.StyleHeadDrawingUrl,
+			CreatedAt:        v.CreatedAt,
+			UpdatedAt:        v.UpdatedAt,
+			DeletedAt:        &v.DeletedAt,
+			SpuID:            v.SpuID,
+			SaleAttr:         attr,
+			HistoryID:        v.HistoryID,
+			LockStock:        v.LockStock,
+		})
+	}
+	return result
+}
+
+func BuildSkuInfos(i []*model.Sku) []*modelKitex.SkuInfo {
+	result := make([]*modelKitex.SkuInfo, 0, len(i)) // 预分配容量
+	for _, v := range i {
+		result = append(result, &modelKitex.SkuInfo{
+			SkuID:            v.SkuID,
+			CreatorID:        v.CreatorID,
+			Price:            v.Price,
+			Name:             v.Name,
+			ForSale:          int32(v.ForSale),
+			LockStock:        v.LockStock,
+			StyleHeadDrawing: v.StyleHeadDrawingUrl,
+			SpuID:            v.SpuID,
+			HistoryID:        v.HistoryID,
+		})
+	}
+	return result
+}
+
+func BuildSkuPriceHistory(i []*model.SkuPriceHistory) []*modelKitex.PriceHistory {
+	result := make([]*modelKitex.PriceHistory, 0, len(i))
+	for _, v := range i {
+		result = append(result, &modelKitex.PriceHistory{
+			HistoryID: v.Id,
+			SkuID:     v.SkuId,
+			Price:     int64(v.MarkPrice),
+			CreatedAt: v.CreatedAt,
+		})
+	}
+	return result
+}
+
+func BuildCategory(category *model.CategoryInfo) *modelKitex.CategoryInfo {
+	return &modelKitex.CategoryInfo{
+		CategoryID: category.CategoryID,
+		Name:       category.Name,
+	}
+}
+
+func BuildCategorys(categorys []*model.CategoryInfo) []*modelKitex.CategoryInfo {
+	return base.BuildTypeList(categorys, BuildCategory)
+}

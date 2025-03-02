@@ -32,12 +32,11 @@ const (
 
 const (
 	UserTableName       = "users"
-	CategoryTableName   = "categories"
+	CategoryTableName   = "category"
 	OrderTableName      = "orders"
 	OrderGoodsTableName = "order_goods"
 	SpuTableName        = "spu_info"
 	SpuImageTableName   = "spu_image"
-	SkuTableName        = "sku_info"
 	CouponTableName     = "coupon_info"
 	UserCouponTableName = "user_coupon"
 
@@ -45,5 +44,10 @@ const (
 	CartTableName          = "cart"
 	PaymentTableName       = "payment_orders"
 	PaymentRefundTableName = "payment_refunds"
-	PaymentLedgerTableName = "payment_ledgers"
+	PaymentLedgerTableName = "payment_ledger"
+
+	SkuTableName             = "sku_info"
+	SkuImagesTableName       = "sku_image"
+	SkuSaleAttrTableName     = "sku_sale_attr"
+	SkuPriceHistoryTableName = "sku_price_history"
 )

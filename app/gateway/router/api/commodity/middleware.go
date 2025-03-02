@@ -235,3 +235,23 @@ func _descskustockMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _createskuimageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteskuimageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateskuimageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _image0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

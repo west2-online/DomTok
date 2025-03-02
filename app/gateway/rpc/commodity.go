@@ -22,6 +22,7 @@ import (
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/metadata"
 
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
+	"github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
@@ -289,6 +290,245 @@ func ViewUserAllCouponRPC(ctx context.Context, req *commodity.ViewUserAllCouponR
 	resp, err := commodityClient.ViewUserAllCoupon(ctx, req)
 	if err != nil {
 		logger.Errorf("rpc.ViewUserAllCouponRPC ViewUserAllCoupon failed, err: %v", err)
+		return nil, errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return resp, nil
+}
+
+func CreateSkuRPC(ctx context.Context, req *commodity.CreateSkuReq, files [][]byte) (skuID int64, err error) {
+	stream, err := commodityStreamClient.CreateSku(ctx)
+	if err != nil {
+		logger.Errorf("rpc.CreateSkuRPC: RPC called failed: %v", err.Error())
+		return 0, errno.InternalServiceError.WithMessage(err.Error())
+	}
+
+	err = stream.Send(req)
+	if err != nil {
+		logger.Errorf("rpc.CreateSkuRPC: RPC called failed: %v", err.Error())
+		return 0, errno.InternalServiceError.WithMessage(err.Error())
+	}
+
+	for _, file := range files {
+		err = stream.Send(&commodity.CreateSkuReq{StyleHeadDrawing: file})
+		if err != nil {
+			logger.Errorf("rpc.CreateSkuRPC CreateSku failed, err  %v", err)
+			return 0, errno.InternalServiceError.WithMessage(err.Error())
+		}
+	}
+
+	resp, err := stream.CloseAndRecv()
+	if err != nil {
+		logger.Errorf("rpc.CreateSkuRPC: RPC called failed: %v", err.Error())
+		return -1, errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return -1, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return resp.SkuID, nil
+}
+
+func CreateSkuImageRPC(ctx context.Context, req *commodity.CreateSkuImageReq, files [][]byte) (id int64, err error) {
+	stream, err := commodityStreamClient.CreateSkuImage(ctx)
+	if err != nil {
+		logger.Errorf("rpc.CreateSkuImageRPC: RPC called failed: %v", err.Error())
+		return 0, errno.InternalServiceError.WithMessage(err.Error())
+	}
+	err = stream.Send(req)
+	if err != nil {
+		logger.Errorf("rpc.CreateSkuImageRPC: RPC called failed: %v", err.Error())
+		return 0, errno.InternalServiceError.WithMessage(err.Error())
+	}
+
+	for _, file := range files {
+		err = stream.Send(&commodity.CreateSkuImageReq{Data: file})
+		if err != nil {
+			logger.Errorf("rpc.CreateSkuImageRPC CreateSkuImage failed, err  %v", err)
+			return 0, errno.InternalServiceError.WithMessage(err.Error())
+		}
+	}
+
+	resp, err := stream.CloseAndRecv()
+	if err != nil {
+		logger.Errorf("rpc.CreateSkuImageRPC: RPC called failed: %v", err.Error())
+		return 0, errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return 0, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return resp.ImageID, nil
+}
+
+func UpdateSkuRPC(ctx context.Context, req *commodity.UpdateSkuReq, files [][]byte) (err error) {
+	stream, err := commodityStreamClient.UpdateSku(ctx)
+	if err != nil {
+		logger.Errorf("rpc.UpdateSkuRPC: RPC called failed: %v", err.Error())
+		return errno.InternalServiceError.WithMessage(err.Error())
+	}
+
+	err = stream.Send(req)
+	if err != nil {
+		logger.Errorf("rpc.UpdateSkuRPC SendReq failed, err  %v", err)
+		return errno.InternalServiceError.WithMessage(err.Error())
+	}
+
+	for _, file := range files {
+		err = stream.Send(&commodity.UpdateSkuReq{StyleHeadDrawing: file})
+		if err != nil {
+			logger.Errorf("rpc.UpdateSkuRPC UpdateSku failed, err  %v", err)
+			return errno.InternalServiceError.WithMessage(err.Error())
+		}
+	}
+
+	resp, err := stream.CloseAndRecv()
+	if err != nil {
+		logger.Errorf("rpc.UpdateSkuRPC UpdateSku failed, err  %v", err)
+		return errno.InternalServiceError.WithMessage(err.Error())
+	}
+
+	if !utils.IsSuccess(resp.Base) {
+		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return nil
+}
+
+func UpdateSkuImageRPC(ctx context.Context, req *commodity.UpdateSkuImageReq, files [][]byte) (err error) {
+	stream, err := commodityStreamClient.UpdateSkuImage(ctx)
+	if err != nil {
+		logger.Errorf("rpc.UpdateSkuImageRPC: RPC called failed: %v", err.Error())
+		return errno.InternalServiceError.WithMessage(err.Error())
+	}
+
+	err = stream.Send(req)
+	if err != nil {
+		logger.Errorf("rpc.UpdateSkuImageRPC SendReq failed, err  %v", err)
+		return errno.InternalServiceError.WithMessage(err.Error())
+	}
+
+	for _, file := range files {
+		err = stream.Send(&commodity.UpdateSkuImageReq{Data: file})
+		if err != nil {
+			logger.Errorf("rpc.UpdateSkuImageRPC UpdateSkuImage failed, err  %v", err)
+			return errno.InternalServiceError.WithMessage(err.Error())
+		}
+	}
+
+	resp, err := stream.CloseAndRecv()
+	if err != nil {
+		logger.Errorf("rpc.UpdateSkuImageRPC UpdateSkuImage failed, err  %v", err)
+		return errno.InternalServiceError.WithMessage(err.Error())
+	}
+
+	if !utils.IsSuccess(resp.Base) {
+		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return nil
+}
+
+func DeleteSkuRPC(ctx context.Context, req *commodity.DeleteSkuReq) (err error) {
+	resp, err := commodityClient.DeleteSku(ctx, req)
+	if err != nil {
+		logger.Errorf("DeleteSkuRPC: RPC called failed: %v", err.Error())
+		return errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return nil
+}
+
+func DeleteSkuImageRPC(ctx context.Context, req *commodity.DeleteSkuImageReq) (err error) {
+	resp, err := commodityClient.DeleteSkuImage(ctx, req)
+	if err != nil {
+		logger.Errorf("DeleteSkuImageRPC: RPC called failed: %v", err.Error())
+		return errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return nil
+}
+
+func ViewSkuImageRPC(ctx context.Context, req *commodity.ViewSkuImageReq) (images []*model.SkuImage, err error) {
+	resp, err := commodityClient.ViewSkuImage(ctx, req)
+	if err != nil {
+		logger.Errorf("ViewSkuImageRPC: RPC called failed: %v", err.Error())
+		return nil, errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return resp.Images, nil
+}
+
+func ViewSkuRPC(ctx context.Context, req *commodity.ViewSkuReq) (sku []*model.Sku, err error) {
+	resp, err := commodityClient.ViewSku(ctx, req)
+	if err != nil {
+		logger.Errorf("ViewSkuRPC: RPC called failed: %v", err.Error())
+		return nil, errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return resp.Skus, nil
+}
+
+func UploadSkuAttrRPC(ctx context.Context, req *commodity.UploadSkuAttrReq) (err error) {
+	resp, err := commodityClient.UploadSkuAttr(ctx, req)
+	if err != nil {
+		logger.Errorf("UploadSkuAttrRPC: RPC called failed: %v", err.Error())
+		return errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return nil
+}
+
+func CreateCategoryRPC(ctx context.Context, req *commodity.CreateCategoryReq) (int64, error) {
+	resp, err := commodityClient.CreateCategory(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.CreateCategoryRPC CreateCategory failed, err  %v", err)
+		return -1, errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return -1, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return resp.CategoryID, nil
+}
+
+func DeleteCategoryRPC(ctx context.Context, req *commodity.DeleteCategoryReq) (err error) {
+	resp, err := commodityClient.DeleteCategory(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.DeleteCategoryRPC DeleteCategory failed, err  %v", err)
+		return errno.InternalServiceError.WithMessage(err.Error())
+	}
+
+	if !utils.IsSuccess(resp.Base) {
+		return errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return nil
+}
+
+func UpdateCategoryRPC(ctx context.Context, req *commodity.UpdateCategoryReq) (err error) {
+	resp, err := commodityClient.UpdateCategory(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.UpdateCategoryRPC UpdateCategory failed, err  %v", err)
+		return errno.InternalServiceError.WithMessage(err.Error())
+	}
+
+	if !utils.IsSuccess(resp.Base) {
+		return errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return nil
+}
+
+func ViewCategoryRPC(ctx context.Context, req *commodity.ViewCategoryReq) (*commodity.ViewCategoryResp, error) {
+	resp, err := commodityClient.ViewCategory(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.ViewCategoryRPC ViewCategory failed, err  %v", err)
 		return nil, errno.InternalServiceError.WithMessage(err.Error())
 	}
 	if !utils.IsSuccess(resp.Base) {

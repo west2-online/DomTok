@@ -74,21 +74,6 @@ func RequestPaymentToken(ctx context.Context, c *app.RequestContext) {
 	pack.RespData(c, resp)
 }
 
-// ProcessRefund .
-// @router /api/payment/process-refund [POST]
-func ProcessRefund(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req api.RefundRequest
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
-		return
-	}
-	resp := new(payment.RefundResponse)
-
-	c.JSON(consts.StatusOK, resp)
-}
-
 // RequestRefund .
 // @router /api/payment/refund [GET]
 func RequestRefund(ctx context.Context, c *app.RequestContext) {
@@ -116,4 +101,50 @@ func RequestRefund(ctx context.Context, c *app.RequestContext) {
 
 	// 返回成功响应
 	pack.RespData(c, resp)
+}
+
+// RefundReview .
+// @router /api/payment/refund/review [POST]
+func RefundReview(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.RefundReviewRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	err = rpc.RequestRefundReviewRPC(ctx, &payment.RefundReviewRequest{
+		OrderID: req.OrderID,
+		Passed:  req.Passed,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespSuccess(c)
+}
+
+// RequestPaymentCheckout .
+// @router /api/payment/checkout [POST]
+func RequestPaymentCheckout(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.PaymentCheckoutRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	err = rpc.RequestPaymentCheckoutRPC(ctx, &payment.PaymentCheckoutRequest{
+		OrderID: req.OrderID,
+		Token:   req.Token,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespSuccess(c)
 }
