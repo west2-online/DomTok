@@ -50,6 +50,21 @@ const (
 	ServiceUserCloseWebsocketConn
 )
 
+// payment
 const (
-	PaymentOrderNotExist = 4000 + iota
+	ServicePaymentOrderNotExist = 4000 + iota
+	// ServicePaymentNotFound 利用orderID在订单支付表里查询是否已经发起过支付申请了（注意是订单支付表不是订单表）
+	ServiceIncrementRedisKeyFailed
+	ServiceCheck24hExistFailed
+	ServiceSetRedisKeyFailed
+	ServiceStorePaymentRedisTokenFailed
+	ServiceCreatePaymentIDFailed
+	ServiceCreatePaymentOrderFailed
+	ServiceGetLoginDataFailed
+	ServiceCheckOrderExistFailed
+	ServiceGenerateHMACFailed
+	ServiceCheckRedisTimeFailed
+	ServiceRedisTimeLimited
+	ServiceCreateRefundIDFailed
+	ServiceCreateRefundFailed
 )
