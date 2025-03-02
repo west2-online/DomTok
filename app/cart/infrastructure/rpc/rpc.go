@@ -31,19 +31,19 @@ import (
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
-type cartRpcImpl struct {
+type CartRpcImpl struct {
 	commodity commodityservice.Client
 	order     orderservice.Client
 }
 
 func NewCartRpcImpl(c commodityservice.Client, o orderservice.Client) repository.RpcPort {
-	return &cartRpcImpl{
+	return &CartRpcImpl{
 		commodity: c,
 		order:     o,
 	}
 }
 
-func (rpc *cartRpcImpl) GetGoodsInfo(ctx context.Context, cartGoodsIds []*model.CartGoods) ([]*model.CartGoods, error) {
+func (rpc *CartRpcImpl) GetGoodsInfo(ctx context.Context, cartGoodsIds []*model.CartGoods) ([]*model.CartGoods, error) {
 	skuVs := lo.Map(cartGoodsIds, func(item *model.CartGoods, index int) *kmodel.SkuVersion {
 		v := &kmodel.SkuVersion{
 			SkuID:     item.SkuID,
@@ -72,6 +72,7 @@ func (rpc *cartRpcImpl) GetGoodsInfo(ctx context.Context, cartGoodsIds []*model.
 			StyleHeadDrawing: item.StyleHeadDrawing,
 			PurchaseQuantity: purchaseCount,
 			TotalAmount:      decimal.NewFromInt(int64(item.Price) * purchaseCount),
+			DiscountAmount:   decimal.NewFromInt(int64(item.Price) * purchaseCount), // 暂时不去调rpc了，时间不是很够
 		}
 	})
 	return cartGoods, nil
