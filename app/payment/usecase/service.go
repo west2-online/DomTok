@@ -19,6 +19,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"github.com/west2-online/DomTok/pkg/errno"
 
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
@@ -71,7 +72,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 		}
 		// 如果订单正在支付或者已经支付完成，则拒绝进行接下来的生成令牌的活动
 		if payStatus.Status == paymentStatus.PaymentStatusSuccessCode || payStatus.Status == paymentStatus.PaymentStatusProcessingCode {
-			return "", 0, fmt.Errorf("payment is processing or has already done")
+			return "", 0, errno.Errorf(errno.ServicePaymentIsProcessing, "payment is processing or has already done")
 		}
 	}
 

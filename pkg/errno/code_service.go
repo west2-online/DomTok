@@ -71,4 +71,5 @@ const (
 	ServiceRedisTimeLimited
 	ServiceCreateRefundIDFailed
 	ServiceCreateRefundFailed
+	ServicePaymentIsProcessing
 )
