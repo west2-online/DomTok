@@ -62,6 +62,7 @@ type Cache interface {
 	SetPaymentStatus(ctx context.Context, s *model.CachePaymentStatus) error
 	GetPaymentStatus(ctx context.Context, orderID int64) (*model.CachePaymentStatus, bool, error)
 	UpdatePaymentStatus(ctx context.Context, s *model.CachePaymentStatus) (exist bool, err error)
+	DeletePaymentStatus(ctx context.Context, orderID int64) error
 }
 
 type Locker interface {

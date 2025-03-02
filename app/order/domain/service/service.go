@@ -18,12 +18,13 @@ package service
 
 import (
 	"context"
+	"time"
+
 	"github.com/west2-online/DomTok/app/order/domain/model"
 	"github.com/west2-online/DomTok/app/order/domain/repository"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
-	"time"
 )
 
 type OrderService struct {
@@ -170,6 +171,16 @@ func (svc *OrderService) CancelOrder(ctx context.Context, payRel *model.PaymentR
 
 func (svc *OrderService) IsEqualStatus(s1, s2 int8) bool {
 	return s1 == s2
+}
+
+func (svc *OrderService) DeleteOrder(ctx context.Context, orderID int64) error {
+	if err := svc.cache.DeletePaymentStatus(ctx, orderID); err != nil {
+		return err
+	}
+	if err := svc.db.DeleteOrder(ctx, orderID); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (svc *OrderService) nextVal() int64 {

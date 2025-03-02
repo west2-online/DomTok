@@ -135,7 +135,6 @@ func (uc *useCase) ChangeDeliverAddress(ctx context.Context, orderID, addressID 
 
 // DeleteOrder 删除订单
 func (uc *useCase) DeleteOrder(ctx context.Context, orderID int64) error {
-	// 1. 检查订单是否存在
 	exist, _, err := uc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
@@ -144,8 +143,7 @@ func (uc *useCase) DeleteOrder(ctx context.Context, orderID int64) error {
 		return errno.NewErrNo(errno.ServiceOrderNotFound, "order not found")
 	}
 
-	// 2. 删除订单（包含订单商品）
-	return uc.db.DeleteOrder(ctx, orderID)
+	return uc.svc.DeleteOrder(ctx, orderID)
 }
 
 func (uc *useCase) IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error) {
