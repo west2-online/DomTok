@@ -49,7 +49,7 @@ kafka:
   user: domtok
   password: domtok-password
 
-upyuns:
+upyun:
   bucket: "w2-domtok"
   operator: "penqee"
   password: ""

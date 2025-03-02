@@ -39,7 +39,11 @@ const (
 	ServiceSpuNotExist = 3000 + iota
 	ServiceImgNotExist
 	ServiceSkuExist
-	UserNotExist
+
+	ServiceSkuNotExist
+	ServiceSkuImageNotExist
+	ServiceSkuAttrNotExist
+
 	ServiceCategoryExist
 	ServiceListCategoryFailed
 )
