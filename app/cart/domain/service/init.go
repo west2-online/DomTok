@@ -26,13 +26,15 @@ type CartService struct {
 	DB    repository.PersistencePort
 	Cache repository.CachePort
 	MQ    repository.MqPort
+	Rpc   repository.RpcPort
 }
 
-func NewCartService(db repository.PersistencePort, cache repository.CachePort, mq repository.MqPort) *CartService {
+func NewCartService(db repository.PersistencePort, cache repository.CachePort, mq repository.MqPort, rpc repository.RpcPort) *CartService {
 	svc := &CartService{
 		DB:    db,
 		Cache: cache,
 		MQ:    mq,
+		Rpc:   rpc,
 	}
 	svc.init()
 	return svc
