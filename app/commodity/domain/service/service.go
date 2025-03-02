@@ -209,6 +209,10 @@ func (svc *CommodityService) DeleteAllSpuImages(ctx context.Context, spuId int64
 		return fmt.Errorf("service.DeleteAllSpuImages: delete spuImages failed: %w", err)
 	}
 
+	if len(ids) < 1 {
+		return nil
+	}
+
 	for i := 0; i < len(ids); i++ {
 		eg.Go(func() error {
 			if err = upyun.DeleteImg(urls[i]); err != nil {
