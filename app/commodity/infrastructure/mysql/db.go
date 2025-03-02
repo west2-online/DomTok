@@ -47,7 +47,7 @@ func (db *commodityDB) IsCategoryExistByName(ctx context.Context, name string) (
 		}
 		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
 	}
-	return true, errno.Errorf(errno.ServiceCategoryExist, "category was found")
+	return true, errno.Errorf(errno.ServiceCategoryExist, "category already exist")
 }
 
 func (db *commodityDB) GetCategoryById(ctx context.Context, id int64) (*model.Category, error) {

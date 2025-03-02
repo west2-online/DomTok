@@ -49,8 +49,6 @@ const (
 	ServiceCategorynotExist
 	ServiceListCategoryFailed
 	ServiceCategoryCreateFail
-
-	ServiceCategoryCreateFail
 )
 
 // payment
