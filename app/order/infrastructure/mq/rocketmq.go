@@ -24,7 +24,6 @@ import (
 	"github.com/apache/rocketmq-client-go/v2"
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
-	"github.com/apache/rocketmq-client-go/v2/rlog"
 	"github.com/samber/lo"
 
 	"github.com/west2-online/DomTok/app/order/domain/model"
@@ -42,7 +41,7 @@ type rocketMq struct {
 }
 
 func NewRocketmq() repository.MQ {
-	rlog.SetLogLevel("fatal")
+	client.SetRocketMqLoggerLevel("ERROR")
 	mq := &rocketMq{
 		producers: make(map[string]rocketmq.Producer),
 		consumers: make([]rocketmq.PushConsumer, 0),
