@@ -99,7 +99,9 @@ func (db *orderDB) GetOrderByID(ctx context.Context, orderID int64) (*model.Orde
 // GetOrderGoodsByOrderID 获取订单商品列表
 func (db *orderDB) GetOrderGoodsByOrderID(ctx context.Context, orderID int64) ([]*model.OrderGoods, error) {
 	var goods []*OrderGoods
-	if err := db.client.WithContext(ctx).Where("order_id = ?", orderID).Find(&goods).Error; err != nil {
+	if err := db.client.WithContext(ctx).Table("order_goods").
+		Where("order_id = ?", orderID).
+		Find(&goods).Error; err != nil {
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get order goods: %v", err)
 	}
 
@@ -179,7 +181,7 @@ func (db *orderDB) GetOrderAndGoods(ctx context.Context, orderID int64) (*model.
 
 	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// 1. 先查询订单
-		if err := tx.Table("order").First(&order, orderID).Error; err != nil {
+		if err := tx.Table("orders").First(&order, orderID).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return errno.NewErrNo(errno.ServiceOrderNotFound, fmt.Sprintf("can't find order by id: %d", orderID))
 			}
