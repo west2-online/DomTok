@@ -49,8 +49,19 @@ type CommodityUseCase interface {
 	GetCreatorCoupons(ctx context.Context, pageNum int64) (coupons []*model.Coupon, err error)
 	CreateUserCoupon(ctx context.Context, coupon *model.UserCoupon) (err error)
 	SearchUserCoupons(ctx context.Context, pageNum int64) (coupons []*model.Coupon, err error)
-	GetCouponAndPrice(ctx context.Context, goods []*model.OrderGoods) ([]*model.OrderGoods, float64, error)
+
+	CreateSku(ctx context.Context, sku *model.Sku, ext string) (skuID int64, err error)
+	UpdateSku(ctx context.Context, sku *model.Sku, ext string) (err error)
+	DeleteSku(ctx context.Context, sku *model.Sku) (err error)
+	ViewSku(ctx context.Context, sku *model.Sku, pageNum *int64, pageSize *int64, isSpuId bool) (Skus []*model.Sku, total int64, err error)
+	UploadSkuAttr(ctx context.Context, attr *model.AttrValue, Sku *model.Sku) (err error)
+	ListSkuInfo(ctx context.Context, skuInfos []*model.SkuVersion, pageNum int64, pageSize int64) (SkuInfos []*model.Sku, total int64, err error)
+	CreateSkuImage(ctx context.Context, skuImage *model.SkuImage, data []byte) (int64, error)
+	UpdateSkuImage(ctx context.Context, skuImage *model.SkuImage, data []byte) (err error)
+	ViewSkuImages(ctx context.Context, sku *model.Sku, pageNum *int64, pageSize *int64) (Images []*model.SkuImage, total int64, err error)
+	DeleteSkuImage(ctx context.Context, imageId int64) (err error)
 }
+
 type useCase struct {
 	db    repository.CommodityDB
 	svc   *service.CommodityService

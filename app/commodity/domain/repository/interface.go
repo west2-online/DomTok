@@ -67,12 +67,33 @@ type CommodityDB interface {
 	DecrStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error
 	DecrLockStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error
 	IncrLockStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error
+
+	CreateSku(ctx context.Context, sku *model.Sku) error
+	UpdateSku(ctx context.Context, sku *model.Sku) error
+	ViewSku(ctx context.Context, skuIds []*int64, PageNum int, PageSize int) ([]*model.Sku, error)
+	DeleteSku(ctx context.Context, sku *model.Sku) error
+	CreateSkuImage(ctx context.Context, skuImage *model.SkuImage) error
+	UpdateSkuImage(ctx context.Context, skuImage *model.SkuImage) error
+	ViewSkuImage(ctx context.Context, sku *model.Sku, PageNum int, PageSize int) ([]*model.SkuImage, error)
+	DeleteSkuImage(ctx context.Context, imageId int64) error
+	GetSkuBySkuId(ctx context.Context, skuId int64) (*model.Sku, error)
+	GetSkuImageByImageId(ctx context.Context, imageId int64) (*model.SkuImage, error)
+	GetSkuIdBySpuID(ctx context.Context, spuId int64, PageNum int, PageSize int) ([]*int64, error)
+	UploadSkuAttr(ctx context.Context, sku *model.Sku, attr *model.AttrValue, id int64) error
+	ListSkuInfo(ctx context.Context, skuInfo []*model.SkuVersion, PageNum int, PageSize int) ([]*model.Sku, error)
 }
 
 type CommodityCache interface {
 	IsExist(ctx context.Context, key string) bool
 	GetSpuImages(ctx context.Context, key string) (*model.SpuImages, error)
 	SetSpuImages(ctx context.Context, key string, images *model.SpuImages)
+
+	GetSku(ctx context.Context, key string) (*model.Sku, error)
+	SetSku(ctx context.Context, key string, sku *model.Sku)
+	DeleteSku(ctx context.Context, key string) error
+	SetSkuImages(ctx context.Context, key string, skuImages []*model.SkuImage)
+	GetSkuImages(ctx context.Context, key string) ([]*model.SkuImage, error)
+	DeleteSkuImages(ctx context.Context, key string) error
 
 	GetLockStockNum(ctx context.Context, key string) (int64, error)
 	SetLockStockNum(ctx context.Context, key string, num int64)

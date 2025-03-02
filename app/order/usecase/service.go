@@ -57,7 +57,7 @@ func (uc *useCase) CreateOrder(ctx context.Context, addressID int64, baseGoods [
 }
 
 // ViewOrderList 获取订单列表
-func (uc *useCase) ViewOrderList(ctx context.Context, page, size int32) ([]*model.Order, []*model.OrderGoods, int32, error) {
+func (uc *useCase) ViewOrderList(ctx context.Context, page, size int32) ([]*model.Order, [][]*model.OrderGoods, int32, error) {
 	// 从 RPC 上下文中获取用户ID
 	userID, err := basecontext.GetLoginData(ctx)
 	if err != nil {

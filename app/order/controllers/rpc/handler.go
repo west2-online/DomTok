@@ -63,7 +63,9 @@ func (h *OrderHandler) ViewOrderList(ctx context.Context, req *order.ViewOrderLi
 	for i, o := range orders {
 		idlOrders = append(idlOrders, &idlmodel.BaseOrderWithGoods{
 			Order: pack.BuildBaseOrder(o),
-			Goods: []*idlmodel.BaseOrderGoods{pack.BuildBaseOrderGoods(goods[i])},
+			Goods: lo.Map(goods[i], func(item *model.OrderGoods, index int) *idlmodel.BaseOrderGoods {
+				return pack.BuildBaseOrderGoods(item)
+			}),
 		})
 	}
 
