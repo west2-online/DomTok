@@ -91,38 +91,51 @@ struct RefundResponse {
 /*
  * struct RefundRequest 退款请求
  * @Param orderID 关联的商户订单号
- * @Param userID 用户ID
- * @Param refundAmount 退款金额
- * @Param refundReason 退款原因
+ * @Param passed 审核是否通过
  */
 struct RefundReviewRequest {
     1: required i64 orderID
-    3: required double refundAmount
-    4: required string refundReason
+    2: required bool passed
 }
 
 /*
  * struct RefundResponse 退款响应
  * @Param refundID 退款ID
- * @Param status 请求状态
  */
 struct RefundReviewResponse {
-    1: model.BaseResp base,
-    2: required i64 refundID
-    3: required i64 status
+    1: model.BaseResp base
+}
+
+/*
+ * struct PaymentCheckoutRequest 订单结算请求
+ * @Param orderID 订单号
+ * @Param token 支付令牌
+ */
+struct PaymentCheckoutRequest {
+    1: required i64 orderID
+    2: required string token
+}
+
+/*
+ * struct PaymentCheckoutResponse 订单支付响应
+ */
+struct PaymentCheckoutResponse {
+    1: model.BaseResp base
 }
 
 /*
  * service PaymentService 支付服务
  * @Method RequestPaymentToken 请求支付令牌
  * @Method ProcessPayment 处理支付
+ * @Method PaymentCheckout 订单结算
  * @Method RequestRefundToken 请求退款令牌
  * @Method ProcessRefund 处理退款
  */
 service PaymentService {
     PaymentResponse ProcessPayment(1: PaymentRequest request) (api.post="/api/payment/process")
     PaymentTokenResponse RequestPaymentToken(1: PaymentTokenRequest request) (api.get="/api/payment/token")
-    RefundReviewResponse ProcessRefund(1: RefundReviewRequest request) (api.post="/api/payment/process-refund")
+    PaymentCheckoutResponse RequestPaymentCheckout(1: PaymentCheckoutRequest request) (api.post="/api/payment/checkout")
+    RefundReviewResponse RefundReview(1: RefundReviewRequest request) (api.post="/api/payment/refund/review")
     RefundResponse RequestRefund(1: RefundRequest request) (api.get="/api/payment/refund")
 }
 
