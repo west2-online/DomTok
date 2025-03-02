@@ -102,7 +102,7 @@ func TestPaymentUseCase_GetPaymentToken(t *testing.T) {
 			},
 			ExpectedToken:   "",
 			ExpectedExpTime: 0,
-			ExpectedError:   errors.New("payment is processing or has already done"),
+			ExpectedError:   errors.New("[4011] payment is processing or has already done"),
 		},
 		{
 			Name:                       "GenerateTokenError",
