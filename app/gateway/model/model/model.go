@@ -10057,7 +10057,6 @@ var fieldIDToName_CartGoods = map[int16]string{
 }
 
 func (p *CartGoods) Read(iprot thrift.TProtocol) (err error) {
-
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetMerchantId bool = false
@@ -10367,7 +10366,6 @@ func (p *CartGoods) ReadField14(iprot thrift.TProtocol) error {
 }
 
 func (p *CartGoods) Write(oprot thrift.TProtocol) (err error) {
-
 	var fieldId int16
 	if err = oprot.WriteStructBegin("CartGoods"); err != nil {
 		goto WriteStructBeginError
@@ -10447,7 +10445,6 @@ WriteFieldBeginError:
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
-
 func (p *CartGoods) writeField2(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("goodsId", thrift.I64, 2); err != nil {
 		goto WriteFieldBeginError
@@ -10464,7 +10461,6 @@ WriteFieldBeginError:
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
-
 func (p *CartGoods) writeField3(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("goodsName", thrift.STRING, 3); err != nil {
 		goto WriteFieldBeginError
@@ -10481,7 +10477,6 @@ WriteFieldBeginError:
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
-
 func (p *CartGoods) writeField4(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("skuId", thrift.I64, 4); err != nil {
 		goto WriteFieldBeginError
@@ -10498,7 +10493,6 @@ WriteFieldBeginError:
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
-
 func (p *CartGoods) writeField5(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("skuName", thrift.STRING, 5); err != nil {
 		goto WriteFieldBeginError
@@ -10515,7 +10509,6 @@ WriteFieldBeginError:
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
 }
-
 func (p *CartGoods) writeField6(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("goodsVersion", thrift.I64, 6); err != nil {
 		goto WriteFieldBeginError
@@ -10532,7 +10525,6 @@ WriteFieldBeginError:
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
 }
-
 func (p *CartGoods) writeField7(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("styleHeadDrawing", thrift.STRING, 7); err != nil {
 		goto WriteFieldBeginError
@@ -10549,7 +10541,6 @@ WriteFieldBeginError:
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 7 end error: ", p), err)
 }
-
 func (p *CartGoods) writeField11(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("purchaseQuantity", thrift.I64, 11); err != nil {
 		goto WriteFieldBeginError
@@ -10566,7 +10557,6 @@ WriteFieldBeginError:
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 11 end error: ", p), err)
 }
-
 func (p *CartGoods) writeField12(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("totalAmount", thrift.DOUBLE, 12); err != nil {
 		goto WriteFieldBeginError
@@ -10583,7 +10573,6 @@ WriteFieldBeginError:
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 12 end error: ", p), err)
 }
-
 func (p *CartGoods) writeField14(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("discountAmount", thrift.DOUBLE, 14); err != nil {
 		goto WriteFieldBeginError

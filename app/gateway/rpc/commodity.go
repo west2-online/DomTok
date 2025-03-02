@@ -486,3 +486,53 @@ func UploadSkuAttrRPC(ctx context.Context, req *commodity.UploadSkuAttrReq) (err
 	}
 	return nil
 }
+
+func CreateCategoryRPC(ctx context.Context, req *commodity.CreateCategoryReq) (int64, error) {
+	resp, err := commodityClient.CreateCategory(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.CreateCategoryRPC CreateCategory failed, err  %v", err)
+		return -1, errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return -1, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return resp.CategoryID, nil
+}
+
+func DeleteCategoryRPC(ctx context.Context, req *commodity.DeleteCategoryReq) (err error) {
+	resp, err := commodityClient.DeleteCategory(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.DeleteCategoryRPC DeleteCategory failed, err  %v", err)
+		return errno.InternalServiceError.WithMessage(err.Error())
+	}
+
+	if !utils.IsSuccess(resp.Base) {
+		return errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return nil
+}
+
+func UpdateCategoryRPC(ctx context.Context, req *commodity.UpdateCategoryReq) (err error) {
+	resp, err := commodityClient.UpdateCategory(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.UpdateCategoryRPC UpdateCategory failed, err  %v", err)
+		return errno.InternalServiceError.WithMessage(err.Error())
+	}
+
+	if !utils.IsSuccess(resp.Base) {
+		return errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return nil
+}
+
+func ViewCategoryRPC(ctx context.Context, req *commodity.ViewCategoryReq) (*commodity.ViewCategoryResp, error) {
+	resp, err := commodityClient.ViewCategory(ctx, req)
+	if err != nil {
+		logger.Errorf("rpc.ViewCategoryRPC ViewCategory failed, err  %v", err)
+		return nil, errno.InternalServiceError.WithMessage(err.Error())
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return resp, nil
+}

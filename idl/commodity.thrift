@@ -264,7 +264,7 @@ struct CreateSkuReq {
 
 struct CreateSkuResp {
     1: required model.BaseResp base;
-    2: required model.SkuInfo skuID;
+    2: required model.SkuInfo SkuInfo;
 }
 
 struct CreateSkuImageReq {
@@ -278,16 +278,6 @@ struct CreateSkuImageResp {
     2: required i64 imageID;
 }
 
-struct CreateSkuImageReq {
-    1: required binary data;
-    2: required i64 skuID;
-    3: required i64 bufferCount;
-}
-
-struct CreateSkuImageResp {
-    1: required model.BaseResp base;
-    2: required i64 imageID;
-}
 
 /*
 * struct UpdateSkuReq 更新sku请求

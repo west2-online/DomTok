@@ -347,7 +347,7 @@ func (c CommodityHandler) CreateSku(streamServer commodity.CommodityService_Crea
 	r.Base = base.BuildSuccessResp()
 	r.SkuInfo = pack.BuildSkuInfo(sku)
 	return streamServer.SendAndClose(r)
-	}
+}
 
 func (c CommodityHandler) UpdateSku(streamServer commodity.CommodityService_UpdateSkuServer) (err error) {
 	r := new(commodity.UpdateSkuResp)
