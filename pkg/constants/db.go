@@ -32,7 +32,7 @@ const (
 
 const (
 	UserTableName       = "users"
-	CategoryTableName   = "categories"
+	CategoryTableName   = "category"
 	OrderTableName      = "orders"
 	OrderGoodsTableName = "order_goods"
 	SpuTableName        = "spu_info"
@@ -44,7 +44,7 @@ const (
 	CartTableName          = "cart"
 	PaymentTableName       = "payment_orders"
 	PaymentRefundTableName = "payment_refunds"
-	PaymentLedgerTableName = "payment_ledgers"
+	PaymentLedgerTableName = "payment_ledger"
 
 	SkuTableName             = "sku_info"
 	SkuImagesTableName       = "sku_image"

@@ -43,42 +43,38 @@ func (db *commodityDB) IsCategoryExistByName(ctx context.Context, name string) (
 	err := db.client.WithContext(ctx).Where("Name = ?", name).First(&category).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, errno.Errorf(errno.ErrRecordNotFound, "mysql: ErrRecordNotFound record not found: %v", err)
+			return false, nil
 		}
 		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
 	}
-	return true, nil
+	return true, errno.Errorf(errno.ServiceCategoryExist, "category already exist")
 }
 
-func (db *commodityDB) IsCategoryExistById(ctx context.Context, id int64) (bool, error) {
-	var category model.Category
-	err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error
-	if err != nil {
+func (db *commodityDB) GetCategoryById(ctx context.Context, id int64) (*model.Category, error) {
+	var category *model.Category
+	if err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, errno.Errorf(errno.ErrRecordNotFound, "mysql: ErrRecordNotFound record not found: %v", err)
+			return nil, errno.Errorf(errno.ServiceCategorynotExist, "category already exist")
 		}
-		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get category %v", err)
 	}
-	return true, nil
+	return category, nil
 }
 
 func (db *commodityDB) CreateCategory(ctx context.Context, entity *model.Category) error {
-	m := Category{
+	model := Category{
 		Id:        entity.Id,
 		Name:      entity.Name,
 		CreatorId: entity.CreatorId,
-		CreatedAt: entity.CreatedAt,
-		UpdatedAt: entity.UpdatedAt,
-		DeletedAt: gorm.DeletedAt{},
 	}
-	if err := db.client.WithContext(ctx).Create(m).Error; err != nil {
+	if err := db.client.WithContext(ctx).Table(model.TableName()).Create(&model).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create category: %v", err)
 	}
 	return nil
 }
 
 func (db *commodityDB) DeleteCategory(ctx context.Context, category *model.Category) error {
-	if err := db.client.WithContext(ctx).Delete(Category{Id: category.Id}).Error; err != nil {
+	if err := db.client.WithContext(ctx).Delete(&Category{Id: category.Id}).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete category: %v", err)
 	}
 	return nil
