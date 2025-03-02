@@ -100,7 +100,7 @@ func (svc *CommodityService) VerifyRemainUses(times int64) CommodityVerifyOps {
 
 func (svc *CommodityService) VerifyCategoryId(ctx context.Context, categoryId int64) CommodityVerifyOps {
 	return func() error {
-		_, err := svc.db.IsCategoryExistById(ctx, categoryId)
+		_, err := svc.db.GetCategoryById(ctx, categoryId)
 		if err != nil {
 			return fmt.Errorf("CommodityService.VerifyCategoryId failed :%w", err)
 		}
