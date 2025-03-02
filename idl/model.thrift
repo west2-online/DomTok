@@ -231,3 +231,16 @@ struct RefundResponseInfo{
     1: required i64 refundID
     2: required i64 status
 }
+
+struct CartGoods {
+    1: required i64 merchantId; // 商家 ID
+    2: required i64 goodsId; // 商品 ID
+    3: required string goodsName; // 商品名字
+    4: required i64 skuId; // 商品款式 ID
+    5: required string skuName; // 款式名称
+    6: required i64 goodsVersion; // 商品版本号
+    7: required string styleHeadDrawing; // 款式头图
+    11: required i64 purchaseQuantity; // 购买数量
+    12: required double totalAmount; // 本应总金额
+    14: required double discountAmount; // 折扣总金额
+}

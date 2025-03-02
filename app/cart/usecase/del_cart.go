@@ -20,23 +20,25 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/west2-online/DomTok/app/cart/domain/model"
 	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-func (u *UseCase) AddGoodsIntoCart(ctx context.Context, goods *model.GoodInfo) (err error) {
-	if err = u.svc.Verify(u.svc.VerifyCount(goods.Count)); err != nil {
-		return
-	}
-
-	id, err := metainfoContext.GetLoginData(ctx)
+func (u *UseCase) DeleteCartGoods(ctx context.Context) error {
+	userID, err := metainfoContext.GetLoginData(ctx)
 	if err != nil {
-		return fmt.Errorf("cartCase.AddGoodsIntoCart metainfo unmarshal error:%w", err)
+		return fmt.Errorf("DeleteCartGoods get user info error: %w", err)
 	}
-	err = u.MQ.SendAddGoods(ctx, id, goods)
+	e, _, err := u.DB.GetCartByUserId(ctx, userID)
 	if err != nil {
-		return fmt.Errorf("cartCase.AddGoodsIntoCart send mq error:%w", err)
+		return fmt.Errorf("DeleteCartGoods get cart by user id error: %w", err)
 	}
-
+	if !e {
+		return errno.Errorf(errno.InvalidDeleteCartCode, "cart not exist")
+	}
+	err = u.DB.DeleteCart(ctx, userID)
+	if err != nil {
+		return fmt.Errorf("DeleteCartGoods delete cart error: %w", err)
+	}
 	return nil
 }

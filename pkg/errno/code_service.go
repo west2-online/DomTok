@@ -72,3 +72,8 @@ const (
 	ServiceCreateRefundFailed
 	ServicePaymentIsProcessing
 )
+
+// cart
+const (
+	InvalidDeleteCartCode = 5000 + iota
+)
