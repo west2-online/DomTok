@@ -128,84 +128,6 @@ services:
 #      networks:
 #        - domtok
 #
-#    prometheus:
-#      image: prom/prometheus
-#      container_name: domtok-prometheus
-#      hostname: prometheus
-#      restart: always
-#      volumes:
-#        - ../config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-#      ports:
-#        - 9090:9090
-#      networks:
-#        - domtok
-#
-#    grafana:
-#      image: grafana/grafana
-#      container_name: domtok-grafana
-#      restart: always
-#      ports:
-#        - 3000:3000
-#      volumes:
-#        - ../config/grafana:/etc/grafana
-#      networks:
-#        - domtok
-#
-#    alertmanager: #预警模块
-#      image: prom/alertmanager
-#      container_name: domtok-alertmanager
-#      restart: always
-#      ports:
-#        - 9093:9093
-#      networks:
-#        - domtok
-#
-#    node-exporter:
-#      image: quay.io/prometheus/node-exporter
-#      container_name: domtok-node-exporter
-#      restart: always
-#      ports:
-#        - 9100:9100
-#      networks:
-#        - domtok
-#
-#    cadvisor:
-#      image: google/cadvisor:latest
-#      container_name: domtok-cadvisor
-#      restart: always
-#      platform: linux/amd64
-#      volumes:
-#        - /:/rootfs:ro
-#        - /var/run:/var/run:rw
-#        - /sys:/sys:ro
-#        - /var/lib/docker/:/var/lib/docker:ro
-#      ports:
-#        - 8899:8080
-#      networks:
-#        - domtok
-#
-#    redis-exporter:
-#      image: oliver006/redis_exporter
-#      container_name: domtok-redis-exporter
-#      restart: always
-#      ports:
-#        - 9121:9121
-#      command:
-#        - "--redis.addr=redis://127.0.0.1:6379"
-#      networks:
-#        - domtok
-#
-#  mysql_xporter:
-#    image: prom/mysqld-exporter
-#    container_name: domtok-mysql-exporter
-#    restart: always
-#    ports:
-#      - 9104:9104
-#    environment:
-#      DATA_SOURCE_NAME: 'exporter:123456@(127.0.0.1:3306)'
-#    networks:
-#       - domtok
-#
   kafka:
     container_name: domtok-kafka
     image: bitnami/kafka:latest
@@ -266,6 +188,83 @@ services:
       domtok:
         aliases:
           - rmqbroker
+
+  domtok-prometheus:
+    image: prom/prometheus
+    container_name: domtok-prometheus
+    hostname: prometheus
+    volumes:
+      - ../config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    networks:
+      - domtok
+
+  domtok-node-exporter:
+    image: quay.io/prometheus/node-exporter
+    container_name: domtok-node-exporter
+    restart: always
+    ports:
+      - 9100:9100
+    networks:
+      - domtok
+
+  domtok-cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: domtok-cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 8080:8080
+    networks:
+      - domtok
+
+  domtok-redis-exporter:
+    image: oliver006/redis_exporter
+    container_name: domtok-redis-exporter
+    ports:
+      - 9121:9121
+    command:
+      - "--redis.addr=redis://domtok-redis:6379"
+    networks:
+      - domtok
+
+  domtok-mysql-exporter:
+    image: prom/mysqld-exporter
+    container_name: domtok-mysql-exporter
+    ports:
+      - 9104:9104
+    #command: #如果 environment 没有用的话，可以使用 command
+    #  - "--mysqld.username=fzu-helper:fzu-helper"
+    #  - "--mysqld.address=domtok-mysql:3306"
+    environment:
+      DATA_SOURCE_NAME: 'domtok:domtok@(domtokr-mysql:3306)/' # user:passwd@(host:port)/
+    networks:
+      - domtok
+    depends_on:
+      - domtok-mysql
+
+  domtok-alloy:
+    container_name: domtok-alloy
+    image: grafana/alloy:latest
+    volumes:
+      - ../config/alloy/config.alloy:/etc/alloy/config.alloy
+    ports:
+      - "12345:12345"
+    command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    networks:
+      - domtok
+
+  domtok-grafana:
+    container_name: domtok-grafana
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - domtok
 
 networks:
   domtok:
