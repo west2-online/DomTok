@@ -26,20 +26,24 @@ import (
 
 type CartCasePort interface {
 	AddGoodsIntoCart(ctx context.Context, goods *model.GoodInfo) error
+	ShowCartGoods(ctx context.Context, pageNum int64) ([]*model.CartGoods, error)
+	DeleteCartGoods(ctx context.Context) error
 }
 
 type UseCase struct {
 	DB    repository.PersistencePort
 	Cache repository.CachePort
 	MQ    repository.MqPort
+	Rpc   repository.RpcPort
 	svc   *service.CartService
 }
 
-func NewCartCase(db repository.PersistencePort, cache repository.CachePort, mq repository.MqPort, svc *service.CartService) *UseCase {
+func NewCartCase(db repository.PersistencePort, cache repository.CachePort, mq repository.MqPort, rpc repository.RpcPort, svc *service.CartService) *UseCase {
 	return &UseCase{
 		DB:    db,
 		Cache: cache,
 		MQ:    mq,
 		svc:   svc,
+		Rpc:   rpc,
 	}
 }

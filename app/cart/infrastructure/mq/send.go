@@ -26,6 +26,13 @@ import (
 )
 
 func (c *KafkaAdapter) send(ctx context.Context, msg []*kafka.Message) (err error) {
+	if !c.done.Load() {
+		err = c.mq.SetWriter(constants.KafkaCartTopic, true)
+		if err != nil {
+			return err
+		}
+		c.done.Swap(true)
+	}
 	errs := c.mq.Send(ctx, constants.KafkaCartTopic, msg)
 	if len(errs) != 0 {
 		var errMsg string

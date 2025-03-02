@@ -65,7 +65,7 @@ func (svc *OrderService) OrderExist(ctx context.Context, orderID int64) error {
 }
 
 // ViewOrderList 获取订单列表
-func (svc *OrderService) ViewOrderList(ctx context.Context, userID int64, page, size int32) ([]*model.Order, []*model.OrderGoods, int32, error) {
+func (svc *OrderService) ViewOrderList(ctx context.Context, userID int64, page, size int32) ([]*model.Order, [][]*model.OrderGoods, int32, error) {
 	// 1. 获取订单列表
 	orders, total, err := svc.db.GetOrdersByUserID(ctx, userID, page, size)
 	if err != nil {
@@ -77,17 +77,17 @@ func (svc *OrderService) ViewOrderList(ctx context.Context, userID int64, page, 
 		return nil, nil, total, nil
 	}
 
-	// 3. 获取所有订单的商品信息
-	var allGoods []*model.OrderGoods
-	for _, order := range orders {
+	// 3. 获取每个订单对应的商品列表
+	allOrderGoods := make([][]*model.OrderGoods, len(orders))
+	for i, order := range orders {
 		goods, err := svc.db.GetOrderGoodsByOrderID(ctx, order.Id)
 		if err != nil {
 			return nil, nil, 0, err
 		}
-		allGoods = append(allGoods, goods...)
+		allOrderGoods[i] = goods // 每个订单对应一个商品数组
 	}
 
-	return orders, allGoods, total, nil
+	return orders, allOrderGoods, total, nil
 }
 
 func (svc *OrderService) GetOrderStatusMsg(code int8) string {
@@ -171,6 +171,6 @@ func (svc *OrderService) nextVal() int64 {
 
 func (svc *OrderService) logUnLock(id int64, fn func(id int64) error) {
 	if err := fn(id); err != nil {
-		logger.Errorf(err.Error())
+		logger.Error(err.Error())
 	}
 }

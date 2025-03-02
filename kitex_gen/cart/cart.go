@@ -26,9 +26,10 @@ import (
 )
 
 type AddGoodsIntoCartRequest struct {
-	SkuId  int64 `thrift:"skuId,1,required" frugal:"1,required,i64" json:"skuId"`
-	ShopId int64 `thrift:"shop_id,2,required" frugal:"2,required,i64" json:"shop_id"`
-	Count  int64 `thrift:"count,3,required" frugal:"3,required,i64" json:"count"`
+	SkuId     int64 `thrift:"skuId,1,required" frugal:"1,required,i64" json:"skuId"`
+	ShopId    int64 `thrift:"shop_id,2,required" frugal:"2,required,i64" json:"shop_id"`
+	VersionId int64 `thrift:"version_id,3,required" frugal:"3,required,i64" json:"version_id"`
+	Count     int64 `thrift:"count,4,required" frugal:"4,required,i64" json:"count"`
 }
 
 func NewAddGoodsIntoCartRequest() *AddGoodsIntoCartRequest {
@@ -46,6 +47,10 @@ func (p *AddGoodsIntoCartRequest) GetShopId() (v int64) {
 	return p.ShopId
 }
 
+func (p *AddGoodsIntoCartRequest) GetVersionId() (v int64) {
+	return p.VersionId
+}
+
 func (p *AddGoodsIntoCartRequest) GetCount() (v int64) {
 	return p.Count
 }
@@ -54,6 +59,9 @@ func (p *AddGoodsIntoCartRequest) SetSkuId(val int64) {
 }
 func (p *AddGoodsIntoCartRequest) SetShopId(val int64) {
 	p.ShopId = val
+}
+func (p *AddGoodsIntoCartRequest) SetVersionId(val int64) {
+	p.VersionId = val
 }
 func (p *AddGoodsIntoCartRequest) SetCount(val int64) {
 	p.Count = val
@@ -78,7 +86,10 @@ func (p *AddGoodsIntoCartRequest) DeepEqual(ano *AddGoodsIntoCartRequest) bool {
 	if !p.Field2DeepEqual(ano.ShopId) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.Count) {
+	if !p.Field3DeepEqual(ano.VersionId) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.Count) {
 		return false
 	}
 	return true
@@ -100,6 +111,13 @@ func (p *AddGoodsIntoCartRequest) Field2DeepEqual(src int64) bool {
 }
 func (p *AddGoodsIntoCartRequest) Field3DeepEqual(src int64) bool {
 
+	if p.VersionId != src {
+		return false
+	}
+	return true
+}
+func (p *AddGoodsIntoCartRequest) Field4DeepEqual(src int64) bool {
+
 	if p.Count != src {
 		return false
 	}
@@ -109,7 +127,8 @@ func (p *AddGoodsIntoCartRequest) Field3DeepEqual(src int64) bool {
 var fieldIDToName_AddGoodsIntoCartRequest = map[int16]string{
 	1: "skuId",
 	2: "shop_id",
-	3: "count",
+	3: "version_id",
+	4: "count",
 }
 
 type AddGoodsIntoCartResponse struct {
@@ -220,9 +239,9 @@ var fieldIDToName_ShowCartGoodsListRequest = map[int16]string{
 }
 
 type ShowCartGoodsListResponse struct {
-	Base       *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
-	GoodsList  []*model.Sku    `thrift:"goodsList,2,required" frugal:"2,required,list<model.Sku>" json:"goodsList"`
-	GoodsCount int64           `thrift:"goodsCount,3,required" frugal:"3,required,i64" json:"goodsCount"`
+	Base       *model.BaseResp    `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+	GoodsList  []*model.CartGoods `thrift:"goodsList,2,required" frugal:"2,required,list<model.CartGoods>" json:"goodsList"`
+	GoodsCount int64              `thrift:"goodsCount,3,required" frugal:"3,required,i64" json:"goodsCount"`
 }
 
 func NewShowCartGoodsListResponse() *ShowCartGoodsListResponse {
@@ -241,7 +260,7 @@ func (p *ShowCartGoodsListResponse) GetBase() (v *model.BaseResp) {
 	return p.Base
 }
 
-func (p *ShowCartGoodsListResponse) GetGoodsList() (v []*model.Sku) {
+func (p *ShowCartGoodsListResponse) GetGoodsList() (v []*model.CartGoods) {
 	return p.GoodsList
 }
 
@@ -251,7 +270,7 @@ func (p *ShowCartGoodsListResponse) GetGoodsCount() (v int64) {
 func (p *ShowCartGoodsListResponse) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
-func (p *ShowCartGoodsListResponse) SetGoodsList(val []*model.Sku) {
+func (p *ShowCartGoodsListResponse) SetGoodsList(val []*model.CartGoods) {
 	p.GoodsList = val
 }
 func (p *ShowCartGoodsListResponse) SetGoodsCount(val int64) {
@@ -294,7 +313,7 @@ func (p *ShowCartGoodsListResponse) Field1DeepEqual(src *model.BaseResp) bool {
 	}
 	return true
 }
-func (p *ShowCartGoodsListResponse) Field2DeepEqual(src []*model.Sku) bool {
+func (p *ShowCartGoodsListResponse) Field2DeepEqual(src []*model.CartGoods) bool {
 
 	if len(p.GoodsList) != len(src) {
 		return false

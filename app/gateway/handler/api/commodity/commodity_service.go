@@ -678,8 +678,15 @@ func CreateCategory(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(api.CreateCategoryResp)
-
-	c.JSON(consts.StatusOK, resp)
+	id, err := rpc.CreateCategoryRPC(ctx, &commodity.CreateCategoryReq{
+		Name: req.Name,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	resp.CategoryID = id
+	pack.RespData(c, resp)
 }
 
 // DeleteCategory .
@@ -689,13 +696,19 @@ func DeleteCategory(ctx context.Context, c *app.RequestContext) {
 	var req api.DeleteCategoryReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.DeleteCategoryResp)
-
-	c.JSON(consts.StatusOK, resp)
+	err = rpc.DeleteCategoryRPC(ctx, &commodity.DeleteCategoryReq{
+		CategoryID: req.CategoryID,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, resp)
 }
 
 // ViewCategory .
@@ -705,13 +718,21 @@ func ViewCategory(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewCategoryReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.ViewCategoryResp)
-
-	c.JSON(consts.StatusOK, resp)
+	res, err := rpc.ViewCategoryRPC(ctx, &commodity.ViewCategoryReq{
+		PageNum:  req.PageNum,
+		PageSize: req.PageSize,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	resp.CategoryInfo = pack.BuildCategorys(res.CategoryInfo)
+	pack.RespData(c, resp)
 }
 
 // UpdateCategory .
@@ -721,13 +742,20 @@ func UpdateCategory(ctx context.Context, c *app.RequestContext) {
 	var req api.UpdateCategoryReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.UpdateCategoryResp)
-
-	c.JSON(consts.StatusOK, resp)
+	err = rpc.UpdateCategoryRPC(ctx, &commodity.UpdateCategoryReq{
+		CategoryID: req.CategoryID,
+		Name:       req.Name,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, resp)
 }
 
 // CreateSpuImage .

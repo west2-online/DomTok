@@ -170,3 +170,14 @@ func BuildSkuPriceHistory(i []*model.SkuPriceHistory) []*modelKitex.PriceHistory
 	}
 	return result
 }
+
+func BuildCategory(category *model.CategoryInfo) *modelKitex.CategoryInfo {
+	return &modelKitex.CategoryInfo{
+		CategoryID: category.CategoryID,
+		Name:       category.Name,
+	}
+}
+
+func BuildCategorys(categorys []*model.CategoryInfo) []*modelKitex.CategoryInfo {
+	return base.BuildTypeList(categorys, BuildCategory)
+}

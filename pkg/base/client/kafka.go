@@ -50,6 +50,9 @@ func GetNewReader(topic string, groupID string) *kafukago.Reader {
 	if groupID == "" {
 		groupID = constants.DefaultReaderGroupID
 	}
+	if err := createIfNotExist(topic); err != nil {
+		logger.Fatalf("Failed to create topic %s, %v", topic, err)
+	}
 
 	cfg := kafukago.ReaderConfig{
 		Brokers:     []string{config.Kafka.Address}, // 单节点无Leader

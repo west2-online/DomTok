@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	"github.com/west2-online/DomTok/app/cart/domain/model"
-	"github.com/west2-online/DomTok/pkg/constants"
+	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
 )
 
 func (u *UseCase) AddGoodsIntoCart(ctx context.Context, goods *model.GoodInfo) (err error) {
@@ -29,15 +29,11 @@ func (u *UseCase) AddGoodsIntoCart(ctx context.Context, goods *model.GoodInfo) (
 		return
 	}
 
-	// todo: 开启metainfo透传
-	/*
-		loginData, err := metainfoContext.GetLoginData(ctx)
-		if err != nil {
-			return fmt.Errorf("cartCase.AddGoodsIntoCart metainfo unmarshal error:%w", err)
-		}
-
-	*/
-	err = u.MQ.SendAddGoods(ctx, constants.UserTestId, goods)
+	id, err := metainfoContext.GetLoginData(ctx)
+	if err != nil {
+		return fmt.Errorf("cartCase.AddGoodsIntoCart metainfo unmarshal error:%w", err)
+	}
+	err = u.MQ.SendAddGoods(ctx, id, goods)
 	if err != nil {
 		return fmt.Errorf("cartCase.AddGoodsIntoCart send mq error:%w", err)
 	}

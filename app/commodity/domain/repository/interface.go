@@ -29,7 +29,7 @@ import (
 
 type CommodityDB interface {
 	IsCategoryExistByName(ctx context.Context, name string) (bool, error)
-	IsCategoryExistById(ctx context.Context, id int64) (bool, error)
+	GetCategoryById(ctx context.Context, id int64) (*model.Category, error)
 	CreateCategory(ctx context.Context, entity *model.Category) error
 	DeleteCategory(ctx context.Context, category *model.Category) error
 	UpdateCategory(ctx context.Context, category *model.Category) error
@@ -89,6 +89,9 @@ type CommodityCache interface {
 	GetSpuImages(ctx context.Context, key string) (*model.SpuImages, error)
 	SetSpuImages(ctx context.Context, key string, images *model.SpuImages)
 
+	GetSku(ctx context.Context, key string) (*model.Sku, error)
+	SetSku(ctx context.Context, key string, sku *model.Sku)
+	DeleteSku(ctx context.Context, key string) error
 	SetSkuImages(ctx context.Context, key string, skuImages []*model.SkuImage)
 	GetSkuImages(ctx context.Context, key string) ([]*model.SkuImage, error)
 	DeleteSkuImages(ctx context.Context, key string) error

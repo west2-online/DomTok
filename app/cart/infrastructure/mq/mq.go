@@ -16,11 +16,16 @@ limitations under the License.
 
 package mq
 
-import "github.com/west2-online/DomTok/pkg/kafka"
+import (
+	"sync/atomic"
+
+	"github.com/west2-online/DomTok/pkg/kafka"
+)
 
 // KafkaAdapter 这里不是mqAdapter的原因是我们调用的是在pkg封装的kafka
 type KafkaAdapter struct {
-	mq *kafka.Kafka
+	mq   *kafka.Kafka
+	done atomic.Bool // topic并发的标记
 }
 
 func NewKafkaAdapter(mq *kafka.Kafka) *KafkaAdapter {

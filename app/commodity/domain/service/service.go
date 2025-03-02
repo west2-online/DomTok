@@ -209,6 +209,10 @@ func (svc *CommodityService) DeleteAllSpuImages(ctx context.Context, spuId int64
 		return fmt.Errorf("service.DeleteAllSpuImages: delete spuImages failed: %w", err)
 	}
 
+	if len(ids) < 1 {
+		return nil
+	}
+
 	for i := 0; i < len(ids); i++ {
 		eg.Go(func() error {
 			if err = upyun.DeleteImg(urls[i]); err != nil {
@@ -381,28 +385,28 @@ func (svc *CommodityService) IsSpuMappingExist(ctx context.Context) error {
 	return err
 }
 
-func (svc *CommodityService) DeleteCategory(ctx context.Context, category *model.Category) (err error) {
-	// 判断是否存在
-	exist, err := svc.db.IsCategoryExistByName(ctx, category.Name)
-	if err != nil {
-		return fmt.Errorf("check category exist failed: %w", err)
-	}
-	if !exist {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "category does not exist")
-	}
-	err = svc.db.DeleteCategory(ctx, category)
-	if err != nil {
-		return fmt.Errorf("delete category failed: %w", err)
-	}
-	return nil
-}
-
 func (svc *CommodityService) CreateCategory(ctx context.Context, category *model.Category) error {
 	category.Id = svc.nextID()
 	if err := svc.db.CreateCategory(ctx, category); err != nil {
 		return fmt.Errorf("create category failed: %w", err)
 	}
 	return nil
+}
+
+func (svc *CommodityService) DeleteCategory(ctx context.Context, category *model.Category) error {
+	err := svc.db.DeleteCategory(ctx, category)
+	if err != nil {
+		return fmt.Errorf("delete category failed: %w", err)
+	}
+	return nil
+}
+
+func (svc *CommodityService) UpdateCategory(ctx context.Context, category *model.Category) error {
+	err := svc.db.UpdateCategory(ctx, category)
+	if err != nil {
+		return fmt.Errorf("update category failed: %w", err)
+	}
+	return err
 }
 
 func (svc *CommodityService) Cached(ctx context.Context, infos []*model.SkuBuyInfo) bool {
