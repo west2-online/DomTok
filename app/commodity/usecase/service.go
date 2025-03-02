@@ -47,8 +47,8 @@ func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category)
 }
 
 func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category) (err error) {
-	// 判断用户是否有权限
-	category.CreatorId, err = uc.db.GetCreatorIDById(ctx, category.Id)
+	// 获取
+	category, err = uc.db.GetCategoryById(ctx, category.Id)
 	if err != nil {
 		return err
 	}
@@ -65,8 +65,8 @@ func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category)
 }
 
 func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category) (err error) {
-	// 判断用户是否有权限
-	category.CreatorId, err = uc.db.GetCreatorIDById(ctx, category.Id)
+	// 	获取
+	category, err = uc.db.GetCategoryById(ctx, category.Id)
 	if err != nil {
 		return err
 	}

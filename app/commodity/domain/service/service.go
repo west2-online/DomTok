@@ -394,15 +394,7 @@ func (svc *CommodityService) CreateCategory(ctx context.Context, category *model
 }
 
 func (svc *CommodityService) DeleteCategory(ctx context.Context, category *model.Category) error {
-	// 判断是否存在
-	exist, err := svc.db.IsCategoryExistById(ctx, category.Id)
-	if err != nil {
-		return fmt.Errorf("check category exist failed: %w", err)
-	}
-	if !exist {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "category does not exist")
-	}
-	err = svc.db.DeleteCategory(ctx, category)
+	err := svc.db.DeleteCategory(ctx, category)
 	if err != nil {
 		return fmt.Errorf("delete category failed: %w", err)
 	}
@@ -410,15 +402,7 @@ func (svc *CommodityService) DeleteCategory(ctx context.Context, category *model
 }
 
 func (svc *CommodityService) UpdateCategory(ctx context.Context, category *model.Category) error {
-	// 判断是否存在
-	exist, err := svc.db.IsCategoryExistById(ctx, category.Id)
-	if err != nil {
-		return fmt.Errorf("check category exist failed: %w", err)
-	}
-	if !exist {
-		return errno.NewErrNo(errno.ServiceUserNotExist, "category does not exist")
-	}
-	err = svc.db.UpdateCategory(ctx, category)
+	err := svc.db.UpdateCategory(ctx, category)
 	if err != nil {
 		return fmt.Errorf("update category failed: %w", err)
 	}

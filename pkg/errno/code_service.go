@@ -48,7 +48,6 @@ const (
 	ServiceCategoryExist
 	ServiceCategorynotExist
 	ServiceListCategoryFailed
-
 	ServiceCategoryCreateFail
 )
 
