@@ -50,9 +50,6 @@ const (
 	ServiceListCategoryFailed
 
 	ServiceCategoryCreateFail
-
-	ServiceUserCloseWebsocketConn
-
 )
 
 // payment
