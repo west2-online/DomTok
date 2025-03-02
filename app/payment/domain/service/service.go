@@ -36,7 +36,7 @@ func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64)
 	// 1. 生成支付 ID（雪花算法）
 	paymentID, err = svc.sf.NextVal()
 	if err != nil {
-		return 0, errno.Errorf(errno.ServiceCreatePaymentIDFailed, "failed to create payment ID: %v", err)
+		return 0, fmt.Errorf("failed to create payment information order: %w", err)
 	}
 
 	// 2. 构造支付订单对象
@@ -49,7 +49,7 @@ func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64)
 	// 3. 存入数据库
 	err = svc.db.CreatePayment(ctx, paymentOrder)
 	if err != nil {
-		return 0, errno.Errorf(errno.ServiceCreatePaymentOrderFailed, "failed to create payment order: %v", err)
+		return 0, fmt.Errorf("failed to create refund order: %w", err)
 	}
 
 	// 4. 返回支付 ID
@@ -60,7 +60,7 @@ func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64)
 func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error) {
 	uid, err = loginData.GetLoginData(ctx)
 	if err != nil {
-		return 0, errno.Errorf(errno.ServiceGetLoginDataFailed, "failed to get login data: %v", err)
+		return 0, fmt.Errorf("failed to get login data: %w", err)
 	}
 	return uid, nil
 }
@@ -69,7 +69,7 @@ func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error)
 func (svc *PaymentService) CheckOrderExist(ctx context.Context, orderID int64) (orderInfo bool, err error) {
 	userInfo, err := svc.rpc.PaymentIsOrderExist(ctx, orderID)
 	if err != nil {
-		return false, errno.Errorf(errno.ServiceCheckOrderExistFailed, "failed to check order existence: %v", err)
+		return false, fmt.Errorf("failed to check order existence: %w", err)
 	}
 	return userInfo, nil
 }
@@ -87,7 +87,7 @@ func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int
 	_, err = h.Write([]byte(fmt.Sprintf("%d:%d", orderID, expirationTime)))
 	if err != nil {
 		logger.Infof("failed to generate payment HMAC token, orderID: %d, expirationTime: %d", orderID, expirationTime)
-		return "", 0, errno.Errorf(errno.ServiceGenerateHMACFailed, "failed to generate payment HMAC token: %v", err)
+		return "", 0, fmt.Errorf("failed to generate payment HMAC token: %w", err)
 	}
 
 	// 4. 生成十六进制编码的 HMAC 签名
@@ -107,7 +107,7 @@ func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, 
 	expirationDuration := time.Until(time.Unix(expTime, 0))
 	if expirationDuration <= 0 {
 		logger.Warnf("Token expiration time has already passed: orderID: %d, userID: %d", orderID, userID)
-		return paymentStatus.RedisStoreFailed, errno.Errorf(errno.ServiceStorePaymentRedisTokenFailed, "cannot store token: expiration time has already passed")
+		return paymentStatus.RedisStoreFailed, fmt.Errorf("cannot store token: expiration time has already passed")
 	}
 	// 2. 构造 Redis Key
 	redisKey := fmt.Sprintf("payment_token:%d:%d", userID, orderID)
@@ -115,9 +115,8 @@ func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, 
 	err := svc.redis.SetPaymentToken(ctx, redisKey, token, expirationDuration)
 	if err != nil {
 		logger.Infof("failed to store payment token in redis, orderID: %d, userID: %d", orderID, userID)
-		return paymentStatus.RedisStoreFailed, errno.Errorf(errno.InternalRedisErrorCode, "failed to store payment token in redis: %v", err)
-	}
-	// 4. 返回成功状态码
+		return paymentStatus.RedisStoreFailed, fmt.Errorf("failed to store payment token in redis: %w", err)
+	} // 4. 返回成功状态码
 	return paymentStatus.RedisStoreSuccess, nil
 }
 
@@ -128,7 +127,7 @@ func (svc *PaymentService) CheckRedisRateLimiting(ctx context.Context, uid int64
 	// 检查 1 分钟内的申请次数
 	count, err := svc.redis.IncrRedisKey(ctx, minuteKey, paymentStatus.RedisMinute)
 	if err != nil {
-		return false, false, errno.Errorf(errno.InternalRedisErrorCode, "check refund request limit failed: %v", err)
+		return false, false, fmt.Errorf("check refund request limit failed: %w", err)
 	}
 	if count > paymentStatus.RedisCheckTimesInMinute {
 		return false, false, errno.Errorf(errno.ServiceRedisTimeLimited, "too many refund requests in a short time")
@@ -138,7 +137,7 @@ func (svc *PaymentService) CheckRedisRateLimiting(ctx context.Context, uid int64
 	// TODO 这下面的返回值的全用false吗？
 	exists, err := svc.redis.CheckRedisDayKey(ctx, dayKey)
 	if err != nil {
-		return false, false, errno.Errorf(errno.InternalRedisErrorCode, "check refund request history failed: %v", err)
+		return false, false, fmt.Errorf("check refund request history failed: %w", err)
 	}
 	if exists {
 		return true, false, errno.Errorf(errno.ServiceRedisTimeLimited, "refund already requested for this order in the last 24 hours")
@@ -146,7 +145,7 @@ func (svc *PaymentService) CheckRedisRateLimiting(ctx context.Context, uid int64
 	// 记录订单退款请求，设置 24 小时过期
 	err = svc.redis.SetRedisDayKey(ctx, dayKey, paymentStatus.RedisDayPlaceholder, paymentStatus.RedisDay)
 	if err != nil {
-		return false, false, errno.Errorf(errno.InternalRedisErrorCode, "record refund request failed: %v", err)
+		return false, false, fmt.Errorf("record refund request failed: %w", err)
 	}
 	return true, true, nil
 }
@@ -155,7 +154,7 @@ func (svc *PaymentService) CreateRefundInfo(ctx context.Context, orderID int64) 
 	// 1. 生成退款 ID（雪花算法）
 	refundID, err = svc.sf.NextVal()
 	if err != nil {
-		return 0, errno.Errorf(errno.ServiceCreateRefundIDFailed, "failed to create refund information order: %v", err)
+		return 0, fmt.Errorf("failed to create refund information order: %w", err)
 	}
 
 	// 2. 构造退款订单对象
@@ -168,7 +167,7 @@ func (svc *PaymentService) CreateRefundInfo(ctx context.Context, orderID int64) 
 	// 3. 存入数据库
 	err = svc.db.CreateRefund(ctx, refundOrder)
 	if err != nil {
-		return 0, errno.Errorf(errno.ServiceCreateRefundFailed, "failed to create refund order: %v", err)
+		return 0, fmt.Errorf("failed to create refund order: %w", err)
 	}
 
 	// 4. 返回退款 ID
