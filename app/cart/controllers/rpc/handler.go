@@ -72,7 +72,8 @@ func (h *CartHandler) DeleteCartGoods(ctx context.Context, req *cart.DeleteAllCa
 
 func (h *CartHandler) DeleteAllCartGoods(ctx context.Context, req *cart.DeleteAllCartGoodsRequest) (r *cart.DeleteAllCartGoodsResponse, err error) {
 	r = new(cart.DeleteAllCartGoodsResponse)
-	return r, nil
+	err = h.useCase.DeleteCartGoods(ctx)
+	return
 }
 
 func (h *CartHandler) PayCartGoods(ctx context.Context, req *cart.PayCartGoodsRequest) (r *cart.PayCartGoodsResponse, err error) {

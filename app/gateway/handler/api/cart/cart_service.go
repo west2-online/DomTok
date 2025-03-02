@@ -62,19 +62,20 @@ func ShowCartGoodsList(ctx context.Context, c *app.RequestContext) {
 	var req api.ShowCartGoodsListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	// resp := new(api.ShowCartGoodsListResponse)
-	err = rpc.ShowCartGoodsRPC(ctx, &cart.ShowCartGoodsListRequest{
+	resp := new(api.ShowCartGoodsListResponse)
+	cartGoods, err := rpc.ShowCartGoodsRPC(ctx, &cart.ShowCartGoodsListRequest{
 		PageNum: req.PageNum,
 	})
 	if err != nil {
 		pack.RespError(c, err)
 		return
 	}
-	pack.RespSuccess(c)
+	resp.GoodsList = pack.BuildCartGoodsList(cartGoods)
+	pack.RespList(c, resp.GoodsList)
 }
 
 // UpdateCartGoods .
@@ -103,8 +104,23 @@ func DeleteCartGoods(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
+}
 
-	resp := new(api.DeleteCartGoodsResponse)
+// DeleteAllCartGoods .
+// @router /api/v1/cart/empty [GET]
+func DeleteAllCartGoods(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req cart.DeleteAllCartGoodsRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	err = rpc.DeleteAllCartGoodsRPC(ctx, &cart.DeleteAllCartGoodsRequest{})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespSuccess(c)
 }

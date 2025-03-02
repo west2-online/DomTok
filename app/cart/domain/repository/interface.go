@@ -27,6 +27,7 @@ type PersistencePort interface {
 	CreateCart(ctx context.Context, uid int64, cart string) error
 	GetCartByUserId(ctx context.Context, uid int64) (bool, *model.Cart, error)
 	SaveCart(ctx context.Context, uid int64, cart string) error
+	DeleteCart(ctx context.Context, uid int64) error
 }
 
 type CachePort interface {

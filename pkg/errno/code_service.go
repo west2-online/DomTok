@@ -53,3 +53,8 @@ const (
 const (
 	PaymentOrderNotExist = 4000 + iota
 )
+
+// cart
+const (
+	InvalidDeleteCartCode = 5000 + iota
+)

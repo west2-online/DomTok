@@ -28,6 +28,9 @@ import (
 )
 
 func (u *UseCase) ShowCartGoods(ctx context.Context, pageNum int64) ([]*model.CartGoods, error) {
+	if err := u.svc.Verify(u.svc.VerifyPageNum(pageNum)); err != nil {
+		return nil, err
+	}
 	userID, err := metainfoContext.GetLoginData(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("ShowCartGoods get user info error: %w", err)

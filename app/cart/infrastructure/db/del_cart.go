@@ -14,31 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package model
+package db
 
-import "github.com/shopspring/decimal"
+import (
+	"context"
 
-type Cart struct {
-	UserId  int64
-	SkuJson string
-}
+	"github.com/west2-online/DomTok/pkg/errno"
+)
 
-type GoodInfo struct {
-	SkuId     int64
-	ShopId    int64
-	VersionId int64
-	Count     int64
-}
-
-type CartGoods struct {
-	MerchantID       int64
-	GoodsID          int64
-	GoodsName        string
-	SkuID            int64
-	SkuName          string
-	GoodsVersion     int64
-	StyleHeadDrawing string
-	PurchaseQuantity int64
-	TotalAmount      decimal.Decimal
-	DiscountAmount   decimal.Decimal
+func (c *DBAdapter) DeleteCart(ctx context.Context, uid int64) error {
+	model := Cart{UserId: uid}
+	if err := c.client.WithContext(ctx).Delete(&model).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "db.DeleteCart error: %v", err)
+	}
+	return nil
 }

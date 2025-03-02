@@ -27,6 +27,7 @@ import (
 type CartCasePort interface {
 	AddGoodsIntoCart(ctx context.Context, goods *model.GoodInfo) error
 	ShowCartGoods(ctx context.Context, pageNum int64) ([]*model.CartGoods, error)
+	DeleteCartGoods(ctx context.Context) error
 }
 
 type UseCase struct {

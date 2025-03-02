@@ -18,7 +18,6 @@ package rpc
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/samber/lo"
 	"github.com/shopspring/decimal"
@@ -46,7 +45,6 @@ func NewCartRpcImpl(c commodityservice.Client, o orderservice.Client) repository
 
 func (rpc *cartRpcImpl) GetGoodsInfo(ctx context.Context, cartGoodsIds []*model.CartGoods) ([]*model.CartGoods, error) {
 	skuVs := lo.Map(cartGoodsIds, func(item *model.CartGoods, index int) *kmodel.SkuVersion {
-		fmt.Println(item.GoodsVersion)
 		v := &kmodel.SkuVersion{
 			SkuID:     item.SkuID,
 			VersionID: item.GoodsVersion,

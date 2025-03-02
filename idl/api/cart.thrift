@@ -69,4 +69,5 @@ service CartService {
     ShowCartGoodsListResponse ShowCartGoodsList(1: ShowCartGoodsListRequest req) (api.get="/api/v1/cart/show")
     UpdateCartGoodsResponse UpdateCartGoods(1: UpdateCartGoodsRequest req) (api.put="/api/v1/cart/update")
     DeleteCartGoodsResponse DeleteCartGoods(1: DeleteCartGoodsRequest req) (api.delete="/api/v1/cart/delete")
+    DeleteAllCartGoodsResponse DeleteAllCartGoods(1:DeleteAllCartGoodsRequest req)(api.get="/api/v1/cart/empty")
 }
