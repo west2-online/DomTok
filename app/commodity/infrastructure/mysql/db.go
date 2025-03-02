@@ -50,31 +50,15 @@ func (db *commodityDB) IsCategoryExistByName(ctx context.Context, name string) (
 	return true, errno.Errorf(errno.ServiceCategoryExist, "category was found")
 }
 
-func (db *commodityDB) IsCategoryExistById(ctx context.Context, id int64) (bool, error) {
-	if id <= 0 {
-		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "invalid category id: %d", id)
-	}
-
-	var category model.Category
-	err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, errno.Errorf(errno.ServiceCategorynotExist, "category not found")
-		}
-		return false, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query category: %v", err)
-	}
-	return true, nil
-}
-
-func (db *commodityDB) GetCreatorIDById(ctx context.Context, id int64) (int64, error) {
-	var category model.Category
+func (db *commodityDB) GetCategoryById(ctx context.Context, id int64) (*model.Category, error) {
+	var category *model.Category
 	if err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return 0, errno.Errorf(errno.ServiceCategorynotExist, "category not found")
+			return nil, errno.Errorf(errno.ServiceCategorynotExist, "category already exist")
 		}
-		return 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get creator ID: %v", err)
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get category %v", err)
 	}
-	return category.CreatorId, nil
+	return category, nil
 }
 
 func (db *commodityDB) CreateCategory(ctx context.Context, entity *model.Category) error {
@@ -82,18 +66,15 @@ func (db *commodityDB) CreateCategory(ctx context.Context, entity *model.Categor
 		Id:        entity.Id,
 		Name:      entity.Name,
 		CreatorId: entity.CreatorId,
-		CreatedAt: entity.CreatedAt,
-		UpdatedAt: entity.UpdatedAt,
-		DeletedAt: gorm.DeletedAt{},
 	}
-	if err := db.client.WithContext(ctx).Create(model).Error; err != nil {
+	if err := db.client.WithContext(ctx).Table(model.TableName()).Create(&model).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create category: %v", err)
 	}
 	return nil
 }
 
 func (db *commodityDB) DeleteCategory(ctx context.Context, category *model.Category) error {
-	if err := db.client.WithContext(ctx).Delete(Category{Id: category.Id}).Error; err != nil {
+	if err := db.client.WithContext(ctx).Delete(&Category{Id: category.Id}).Error; err != nil {
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete category: %v", err)
 	}
 	return nil
@@ -678,8 +659,11 @@ func (db *commodityDB) UpdateCategory(ctx context.Context, category *model.Categ
 func (db *commodityDB) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*model.CategoryInfo, err error) {
 	offset := (pageNum - 1) * pageSize
 	cs := make([]*Category, 0)
-	if err := db.client.WithContext(ctx).Offset(offset).Limit(pageSize).Find(&cs).Error; err != nil {
+	if err := db.client.WithContext(ctx).Table(constants.CategoryTableName).Offset(offset).Limit(pageSize).Find(&cs).Error; err != nil {
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to list categories: %v", err)
+	}
+	if len(cs) == 0 {
+		return nil, errno.Errorf(errno.ServiceCategorynotExist, "not any category")
 	}
 	resp = make([]*model.CategoryInfo, 0)
 	for _, c := range cs {
