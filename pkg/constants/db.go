@@ -27,6 +27,7 @@ const (
 
 const (
 	UserTableName       = "users"
+	AddressTableName    = "address"
 	CategoryTableName   = "categories"
 	OrderTableName      = "orders"
 	OrderGoodsTableName = "order_goods"

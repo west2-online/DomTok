@@ -71,3 +71,32 @@ func (h *UserHandler) Login(ctx context.Context, req *user.LoginRequest) (r *use
 	r.User = pack.BuildUser(ans)
 	return
 }
+
+func (h *UserHandler) GetAddress(ctx context.Context, req *user.GetAddressRequest) (r *user.GetAddressResponse, err error) {
+	r = new(user.GetAddressResponse)
+	ans, err := h.useCase.GetAddress(ctx, req.AddressId)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.Address = pack.BuildAddress(ans)
+	return
+}
+
+func (h *UserHandler) AddAddress(ctx context.Context, req *user.AddAddressRequest) (r *user.AddAddressResponse, err error) {
+	r = new(user.AddAddressResponse)
+	address := &model.Address{
+		Province: req.Province,
+		City:     req.City,
+		Detail:   req.Detail,
+	}
+	var addressID int64
+	if addressID, err = h.useCase.AddAddress(ctx, address); err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.AddressID = addressID
+	return
+}

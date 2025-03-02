@@ -25,7 +25,29 @@ struct LoginResponse {
     2: model.UserInfo user,
 }
 
+struct GetAddressRequest {
+    1: required i64 address_id
+}
+
+struct GetAddressResponse {
+    1: required model.BaseResp base,
+    2: optional model.AddressInfo address,
+}
+
+struct AddAddressRequest {
+    1: required string province,
+    2: required string city,
+    3: required string detail,
+}
+
+struct AddAddressResponse {
+    1: required model.BaseResp base,
+    2: required i64 addressID,
+}
+
 service UserService {
     RegisterResponse Register(1: RegisterRequest req),
     LoginResponse Login(1: LoginRequest req),
+    GetAddressResponse GetAddress(1: GetAddressRequest req),
+    AddAddressResponse AddAddress(1: AddAddressRequest req),
 }

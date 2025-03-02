@@ -159,6 +159,112 @@ var fieldIDToName_UserInfo = map[int16]string{
 	2: "name",
 }
 
+type AddressInfo struct {
+	Province  string `thrift:"province,1" frugal:"1,default,string" json:"province"`
+	City      string `thrift:"city,2" frugal:"2,default,string" json:"city"`
+	Detail    string `thrift:"detail,3" frugal:"3,default,string" json:"detail"`
+	AddressID int64  `thrift:"addressID,4" frugal:"4,default,i64" json:"addressID"`
+}
+
+func NewAddressInfo() *AddressInfo {
+	return &AddressInfo{}
+}
+
+func (p *AddressInfo) InitDefault() {
+}
+
+func (p *AddressInfo) GetProvince() (v string) {
+	return p.Province
+}
+
+func (p *AddressInfo) GetCity() (v string) {
+	return p.City
+}
+
+func (p *AddressInfo) GetDetail() (v string) {
+	return p.Detail
+}
+
+func (p *AddressInfo) GetAddressID() (v int64) {
+	return p.AddressID
+}
+func (p *AddressInfo) SetProvince(val string) {
+	p.Province = val
+}
+func (p *AddressInfo) SetCity(val string) {
+	p.City = val
+}
+func (p *AddressInfo) SetDetail(val string) {
+	p.Detail = val
+}
+func (p *AddressInfo) SetAddressID(val int64) {
+	p.AddressID = val
+}
+
+func (p *AddressInfo) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AddressInfo(%+v)", *p)
+}
+
+func (p *AddressInfo) DeepEqual(ano *AddressInfo) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Province) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.City) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Detail) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.AddressID) {
+		return false
+	}
+	return true
+}
+
+func (p *AddressInfo) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.Province, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddressInfo) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.City, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddressInfo) Field3DeepEqual(src string) bool {
+
+	if strings.Compare(p.Detail, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddressInfo) Field4DeepEqual(src int64) bool {
+
+	if p.AddressID != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_AddressInfo = map[int16]string{
+	1: "province",
+	2: "city",
+	3: "detail",
+	4: "addressID",
+}
+
 type LoginData struct {
 	UserId int64 `thrift:"userId,1" frugal:"1,default,i64" json:"userId"`
 }
