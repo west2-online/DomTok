@@ -40,16 +40,16 @@ func NewOrderDB(client *gorm.DB) repository.OrderDB {
 // IsOrderExist 检查订单是否存在
 func (db *orderDB) IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error) {
 	var t int64
-	result := db.client.WithContext(ctx).Model(&Order{}).
+	err := db.client.WithContext(ctx).Model(&Order{}).
 		Select("ordered_at").
 		Where("id = ? AND deleted_at IS NULL", orderID).
-		First(&t)
+		First(&t).Error
 
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, 0, nil
 		}
-		return false, 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to check order exist: %v", result.Error)
+		return false, 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to check order exist: %v", err)
 	}
 
 	return true, t, nil
