@@ -51,6 +51,7 @@ func initConfig() bool {
 }
 
 func TestCommodityDB_Spu(t *testing.T) {
+
 	if !initConfig() {
 		return
 	}

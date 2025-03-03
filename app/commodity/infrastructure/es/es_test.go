@@ -53,6 +53,9 @@ func initConfig() bool {
 }
 
 func TestCommodityElastic_CreateAndDeleteItem(t *testing.T) {
+	if !utils.EnvironmentEnable() {
+		return
+	}
 	if !initConfig() {
 		return
 	}

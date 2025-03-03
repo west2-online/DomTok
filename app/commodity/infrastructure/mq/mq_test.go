@@ -41,10 +41,10 @@ func initTest(t *testing.T) repository.CommodityMQ {
 var testDeleteId int64 = 1
 
 func TestCommodityMQ_SendAndConsume(t *testing.T) {
-	initTest(t)
 	if !utils.EnvironmentEnable() {
 		return
 	}
+	initTest(t)
 
 	kfk := NewCommodityMQ(kafka.NewKafkaInstance())
 	ctx := context.Background()
