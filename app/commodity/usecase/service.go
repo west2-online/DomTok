@@ -47,8 +47,8 @@ func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category)
 }
 
 func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category) (err error) {
-	// 判断用户是否有权限
-	category.CreatorId, err = uc.db.GetCreatorIDById(ctx, category.Id)
+	// 获取
+	category, err = uc.db.GetCategoryById(ctx, category.Id)
 	if err != nil {
 		return err
 	}
@@ -65,8 +65,8 @@ func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category)
 }
 
 func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category) (err error) {
-	// 判断用户是否有权限
-	category.CreatorId, err = uc.db.GetCreatorIDById(ctx, category.Id)
+	// 	获取
+	category, err = uc.db.GetCategoryById(ctx, category.Id)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (us *useCase) CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err
 	}
 	spu.CreatorId = loginData
 
-	if err = us.svc.Verify(us.svc.VerifyForSaleStatus(spu.ForSale)); err != nil {
+	if err = us.svc.Verify(us.svc.VerifyForSaleStatus(spu.ForSale), us.svc.VerifyCategoryId(ctx, spu.CategoryId)); err != nil {
 		return 0, fmt.Errorf("usecase.CreateSpu verify failed: %w", err)
 	}
 
@@ -154,6 +154,12 @@ func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
 
 	if err = us.svc.Verify(us.svc.VerifyForSaleStatus(spu.ForSale)); err != nil {
 		return fmt.Errorf("usecase.UpdateSpu verify failed: %w", err)
+	}
+
+	if spu.CategoryId != 0 {
+		if err = us.svc.Verify(us.svc.VerifyCategoryId(ctx, spu.CategoryId)); err != nil {
+			return fmt.Errorf("usecase.UpdateSpu verify failed: %w", err)
+		}
 	}
 
 	spu.GoodsHeadDrawingUrl = utils.GenerateFileName(constants.SpuDirDest, spu.SpuId)
@@ -220,9 +226,8 @@ func (us *useCase) ListSpuInfo(ctx context.Context, ids []int64) ([]*model.Spu, 
 }
 
 func (us *useCase) IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	err := us.cache.IsHealthy(ctx)
-	if err != nil {
-		err = us.db.IncrLockStock(ctx, infos)
+	if !us.svc.IsHealthy() {
+		err := us.db.IncrLockStock(ctx, infos)
 		if err != nil {
 			return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
 		}
@@ -233,9 +238,8 @@ func (us *useCase) IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo)
 }
 
 func (us *useCase) DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	err := us.cache.IsHealthy(ctx)
-	if err != nil {
-		err = us.db.DecrLockStock(ctx, infos)
+	if !us.svc.IsHealthy() {
+		err := us.db.DecrLockStock(ctx, infos)
 		if err != nil {
 			return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
 		}
@@ -246,9 +250,8 @@ func (us *useCase) DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo)
 }
 
 func (us *useCase) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	err := us.cache.IsHealthy(ctx)
-	if err != nil {
-		err = us.db.DecrStock(ctx, infos)
+	if !us.svc.IsHealthy() {
+		err := us.db.DecrStock(ctx, infos)
 		if err != nil {
 			return fmt.Errorf("usecase.DecrStock failed: %w", err)
 		}
@@ -258,18 +261,26 @@ func (us *useCase) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) err
 	}
 }
 
-func (us *useCase) CreateSku(ctx context.Context, sku *model.Sku, ext string) (skuID int64, err error) {
+func (us *useCase) CreateSku(ctx context.Context, sku *model.Sku, ext string) (s *model.Sku, err error) {
 	loginData, err := contextLogin.GetStreamLoginData(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("usecase.CreateSku failed: %w", err)
+		return nil, fmt.Errorf("usecase.CreateSku failed: %w", err)
 	}
 	sku.CreatorID = loginData
 
-	skuID, err = us.svc.CreateSku(ctx, sku, ext)
+	ok, err := us.db.IsSpuExist(ctx, sku.SpuID)
 	if err != nil {
-		return -1, fmt.Errorf("usecase.CreateSku failed: %w", err)
+		return nil, fmt.Errorf("usecase.CreateSku: check spu exist failed: %w", err)
 	}
-	return skuID, nil
+	if !ok {
+		return nil, errno.NewErrNo(errno.ServiceSpuNotExist, "spu does not exist")
+	}
+	s, err = us.svc.CreateSku(ctx, sku, ext)
+	if err != nil {
+		return nil, fmt.Errorf("usecase.CreateSku failed: %w", err)
+	}
+
+	return s, nil
 }
 
 func (us *useCase) UpdateSku(ctx context.Context, sku *model.Sku, ext string) (err error) {
@@ -300,7 +311,7 @@ func (us *useCase) DeleteSku(ctx context.Context, sku *model.Sku) (err error) {
 		return fmt.Errorf("service.UpdateSku: %w", err)
 	}
 
-	if err = us.svc.DeleteSku(ctx, sku); err != nil {
+	if err = us.svc.DeleteSku(ctx, ret); err != nil {
 		return fmt.Errorf("usecase.DeleteSku failed: %w", err)
 	}
 	return nil

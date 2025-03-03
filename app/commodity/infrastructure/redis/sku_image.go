@@ -33,7 +33,7 @@ func (c commodityCache) SetSkuImages(ctx context.Context, key string, skuImages 
 		logger.Errorf("commodityCache.SetSkuImages marshal data failed: %v", err)
 	}
 
-	err = c.client.Set(ctx, key, dataJSON, constants.RedisSkuExpireTime).Err()
+	err = c.client.Set(ctx, key, dataJSON, constants.RedisSkuImagesExpireTime).Err()
 	if err != nil {
 		logger.Errorf("commodity.SetSkuImages set data failed: %v", err)
 	}

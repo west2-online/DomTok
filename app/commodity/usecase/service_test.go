@@ -664,7 +664,7 @@ func TestUseCase_ListSpuImages(t *testing.T) {
 func TestUseCase_DecrStock(t *testing.T) {
 	type TestCase struct {
 		Name                 string
-		MockIsHealthyError   error
+		MockIsHealthy        bool
 		MockServiceDecrError error
 		MockDBDecrError      error
 		ExpectedError        error
@@ -683,14 +683,14 @@ func TestUseCase_DecrStock(t *testing.T) {
 
 	testCases := []TestCase{
 		{
-			Name:               "decrStockInDBError",
-			MockIsHealthyError: errors.New("IsHealthyError"),
-			MockDBDecrError:    errors.New("ServiceDecrError"),
-			ExpectedError:      errors.New("usecase.DecrStock failed: ServiceDecrError"),
+			Name:            "decrStockInDBError",
+			MockIsHealthy:   false,
+			MockDBDecrError: errors.New("ServiceDecrError"),
+			ExpectedError:   errors.New("usecase.DecrStock failed: ServiceDecrError"),
 		},
 		{
 			Name:                 "ServiceDecrStockError",
-			MockIsHealthyError:   nil,
+			MockIsHealthy:        true,
 			MockServiceDecrError: errors.New("ServiceDecrError"),
 			ExpectedError:        errors.New("ServiceDecrError"),
 		},
@@ -715,7 +715,7 @@ func TestUseCase_DecrStock(t *testing.T) {
 			}
 			mockey.Mock(mockey.GetMethod(us.db, "DecrStock")).Return(tc.MockDBDecrError).Build()
 			mockey.Mock((*service.CommodityService).DecrStockInNX).Return(tc.MockServiceDecrError).Build()
-			mockey.Mock(mockey.GetMethod(us.cache, "IsHealthy")).Return(tc.MockIsHealthyError).Build()
+			mockey.Mock((*service.CommodityService).IsHealthy).Return(tc.MockIsHealthy).Build()
 			err := us.DecrStock(ctx.Background(), input)
 			if err != nil {
 				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
@@ -729,7 +729,7 @@ func TestUseCase_DecrStock(t *testing.T) {
 func TestUseCase_DecrLockStock(t *testing.T) {
 	type TestCase struct {
 		Name                 string
-		MockIsHealthyError   error
+		MockIsHealthy        bool
 		MockServiceDecrError error
 		MockDBDecrError      error
 		ExpectedError        error
@@ -748,14 +748,14 @@ func TestUseCase_DecrLockStock(t *testing.T) {
 
 	testCases := []TestCase{
 		{
-			Name:               "decrStockInDBError",
-			MockIsHealthyError: errors.New("IsHealthyError"),
-			MockDBDecrError:    errors.New("ServiceDecrError"),
-			ExpectedError:      errors.New("usecase.DecrLockStock failed: ServiceDecrError"),
+			Name:            "decrStockInDBError",
+			MockIsHealthy:   false,
+			MockDBDecrError: errors.New("ServiceDecrError"),
+			ExpectedError:   errors.New("usecase.DecrLockStock failed: ServiceDecrError"),
 		},
 		{
 			Name:                 "ServiceDecrStockError",
-			MockIsHealthyError:   nil,
+			MockIsHealthy:        true,
 			MockServiceDecrError: errors.New("ServiceDecrError"),
 			ExpectedError:        errors.New("ServiceDecrError"),
 		},
@@ -780,7 +780,7 @@ func TestUseCase_DecrLockStock(t *testing.T) {
 			}
 			mockey.Mock(mockey.GetMethod(us.db, "DecrLockStock")).Return(tc.MockDBDecrError).Build()
 			mockey.Mock((*service.CommodityService).DecrLockStockInNX).Return(tc.MockServiceDecrError).Build()
-			mockey.Mock(mockey.GetMethod(us.cache, "IsHealthy")).Return(tc.MockIsHealthyError).Build()
+			mockey.Mock((*service.CommodityService).IsHealthy).Return(tc.MockIsHealthy).Build()
 			err := us.DecrLockStock(ctx.Background(), input)
 			if err != nil {
 				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
@@ -794,7 +794,7 @@ func TestUseCase_DecrLockStock(t *testing.T) {
 func TestUseCase_IncrLockStock(t *testing.T) {
 	type TestCase struct {
 		Name                 string
-		MockIsHealthyError   error
+		MockIsHealthy        bool
 		MockServiceIncrError error
 		MockDBIncrError      error
 		ExpectedError        error
@@ -813,14 +813,14 @@ func TestUseCase_IncrLockStock(t *testing.T) {
 
 	testCases := []TestCase{
 		{
-			Name:               "IncrStockInDBError",
-			MockIsHealthyError: errors.New("IsHealthyError"),
-			MockDBIncrError:    errors.New("ServiceIncrError"),
-			ExpectedError:      errors.New("usecase.IncrLockStock failed: ServiceIncrError"),
+			Name:            "IncrStockInDBError",
+			MockIsHealthy:   false,
+			MockDBIncrError: errors.New("ServiceIncrError"),
+			ExpectedError:   errors.New("usecase.IncrLockStock failed: ServiceIncrError"),
 		},
 		{
 			Name:                 "ServiceIncrStockError",
-			MockIsHealthyError:   nil,
+			MockIsHealthy:        true,
 			MockServiceIncrError: errors.New("ServiceIncrError"),
 			ExpectedError:        errors.New("ServiceIncrError"),
 		},
@@ -845,7 +845,7 @@ func TestUseCase_IncrLockStock(t *testing.T) {
 			}
 			mockey.Mock(mockey.GetMethod(us.db, "IncrLockStock")).Return(tc.MockDBIncrError).Build()
 			mockey.Mock((*service.CommodityService).IncrLockStockInNX).Return(tc.MockServiceIncrError).Build()
-			mockey.Mock(mockey.GetMethod(us.cache, "IsHealthy")).Return(tc.MockIsHealthyError).Build()
+			mockey.Mock((*service.CommodityService).IsHealthy).Return(tc.MockIsHealthy).Build()
 			err := us.IncrLockStock(ctx.Background(), input)
 			if err != nil {
 				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())

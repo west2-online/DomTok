@@ -29,7 +29,7 @@ import (
 func buildTestModelOrder(t *testing.T) *model.Order {
 	t.Helper()
 	return &model.Order{
-		Id:                    rand.Int64(),
+		Id:                    int64(rand.Uint32()),
 		Status:                1,
 		Uid:                   1,
 		TotalAmountOfGoods:    decimal.NewFromFloat(100), //nolint

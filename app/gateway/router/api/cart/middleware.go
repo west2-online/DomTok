@@ -65,3 +65,8 @@ func _updatecartgoodsMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _deleteallcartgoodsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

@@ -36,14 +36,11 @@ _testmain.go
 dumped_hertz_remote_config.json
 /cmd/**/output
 /config/redis
-/config/grafana
 /config/jaeger
-/config/prometheus
 /config/sql
 /docker/data/*
 /config/config.yaml
 /config/config.yaml.bak
-
 coverage.txt
 ca-key
 *.jks

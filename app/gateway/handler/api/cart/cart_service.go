@@ -43,9 +43,10 @@ func AddGoodsIntoCart(ctx context.Context, c *app.RequestContext) {
 	}
 
 	err = rpc.AddGoodsIntoCartRPC(ctx, &cart.AddGoodsIntoCartRequest{
-		SkuId:  req.SkuID,
-		ShopId: req.ShopID,
-		Count:  req.Count,
+		SkuId:     req.SkuID,
+		ShopId:    req.ShopID,
+		Count:     req.Count,
+		VersionId: req.VersionID,
 	})
 	if err != nil {
 		pack.RespError(c, err)
@@ -61,13 +62,20 @@ func ShowCartGoodsList(ctx context.Context, c *app.RequestContext) {
 	var req api.ShowCartGoodsListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
 	resp := new(api.ShowCartGoodsListResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	cartGoods, err := rpc.ShowCartGoodsRPC(ctx, &cart.ShowCartGoodsListRequest{
+		PageNum: req.PageNum,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	resp.GoodsList = pack.BuildCartGoodsList(cartGoods)
+	pack.RespList(c, resp.GoodsList)
 }
 
 // UpdateCartGoods .
@@ -96,8 +104,23 @@ func DeleteCartGoods(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
+}
 
-	resp := new(api.DeleteCartGoodsResponse)
+// DeleteAllCartGoods .
+// @router /api/v1/cart/empty [GET]
+func DeleteAllCartGoods(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req cart.DeleteAllCartGoodsRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	err = rpc.DeleteAllCartGoodsRPC(ctx, &cart.DeleteAllCartGoodsRequest{})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespSuccess(c)
 }

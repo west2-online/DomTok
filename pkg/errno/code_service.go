@@ -48,20 +48,13 @@ const (
 	ServiceCategoryExist
 	ServiceCategorynotExist
 	ServiceListCategoryFailed
-
 	ServiceCategoryCreateFail
 )
 
 // payment
 const (
-	PaymentOrderNotExist = 4000 + iota
-	PaymentRefundNotExist
-)
-
-// assistant
-const (
-	ServiceUserCloseWebsocketConn = 5000 + iota
-	ServicePaymentOrderNotExist   = 4000 + iota
+	ServicePaymentOrderNotExist = 4000 + iota
+	ServicePaymentRefundNotExist
 	ServiceStorePaymentRedisTokenFailed
 	ServiceCreatePaymentIDFailed
 	ServiceCreatePaymentOrderFailed
@@ -72,4 +65,14 @@ const (
 	ServiceCreateRefundIDFailed
 	ServiceCreateRefundFailed
 	ServicePaymentIsProcessing
+)
+
+// cart
+const (
+	InvalidDeleteCartCode = 5000 + iota
+)
+
+// assistant
+const (
+	ServiceUserCloseWebsocketConn = 8000 + iota
 )
