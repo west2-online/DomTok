@@ -20,15 +20,18 @@ import (
 	ctx "context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/bytedance/mockey"
 	"github.com/smartystreets/goconvey/convey"
 	"gorm.io/gorm"
 
 	"github.com/west2-online/DomTok/app/payment/domain/model"
+	"github.com/west2-online/DomTok/app/payment/domain/repository"
 	"github.com/west2-online/DomTok/app/payment/domain/service"
 	"github.com/west2-online/DomTok/app/payment/infrastructure/mysql"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 func TestPaymentUseCase_GetPaymentToken(t *testing.T) {
@@ -337,4 +340,228 @@ func TestPaymentUseCase_CreateRefund(t *testing.T) {
 			convey.So(refundID, convey.ShouldEqual, tc.ExpectedRefundID)
 		})
 	}
+}
+
+func TestPaymentUseCase_RefundReview(t *testing.T) {
+	type _DB struct {
+		repository.PaymentDB
+	}
+	mockey.Mock((*service.PaymentService).GetOrderStatus).Return(true, false, nil).Build()
+	mockey.Mock((*service.PaymentService).GetUserID).Return(int64(1), nil).Build()
+	mockey.Mock((*service.PaymentService).CheckAdminPermission).Return(true, nil).Build()
+	mockey.Mock((*service.PaymentService).Refund).Return(int64(1), "test", nil).Build()
+	mockey.Mock((*service.PaymentService).CancelOrder).Return(nil).Build()
+	mockey.Mock((*_DB).GetRefundInfoByOrderID).Return(&model.PaymentRefund{}, nil).Build()
+	mockey.Mock((*_DB).UpdateRefundStatusByOrderIDAndStatus).Return(nil).Build()
+	mockey.Mock((*_DB).UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction).Return(nil).Build()
+
+	defer mockey.UnPatchAll()
+	uc := &paymentUseCase{
+		db:  &_DB{},
+		svc: new(service.PaymentService),
+	}
+	bg := ctx.Background()
+	orderID := int64(1)
+	testErr := errno.NewErrNo(-1, "")
+
+	mockey.PatchConvey("RefundReview", t, func() {
+		mockey.PatchConvey("success", func() {
+			err := uc.RefundReview(bg, orderID, true)
+			convey.So(err, convey.ShouldBeNil)
+			err = uc.RefundReview(bg, orderID, false)
+			convey.So(err, convey.ShouldBeNil)
+		})
+		mockey.PatchConvey("GetOrderStatusError", func() {
+			mockey.Mock((*service.PaymentService).GetOrderStatus).Return(false, false, testErr).Build()
+			err := uc.RefundReview(bg, orderID, true)
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+		})
+		mockey.PatchConvey("GetOrderStatusNotExist", func() {
+			mockey.Mock((*service.PaymentService).GetOrderStatus).Return(false, false, nil).Build()
+			err := uc.RefundReview(bg, orderID, true)
+			convey.So(errno.ConvertErr(err).ErrorCode, convey.ShouldEqual, errno.ServiceOrderNotFound)
+		})
+		mockey.PatchConvey("GetOrderStatusExpired", func() {
+			mockey.Mock((*service.PaymentService).GetOrderStatus).Return(true, true, nil).Build()
+			err := uc.RefundReview(bg, orderID, true)
+			convey.So(errno.ConvertErr(err).ErrorCode, convey.ShouldEqual, errno.ServiceOrderExpired)
+		})
+		mockey.PatchConvey("GetUserIDError", func() {
+			mockey.Mock((*service.PaymentService).GetUserID).Return(int64(0), testErr).Build()
+			err := uc.RefundReview(bg, orderID, true)
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+		})
+		mockey.PatchConvey("CheckAdminPermissionError", func() {
+			mockey.Mock((*service.PaymentService).CheckAdminPermission).Return(true, testErr).Build()
+			err := uc.RefundReview(bg, orderID, true)
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+		})
+		mockey.PatchConvey("CheckAdminPermissionNoPermission", func() {
+			mockey.Mock((*service.PaymentService).CheckAdminPermission).Return(false, nil).Build()
+			err := uc.RefundReview(bg, orderID, true)
+			convey.So(errno.ConvertErr(err).ErrorCode, convey.ShouldEqual, errno.AuthNoOperatePermission.ErrorCode)
+		})
+		mockey.PatchConvey("GetRefundInfoByOrderIDError", func() {
+			mockey.Mock((*_DB).GetRefundInfoByOrderID).Return(&model.PaymentRefund{}, testErr).Build()
+			err := uc.RefundReview(bg, orderID, true)
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+		})
+		mockey.PatchConvey("GetRefundInfoByOrderIDNotExist", func() {
+			mockey.Mock((*_DB).GetRefundInfoByOrderID).Return(nil, nil).Build()
+			err := uc.RefundReview(bg, orderID, true)
+			convey.So(errno.ConvertErr(err).ErrorCode, convey.ShouldEqual, errno.ServicePaymentRefundNotExist)
+		})
+		mockey.PatchConvey("UpdateRefundStatusByOrderIDAndStatusError", func() {
+			mockey.Mock((*_DB).UpdateRefundStatusByOrderIDAndStatus).Return(testErr).Build()
+			err := uc.RefundReview(bg, orderID, true)
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+		})
+		mockey.PatchConvey("UpdateRefundStatusByOrderIDAndStatusErrorInPassEqualFalse", func() {
+			mockey.Mock((*_DB).UpdateRefundStatusByOrderIDAndStatus).Return(mockey.Sequence(nil).Then(testErr)).Build()
+			err := uc.RefundReview(bg, orderID, false)
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+		})
+		mockey.PatchConvey("RefundError", func() {
+			mockey.Mock((*service.PaymentService).Refund).Return(int64(0), "", testErr).Build()
+			err := uc.RefundReview(bg, orderID, true)
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+		})
+		mockey.PatchConvey("CancelOrderError", func() {
+			mockey.Mock((*service.PaymentService).CancelOrder).Return(testErr).Build()
+			err := uc.RefundReview(bg, orderID, true)
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+		})
+		mockey.PatchConvey("UpdateRefundStatusToSuccessAndCreateLedgerAsTransactionError", func() {
+			mockey.Mock((*_DB).UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction).Return(testErr).Build()
+			err := uc.RefundReview(bg, orderID, true)
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+		})
+	})
+}
+
+func TestPaymentUseCase_PaymentCheckout(t *testing.T) {
+	type _DB struct {
+		repository.PaymentDB
+	}
+	mockey.Mock((*service.PaymentService).GetOrderStatus).Return(true, false, nil).Build()
+	mockey.Mock((*service.PaymentService).GetUserID).Return(int64(1), nil).Build()
+	mockey.Mock((*service.PaymentService).GetExpiredAtAndDelPaymentToken).Return(true, time.Time{}, nil).Build()
+	mockey.Mock((*service.PaymentService).GetPayInfo).Return(0, "", nil).Build()
+	mockey.Mock((*service.PaymentService).ConfirmOrder).Return(nil).Build()
+	mockey.Mock((*service.PaymentService).Pay).Return(0, "", nil).Build()
+	mockey.Mock((*service.PaymentService).PutBackPaymentToken).Return(nil).Build()
+	mockey.Mock((*_DB).GetPaymentInfo).Return(&model.PaymentOrder{Status: paymentStatus.PaymentStatusPendingCode}, nil).Build()
+	mockey.Mock((*_DB).UpdatePaymentStatus).Return(nil).Build()
+	mockey.Mock((*_DB).UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction).Return(nil).Build()
+	uc := &paymentUseCase{
+		db:  &_DB{},
+		svc: new(service.PaymentService),
+	}
+	bg := ctx.Background()
+	orderID := int64(1)
+	testErr := errno.NewErrNo(-1, "")
+	mockey.PatchConvey("PaymentCheckout", t, func() {
+		mockey.PatchConvey("success", func() {
+			err := uc.PaymentCheckout(bg, orderID, "test")
+			convey.So(err, convey.ShouldBeNil)
+		})
+		mockey.PatchConvey("GetOrderStatusError", func() {
+			mockey.Mock((*service.PaymentService).GetOrderStatus).Return(true, false, testErr).Build()
+			err := uc.PaymentCheckout(bg, orderID, "test")
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+		})
+		mockey.PatchConvey("GetOrderStatusNotExist", func() {
+			mockey.Mock((*service.PaymentService).GetOrderStatus).Return(false, false, nil).Build()
+			err := uc.PaymentCheckout(bg, orderID, "test")
+			convey.So(errno.ConvertErr(err).ErrorCode, convey.ShouldEqual, errno.ServiceOrderNotFound)
+		})
+		mockey.PatchConvey("GetOrderStatusExpired", func() {
+			mockey.Mock((*service.PaymentService).GetOrderStatus).Return(true, true, nil).Build()
+			err := uc.PaymentCheckout(bg, orderID, "test")
+			convey.So(errno.ConvertErr(err).ErrorCode, convey.ShouldEqual, errno.ServiceOrderExpired)
+		})
+		mockey.PatchConvey("GetUserIDError", func() {
+			mockey.Mock((*service.PaymentService).GetUserID).Return(int64(0), testErr).Build()
+			err := uc.PaymentCheckout(bg, orderID, "test")
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+		})
+		mockey.PatchConvey("GetExpiredAtAndDelPaymentTokenErrorSoSecondCheck", func() {
+			mockey.Mock((*service.PaymentService).GetExpiredAtAndDelPaymentToken).Return(false, time.Time{}, testErr).Build()
+			err := uc.PaymentCheckout(bg, orderID, "test")
+			convey.So(err, convey.ShouldEqual, nil)
+
+			mockey.PatchConvey("GetPayInfoError", func() {
+				mockey.Mock((*_DB).GetPaymentInfo).
+					Return(&model.PaymentOrder{Status: paymentStatus.PaymentStatusPendingCode}, testErr).Build()
+				err := uc.PaymentCheckout(bg, orderID, "test")
+				convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+			})
+			mockey.PatchConvey("PaymentAlreadyProcessing", func() {
+				mockey.Mock((*_DB).GetPaymentInfo).
+					Return(&model.PaymentOrder{Status: paymentStatus.PaymentStatusProcessingCode}, nil).Build()
+				err := uc.PaymentCheckout(bg, orderID, "test")
+				convey.So(errno.ConvertErr(err).ErrorCode, convey.ShouldEqual, errno.IllegalOperatorCode)
+			})
+			mockey.PatchConvey("UpdatePaymentStatusError", func() {
+				mockey.Mock((*_DB).GetPaymentInfo).
+					Return(&model.PaymentOrder{Status: paymentStatus.PaymentStatusPendingCode}, nil).Build()
+				mockey.Mock((*_DB).UpdatePaymentStatus).Return(testErr).Build()
+				err := uc.PaymentCheckout(bg, orderID, "test")
+				convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+			})
+		})
+		mockey.PatchConvey("GetExpiredAtAndDelPaymentTokenNotExist", func() {
+			mockey.Mock((*service.PaymentService).GetExpiredAtAndDelPaymentToken).Return(false, time.Time{}, nil).Build()
+			err := uc.PaymentCheckout(bg, orderID, "test")
+			convey.So(errno.ConvertErr(err).ErrorCode, convey.ShouldEqual, errno.IllegalOperatorCode)
+		})
+		mockey.PatchConvey("GetPayInfoError", func() {
+			mockey.Mock((*service.PaymentService).GetPayInfo).Return(0, "", testErr).Build()
+			err := uc.PaymentCheckout(bg, orderID, "test")
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+		})
+		mockey.PatchConvey("ConfirmOrderError", func() {
+			mockey.Mock((*service.PaymentService).ConfirmOrder).Return(testErr).Build()
+			err := uc.PaymentCheckout(bg, orderID, "test")
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+
+			mockey.PatchConvey("PutBackPaymentTokenError", func() {
+				mockey.Mock((*service.PaymentService).PutBackPaymentToken).Return(testErr).Build()
+				err := uc.PaymentCheckout(bg, orderID, "test")
+				convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+			})
+			mockey.PatchConvey("UpdatePaymentStatusError", func() {
+				mockey.Mock((*service.PaymentService).GetExpiredAtAndDelPaymentToken).
+					Return(true, time.Time{}, errno.NewErrNo(-2, "")).Build()
+				err := uc.PaymentCheckout(bg, orderID, "test")
+				convey.So(errno.ConvertErr(err).ErrorCode, convey.ShouldEqual, -1)
+				mockey.Mock((*_DB).UpdatePaymentStatus).Return(mockey.Sequence(nil).Then(testErr)).Build()
+				err = uc.PaymentCheckout(bg, orderID, "test")
+				convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+			})
+		})
+		mockey.PatchConvey("PayError", func() {
+			mockey.Mock((*service.PaymentService).Pay).Return(0, "", testErr).Build()
+			err := uc.PaymentCheckout(bg, orderID, "test")
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+
+			mockey.PatchConvey("UpdatePaymentStatusError", func() {
+				mockey.Mock((*_DB).UpdatePaymentStatus).Return(testErr).Build()
+				err := uc.PaymentCheckout(bg, orderID, "test")
+				convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+			})
+		})
+		mockey.PatchConvey("RedisSuccessAndGetPayInfoError", func() {
+			mockey.Mock((*_DB).GetPaymentInfo).Return(&model.PaymentOrder{Status: paymentStatus.PaymentStatusPendingCode}, testErr).Build()
+			err := uc.PaymentCheckout(bg, orderID, "test")
+			convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+
+			mockey.PatchConvey("UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction", func() {
+				mockey.Mock((*_DB).GetPaymentInfo).Return(&model.PaymentOrder{Status: paymentStatus.PaymentStatusPendingCode}, nil).Build()
+				mockey.Mock((*_DB).UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction).Return(testErr).Build()
+				err := uc.PaymentCheckout(bg, orderID, "test")
+				convey.So(errno.ConvertErr(err), convey.ShouldEqual, testErr)
+			})
+		})
+	})
 }

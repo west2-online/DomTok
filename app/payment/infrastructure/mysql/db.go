@@ -60,7 +60,7 @@ func (db *paymentDB) GetPaymentInfo(ctx context.Context, orderID int64) (*model.
 	err := db.client.WithContext(ctx).Table(constants.PaymentTableName).Where("order_id = ?", orderID).First(&paymentOrder).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errno.NewErrNo(errno.PaymentOrderNotExist, "payment order not found")
+			return nil, errno.NewErrNo(errno.ServicePaymentOrderNotExist, "payment order not found")
 		}
 		// 这里报错了就不是业务错误了, 而是服务级别的错误
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment order_id: %v", err)
@@ -119,7 +119,7 @@ func (db *paymentDB) UpdatePaymentStatus(ctx context.Context, orderID int64, sta
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update payment status: %v", result.Error)
 	}
 	if result.RowsAffected <= 0 {
-		return errno.Errorf(errno.PaymentOrderNotExist, "mysql: payment order not found but tried to update")
+		return errno.Errorf(errno.ServicePaymentOrderNotExist, "mysql: payment order not found but tried to update")
 	}
 	return nil
 }
@@ -138,7 +138,7 @@ func (db *paymentDB) UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction(ct
 			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update payment status: %v", result.Error)
 		}
 		if result.RowsAffected <= 0 {
-			return errno.Errorf(errno.PaymentOrderNotExist, "mysql: payment order not found but tried to update")
+			return errno.Errorf(errno.ServicePaymentOrderNotExist, "mysql: payment order not found but tried to update")
 		}
 
 		ledger := order.ToLedger()
@@ -209,7 +209,7 @@ func (db *paymentDB) GetRefundInfoByOrderID(ctx context.Context, orderID int64) 
 	err := db.client.WithContext(ctx).Table(constants.PaymentRefundTableName).Where("order_id = ?", orderID).First(&refundOrder).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errno.NewErrNo(errno.PaymentRefundNotExist, "refund order not found")
+			return nil, errno.NewErrNo(errno.ServicePaymentRefundNotExist, "refund order not found")
 		}
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query refund order_id: %v", err)
 	}
@@ -235,7 +235,7 @@ func (db *paymentDB) UpdateRefundStatusByOrderIDAndStatus(ctx context.Context, o
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update refund status: %v", result.Error)
 	}
 	if result.RowsAffected <= 0 {
-		return errno.Errorf(errno.PaymentRefundNotExist, "mysql: refund order not found but tried to update")
+		return errno.Errorf(errno.ServicePaymentRefundNotExist, "mysql: refund order not found but tried to update")
 	}
 	return nil
 }
@@ -254,7 +254,7 @@ func (db *paymentDB) UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction(ctx
 			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update refund status: %v", result.Error)
 		}
 		if result.RowsAffected <= 0 {
-			return errno.Errorf(errno.PaymentRefundNotExist, "mysql: refund order not found but tried to update")
+			return errno.Errorf(errno.ServicePaymentRefundNotExist, "mysql: refund order not found but tried to update")
 		}
 
 		ledger := refund.ToLedger()

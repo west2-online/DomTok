@@ -2949,8 +2949,8 @@ var fieldIDToName_CreateSkuReq = map[int16]string{
 }
 
 type CreateSkuResp struct {
-	Base  *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
-	SkuID int64           `thrift:"skuID,2,required" frugal:"2,required,i64" json:"skuID"`
+	Base    *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+	SkuInfo *model.SkuInfo  `thrift:"SkuInfo,2,required" frugal:"2,required,model.SkuInfo" json:"SkuInfo"`
 }
 
 func NewCreateSkuResp() *CreateSkuResp {
@@ -2969,18 +2969,27 @@ func (p *CreateSkuResp) GetBase() (v *model.BaseResp) {
 	return p.Base
 }
 
-func (p *CreateSkuResp) GetSkuID() (v int64) {
-	return p.SkuID
+var CreateSkuResp_SkuInfo_DEFAULT *model.SkuInfo
+
+func (p *CreateSkuResp) GetSkuInfo() (v *model.SkuInfo) {
+	if !p.IsSetSkuInfo() {
+		return CreateSkuResp_SkuInfo_DEFAULT
+	}
+	return p.SkuInfo
 }
 func (p *CreateSkuResp) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
-func (p *CreateSkuResp) SetSkuID(val int64) {
-	p.SkuID = val
+func (p *CreateSkuResp) SetSkuInfo(val *model.SkuInfo) {
+	p.SkuInfo = val
 }
 
 func (p *CreateSkuResp) IsSetBase() bool {
 	return p.Base != nil
+}
+
+func (p *CreateSkuResp) IsSetSkuInfo() bool {
+	return p.SkuInfo != nil
 }
 
 func (p *CreateSkuResp) String() string {
@@ -2999,7 +3008,7 @@ func (p *CreateSkuResp) DeepEqual(ano *CreateSkuResp) bool {
 	if !p.Field1DeepEqual(ano.Base) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.SkuID) {
+	if !p.Field2DeepEqual(ano.SkuInfo) {
 		return false
 	}
 	return true
@@ -3012,9 +3021,9 @@ func (p *CreateSkuResp) Field1DeepEqual(src *model.BaseResp) bool {
 	}
 	return true
 }
-func (p *CreateSkuResp) Field2DeepEqual(src int64) bool {
+func (p *CreateSkuResp) Field2DeepEqual(src *model.SkuInfo) bool {
 
-	if p.SkuID != src {
+	if !p.SkuInfo.DeepEqual(src) {
 		return false
 	}
 	return true
@@ -3022,7 +3031,7 @@ func (p *CreateSkuResp) Field2DeepEqual(src int64) bool {
 
 var fieldIDToName_CreateSkuResp = map[int16]string{
 	1: "base",
-	2: "skuID",
+	2: "SkuInfo",
 }
 
 type CreateSkuImageReq struct {
