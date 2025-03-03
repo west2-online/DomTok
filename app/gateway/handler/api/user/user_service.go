@@ -20,7 +20,6 @@ package api
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cloudwego/hertz/pkg/app"
 
@@ -97,7 +96,6 @@ func GetAddress(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
-	fmt.Printf("Address ID: %v\n", req.AddressId)
 
 	resp := new(api.GetAddressResponse)
 	resp, err = rpc.GetAddressRPC(ctx, &user.GetAddressRequest{AddressId: req.AddressId})
