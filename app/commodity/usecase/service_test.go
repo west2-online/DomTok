@@ -882,10 +882,10 @@ func TestUseCase_CreateCategory(t *testing.T) {
 			ExpectedError: errors.New("get category creatorid failed,[20001] Failed to get header in context"),
 		},
 		{
-			Name: "CreateCategorySuccessfully",
+			Name:          "CreateCategorySuccessfully",
 			ExpectedError: nil,
-			MockError: nil,
-			Id: 1,
+			MockError:     nil,
+			Id:            1,
 		},
 	}
 
@@ -975,7 +975,7 @@ func TestUseCase_DeleteCategory(t *testing.T) {
 			mockey.Mock(mockey.GetMethod(us.db, "GetCategoryById")).Return(&category, nil).Build()
 			mockey.Mock(mockey.GetMethod(us.db, "DeleteCategory")).Return(tc.MockError).Build()
 			mockey.Mock((*service.CommodityService).DeleteCategory).Return(tc.MockError).Build()
-			mockey.Mock(mockey.GetMethod(us,"DeleteCategory")).Return(tc.MockError).Build()
+			mockey.Mock(mockey.GetMethod(us, "DeleteCategory")).Return(tc.MockError).Build()
 			// 调用测试方法
 			err := us.DeleteCategory(ctx.Background(), &category)
 
@@ -989,6 +989,7 @@ func TestUseCase_DeleteCategory(t *testing.T) {
 		})
 	}
 }
+
 func TestUseCase_UpdateCategory(t *testing.T) {
 	type TestCase struct {
 		Name          string
@@ -1008,8 +1009,8 @@ func TestUseCase_UpdateCategory(t *testing.T) {
 			ExpectedError: errors.New("service.IdentifyUser failed: [20001] Failed to get header in context"),
 		},
 		{
-			Name: "UpdataCategorySuccessfully",
-			MockError: nil,
+			Name:          "UpdataCategorySuccessfully",
+			MockError:     nil,
 			ExpectedError: nil,
 		},
 	}
@@ -1033,9 +1034,9 @@ func TestUseCase_UpdateCategory(t *testing.T) {
 
 			// Mock 方法
 			mockey.Mock(mockey.GetMethod(us.db, "GetCategoryById")).Return(&category, tc.MockError).Build()
-			mockey.Mock(mockey.GetMethod(us.db, "UpdateCategory")).Return( tc.MockError).Build()
+			mockey.Mock(mockey.GetMethod(us.db, "UpdateCategory")).Return(tc.MockError).Build()
 			mockey.Mock((*service.CommodityService).UpdateCategory).Return(tc.MockError).Build()
-			mockey.Mock(mockey.GetMethod(us,"UpdateCategory")).Return(tc.MockError).Build()
+			mockey.Mock(mockey.GetMethod(us, "UpdateCategory")).Return(tc.MockError).Build()
 			// 调用测试方法
 			err := us.UpdateCategory(ctx.Background(), &category)
 
