@@ -923,7 +923,7 @@ func TestUseCase_CreateCategory(t *testing.T) {
 				}
 			} else {
 				convey.So(err, convey.ShouldBeNil)
-				convey.So(id, convey.ShouldResemble, tc.Id)
+				convey.So(id, convey.ShouldEqual, tc.Id)
 			}
 		})
 	}
@@ -1102,7 +1102,7 @@ func TestUseCase_ViewCategory(t *testing.T) {
 				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
 			} else {
 				convey.So(err, convey.ShouldBeNil)
-				convey.So(resp, convey.ShouldResemble, tc.MockCategory)
+				convey.So(resp, convey.ShouldEqual, tc.MockCategory)
 			}
 		})
 	}
