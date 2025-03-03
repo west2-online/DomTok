@@ -14,20 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package mq
+package redis
 
 import (
-	"sync/atomic"
+	"math/rand"
+	"testing"
 
-	"github.com/west2-online/DomTok/app/commodity/domain/repository"
-	"github.com/west2-online/DomTok/pkg/kafka"
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
 )
 
-type CommodityMQ struct {
-	client *kafka.Kafka
-	done   atomic.Bool
-}
-
-func NewCommodityMQ(client *kafka.Kafka) repository.CommodityMQ {
-	return &CommodityMQ{client: client}
+func buildSkuBuyInfo(t *testing.T, id int64) []*model.SkuBuyInfo {
+	maxNum := 10
+	return []*model.SkuBuyInfo{
+		{
+			SkuID: id,
+			Count: int64(rand.Intn(maxNum)),
+		},
+	}
 }

@@ -54,7 +54,7 @@ func (db *commodityDB) GetCategoryById(ctx context.Context, id int64) (*model.Ca
 	var category *model.Category
 	if err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errno.Errorf(errno.ServiceCategorynotExist, "category already exist")
+			return nil, errno.Errorf(errno.ServiceCategorynotExist, "category not exists")
 		}
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get category %v", err)
 	}
@@ -257,13 +257,20 @@ func (db *commodityDB) DeleteSpuImagesBySpuId(ctx context.Context, spuId int64) 
 	url = make([]string, 0)
 	imgs := make([]*SpuImage, 0)
 
+	if err = db.client.WithContext(ctx).Table(constants.SpuImageTableName).Where("spu_id = ?", spuId).
+		Find(&imgs).Error; err != nil {
+		return nil, nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete spu images: %v", err)
+	}
+
+	for _, img := range imgs {
+		ids = append(ids, img.Id)
+		url = append(url, img.Url)
+	}
+
 	if err = db.client.WithContext(ctx).Table(constants.SpuImageTableName).Where("spu_id = ?", spuId).Delete(imgs).Error; err != nil {
 		return nil, nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete images: %v", err)
 	}
-	for _, img := range imgs {
-		ids = append(ids, img.SpuId)
-		url = append(url, img.Url)
-	}
+
 	return ids, url, nil
 }
 
