@@ -18,6 +18,7 @@ package service
 
 import (
 	"context"
+	"sync/atomic"
 
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 	"github.com/west2-online/DomTok/pkg/utils"
@@ -29,8 +30,9 @@ type CommodityService struct {
 	cache repository.CommodityCache
 	mq    repository.CommodityMQ
 	es    repository.CommodityElastic
-	// TODO
 }
+
+var RedisAvailable atomic.Bool
 
 func NewCommodityService(db repository.CommodityDB, sf *utils.Snowflake, cache repository.CommodityCache,
 	mq repository.CommodityMQ, es repository.CommodityElastic,
@@ -73,4 +75,5 @@ func (s *CommodityService) init() {
 	go s.ConsumeCreateSpuMsg(context.Background())
 	go s.ConsumeUpdateSpuMsg(context.Background())
 	go s.ConsumeDeleteSpuMsg(context.Background())
+	go s.CheckoutRedisHealth()
 }

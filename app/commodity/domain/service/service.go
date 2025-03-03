@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/bytedance/sonic"
 	"golang.org/x/sync/errgroup"
@@ -879,4 +880,20 @@ func (svc *CommodityService) GetSkuFromImageId(ctx context.Context, imageId int6
 		return nil, nil, fmt.Errorf("service.GetSkuFromImageId: get sku info failed: %w", err)
 	}
 	return ret, img, nil
+}
+
+func (svc *CommodityService) CheckoutRedisHealth() {
+	for {
+		err := svc.cache.IsHealthy(context.Background())
+		if err != nil {
+			RedisAvailable.Store(constants.RedisUnHealthy)
+		} else {
+			RedisAvailable.Store(constants.RedisHealthy)
+		}
+		time.Sleep(constants.RedisCheckoutInterval)
+	}
+}
+
+func (svc *CommodityService) IsHealthy() bool {
+	return RedisAvailable.Load()
 }

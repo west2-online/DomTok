@@ -80,3 +80,10 @@ const (
         return 1
     `
 )
+
+const (
+	RedisUnHealthy        = false
+	RedisHealthy          = true
+	RedisCheckoutTimeOut  = 2 * time.Second
+	RedisCheckoutInterval = 5 * time.Second
+)

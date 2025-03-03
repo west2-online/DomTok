@@ -226,9 +226,8 @@ func (us *useCase) ListSpuInfo(ctx context.Context, ids []int64) ([]*model.Spu, 
 }
 
 func (us *useCase) IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	err := us.cache.IsHealthy(ctx)
-	if err != nil {
-		err = us.db.IncrLockStock(ctx, infos)
+	if !us.svc.IsHealthy() {
+		err := us.db.IncrLockStock(ctx, infos)
 		if err != nil {
 			return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
 		}
@@ -239,9 +238,8 @@ func (us *useCase) IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo)
 }
 
 func (us *useCase) DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	err := us.cache.IsHealthy(ctx)
-	if err != nil {
-		err = us.db.DecrLockStock(ctx, infos)
+	if !us.svc.IsHealthy() {
+		err := us.db.DecrLockStock(ctx, infos)
 		if err != nil {
 			return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
 		}
@@ -252,9 +250,8 @@ func (us *useCase) DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo)
 }
 
 func (us *useCase) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	err := us.cache.IsHealthy(ctx)
-	if err != nil {
-		err = us.db.DecrStock(ctx, infos)
+	if !us.svc.IsHealthy() {
+		err := us.db.DecrStock(ctx, infos)
 		if err != nil {
 			return fmt.Errorf("usecase.DecrStock failed: %w", err)
 		}
