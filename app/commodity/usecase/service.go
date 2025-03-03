@@ -31,17 +31,17 @@ import (
 func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category) (int64, error) {
 	exist, err := uc.db.IsCategoryExistByName(ctx, category.Name)
 	if err != nil {
-		return 0, fmt.Errorf("check category exist failed: %w", err)
+		return 0, fmt.Errorf("check category exist failed")
 	}
 	if exist {
-		return 0, errno.NewErrNo(errno.ServiceUserExist, "category  exist")
+		return 0, fmt.Errorf("category exist")
 	}
 	category.CreatorId, err = contextLogin.GetLoginData(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("get category creatorid failed: %w", err)
+		return 0, fmt.Errorf("get category creatorid failed")
 	}
 	if err = uc.svc.CreateCategory(ctx, category); err != nil {
-		return 0, fmt.Errorf("mysql create category failed: %w", err)
+		return 0, fmt.Errorf("mysql create category failed")
 	}
 	return category.Id, nil
 }

@@ -855,3 +855,215 @@ func TestUseCase_IncrLockStock(t *testing.T) {
 		})
 	}
 }
+
+func TestUseCase_CreateCategory(t *testing.T) {
+	type TestCase struct {
+		Name                string
+		CategoryExistStatus bool
+		MockError           error
+		ExpectedError       error
+	}
+
+	testcases := []TestCase{
+		{
+			Name:          "CheckCategoryError",
+			MockError:     errors.New("CreateCategoryError"),
+			ExpectedError: errors.New("check category exist failed"),
+		},
+		{
+			Name:                "CategoryAlreadyExists",
+			CategoryExistStatus: true,
+			ExpectedError:       errors.New("check category exist failed"),
+		},
+		{
+			Name:          "CreateCategoryError",
+			ExpectedError: errors.New("check category exist failed"),
+		},
+		{
+			Name:          "CreateCategorySuccessfully",
+			ExpectedError: errors.New("check category exist failed"),
+		},
+	}
+
+	input := model.Category{
+		Name: "test",
+	}
+
+	defer mockey.UnPatchAll()
+
+	for _, tc := range testcases {
+		mockey.PatchConvey(tc.Name, t, func() {
+			// 初始化 gorm.DB
+			gormDB := new(gorm.DB)
+
+			// 初始化 Mock 对象
+			svc := new(service.CommodityService)
+			db := mysql.NewCommodityDB(gormDB)
+			us := &useCase{
+				svc: svc,
+				db:  db,
+			}
+			// Mock 方法
+			mockey.Mock(mockey.GetMethod(us.db, "CreateCategory")).Return(tc.ExpectedError).Build()
+			mockey.Mock(mockey.GetMethod(us.db, "IsCategoryExistByName")).Return(tc.CategoryExistStatus, tc.ExpectedError).Build()
+
+			mockey.Mock((*service.CommodityService).CreateCategory).Return(int64(1), tc.MockError).Build()
+
+			// 调用测试方法
+			_, err := us.CreateCategory(ctx.Background(), &input)
+
+			// 验证结果
+			if tc.ExpectedError != nil {
+				convey.So(err, convey.ShouldNotBeNil)
+				if err != nil {
+					convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+				}
+			} else {
+				convey.So(err, convey.ShouldBeNil)
+			}
+		})
+	}
+}
+
+func TestUseCase_DeleteCategory(t *testing.T) {
+	type TestCase struct {
+		Name          string
+		MockError     error
+		ExpectedError error
+	}
+	testcase := []TestCase{
+		{
+			Name:          "DeleteCategoryError",
+			MockError:     errors.New("DeleteCategoryError"),
+			ExpectedError: errors.New("usecase.DeleteCategory faild:DeleteCategoryError"),
+		},
+		{
+			Name:          "DeleteCategorySuccessfully",
+			MockError:     nil,
+			ExpectedError: nil,
+		},
+	}
+	defer mockey.UnPatchAll()
+	category := model.Category{
+		Id: 1,
+	}
+	for _, tc := range testcase {
+		mockey.PatchConvey(tc.Name, t, func() {
+			// 初始化 gorm.DB
+			gormDB := new(gorm.DB)
+
+			// 初始化 Mock 对象
+			svc := new(service.CommodityService)
+			db := mysql.NewCommodityDB(gormDB)
+			us := &useCase{
+				svc: svc,
+				db:  db,
+			}
+			mockey.Mock(mockey.GetMethod(us.db, "GetCategoryById")).Return(&category, tc.ExpectedError).Build()
+			mockey.Mock(mockey.GetMethod(us.db, "DeleteCategory")).Return(tc.ExpectedError).Build()
+			mockey.Mock((*service.CommodityService).DeleteCategory).Return(tc.MockError).Build()
+			err := us.DeleteCategory(ctx.Background(), &category)
+			if err != nil {
+				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			} else {
+				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+			}
+		})
+	}
+}
+
+func TestUseCase_UpdateCategory(t *testing.T) {
+	type TestCase struct {
+		Name          string
+		MockError     error
+		ExpectedError error
+	}
+	testcase := []TestCase{
+		{
+			Name:          "UpdateCategoryError",
+			MockError:     errors.New("UpdateCategoryError"),
+			ExpectedError: errors.New("usecase.UpdateCategory faild:UpdateCategoryError"),
+		},
+		{
+			Name: "UpdateCategorySuccessfully",
+		},
+	}
+	category := model.Category{
+		Name: "test",
+		Id:   1,
+	}
+	defer mockey.UnPatchAll()
+	for _, tc := range testcase {
+		mockey.PatchConvey(tc.Name, t, func() {
+			// 初始化 gorm.DB
+			gormDB := new(gorm.DB)
+
+			// 初始化 Mock 对象
+			svc := new(service.CommodityService)
+			db := mysql.NewCommodityDB(gormDB)
+			us := &useCase{
+				svc: svc,
+				db:  db,
+			}
+			mockey.Mock(mockey.GetMethod(us.db, "GetCategoryById")).Return(&category, tc.ExpectedError).Build()
+			mockey.Mock(mockey.GetMethod(us.db, "UpdateCategory")).Return(tc.ExpectedError).Build()
+			mockey.Mock((*service.CommodityService).UpdateCategory).Return(tc.MockError).Build()
+
+			err := us.UpdateCategory(ctx.Background(), &category)
+			if err != nil {
+				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			} else {
+				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+			}
+		})
+	}
+}
+
+func TestUseCase_ViewCategory(t *testing.T) {
+	type TestCase struct {
+		Name          string
+		MockCategory  *model.CategoryInfo
+		MockError     error
+		ExpectedError error
+	}
+	testcase := []TestCase{
+		{
+			Name:          "ViewCategoryError",
+			MockError:     errors.New("ViewCategoryError"),
+			ExpectedError: errors.New("usecase.ViewCategory faild:ViewCategoryError"),
+		},
+		{
+			Name: "ViewCategorySuccessfully",
+			MockCategory: &model.CategoryInfo{
+				CategoryID: 1,
+				Name:       "test",
+			},
+		},
+	}
+	defer mockey.UnPatchAll()
+	categoryinfo := new([]model.CategoryInfo)
+	for _, tc := range testcase {
+		mockey.PatchConvey(tc.Name, t, func() {
+			// 初始化 gorm.DB
+			gormDB := new(gorm.DB)
+
+			// 初始化 Mock 对象
+			svc := new(service.CommodityService)
+			db := mysql.NewCommodityDB(gormDB)
+			us := &useCase{
+				svc: svc,
+				db:  db,
+			}
+			mockey.Mock(mockey.GetMethod(us.db, "ViewCategory")).Return(&categoryinfo, tc.ExpectedError).Build()
+			mockey.Mock(us.ViewCategory).Return(tc.MockCategory, tc.MockError).Build()
+			category, err := us.ViewCategory(ctx.Background(), 1, 1)
+			if category == nil {
+				convey.So(err.Error(), convey.ShouldBeFalse, tc.ExpectedError.Error())
+			} else if err != nil {
+				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			} else {
+				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+			}
+		})
+	}
+}
