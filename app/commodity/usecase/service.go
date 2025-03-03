@@ -34,7 +34,7 @@ func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category)
 		return 0, fmt.Errorf("check category exist failed,%w", err)
 	}
 	if exist {
-		return 0, fmt.Errorf("category exist")
+		return 0, errno.Errorf(errno.ServiceCategoryExist, "category already exist")
 	}
 	category.CreatorId, err = contextLogin.GetLoginData(ctx)
 	if err != nil {

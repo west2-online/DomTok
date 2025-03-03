@@ -873,11 +873,6 @@ func TestUseCase_CreateCategory(t *testing.T) {
 			ExpectedError: errors.New("check category exist failed,check category exist failed"),
 		},
 		{
-			Name:          "CheckCategoryFailed",
-			MockError:     errors.New("check category exist failed"),
-			ExpectedError: errors.New("check category exist failed,check category exist failed"),
-		},
-		{
 			Name:                "CategoryAlreadyExists",
 			CategoryExistStatus: true,
 			ExpectedError:       errors.New("category exist"),
@@ -885,6 +880,12 @@ func TestUseCase_CreateCategory(t *testing.T) {
 		{
 			Name:          "GetCreatoridFailed",
 			ExpectedError: errors.New("get category creatorid failed,[20001] Failed to get header in context"),
+		},
+		{
+			Name: "CreateCategorySuccessfully",
+			ExpectedError: nil,
+			MockError: nil,
+			Id: 1,
 		},
 	}
 
@@ -908,8 +909,8 @@ func TestUseCase_CreateCategory(t *testing.T) {
 			}
 			// Mock 方法
 			mockey.Mock(mockey.GetMethod(us.db, "IsCategoryExistByName")).Return(tc.CategoryExistStatus, tc.MockError).Build()
-			mockey.Mock(mockey.GetMethod(us.db, "CreateCategory")).Return(int64(1), tc.MockError).Build()
-			mockey.Mock((*service.CommodityService).CreateCategory).Return(int64(1), tc.MockError).Build()
+			mockey.Mock(mockey.GetMethod(us.db, "CreateCategory")).Return(tc.Id, tc.MockError).Build()
+			mockey.Mock((*service.CommodityService).CreateCategory).Return(tc.Id, tc.MockError).Build()
 			mockey.Mock(mockey.GetMethod(us, "CreateCategory")).Return(tc.Id, tc.ExpectedError).Build()
 			// 调用测试方法
 			id, err := us.CreateCategory(ctx.Background(), &input)
@@ -941,9 +942,14 @@ func TestUseCase_DeleteCategory(t *testing.T) {
 			ExpectedError: errors.New("DeleteCategoryError"),
 		},
 		{
+			Name:          "GetHeaderfail",
+			MockError:     errors.New("service.IdentifyUser failed: [20001] Failed to get header in context"),
+			ExpectedError: errors.New("service.IdentifyUser failed: [20001] Failed to get header in context"),
+		},
+		{
 			Name:          "DeleteCategorySuccessfully",
 			MockError:     nil,
-			ExpectedError: errors.New("service.IdentifyUser failed: [20001] Failed to get header in context"),
+			ExpectedError: nil,
 		},
 	}
 	defer mockey.UnPatchAll()
@@ -966,26 +972,23 @@ func TestUseCase_DeleteCategory(t *testing.T) {
 			}
 
 			// Mock 方法
-			mockey.Mock(mockey.GetMethod(us.db, "GetCategoryById")).Return(&category, tc.MockError).Build()
-			mockey.Mock(mockey.GetMethod(us.db, "DeleteCategory")).Return(int64(1), tc.MockError).Build()
-			mockey.Mock((*service.CommodityService).DeleteCategory).Return(int64(1), tc.MockError).Build()
-
+			mockey.Mock(mockey.GetMethod(us.db, "GetCategoryById")).Return(&category, nil).Build()
+			mockey.Mock(mockey.GetMethod(us.db, "DeleteCategory")).Return(tc.MockError).Build()
+			mockey.Mock((*service.CommodityService).DeleteCategory).Return(tc.MockError).Build()
+			mockey.Mock(mockey.GetMethod(us,"DeleteCategory")).Return(tc.MockError).Build()
 			// 调用测试方法
 			err := us.DeleteCategory(ctx.Background(), &category)
 
 			// 验证结果
 			if tc.ExpectedError != nil {
 				convey.So(err, convey.ShouldNotBeNil)
-				if err != nil {
-					convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
-				}
+				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
 			} else {
 				convey.So(err, convey.ShouldBeNil)
 			}
 		})
 	}
 }
-
 func TestUseCase_UpdateCategory(t *testing.T) {
 	type TestCase struct {
 		Name          string
@@ -1003,6 +1006,11 @@ func TestUseCase_UpdateCategory(t *testing.T) {
 			Name:          "FailtoGetHeader",
 			MockError:     errors.New("service.IdentifyUser failed: [20001] Failed to get header in context"),
 			ExpectedError: errors.New("service.IdentifyUser failed: [20001] Failed to get header in context"),
+		},
+		{
+			Name: "UpdataCategorySuccessfully",
+			MockError: nil,
+			ExpectedError: nil,
 		},
 	}
 	category := model.Category{
@@ -1025,9 +1033,9 @@ func TestUseCase_UpdateCategory(t *testing.T) {
 
 			// Mock 方法
 			mockey.Mock(mockey.GetMethod(us.db, "GetCategoryById")).Return(&category, tc.MockError).Build()
-			mockey.Mock(mockey.GetMethod(us.db, "UpdateCategory")).Return(int64(1), tc.MockError).Build()
-			mockey.Mock((*service.CommodityService).UpdateCategory).Return(int64(1), tc.MockError).Build()
-
+			mockey.Mock(mockey.GetMethod(us.db, "UpdateCategory")).Return( tc.MockError).Build()
+			mockey.Mock((*service.CommodityService).UpdateCategory).Return(tc.MockError).Build()
+			mockey.Mock(mockey.GetMethod(us,"UpdateCategory")).Return(tc.MockError).Build()
 			// 调用测试方法
 			err := us.UpdateCategory(ctx.Background(), &category)
 
