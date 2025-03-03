@@ -661,13 +661,21 @@ func ViewHistory(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewHistoryPriceReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.ViewHistoryPriceResp)
-
-	c.JSON(consts.StatusOK, resp)
+	resp, err := rpc.ViewHistoryPriceRPC(ctx, &commodity.ViewHistoryPriceReq{
+		SkuID:     req.SkuID,
+		HistoryID: req.HistoryID,
+		PageNum:   req.PageNum,
+		PageSize:  req.PageSize,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespList(c, resp)
 }
 
 // CreateCategory .

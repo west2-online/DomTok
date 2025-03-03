@@ -620,7 +620,10 @@ func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku, ext 
 
 func (svc *CommodityService) UpdateSku(ctx context.Context, sku *model.Sku, originSpu *model.Sku) error {
 	sku.HistoryID = svc.nextID()
-
+	ret, err := svc.db.GetSkuById(ctx, sku.SkuID)
+	if err != nil {
+		return fmt.Errorf("service.UpdateSku: get sku failed: %w", err)
+	}
 	if len(sku.StyleHeadDrawing) > 0 {
 		var eg errgroup.Group
 		eg.Go(func() error {
@@ -644,7 +647,7 @@ func (svc *CommodityService) UpdateSku(ctx context.Context, sku *model.Sku, orig
 		}
 	}
 
-	if err := svc.db.UpdateSku(ctx, sku); err != nil {
+	if err := svc.db.UpdateSku(ctx, sku, ret); err != nil {
 		return fmt.Errorf("service.UpdateSku: update sku failed: %w", err)
 	}
 
@@ -719,6 +722,14 @@ func (svc *CommodityService) ListSkuInfo(ctx context.Context, skuInfo []*model.S
 	}
 
 	return skuInfos, total, nil
+}
+
+func (svc *CommodityService) ViewSkuPriceHistory(ctx context.Context, s *model.SkuPriceHistory, pNum int64, pSize int64) ([]*model.SkuPriceHistory, error) {
+	histories, err := svc.db.ViewSkuPriceHistory(ctx, s, int(pNum), int(pSize))
+	if err != nil {
+		return nil, fmt.Errorf("usecase.ViewSkuPriceHistory failed: %w", err)
+	}
+	return histories, nil
 }
 
 func (svc *CommodityService) CreateSkuImage(ctx context.Context, skuImage *model.SkuImage, data []byte) (int64, error) {

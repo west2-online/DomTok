@@ -373,6 +373,18 @@ func (us *useCase) ListSkuInfo(ctx context.Context, skuInfo []*model.SkuVersion,
 	return skuInfos, total, nil
 }
 
+func (us *useCase) ViewSkuPriceHistory(ctx context.Context, skuPrice *model.SkuPriceHistory, pageNum int64, pageSize int64) ([]*model.SkuPriceHistory, error) {
+	if pageNum < 1 || pageSize < 1 {
+		return nil, fmt.Errorf("usecase.ViewSkuPriceHistory failed: invalid PageNum or PageSize")
+	}
+
+	histories, err := us.svc.ViewSkuPriceHistory(ctx, skuPrice, pageNum, pageSize)
+	if err != nil {
+		return nil, fmt.Errorf("usecase.ViewSkuPriceHistory failed: %w", err)
+	}
+	return histories, nil
+}
+
 func (us *useCase) CreateSkuImage(ctx context.Context, skuImage *model.SkuImage, data []byte) (int64, error) {
 	ret, err := us.db.GetSkuBySkuId(ctx, skuImage.SkuID)
 	if err != nil {
