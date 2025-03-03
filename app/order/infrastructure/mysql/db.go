@@ -44,7 +44,6 @@ func (db *orderDB) IsOrderExist(ctx context.Context, orderID int64) (bool, int64
 		Select("ordered_at").
 		Where("id = ? AND deleted_at IS NULL", orderID).
 		First(&t).Error
-
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, 0, nil

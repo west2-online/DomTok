@@ -52,10 +52,10 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
-	"DeleteCartGoods": kitex.NewMethodInfo(
-		deleteCartGoodsHandler,
-		newCartServiceDeleteCartGoodsArgs,
-		newCartServiceDeleteCartGoodsResult,
+	"PurChaseCartGoods": kitex.NewMethodInfo(
+		purChaseCartGoodsHandler,
+		newCartServicePurChaseCartGoodsArgs,
+		newCartServicePurChaseCartGoodsResult,
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
@@ -63,13 +63,6 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		deleteAllCartGoodsHandler,
 		newCartServiceDeleteAllCartGoodsArgs,
 		newCartServiceDeleteAllCartGoodsResult,
-		false,
-		kitex.WithStreamingMode(kitex.StreamingNone),
-	),
-	"PayCartGoods": kitex.NewMethodInfo(
-		payCartGoodsHandler,
-		newCartServicePayCartGoodsArgs,
-		newCartServicePayCartGoodsResult,
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
@@ -193,22 +186,22 @@ func newCartServiceUpdateCartGoodsResult() interface{} {
 	return cart.NewCartServiceUpdateCartGoodsResult()
 }
 
-func deleteCartGoodsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*cart.CartServiceDeleteCartGoodsArgs)
-	realResult := result.(*cart.CartServiceDeleteCartGoodsResult)
-	success, err := handler.(cart.CartService).DeleteCartGoods(ctx, realArg.Req)
+func purChaseCartGoodsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*cart.CartServicePurChaseCartGoodsArgs)
+	realResult := result.(*cart.CartServicePurChaseCartGoodsResult)
+	success, err := handler.(cart.CartService).PurChaseCartGoods(ctx, realArg.Req)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newCartServiceDeleteCartGoodsArgs() interface{} {
-	return cart.NewCartServiceDeleteCartGoodsArgs()
+func newCartServicePurChaseCartGoodsArgs() interface{} {
+	return cart.NewCartServicePurChaseCartGoodsArgs()
 }
 
-func newCartServiceDeleteCartGoodsResult() interface{} {
-	return cart.NewCartServiceDeleteCartGoodsResult()
+func newCartServicePurChaseCartGoodsResult() interface{} {
+	return cart.NewCartServicePurChaseCartGoodsResult()
 }
 
 func deleteAllCartGoodsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -227,24 +220,6 @@ func newCartServiceDeleteAllCartGoodsArgs() interface{} {
 
 func newCartServiceDeleteAllCartGoodsResult() interface{} {
 	return cart.NewCartServiceDeleteAllCartGoodsResult()
-}
-
-func payCartGoodsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*cart.CartServicePayCartGoodsArgs)
-	realResult := result.(*cart.CartServicePayCartGoodsResult)
-	success, err := handler.(cart.CartService).PayCartGoods(ctx, realArg.Req)
-	if err != nil {
-		return err
-	}
-	realResult.Success = success
-	return nil
-}
-func newCartServicePayCartGoodsArgs() interface{} {
-	return cart.NewCartServicePayCartGoodsArgs()
-}
-
-func newCartServicePayCartGoodsResult() interface{} {
-	return cart.NewCartServicePayCartGoodsResult()
 }
 
 type kClient struct {
@@ -287,11 +262,11 @@ func (p *kClient) UpdateCartGoods(ctx context.Context, req *cart.UpdateCartGoods
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) DeleteCartGoods(ctx context.Context, req *cart.DeleteAllCartGoodsRequest) (r *cart.DeleteAllCartGoodsResponse, err error) {
-	var _args cart.CartServiceDeleteCartGoodsArgs
+func (p *kClient) PurChaseCartGoods(ctx context.Context, req *cart.PurChaseCartGoodsRequest) (r *cart.PurChaseCartGoodsResponse, err error) {
+	var _args cart.CartServicePurChaseCartGoodsArgs
 	_args.Req = req
-	var _result cart.CartServiceDeleteCartGoodsResult
-	if err = p.c.Call(ctx, "DeleteCartGoods", &_args, &_result); err != nil {
+	var _result cart.CartServicePurChaseCartGoodsResult
+	if err = p.c.Call(ctx, "PurChaseCartGoods", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -302,16 +277,6 @@ func (p *kClient) DeleteAllCartGoods(ctx context.Context, req *cart.DeleteAllCar
 	_args.Req = req
 	var _result cart.CartServiceDeleteAllCartGoodsResult
 	if err = p.c.Call(ctx, "DeleteAllCartGoods", &_args, &_result); err != nil {
-		return
-	}
-	return _result.GetSuccess(), nil
-}
-
-func (p *kClient) PayCartGoods(ctx context.Context, req *cart.PayCartGoodsRequest) (r *cart.PayCartGoodsResponse, err error) {
-	var _args cart.CartServicePayCartGoodsArgs
-	_args.Req = req
-	var _result cart.CartServicePayCartGoodsResult
-	if err = p.c.Call(ctx, "PayCartGoods", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
