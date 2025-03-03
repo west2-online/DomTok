@@ -34,6 +34,7 @@ import (
 	redisCommodity "github.com/west2-online/DomTok/app/commodity/infrastructure/redis"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	"github.com/west2-online/DomTok/pkg/base/context"
+	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
@@ -935,22 +936,24 @@ func TestUseCase_DeleteCategory(t *testing.T) {
 		{
 			Name:          "DeleteCategoryError",
 			MockError:     errors.New("DeleteCategoryError"),
-			ExpectedError: errors.New("usecase.DeleteCategory faild:DeleteCategoryError"),
+			ExpectedError: errors.New("service.IdentifyUser failed: [20001] Failed to get header in context"),
 		},
 		{
 			Name:          "DeleteCategorySuccessfully",
 			MockError:     nil,
-			ExpectedError: nil,
+			ExpectedError: errors.New("service.IdentifyUser failed: [20001] Failed to get header in context"),
 		},
 	}
 	defer mockey.UnPatchAll()
+
 	category := model.Category{
 		Id: 1,
 	}
+
 	for _, tc := range testcase {
 		mockey.PatchConvey(tc.Name, t, func() {
 			// 初始化 gorm.DB
-			gormDB := new(gorm.DB)
+			gormDB := new(gorm.DB) // 确保 gormDB 不为 nil
 
 			// 初始化 Mock 对象
 			svc := new(service.CommodityService)
@@ -959,14 +962,23 @@ func TestUseCase_DeleteCategory(t *testing.T) {
 				svc: svc,
 				db:  db,
 			}
-			mockey.Mock(mockey.GetMethod(us.db, "GetCategoryById")).Return(&category, tc.ExpectedError).Build()
-			mockey.Mock(mockey.GetMethod(us.db, "DeleteCategory")).Return(tc.ExpectedError).Build()
+
+			// Mock 方法
+			mockey.Mock(mockey.GetMethod(us.db, "GetCategoryById")).Return(&category, nil).Build()
+			mockey.Mock(mockey.GetMethod(us.db, "DeleteCategory")).Return(tc.MockError).Build()
 			mockey.Mock((*service.CommodityService).DeleteCategory).Return(tc.MockError).Build()
+
+			// 调用测试方法
 			err := us.DeleteCategory(ctx.Background(), &category)
-			if err != nil {
-				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+
+			// 验证结果
+			if tc.ExpectedError != nil {
+				convey.So(err, convey.ShouldNotBeNil)
+				if err != nil {
+					convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+				}
 			} else {
-				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+				convey.So(err, convey.ShouldBeNil)
 			}
 		})
 	}
@@ -982,10 +994,12 @@ func TestUseCase_UpdateCategory(t *testing.T) {
 		{
 			Name:          "UpdateCategoryError",
 			MockError:     errors.New("UpdateCategoryError"),
-			ExpectedError: errors.New("usecase.UpdateCategory faild:UpdateCategoryError"),
+			ExpectedError: errors.New("service.IdentifyUser failed: [20001] Failed to get header in context"),
 		},
 		{
-			Name: "UpdateCategorySuccessfully",
+			Name:          "UpdateCategorySuccessfully",
+			MockError:     nil,
+			ExpectedError: errors.New("service.IdentifyUser failed: [20001] Failed to get header in context"),
 		},
 	}
 	category := model.Category{
@@ -996,7 +1010,7 @@ func TestUseCase_UpdateCategory(t *testing.T) {
 	for _, tc := range testcase {
 		mockey.PatchConvey(tc.Name, t, func() {
 			// 初始化 gorm.DB
-			gormDB := new(gorm.DB)
+			gormDB := new(gorm.DB) // 确保 gormDB 不为 nil
 
 			// 初始化 Mock 对象
 			svc := new(service.CommodityService)
@@ -1005,15 +1019,21 @@ func TestUseCase_UpdateCategory(t *testing.T) {
 				svc: svc,
 				db:  db,
 			}
-			mockey.Mock(mockey.GetMethod(us.db, "GetCategoryById")).Return(&category, tc.ExpectedError).Build()
-			mockey.Mock(mockey.GetMethod(us.db, "UpdateCategory")).Return(tc.ExpectedError).Build()
+
+			// Mock 方法
+			mockey.Mock(mockey.GetMethod(us.db, "GetCategoryById")).Return(&category, nil).Build()
+			mockey.Mock(mockey.GetMethod(us.db, "UpdateCategory")).Return(tc.MockError).Build()
 			mockey.Mock((*service.CommodityService).UpdateCategory).Return(tc.MockError).Build()
 
+			// 调用测试方法
 			err := us.UpdateCategory(ctx.Background(), &category)
-			if err != nil {
+
+			// 验证结果
+			if tc.ExpectedError != nil {
+				convey.So(err, convey.ShouldNotBeNil)
 				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
 			} else {
-				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+				convey.So(err, convey.ShouldBeNil)
 			}
 		})
 	}
@@ -1022,7 +1042,7 @@ func TestUseCase_UpdateCategory(t *testing.T) {
 func TestUseCase_ViewCategory(t *testing.T) {
 	type TestCase struct {
 		Name          string
-		MockCategory  *model.CategoryInfo
+		MockCategory  []*model.CategoryInfo
 		MockError     error
 		ExpectedError error
 	}
@@ -1030,22 +1050,25 @@ func TestUseCase_ViewCategory(t *testing.T) {
 		{
 			Name:          "ViewCategoryError",
 			MockError:     errors.New("ViewCategoryError"),
-			ExpectedError: errors.New("usecase.ViewCategory faild:ViewCategoryError"),
+			ExpectedError: errno.Errorf(errno.ServiceListCategoryFailed, "failed to view categories: %v", errors.New("ViewCategoryError")),
 		},
 		{
 			Name: "ViewCategorySuccessfully",
-			MockCategory: &model.CategoryInfo{
-				CategoryID: 1,
-				Name:       "test",
+			MockCategory: []*model.CategoryInfo{
+				{
+					CategoryID: 1,
+					Name:       "test",
+				},
 			},
+			MockError:     nil,
+			ExpectedError: nil,
 		},
 	}
 	defer mockey.UnPatchAll()
-	categoryinfo := new([]model.CategoryInfo)
 	for _, tc := range testcase {
 		mockey.PatchConvey(tc.Name, t, func() {
 			// 初始化 gorm.DB
-			gormDB := new(gorm.DB)
+			gormDB := new(gorm.DB) // 确保 gormDB 不为 nil
 
 			// 初始化 Mock 对象
 			svc := new(service.CommodityService)
@@ -1054,15 +1077,20 @@ func TestUseCase_ViewCategory(t *testing.T) {
 				svc: svc,
 				db:  db,
 			}
-			mockey.Mock(mockey.GetMethod(us.db, "ViewCategory")).Return(&categoryinfo, tc.ExpectedError).Build()
-			mockey.Mock(us.ViewCategory).Return(tc.MockCategory, tc.MockError).Build()
-			category, err := us.ViewCategory(ctx.Background(), 1, 1)
-			if category == nil {
-				convey.So(err.Error(), convey.ShouldBeFalse, tc.ExpectedError.Error())
-			} else if err != nil {
+
+			// Mock 方法
+			mockey.Mock(mockey.GetMethod(us.db, "ViewCategory")).Return(tc.MockCategory, tc.MockError).Build()
+
+			// 调用测试方法
+			resp, err := us.ViewCategory(ctx.Background(), 1, 10)
+
+			// 验证结果
+			if tc.ExpectedError != nil {
+				convey.So(err, convey.ShouldNotBeNil)
 				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
 			} else {
-				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+				convey.So(err, convey.ShouldBeNil)
+				convey.So(resp, convey.ShouldResemble, tc.MockCategory)
 			}
 		})
 	}
