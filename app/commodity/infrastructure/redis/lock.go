@@ -27,7 +27,9 @@ import (
 )
 
 func (c *commodityCache) IsHealthy(ctx context.Context) error {
-	err := c.client.Ping(ctx).Err()
+	newCtx, cancel := context.WithTimeout(ctx, constants.RedisCheckoutTimeOut)
+	defer cancel()
+	err := c.client.Ping(newCtx).Err()
 	if err != nil {
 		return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.IsHealthy failed: %v", err)
 	}

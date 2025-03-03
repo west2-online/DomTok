@@ -26,7 +26,6 @@ import (
 
 	"github.com/west2-online/DomTok/app/order/domain/model"
 	"github.com/west2-online/DomTok/app/order/domain/repository"
-	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
@@ -41,12 +40,16 @@ func NewOrderDB(client *gorm.DB) repository.OrderDB {
 // IsOrderExist 检查订单是否存在
 func (db *orderDB) IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error) {
 	var t int64
-	if err := db.client.WithContext(ctx).Model(&Order{}).
-		Select("ordered_at").Where("id = ?", orderID).Find(&t).Error; err != nil {
+	err := db.client.WithContext(ctx).Model(&Order{}).
+		Select("ordered_at").
+		Where("id = ? AND deleted_at IS NULL", orderID).
+		First(&t).Error
+
+	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, t, nil
+			return false, 0, nil
 		}
-		return false, t, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to check order exist: %v", err)
+		return false, 0, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to check order exist: %v", err)
 	}
 
 	return true, t, nil
@@ -206,17 +209,6 @@ func (db *orderDB) GetOrderAndGoods(ctx context.Context, orderID int64) (*model.
 	}
 
 	return db.order2Model(&order), modelGoods, nil
-}
-
-func (db *orderDB) IsOrderPaid(ctx context.Context, orderID int64) (bool, error) {
-	var status int8
-	if err := db.client.WithContext(ctx).
-		Model(&Order{Id: orderID}).
-		Select("").Where("id = ?", orderID).Scan(&status); err != nil {
-		return false, errno.NewErrNo(errno.InternalDatabaseErrorCode,
-			fmt.Sprintf("Failed to query the payment status of an order with order id %d, err: %v", orderID, err))
-	}
-	return status == constants.PaymentStatusSuccessCode, nil
 }
 
 func (db *orderDB) UpdatePaymentStatus(ctx context.Context, message *model.PaymentResult) error {
