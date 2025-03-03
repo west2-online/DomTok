@@ -122,6 +122,10 @@ type rocketmq struct {
 	SecretKey   string `mapstructure:"secretKey"`
 }
 
+type otel struct {
+	CollectorAddr string `mapstructure:"collector-addr"`
+}
+
 type config struct {
 	Server        server
 	Snowflake     snowflake
@@ -137,4 +141,5 @@ type config struct {
 	Volcengine    volcengine
 	Upyun         upyun
 	Rocketmq      rocketmq
+	Otel          otel
 }
