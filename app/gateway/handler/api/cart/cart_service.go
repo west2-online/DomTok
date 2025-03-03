@@ -139,12 +139,12 @@ func PurChaseCartGoods(ctx context.Context, c *app.RequestContext) {
 			GoodsVersion:     item.GoodsVersion,
 		}
 	})
-	err = rpc.PurchaseCartGoodsRPC(ctx, &cart.PurChaseCartGoodsRequest{
+	orderId, err := rpc.PurchaseCartGoodsRPC(ctx, &cart.PurChaseCartGoodsRequest{
 		CartGoods: rpcCartGoods,
 	})
 	if err != nil {
 		pack.RespError(c, err)
 		return
 	}
-	pack.RespSuccess(c)
+	pack.RespData(c, orderId)
 }
