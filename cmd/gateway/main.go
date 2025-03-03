@@ -17,6 +17,8 @@ limitations under the License.
 package main
 
 import (
+	"context"
+
 	"github.com/cloudwego/hertz/pkg/app/server"
 
 	"github.com/west2-online/DomTok/app/gateway/mw"
@@ -25,6 +27,7 @@ import (
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
+	"github.com/west2-online/DomTok/pkg/middleware"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
@@ -42,6 +45,9 @@ func main() {
 	if err != nil {
 		logger.Fatalf("get available port failed, err: %v", err)
 	}
+
+	p := middleware.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
+	defer func() { logger.LogError(p.Shutdown(context.Background())) }()
 
 	h := server.New(
 		server.WithHostPorts(listenAddr),

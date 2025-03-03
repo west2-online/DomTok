@@ -22,6 +22,8 @@ import (
 
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/client/streamclient"
+	"github.com/cloudwego/kitex/pkg/rpcinfo"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	etcd "github.com/kitex-contrib/registry-etcd"
 
 	"github.com/west2-online/DomTok/config"
@@ -44,7 +46,12 @@ func initRPCClient[T any](serviceName string, newClientFunc func(string, ...clie
 		return nil, fmt.Errorf("initRPCClient etcd.NewEtcdResolver failed: %w", err)
 	}
 	// 初始化具体的RPC客户端
-	client, err := newClientFunc(serviceName, client.WithResolver(r), client.WithMuxConnection(constants.MuxConnection))
+	client, err := newClientFunc(serviceName,
+		client.WithResolver(r),
+		client.WithMuxConnection(constants.MuxConnection),
+		client.WithSuite(tracing.NewClientSuite()),
+		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: fmt.Sprintf(constants.KitexClientEndpointInfoFormat, serviceName)}),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("initRPCClient NewClient failed: %w", err)
 	}
