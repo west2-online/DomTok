@@ -863,18 +863,19 @@ func TestUseCase_CreateCategory(t *testing.T) {
 		CategoryExistStatus bool
 		MockError           error
 		ExpectedError       error
+		Id                  int64
 	}
 
 	testcases := []TestCase{
 		{
 			Name:          "CheckCategoryError",
 			MockError:     errors.New("check category exist failed"),
-			ExpectedError: errors.New("check category exist failed"),
+			ExpectedError: errors.New("check category exist failed,check category exist failed"),
 		},
 		{
 			Name:          "CheckCategoryFailed",
 			MockError:     errors.New("check category exist failed"),
-			ExpectedError: errors.New("check category exist failed"),
+			ExpectedError: errors.New("check category exist failed,check category exist failed"),
 		},
 		{
 			Name:                "CategoryAlreadyExists",
@@ -883,7 +884,7 @@ func TestUseCase_CreateCategory(t *testing.T) {
 		},
 		{
 			Name:          "GetCreatoridFailed",
-			ExpectedError: errors.New("get category creatorid failed"),
+			ExpectedError: errors.New("get category creatorid failed,[20001] Failed to get header in context"),
 		},
 	}
 
@@ -909,8 +910,9 @@ func TestUseCase_CreateCategory(t *testing.T) {
 			mockey.Mock(mockey.GetMethod(us.db, "IsCategoryExistByName")).Return(tc.CategoryExistStatus, tc.MockError).Build()
 			mockey.Mock(mockey.GetMethod(us.db, "CreateCategory")).Return(int64(1), tc.MockError).Build()
 			mockey.Mock((*service.CommodityService).CreateCategory).Return(int64(1), tc.MockError).Build()
+			mockey.Mock(mockey.GetMethod(us,"CreateCategory")).Return(tc.Id,tc.ExpectedError).Build()
 			// 调用测试方法
-			_, err := us.CreateCategory(ctx.Background(), &input)
+			id, err := us.CreateCategory(ctx.Background(), &input)
 
 			// 验证结果
 			if tc.ExpectedError != nil {
@@ -920,6 +922,7 @@ func TestUseCase_CreateCategory(t *testing.T) {
 				}
 			} else {
 				convey.So(err, convey.ShouldBeNil)
+				convey.So(id,convey.ShouldResemble,tc.Id)
 			}
 		})
 	}
