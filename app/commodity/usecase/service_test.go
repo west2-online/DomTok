@@ -910,7 +910,7 @@ func TestUseCase_CreateCategory(t *testing.T) {
 			mockey.Mock(mockey.GetMethod(us.db, "IsCategoryExistByName")).Return(tc.CategoryExistStatus, tc.MockError).Build()
 			mockey.Mock(mockey.GetMethod(us.db, "CreateCategory")).Return(int64(1), tc.MockError).Build()
 			mockey.Mock((*service.CommodityService).CreateCategory).Return(int64(1), tc.MockError).Build()
-			mockey.Mock(mockey.GetMethod(us,"CreateCategory")).Return(tc.Id,tc.ExpectedError).Build()
+			mockey.Mock(mockey.GetMethod(us, "CreateCategory")).Return(tc.Id, tc.ExpectedError).Build()
 			// 调用测试方法
 			id, err := us.CreateCategory(ctx.Background(), &input)
 
@@ -922,7 +922,7 @@ func TestUseCase_CreateCategory(t *testing.T) {
 				}
 			} else {
 				convey.So(err, convey.ShouldBeNil)
-				convey.So(id,convey.ShouldResemble,tc.Id)
+				convey.So(id, convey.ShouldResemble, tc.Id)
 			}
 		})
 	}
