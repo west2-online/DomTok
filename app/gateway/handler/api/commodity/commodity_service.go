@@ -378,7 +378,7 @@ func CreateSku(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	skuID, err := rpc.CreateSkuRPC(ctx, &commodity.CreateSkuReq{
+	skuInfo, err := rpc.CreateSkuRPC(ctx, &commodity.CreateSkuReq{
 		Name:        req.Name,
 		Description: req.Description,
 		Price:       req.Price,
@@ -392,7 +392,14 @@ func CreateSku(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	pack.RespData(c, skuID)
+
+	pack.RespData(c, struct {
+		Id        int64
+		HistoryId int64
+	}{
+		Id:        skuInfo.SkuID,
+		HistoryId: skuInfo.HistoryID,
+	})
 }
 
 // UpdateSku .
@@ -468,7 +475,7 @@ func DeleteSku(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	pack.RespData(c, nil)
+	pack.RespSuccess(c)
 }
 
 // ViewSkuImage .
@@ -491,7 +498,7 @@ func ViewSkuImage(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	pack.RespData(c, images)
+	pack.RespList(c, images)
 }
 
 // CreateSkuImage .
@@ -504,8 +511,6 @@ func CreateSkuImage(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
-
-	resp := new(commodity.CreateSkuImageResp)
 
 	file, err := c.FormFile("skuImage")
 	if err != nil {
@@ -532,8 +537,7 @@ func CreateSkuImage(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	resp.ImageID = id
-	pack.RespData(c, resp)
+	pack.RespData(c, id)
 }
 
 // UpdateSkuImage .
@@ -620,7 +624,7 @@ func ViewSku(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	pack.RespData(c, skus)
+	pack.RespList(c, skus)
 }
 
 // UploadSkuAttr .
@@ -672,6 +676,7 @@ func CreateCategory(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
+
 	resp := new(api.CreateCategoryResp)
 	id, err := rpc.CreateCategoryRPC(ctx, &commodity.CreateCategoryReq{
 		Name: req.Name,
