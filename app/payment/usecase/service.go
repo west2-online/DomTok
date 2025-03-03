@@ -40,7 +40,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 		return "", 0, fmt.Errorf("check order existed failed:%w", err)
 	}
 	if orderInfo == paymentStatus.OrderNotExist {
-		return "", 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
+		return "", 0, errno.NewErrNo(errno.ServicePaymentOrderNotExist, "order does not exist")
 	}
 	*/
 	// 2. 获取用户id,无需检查用户是否存在
@@ -102,7 +102,7 @@ func (uc *paymentUseCase) CreateRefund(ctx context.Context, orderID int64) (refu
 		return 0, 0, fmt.Errorf("check order existence failed: %w", err)
 	}
 	if !orderExists {
-		return 0, 0, errno.NewErrNo(errno.PaymentOrderNotExist, "order does not exist")
+		return 0, 0, errno.NewErrNo(errno.ServicePaymentOrderNotExist, "order does not exist")
 	}*/
 	// 2. 获取用户ID
 	uid, err := uc.svc.GetUserID(ctx)
@@ -137,65 +137,65 @@ func (uc *paymentUseCase) RefundReview(ctx context.Context, orderID int64, passe
 	// 1. 检查订单是否存在
 	orderExist, orderExpired, err := uc.svc.GetOrderStatus(ctx, orderID)
 	if err != nil {
-		return fmt.Errorf("check order existence failed: %w", err)
+		return err
 	}
 	// 订单不存在或者订单已经过期
 	if !orderExist {
-		return fmt.Errorf("order does not exist")
+		return errno.Errorf(errno.ServiceOrderNotFound, "order does not exist")
 	}
 	if orderExpired {
-		return fmt.Errorf("order has expired")
+		return errno.Errorf(errno.ServiceOrderExpired, "order has expired")
 	}
 
 	// 2. 用户是否存在
 	uid, err := uc.svc.GetUserID(ctx)
 	if err != nil {
-		return fmt.Errorf("get user id failed: %w", err)
+		return err
 	}
 
 	// 3. 用户是否有权限发起退款
 	hasPermission, err := uc.svc.CheckAdminPermission(ctx, uid)
 	if err != nil {
-		return fmt.Errorf("check admin permission failed: %w", err)
+		return err
 	}
 	if !hasPermission {
-		return fmt.Errorf("user does not have permission to refund")
+		return errno.AuthNoOperatePermission
 	}
 
 	// 4. 检查退款信息是否存在
 	refund, err := uc.db.GetRefundInfoByOrderID(ctx, orderID)
 	if err != nil {
-		return fmt.Errorf("get refund info failed: %w", err)
+		return err
 	}
 	if refund == nil {
-		return fmt.Errorf("refund info does not exist")
+		return errno.Errorf(errno.ServicePaymentRefundNotExist, "refund does not exist")
 	}
 
 	// 5. 更新退款状态为处理中
 	err = uc.db.UpdateRefundStatusByOrderIDAndStatus(ctx, orderID,
 		paymentStatus.RefundStatusPendingCode, paymentStatus.RefundStatusProcessingCode)
 	if err != nil {
-		return fmt.Errorf("update refund status failed: %w", err)
+		return err
 	}
 
 	if passed {
 		refundAt, style, err := uc.svc.Refund(ctx)
 		if err != nil {
-			return fmt.Errorf("refund failed: %w", err)
+			return err
 		}
 		err = uc.svc.CancelOrder(ctx, orderID, refundAt, style)
 		if err != nil {
-			return fmt.Errorf("cancel order failed: %w", err)
+			return err
 		}
 		err = uc.db.UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction(ctx, refund)
 		if err != nil {
-			return fmt.Errorf("update refund status failed: %w", err)
+			return err
 		}
 	} else {
 		err = uc.db.UpdateRefundStatusByOrderIDAndStatus(ctx, orderID,
 			paymentStatus.RefundStatusProcessingCode, paymentStatus.RefundStatusFailedCode)
 		if err != nil {
-			return fmt.Errorf("update refund status failed: %w", err)
+			return err
 		}
 	}
 
@@ -207,26 +207,26 @@ func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, to
 	// 1. 检查订单是否存在
 	orderExist, orderExpired, err := uc.svc.GetOrderStatus(ctx, orderID)
 	if err != nil {
-		return fmt.Errorf("check order existence failed: %w", err)
+		return err
 	}
 	// 订单不存在或者订单已经过期
 	if !orderExist {
-		return fmt.Errorf("order does not exist")
+		return errno.Errorf(errno.ServiceOrderNotFound, "order does not exist")
 	}
 	if orderExpired {
-		return fmt.Errorf("order has expired")
+		return errno.Errorf(errno.ServiceOrderExpired, "order has expired")
 	}
 
 	// 2. 用户是否存在
 	uid, err := uc.svc.GetUserID(ctx)
 	if err != nil {
-		return fmt.Errorf("get user id failed: %w", err)
+		return err
 	}
 
 	// 3. 支付令牌是否在 Redis 中
 	exist, exp, err := uc.svc.GetExpiredAtAndDelPaymentToken(ctx, token, uid, orderID)
 	if !exist && err == nil {
-		return fmt.Errorf("duplicate payment request, mismatched order or token has expired")
+		return errno.Errorf(errno.IllegalOperatorCode, "duplicate payment request, mismatched order or token has expired")
 	}
 
 	var order *model.PaymentOrder
@@ -235,19 +235,19 @@ func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, to
 		// 4.1.1 数据库中查询 status 状态
 		order, err = uc.db.GetPaymentInfo(ctx, orderID)
 		if err != nil {
-			return fmt.Errorf("get payment info failed: %w", err)
+			return err
 		}
 
 		// 4.1.2 校验状态是否为待支付
 		if order.Status != paymentStatus.PaymentStatusPendingCode {
 			// 表示重复操作，返回重复支付错误
-			return fmt.Errorf("duplicate payment request, mismatched order or token has expired")
+			return errno.Errorf(errno.IllegalOperatorCode, "duplicate payment request, mismatched order or token has expired")
 		}
 
 		// 4.1.3 更新支付状态为处理中
 		err = uc.db.UpdatePaymentStatus(ctx, orderID, paymentStatus.PaymentStatusProcessingCode)
 		if err != nil {
-			return fmt.Errorf("update payment status failed: %w", err)
+			return err
 		}
 	}
 
@@ -257,7 +257,7 @@ func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, to
 		rollbackBeforePay = func() error {
 			errRollback := uc.svc.PutBackPaymentToken(ctx, token, uid, orderID, exp)
 			if errRollback != nil {
-				return fmt.Errorf("rollback payment token failed: %w", errRollback)
+				return errRollback
 			}
 			return nil
 		}
@@ -266,7 +266,7 @@ func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, to
 		rollbackBeforePay = func() error {
 			errRollback := uc.db.UpdatePaymentStatus(ctx, orderID, paymentStatus.PaymentStatusPendingCode)
 			if errRollback != nil {
-				return fmt.Errorf("rollback payment status failed: %w", errRollback)
+				return errRollback
 			}
 			return nil
 		}
@@ -275,7 +275,7 @@ func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, to
 	// 临时挂起支付信息，用于预确认订单
 	payAt, style, err := uc.svc.GetPayInfo(ctx)
 	if err != nil {
-		return fmt.Errorf("get pay info failed: %w", err)
+		return err
 	}
 
 	err = uc.svc.ConfirmOrder(ctx, orderID, payAt, style)
@@ -283,9 +283,9 @@ func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, to
 	if err != nil {
 		rollbackErr := rollbackBeforePay()
 		if rollbackErr != nil {
-			return fmt.Errorf("rollback failed: %w", rollbackErr)
+			return rollbackErr
 		}
-		return fmt.Errorf("confirm order failed: %w", err)
+		return err
 	}
 
 	transactionSuccess := true
@@ -317,9 +317,9 @@ func (uc *paymentUseCase) PaymentCheckout(ctx context.Context, orderID int64, to
 		// 支付失败，更新支付状态为失败
 		errX := uc.db.UpdatePaymentStatus(ctx, orderID, paymentStatus.PaymentStatusFailedCode)
 		if errX != nil {
-			return fmt.Errorf("update payment status failed: %w", errX)
+			return errX
 		}
-		return fmt.Errorf("payment failed: %w", err)
+		return err
 	}
 
 	// 6. 将支付结果写入 Redis(未开放查看支付结果接口，故此处不做处理)
