@@ -17,11 +17,13 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"net"
 
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	etcd "github.com/kitex-contrib/registry-etcd"
 
 	"github.com/west2-online/DomTok/app/payment"
@@ -53,9 +55,13 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Payment: resolve tcp addr failed, err: %v", err)
 	}
+	p := middleware.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
+	defer func() { logger.LogError(p.Shutdown(context.Background())) }()
+
 	svr := paymentservice.NewServer(
 		// 注入依赖
 		payment.InjectPaymentHandler(),
+		server.WithSuite(tracing.NewServerSuite()),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
 			ServiceName: serviceName,
 		}),
