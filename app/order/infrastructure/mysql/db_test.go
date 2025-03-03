@@ -343,14 +343,14 @@ func TestOrderDB_GetOrdersByUserID(t *testing.T) {
 
 	Convey("TestOrderDB_GetOrdersByUserID", t, func() {
 		// 清理之前的测试数据
-		err := _db.DeleteOrder(ctx, 1)
+		err := _db.DeleteOrder(ctx, 2)
 		So(err, ShouldBeNil)
 
 		// 创建多个测试订单
 		orders := make([]*model.Order, 0)
 		for i := 0; i < 3; i++ {
 			order := buildTestModelOrder(t)
-			order.Uid = 1 // 设置相同的用户ID
+			order.Uid = 2 // 设置相同的用户ID
 			orderGoods := buildTestModelOrderGoods(t, order.Id)
 			err := _db.CreateOrder(ctx, order, orderGoods)
 			So(err, ShouldBeNil)
@@ -358,15 +358,15 @@ func TestOrderDB_GetOrdersByUserID(t *testing.T) {
 		}
 
 		Convey("TestOrderDB_GetOrdersByUserID_normal", func() {
-			list, total, err := _db.GetOrdersByUserID(ctx, 1, 1, 2)
+			list, total, err := _db.GetOrdersByUserID(ctx, 2, 1, 2)
 			So(err, ShouldBeNil)
 			So(total, ShouldEqual, 3)     // 总数应该是3
-			So(len(list), ShouldEqual, 2) // 每页2条
+			So(len(list), ShouldEqual, 2) //  当前页返回2条订单
 
-			list, total, err = _db.GetOrdersByUserID(ctx, 1, 1, 10)
+			list, total, err = _db.GetOrdersByUserID(ctx, 2, 1, 10)
 			So(err, ShouldBeNil)
 			So(total, ShouldEqual, 3)     // 总数应该是3
-			So(len(list), ShouldEqual, 3) // 每页3条
+			So(len(list), ShouldEqual, 3) //  当前页返回3条订单
 		})
 
 		Convey("TestOrderDB_GetOrdersByUserID_no_orders", func() {
