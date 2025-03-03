@@ -47,7 +47,7 @@ func buildWebsocketHandler(
 	c *app.RequestContext,
 ) func(conn *websocket.Conn) {
 	return func(conn *websocket.Conn) {
-		token := string(c.GetHeader(constants.AccessTokenHeader))
+		token := string(c.GetHeader(constants.AuthHeader))
 		if token == "" {
 			writeTokenError(conn)
 			return

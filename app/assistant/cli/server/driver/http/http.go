@@ -23,6 +23,7 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app/client"
 	"github.com/cloudwego/hertz/pkg/protocol"
+	"github.com/west2-online/DomTok/app/assistant/service"
 
 	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
 )
@@ -53,5 +54,9 @@ func (c *Client) buildUrl(path string) string {
 }
 
 func (c *Client) do(ctx context.Context, req *protocol.Request, resp *protocol.Response) error {
+	auth, ok := ctx.Value(service.CtxKeyAuthHeader).(string)
+	if ok {
+		req.SetHeader("Authorization", auth)
+	}
 	return c.cli.Do(ctx, req, resp)
 }

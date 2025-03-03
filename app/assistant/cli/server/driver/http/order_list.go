@@ -1,0 +1,53 @@
+/*
+Copyright 2024 The west2-online Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package http
+
+import (
+	"context"
+	"net/url"
+	"strconv"
+
+	"github.com/cloudwego/hertz/pkg/protocol"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/west2-online/DomTok/app/gateway/model/api/order"
+)
+
+const (
+	_OrderListPath   = "/api/v1/order/list"
+	_OrderListMethod = consts.MethodGet
+)
+
+func (c *Client) OrderList(ctx context.Context, params *order.ViewOrderListReq) ([]byte, error) {
+	uri, err := url.Parse(c.buildUrl(_OrderListPath))
+	if err != nil {
+		return nil, err
+	}
+	query := uri.Query()
+	query.Set("page", strconv.FormatInt(int64(params.Page), 10))
+	query.Set("size", strconv.FormatInt(int64(params.Size), 10))
+	uri.RawQuery = query.Encode()
+
+	req, resp := protocol.AcquireRequest(), protocol.AcquireResponse()
+	req.SetRequestURI(uri.String())
+	req.SetMethod(_OrderListMethod)
+
+	err = c.do(ctx, req, resp)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Body(), nil
+}
