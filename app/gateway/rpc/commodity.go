@@ -327,6 +327,7 @@ func CreateSkuRPC(ctx context.Context, req *commodity.CreateSkuReq, files [][]by
 	if !utils.IsSuccess(resp.Base) {
 		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
+
 	return resp.SkuInfo, nil
 }
 

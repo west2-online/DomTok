@@ -612,6 +612,7 @@ func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku, ext 
 	}
 	s := &model.Sku{
 		SkuID:     sku.SkuID,
+		CreatorID: sku.CreatorID,
 		HistoryID: sku.HistoryID,
 	}
 	return s, nil

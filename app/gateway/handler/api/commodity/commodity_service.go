@@ -22,6 +22,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+
 	"github.com/cloudwego/hertz/pkg/protocol"
 
 	"github.com/west2-online/DomTok/app/gateway/pack"
@@ -392,13 +394,15 @@ func CreateSku(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-
+	hlog.Info("CreateSku", "skuInfo", skuInfo)
 	pack.RespData(c, struct {
-		Id        int64
-		HistoryId int64
+		Id         int64
+		HistoryId  int64
+		MerchantId int64
 	}{
-		Id:        skuInfo.SkuID,
-		HistoryId: skuInfo.HistoryID,
+		Id:         skuInfo.SkuID,
+		HistoryId:  skuInfo.HistoryID,
+		MerchantId: skuInfo.CreatorID,
 	})
 }
 
