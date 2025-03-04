@@ -43,4 +43,5 @@ type MqPort interface {
 
 type RpcPort interface {
 	GetGoodsInfo(ctx context.Context, cartGoods []*model.CartGoods) ([]*model.CartGoods, error)
+	PurchaseCartGoods(ctx context.Context, cartGoods []*model.CartGoods) (int64, error)
 }

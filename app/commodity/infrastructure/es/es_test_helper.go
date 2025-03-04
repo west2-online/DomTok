@@ -14,15 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package middleware
+package es
 
-import "github.com/kitex-contrib/obs-opentelemetry/provider"
+import (
+	"math/rand/v2"
+	"testing"
 
-func TelemetryProvider(serviceName string, metricAddr string) provider.OtelProvider {
-	p := provider.NewOpenTelemetryProvider(
-		provider.WithServiceName(serviceName),
-		provider.WithExportEndpoint(metricAddr),
-		provider.WithInsecure(),
-	)
-	return p
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
+)
+
+func buildTestSpu(t *testing.T, creatorId int64) *model.Spu {
+	t.Helper()
+	return &model.Spu{
+		SpuId:               rand.Int64(),
+		Name:                "我现在在这里",
+		CreatorId:           creatorId,
+		Description:         "desc",
+		CategoryId:          rand.Int64(),
+		Price:               rand.Float64(),
+		GoodsHeadDrawingUrl: "http://example.com",
+	}
 }

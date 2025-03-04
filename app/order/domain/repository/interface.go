@@ -52,16 +52,17 @@ type MQ interface {
 type RPC interface {
 	GetAddressInfo(ctx context.Context, addressId int64) (string, error)
 	QueryGoodsInfo(ctx context.Context, goods []*model.BaseOrderGoods) ([]*model.OrderGoods, error)
-	DescSkuLockStock(ctx context.Context, stocks *model.OrderStock) error
-	IncrSkuLockStock(ctx context.Context, stocks *model.OrderStock) error
+	WithholdSkuStock(ctx context.Context, stocks *model.OrderStock) error
+	RollbackSkuStock(ctx context.Context, stocks *model.OrderStock) error
 	DescSkuStock(ctx context.Context, stocks *model.OrderStock) error
+	CalcOrderGoodsPrice(ctx context.Context, goods []*model.OrderGoods) ([]*model.OrderGoods, error)
 }
 
 type Cache interface {
 	SetPaymentStatus(ctx context.Context, s *model.CachePaymentStatus) error
 	GetPaymentStatus(ctx context.Context, orderID int64) (*model.CachePaymentStatus, bool, error)
-	// UpdatePaymentStatus 使用 lua 脚本保证了过程的原子性
 	UpdatePaymentStatus(ctx context.Context, s *model.CachePaymentStatus) (exist bool, err error)
+	DeletePaymentStatus(ctx context.Context, orderID int64) error
 }
 
 type Locker interface {

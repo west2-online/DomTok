@@ -72,3 +72,15 @@ func DeleteAllCartGoodsRPC(ctx context.Context, req *cart.DeleteAllCartGoodsRequ
 	}
 	return nil
 }
+
+func PurchaseCartGoodsRPC(ctx context.Context, req *cart.PurChaseCartGoodsRequest) (int64, error) {
+	resp, err := cartClient.PurChaseCartGoods(ctx, req)
+	if err != nil {
+		logger.Errorf("PurchaseCartGoodsRPC RPC called failed: %v", err.Error())
+		return -1, errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return -1, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return resp.OrderId, nil
+}

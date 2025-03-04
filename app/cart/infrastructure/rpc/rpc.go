@@ -27,7 +27,9 @@ import (
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
 	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/kitex_gen/order"
 	"github.com/west2-online/DomTok/kitex_gen/order/orderservice"
+	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
@@ -58,7 +60,7 @@ func (rpc *CartRpcImpl) GetGoodsInfo(ctx context.Context, cartGoodsIds []*model.
 	}
 	skuInfoResp, err := rpc.commodity.ListSkuInfo(ctx, &skuReq)
 	if err = utils.ProcessRpcError("commodity.GetSkuInfo", skuInfoResp, err); err != nil {
-		return nil, err
+		return nil, errno.Errorf(errno.InternalRPCErrorCode, "call commodity.GetSkuInfo failed : %v", err)
 	}
 	cartGoods := lo.Map(skuInfoResp.SkuInfos, func(item *kmodel.SkuInfo, index int) *model.CartGoods {
 		purchaseCount := cartGoodsIds[index].PurchaseQuantity
@@ -76,4 +78,23 @@ func (rpc *CartRpcImpl) GetGoodsInfo(ctx context.Context, cartGoodsIds []*model.
 		}
 	})
 	return cartGoods, nil
+}
+
+func (rpc *CartRpcImpl) PurchaseCartGoods(ctx context.Context, cartGoods []*model.CartGoods) (int64, error) {
+	baseOrderGoods := lo.Map(cartGoods, func(item *model.CartGoods, index int) *kmodel.BaseOrderGoods {
+		return &kmodel.BaseOrderGoods{
+			MerchantID:       item.MerchantID,
+			GoodsID:          item.GoodsID,
+			StyleID:          item.SkuID,
+			GoodsVersion:     item.GoodsVersion,
+			PurchaseQuantity: item.PurchaseQuantity,
+		}
+	})
+	resp, err := rpc.order.CreateOrder(ctx, &order.CreateOrderReq{
+		BaseOrderGoods: baseOrderGoods,
+	})
+	if err = utils.ProcessRpcError("order.CreateOrder", resp, err); err != nil {
+		return -1, errno.Errorf(errno.InternalRPCErrorCode, "call order.CreateOrder failed : %v", err)
+	}
+	return resp.OrderID, nil
 }

@@ -14,4 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package rpc
+package redis
+
+import (
+	"math/rand"
+	"testing"
+
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
+)
+
+func buildSkuBuyInfo(t *testing.T, id int64) []*model.SkuBuyInfo {
+	maxNum := 10
+	return []*model.SkuBuyInfo{
+		{
+			SkuID: id,
+			Count: int64(rand.Intn(maxNum)),
+		},
+	}
+}

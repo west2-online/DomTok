@@ -31,6 +31,7 @@ import (
 	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // rocketMq 结构体封装了与 RocketMQ 交互所需的管理客户端、Broker 地址、生产者和消费者信息
@@ -40,6 +41,7 @@ type rocketMq struct {
 }
 
 func NewRocketmq() repository.MQ {
+	client.SetRocketMqLoggerLevel("ERROR")
 	mq := &rocketMq{
 		producers: make(map[string]rocketmq.Producer),
 		consumers: make([]rocketmq.PushConsumer, 0),
@@ -61,7 +63,7 @@ func (mq *rocketMq) SendSyncMsg(ctx context.Context, topic string, msgs ...*mode
 	if err != nil {
 		return err
 	}
-
+	logger.Infof("[DEBUG] send msg to topic: %s", topic)
 	if _, err = producer.SendSync(ctx, convertMsg(topic, msgs...)...); err != nil {
 		return errno.NewErrNo(errno.InternalRocketmqErrorCode, fmt.Sprintf("failed to send sync msg, err: %v", err))
 	}
@@ -84,6 +86,7 @@ func (mq *rocketMq) SubscribeTopic(ctx context.Context, topic string, pullMsgInt
 
 	err = con.Subscribe(topic, consumer.MessageSelector{}, func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
 		for _, msg := range msgs {
+			logger.Infof("[DEBUG] receive msg: %s", string(msg.Body))
 			if !fn(ctx, msg.Body) {
 				return consumer.ConsumeRetryLater, nil
 			}

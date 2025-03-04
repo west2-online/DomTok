@@ -24,6 +24,14 @@ import (
 )
 
 func (c *CommodityMQ) Send(ctx context.Context, topic string, message []*kafka.Message) error {
+	if !c.done.Load() {
+		err := c.client.SetWriter(topic, true)
+		if err != nil {
+			return err
+		}
+		c.done.Swap(true)
+	}
+
 	errs := c.client.Send(ctx, topic, message)
 	var res error
 	if len(errs) > 0 {

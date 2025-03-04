@@ -14,20 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package mq
+package base
 
-import (
-	"sync/atomic"
+import "github.com/kitex-contrib/obs-opentelemetry/provider"
 
-	"github.com/west2-online/DomTok/app/commodity/domain/repository"
-	"github.com/west2-online/DomTok/pkg/kafka"
-)
-
-type CommodityMQ struct {
-	client *kafka.Kafka
-	done   atomic.Bool
-}
-
-func NewCommodityMQ(client *kafka.Kafka) repository.CommodityMQ {
-	return &CommodityMQ{client: client}
+func TelemetryProvider(serviceName string, metricAddr string) provider.OtelProvider {
+	p := provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(serviceName),
+		provider.WithExportEndpoint(metricAddr),
+		provider.WithInsecure(),
+	)
+	return p
 }

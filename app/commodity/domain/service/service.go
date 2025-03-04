@@ -53,7 +53,14 @@ func (svc *CommodityService) CreateSpu(ctx context.Context, spu *model.Spu) (int
 
 	eg.Go(func() error {
 		if err := upyun.UploadImg(spu.GoodsHeadDrawing, spu.GoodsHeadDrawingUrl); err != nil {
-			return fmt.Errorf("service.UploadImg: upload image failed: %w", err)
+			return fmt.Errorf("service.CreateSpu: upload image failed: %w", err)
+		}
+		return nil
+	})
+
+	eg.Go(func() error {
+		if err := svc.SendCreateSpuMsg(ctx, spu); err != nil {
+			return fmt.Errorf("service.CreateSpu: send create spu message failed: %w", err)
 		}
 		return nil
 	})
@@ -61,7 +68,7 @@ func (svc *CommodityService) CreateSpu(ctx context.Context, spu *model.Spu) (int
 	if err := eg.Wait(); err != nil {
 		return 0, err
 	}
-	go svc.SendCreateSpuMsg(ctx, spu)
+
 	return spu.SpuId, nil
 }
 
@@ -98,7 +105,7 @@ func (svc *CommodityService) UpdateSpuImage(ctx context.Context, spuImage *model
 	eg.Go(func() error {
 		err = svc.db.UpdateSpuImage(ctx, spuImage)
 		if err != nil {
-			return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
+			return fmt.Errorf("service.UpdateSpuImage: update spu failed: %w", err)
 		}
 		return nil
 	})
@@ -127,13 +134,22 @@ func (svc *CommodityService) UpdateSpuImage(ctx context.Context, spuImage *model
 }
 
 func (svc *CommodityService) UpdateSpu(ctx context.Context, spu *model.Spu, originSpu *model.Spu) error {
-	err := svc.db.UpdateSpu(ctx, spu)
-	if err != nil {
-		return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
-	}
+	var eg errgroup.Group
+	eg.Go(func() error {
+		err := svc.db.UpdateSpu(ctx, spu)
+		if err != nil {
+			return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
+		}
+		return nil
+	})
+	eg.Go(func() error {
+		if err := svc.SendUpdateSpuMsg(ctx, spu); err != nil {
+			return fmt.Errorf("service.UpdateSpu: send update spu message failed: %w", err)
+		}
+		return nil
+	})
 
 	if len(spu.GoodsHeadDrawing) > 0 {
-		var eg errgroup.Group
 		eg.Go(func() error {
 			err := upyun.UploadImg(spu.GoodsHeadDrawing, spu.GoodsHeadDrawingUrl)
 			if err != nil {
@@ -149,12 +165,10 @@ func (svc *CommodityService) UpdateSpu(ctx context.Context, spu *model.Spu, orig
 			}
 			return nil
 		})
-
-		if err := eg.Wait(); err != nil {
-			return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
-		}
 	}
-	go svc.SendUpdateSpuMsg(ctx, spu)
+	if err := eg.Wait(); err != nil {
+		return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
+	}
 	return nil
 }
 
@@ -195,10 +209,17 @@ func (svc *CommodityService) DeleteSpu(ctx context.Context, spuId int64, url str
 		return nil
 	})
 
+	eg.Go(func() error {
+		if err := svc.SendDeleteSpuMsg(ctx, spuId); err != nil {
+			return fmt.Errorf("service.DeleteSpu: send delete spu message failed: %w", err)
+		}
+		return nil
+	})
+
 	if err := eg.Wait(); err != nil {
 		return err
 	}
-	go svc.SendDeleteSpuMsg(ctx, spuId)
+
 	return nil
 }
 
@@ -302,25 +323,28 @@ func (svc *CommodityService) GetSpuImages(ctx context.Context, spuId int64, offs
 	return imgs, total, nil
 }
 
-func (svc *CommodityService) SendCreateSpuMsg(ctx context.Context, spu *model.Spu) {
+func (svc *CommodityService) SendCreateSpuMsg(ctx context.Context, spu *model.Spu) error {
 	err := svc.mq.SendCreateSpuInfo(ctx, spu)
 	if err != nil {
-		logger.Errorf("service.SendCreateSpuMsg failed: %v", err)
+		return fmt.Errorf("service.SendCreateSpuMsg failed: %w", err)
 	}
+	return nil
 }
 
-func (svc *CommodityService) SendUpdateSpuMsg(ctx context.Context, spu *model.Spu) {
+func (svc *CommodityService) SendUpdateSpuMsg(ctx context.Context, spu *model.Spu) error {
 	err := svc.mq.SendCreateSpuInfo(ctx, spu)
 	if err != nil {
-		logger.Errorf("service.SendUpdateSpuMsg failed: %v", err)
+		return fmt.Errorf("service.SendUpdateSpuMsg failed: %w", err)
 	}
+	return nil
 }
 
-func (svc *CommodityService) SendDeleteSpuMsg(ctx context.Context, id int64) {
+func (svc *CommodityService) SendDeleteSpuMsg(ctx context.Context, id int64) error {
 	err := svc.mq.SendDeleteSpuInfo(ctx, id)
 	if err != nil {
-		logger.Errorf("service.SendDeleteSpuMsg failed: %v", err)
+		return fmt.Errorf("service.SendDeleteSpuMsg failed: %w", err)
 	}
+	return nil
 }
 
 func (svc *CommodityService) ConsumeCreateSpuMsg(ctx context.Context) {
@@ -597,6 +621,7 @@ func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku, ext 
 		if err := svc.db.CreateSku(ctx, sku); err != nil {
 			return fmt.Errorf("service.CreateSku: create sku failed: %w", err)
 		}
+		svc.Cached(ctx, []*model.SkuBuyInfo{{SkuID: sku.SkuID}})
 		return nil
 	})
 
@@ -610,8 +635,10 @@ func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku, ext 
 	if err := eg.Wait(); err != nil {
 		return nil, err
 	}
+
 	s := &model.Sku{
 		SkuID:     sku.SkuID,
+		CreatorID: sku.CreatorID,
 		HistoryID: sku.HistoryID,
 	}
 	return s, nil
@@ -619,7 +646,10 @@ func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku, ext 
 
 func (svc *CommodityService) UpdateSku(ctx context.Context, sku *model.Sku, originSpu *model.Sku) error {
 	sku.HistoryID = svc.nextID()
-
+	ret, err := svc.db.GetSkuById(ctx, sku.SkuID)
+	if err != nil {
+		return fmt.Errorf("service.UpdateSku: get sku failed: %w", err)
+	}
 	if len(sku.StyleHeadDrawing) > 0 {
 		var eg errgroup.Group
 		eg.Go(func() error {
@@ -643,7 +673,7 @@ func (svc *CommodityService) UpdateSku(ctx context.Context, sku *model.Sku, orig
 		}
 	}
 
-	if err := svc.db.UpdateSku(ctx, sku); err != nil {
+	if err := svc.db.UpdateSku(ctx, sku, ret); err != nil {
 		return fmt.Errorf("service.UpdateSku: update sku failed: %w", err)
 	}
 
@@ -718,6 +748,14 @@ func (svc *CommodityService) ListSkuInfo(ctx context.Context, skuInfo []*model.S
 	}
 
 	return skuInfos, total, nil
+}
+
+func (svc *CommodityService) ViewSkuPriceHistory(ctx context.Context, s *model.SkuPriceHistory, pNum int64, pSize int64) ([]*model.SkuPriceHistory, error) {
+	histories, err := svc.db.ViewSkuPriceHistory(ctx, s, int(pNum), int(pSize))
+	if err != nil {
+		return nil, fmt.Errorf("usecase.ViewSkuPriceHistory failed: %w", err)
+	}
+	return histories, nil
 }
 
 func (svc *CommodityService) CreateSkuImage(ctx context.Context, skuImage *model.SkuImage, data []byte) (int64, error) {
