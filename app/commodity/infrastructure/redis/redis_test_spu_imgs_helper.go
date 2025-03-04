@@ -14,4 +14,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package rpc
+package redis
+
+import (
+	"math/rand/v2"
+	"testing"
+
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
+)
+
+func buildSpuImage(t *testing.T, spuId int64) *model.SpuImages {
+	imgs := []*model.SpuImage{
+		{
+			ImageID: rand.Int64(),
+			Url:     "http://example/com",
+			SpuID:   spuId,
+		},
+		{
+			ImageID: rand.Int64(),
+			Url:     "http://example/com",
+			SpuID:   spuId,
+		},
+		{
+			ImageID: rand.Int64(),
+			Url:     "http://example/com",
+			SpuID:   spuId,
+		},
+	}
+	return &model.SpuImages{
+		Images: imgs,
+		Total:  int64(len(imgs)),
+	}
+}

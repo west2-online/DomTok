@@ -1797,14 +1797,14 @@ func (p *ViewUserAllCouponResp) field2Length() int {
 	return l
 }
 
-func (p *UseUserCouponReq) FastRead(buf []byte) (int, error) {
+func (p *GetCouponAndPriceReq) FastRead(buf []byte) (int, error) {
 
 	var err error
 	var offset int
 	var l int
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetCouponID bool = false
+	var issetGoodsList bool = false
 	for {
 		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
 		offset += l
@@ -1816,13 +1816,13 @@ func (p *UseUserCouponReq) FastRead(buf []byte) (int, error) {
 		}
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.LIST {
 				l, err = p.FastReadField1(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetCouponID = true
+				issetGoodsList = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -1839,7 +1839,7 @@ func (p *UseUserCouponReq) FastRead(buf []byte) (int, error) {
 		}
 	}
 
-	if !issetCouponID {
+	if !issetGoodsList {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -1847,32 +1847,43 @@ func (p *UseUserCouponReq) FastRead(buf []byte) (int, error) {
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UseUserCouponReq[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetCouponAndPriceReq[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 RequiredFieldNotSetError:
-	return offset, thrift.NewProtocolException(thrift.INVALID_DATA, fmt.Sprintf("required field %s is not set", fieldIDToName_UseUserCouponReq[fieldId]))
+	return offset, thrift.NewProtocolException(thrift.INVALID_DATA, fmt.Sprintf("required field %s is not set", fieldIDToName_GetCouponAndPriceReq[fieldId]))
 }
 
-func (p *UseUserCouponReq) FastReadField1(buf []byte) (int, error) {
+func (p *GetCouponAndPriceReq) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+	_, size, l, err := thrift.Binary.ReadListBegin(buf[offset:])
+	offset += l
+	if err != nil {
 		return offset, err
-	} else {
-		offset += l
-		_field = v
 	}
-	p.CouponID = _field
+	_field := make([]*model.OrderGoods, 0, size)
+	values := make([]model.OrderGoods, size)
+	for i := 0; i < size; i++ {
+		_elem := &values[i]
+		_elem.InitDefault()
+		if l, err := _elem.FastRead(buf[offset:]); err != nil {
+			return offset, err
+		} else {
+			offset += l
+		}
+
+		_field = append(_field, _elem)
+	}
+	p.GoodsList = _field
 	return offset, nil
 }
 
-func (p *UseUserCouponReq) FastWrite(buf []byte) int {
+func (p *GetCouponAndPriceReq) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
 
-func (p *UseUserCouponReq) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+func (p *GetCouponAndPriceReq) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], w)
@@ -1881,7 +1892,7 @@ func (p *UseUserCouponReq) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) in
 	return offset
 }
 
-func (p *UseUserCouponReq) BLength() int {
+func (p *GetCouponAndPriceReq) BLength() int {
 	l := 0
 	if p != nil {
 		l += p.field1Length()
@@ -1890,21 +1901,32 @@ func (p *UseUserCouponReq) BLength() int {
 	return l
 }
 
-func (p *UseUserCouponReq) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
+func (p *GetCouponAndPriceReq) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 1)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.CouponID)
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.LIST, 1)
+	listBeginOffset := offset
+	offset += thrift.Binary.ListBeginLength()
+	var length int
+	for _, v := range p.GoodsList {
+		length++
+		offset += v.FastWriteNocopy(buf[offset:], w)
+	}
+	thrift.Binary.WriteListBegin(buf[listBeginOffset:], thrift.STRUCT, length)
 	return offset
 }
 
-func (p *UseUserCouponReq) field1Length() int {
+func (p *GetCouponAndPriceReq) field1Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
+	l += thrift.Binary.ListBeginLength()
+	for _, v := range p.GoodsList {
+		_ = v
+		l += v.BLength()
+	}
 	return l
 }
 
-func (p *UseUserCouponResp) FastRead(buf []byte) (int, error) {
+func (p *GetCouponAndPriceResp) FastRead(buf []byte) (int, error) {
 
 	var err error
 	var offset int
@@ -1912,6 +1934,8 @@ func (p *UseUserCouponResp) FastRead(buf []byte) (int, error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetBase bool = false
+	var issetAssignedGoodsList bool = false
+	var issetTotalPrice bool = false
 	for {
 		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
 		offset += l
@@ -1937,6 +1961,36 @@ func (p *UseUserCouponResp) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
+		case 2:
+			if fieldTypeId == thrift.LIST {
+				l, err = p.FastReadField2(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetAssignedGoodsList = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.DOUBLE {
+				l, err = p.FastReadField3(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetTotalPrice = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -1950,18 +2004,28 @@ func (p *UseUserCouponResp) FastRead(buf []byte) (int, error) {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
+
+	if !issetAssignedGoodsList {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetTotalPrice {
+		fieldId = 3
+		goto RequiredFieldNotSetError
+	}
 	return offset, nil
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UseUserCouponResp[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetCouponAndPriceResp[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 RequiredFieldNotSetError:
-	return offset, thrift.NewProtocolException(thrift.INVALID_DATA, fmt.Sprintf("required field %s is not set", fieldIDToName_UseUserCouponResp[fieldId]))
+	return offset, thrift.NewProtocolException(thrift.INVALID_DATA, fmt.Sprintf("required field %s is not set", fieldIDToName_GetCouponAndPriceResp[fieldId]))
 }
 
-func (p *UseUserCouponResp) FastReadField1(buf []byte) (int, error) {
+func (p *GetCouponAndPriceResp) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 	_field := model.NewBaseResp()
 	if l, err := _field.FastRead(buf[offset:]); err != nil {
@@ -1973,39 +2037,121 @@ func (p *UseUserCouponResp) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *UseUserCouponResp) FastWrite(buf []byte) int {
+func (p *GetCouponAndPriceResp) FastReadField2(buf []byte) (int, error) {
+	offset := 0
+
+	_, size, l, err := thrift.Binary.ReadListBegin(buf[offset:])
+	offset += l
+	if err != nil {
+		return offset, err
+	}
+	_field := make([]*model.OrderGoods, 0, size)
+	values := make([]model.OrderGoods, size)
+	for i := 0; i < size; i++ {
+		_elem := &values[i]
+		_elem.InitDefault()
+		if l, err := _elem.FastRead(buf[offset:]); err != nil {
+			return offset, err
+		} else {
+			offset += l
+		}
+
+		_field = append(_field, _elem)
+	}
+	p.AssignedGoodsList = _field
+	return offset, nil
+}
+
+func (p *GetCouponAndPriceResp) FastReadField3(buf []byte) (int, error) {
+	offset := 0
+
+	var _field float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.TotalPrice = _field
+	return offset, nil
+}
+
+func (p *GetCouponAndPriceResp) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
 
-func (p *UseUserCouponResp) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+func (p *GetCouponAndPriceResp) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
+		offset += p.fastWriteField3(buf[offset:], w)
 		offset += p.fastWriteField1(buf[offset:], w)
+		offset += p.fastWriteField2(buf[offset:], w)
 	}
 	offset += thrift.Binary.WriteFieldStop(buf[offset:])
 	return offset
 }
 
-func (p *UseUserCouponResp) BLength() int {
+func (p *GetCouponAndPriceResp) BLength() int {
 	l := 0
 	if p != nil {
 		l += p.field1Length()
+		l += p.field2Length()
+		l += p.field3Length()
 	}
 	l += thrift.Binary.FieldStopLength()
 	return l
 }
 
-func (p *UseUserCouponResp) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
+func (p *GetCouponAndPriceResp) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 1)
 	offset += p.Base.FastWriteNocopy(buf[offset:], w)
 	return offset
 }
 
-func (p *UseUserCouponResp) field1Length() int {
+func (p *GetCouponAndPriceResp) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.LIST, 2)
+	listBeginOffset := offset
+	offset += thrift.Binary.ListBeginLength()
+	var length int
+	for _, v := range p.AssignedGoodsList {
+		length++
+		offset += v.FastWriteNocopy(buf[offset:], w)
+	}
+	thrift.Binary.WriteListBegin(buf[listBeginOffset:], thrift.STRUCT, length)
+	return offset
+}
+
+func (p *GetCouponAndPriceResp) fastWriteField3(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 3)
+	offset += thrift.Binary.WriteDouble(buf[offset:], p.TotalPrice)
+	return offset
+}
+
+func (p *GetCouponAndPriceResp) field1Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += p.Base.BLength()
+	return l
+}
+
+func (p *GetCouponAndPriceResp) field2Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.ListBeginLength()
+	for _, v := range p.AssignedGoodsList {
+		_ = v
+		l += v.BLength()
+	}
+	return l
+}
+
+func (p *GetCouponAndPriceResp) field3Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.DoubleLength()
 	return l
 }
 
@@ -13039,7 +13185,7 @@ func (p *CommodityServiceViewUserAllCouponResult) field0Length() int {
 	return l
 }
 
-func (p *CommodityServiceUseUserCouponArgs) FastRead(buf []byte) (int, error) {
+func (p *CommodityServiceGetCouponAndPriceArgs) FastRead(buf []byte) (int, error) {
 
 	var err error
 	var offset int
@@ -13083,14 +13229,14 @@ func (p *CommodityServiceUseUserCouponArgs) FastRead(buf []byte) (int, error) {
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_CommodityServiceUseUserCouponArgs[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_CommodityServiceGetCouponAndPriceArgs[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 }
 
-func (p *CommodityServiceUseUserCouponArgs) FastReadField1(buf []byte) (int, error) {
+func (p *CommodityServiceGetCouponAndPriceArgs) FastReadField1(buf []byte) (int, error) {
 	offset := 0
-	_field := NewUseUserCouponReq()
+	_field := NewGetCouponAndPriceReq()
 	if l, err := _field.FastRead(buf[offset:]); err != nil {
 		return offset, err
 	} else {
@@ -13100,11 +13246,11 @@ func (p *CommodityServiceUseUserCouponArgs) FastReadField1(buf []byte) (int, err
 	return offset, nil
 }
 
-func (p *CommodityServiceUseUserCouponArgs) FastWrite(buf []byte) int {
+func (p *CommodityServiceGetCouponAndPriceArgs) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
 
-func (p *CommodityServiceUseUserCouponArgs) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+func (p *CommodityServiceGetCouponAndPriceArgs) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], w)
@@ -13113,7 +13259,7 @@ func (p *CommodityServiceUseUserCouponArgs) FastWriteNocopy(buf []byte, w thrift
 	return offset
 }
 
-func (p *CommodityServiceUseUserCouponArgs) BLength() int {
+func (p *CommodityServiceGetCouponAndPriceArgs) BLength() int {
 	l := 0
 	if p != nil {
 		l += p.field1Length()
@@ -13122,21 +13268,21 @@ func (p *CommodityServiceUseUserCouponArgs) BLength() int {
 	return l
 }
 
-func (p *CommodityServiceUseUserCouponArgs) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
+func (p *CommodityServiceGetCouponAndPriceArgs) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 1)
 	offset += p.Req.FastWriteNocopy(buf[offset:], w)
 	return offset
 }
 
-func (p *CommodityServiceUseUserCouponArgs) field1Length() int {
+func (p *CommodityServiceGetCouponAndPriceArgs) field1Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += p.Req.BLength()
 	return l
 }
 
-func (p *CommodityServiceUseUserCouponResult) FastRead(buf []byte) (int, error) {
+func (p *CommodityServiceGetCouponAndPriceResult) FastRead(buf []byte) (int, error) {
 
 	var err error
 	var offset int
@@ -13180,14 +13326,14 @@ func (p *CommodityServiceUseUserCouponResult) FastRead(buf []byte) (int, error) 
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_CommodityServiceUseUserCouponResult[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_CommodityServiceGetCouponAndPriceResult[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 }
 
-func (p *CommodityServiceUseUserCouponResult) FastReadField0(buf []byte) (int, error) {
+func (p *CommodityServiceGetCouponAndPriceResult) FastReadField0(buf []byte) (int, error) {
 	offset := 0
-	_field := NewUseUserCouponResp()
+	_field := NewGetCouponAndPriceResp()
 	if l, err := _field.FastRead(buf[offset:]); err != nil {
 		return offset, err
 	} else {
@@ -13197,11 +13343,11 @@ func (p *CommodityServiceUseUserCouponResult) FastReadField0(buf []byte) (int, e
 	return offset, nil
 }
 
-func (p *CommodityServiceUseUserCouponResult) FastWrite(buf []byte) int {
+func (p *CommodityServiceGetCouponAndPriceResult) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
 
-func (p *CommodityServiceUseUserCouponResult) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+func (p *CommodityServiceGetCouponAndPriceResult) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
 		offset += p.fastWriteField0(buf[offset:], w)
@@ -13210,7 +13356,7 @@ func (p *CommodityServiceUseUserCouponResult) FastWriteNocopy(buf []byte, w thri
 	return offset
 }
 
-func (p *CommodityServiceUseUserCouponResult) BLength() int {
+func (p *CommodityServiceGetCouponAndPriceResult) BLength() int {
 	l := 0
 	if p != nil {
 		l += p.field0Length()
@@ -13219,7 +13365,7 @@ func (p *CommodityServiceUseUserCouponResult) BLength() int {
 	return l
 }
 
-func (p *CommodityServiceUseUserCouponResult) fastWriteField0(buf []byte, w thrift.NocopyWriter) int {
+func (p *CommodityServiceGetCouponAndPriceResult) fastWriteField0(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p.IsSetSuccess() {
 		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 0)
@@ -13228,7 +13374,7 @@ func (p *CommodityServiceUseUserCouponResult) fastWriteField0(buf []byte, w thri
 	return offset
 }
 
-func (p *CommodityServiceUseUserCouponResult) field0Length() int {
+func (p *CommodityServiceGetCouponAndPriceResult) field0Length() int {
 	l := 0
 	if p.IsSetSuccess() {
 		l += thrift.Binary.FieldBeginLength()
@@ -18623,11 +18769,11 @@ func (p *CommodityServiceViewUserAllCouponResult) GetResult() interface{} {
 	return p.Success
 }
 
-func (p *CommodityServiceUseUserCouponArgs) GetFirstArgument() interface{} {
+func (p *CommodityServiceGetCouponAndPriceArgs) GetFirstArgument() interface{} {
 	return p.Req
 }
 
-func (p *CommodityServiceUseUserCouponResult) GetResult() interface{} {
+func (p *CommodityServiceGetCouponAndPriceResult) GetResult() interface{} {
 	return p.Success
 }
 

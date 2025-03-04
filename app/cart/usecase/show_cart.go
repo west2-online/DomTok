@@ -24,7 +24,6 @@ import (
 
 	"github.com/west2-online/DomTok/app/cart/domain/model"
 	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 func (u *UseCase) ShowCartGoods(ctx context.Context, pageNum int64) ([]*model.CartGoods, error) {
@@ -62,12 +61,10 @@ func (u *UseCase) ShowCartGoods(ctx context.Context, pageNum int64) ([]*model.Ca
 		return nil, fmt.Errorf("ShowCartGoods RPC error: %w", err)
 	}
 
-	go func() {
-		err = u.svc.TrySetCartCache(ctx, userID, cartData.SkuJson, pageNum)
-		if err != nil {
-			logger.Errorf("ShowCartGoods set cart cache error: %v", err)
-		}
-	}()
+	err = u.svc.TrySetCartCache(ctx, userID, cartData.SkuJson, pageNum)
+	if err != nil {
+		return nil, err
+	}
 
 	return goods, nil
 }

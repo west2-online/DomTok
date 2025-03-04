@@ -54,7 +54,7 @@ func (db *commodityDB) GetCategoryById(ctx context.Context, id int64) (*model.Ca
 	var category *model.Category
 	if err := db.client.WithContext(ctx).Where("id = ?", id).First(&category).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errno.Errorf(errno.ServiceCategorynotExist, "category already exist")
+			return nil, errno.Errorf(errno.ServiceCategorynotExist, "category not exists")
 		}
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get category %v", err)
 	}
@@ -257,13 +257,20 @@ func (db *commodityDB) DeleteSpuImagesBySpuId(ctx context.Context, spuId int64) 
 	url = make([]string, 0)
 	imgs := make([]*SpuImage, 0)
 
+	if err = db.client.WithContext(ctx).Table(constants.SpuImageTableName).Where("spu_id = ?", spuId).
+		Find(&imgs).Error; err != nil {
+		return nil, nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete spu images: %v", err)
+	}
+
+	for _, img := range imgs {
+		ids = append(ids, img.Id)
+		url = append(url, img.Url)
+	}
+
 	if err = db.client.WithContext(ctx).Table(constants.SpuImageTableName).Where("spu_id = ?", spuId).Delete(imgs).Error; err != nil {
 		return nil, nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete images: %v", err)
 	}
-	for _, img := range imgs {
-		ids = append(ids, img.SpuId)
-		url = append(url, img.Url)
-	}
+
 	return ids, url, nil
 }
 
@@ -534,7 +541,7 @@ func (db *commodityDB) CreateSku(ctx context.Context, sku *model.Sku) (err error
 	return nil
 }
 
-func (db *commodityDB) UpdateSku(ctx context.Context, sku *model.Sku) error {
+func (db *commodityDB) UpdateSku(ctx context.Context, sku *model.Sku, originSku *model.Sku) error {
 	s := &Sku{
 		Id:               sku.SkuID,
 		CreatorId:        sku.CreatedAt,
@@ -550,7 +557,7 @@ func (db *commodityDB) UpdateSku(ctx context.Context, sku *model.Sku) error {
 		Id:          sku.HistoryID,
 		SkuId:       sku.SkuID,
 		MarkPrice:   sku.Price,
-		PrevVersion: 0,
+		PrevVersion: originSku.HistoryID,
 	}
 
 	if err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
@@ -887,4 +894,35 @@ func (db *commodityDB) UploadSkuAttr(ctx context.Context, sku *model.Sku, attr *
 	}
 
 	return nil
+}
+
+func (db *commodityDB) ViewSkuPriceHistory(ctx context.Context, skuPrice *model.SkuPriceHistory, pageNum int, pageSize int) ([]*model.SkuPriceHistory, error) {
+	s := &SkuPriceHistory{
+		SkuId: skuPrice.SkuId,
+		Id:    skuPrice.Id,
+	}
+
+	var history []SkuPriceHistory
+
+	offset := (pageNum - 1) * pageSize
+	if err := db.client.WithContext(ctx).Table(s.TableName()).Offset(offset).Limit(pageSize).
+		Where("sku_id = ? AND id = ?", s.SkuId, s.Id).Find(&history).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errno.Errorf(errno.ServiceSkuNotExist, "mysql: sku not found")
+		}
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to view sku price history: %v", err)
+	}
+
+	result := make([]*model.SkuPriceHistory, 0, len(history))
+	for _, v := range history {
+		result = append(result, &model.SkuPriceHistory{
+			Id:          v.Id,
+			SkuId:       v.SkuId,
+			MarkPrice:   v.MarkPrice,
+			PrevVersion: v.PrevVersion,
+			CreatedAt:   v.CreatedAt.Unix(),
+		})
+	}
+
+	return result, nil
 }

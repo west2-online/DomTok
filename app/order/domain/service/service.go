@@ -99,12 +99,13 @@ func (svc *OrderService) calcOrderExpireTime(createAt int64) int64 {
 }
 
 func (svc *OrderService) UpdateOrderAsSuccess(ctx context.Context, expired int64, payRel *model.PaymentResult) error {
-	if time.Now().UnixMilli() > expired {
-		return errno.NewErrNo(errno.ServiceOrderExpired, "order expired")
+	// 对状态的一层校验
+	if payRel.PaymentStatus != constants.PaymentStatusSuccessCode {
+		return errno.NewErrNo(errno.ServiceOrderStatusInvalid, "success orders cannot be updated again")
 	}
 
-	if payRel.PaymentStatus == constants.PaymentStatusSuccessCode {
-		return nil
+	if time.Now().UnixMilli() > expired {
+		return errno.NewErrNo(errno.ServiceOrderExpired, "order expired")
 	}
 	// 尝试开始更新
 	if err := svc.locker.LockOrder(payRel.OrderID); err != nil {
@@ -124,6 +125,10 @@ func (svc *OrderService) UpdateOrderAsSuccess(ctx context.Context, expired int64
 	}
 
 	if err = svc.db.UpdatePaymentStatus(ctx, payRel); err != nil {
+		return err
+	}
+
+	if _, err = svc.cache.UpdatePaymentStatus(ctx, &model.CachePaymentStatus{}); err != nil {
 		return err
 	}
 
@@ -149,11 +154,15 @@ func (svc *OrderService) CancelOrder(ctx context.Context, payRel *model.PaymentR
 
 	// 释放锁定库存
 	orderStock := model.ConvertOrderGoodsToOrderStock(payRel.OrderID, goods)
-	if err = svc.rpc.DescSkuLockStock(ctx, orderStock); err != nil {
+	if err = svc.rpc.RollbackSkuStock(ctx, orderStock); err != nil {
 		return err
 	}
 
 	if err = svc.db.UpdatePaymentStatus(ctx, payRel); err != nil {
+		return err
+	}
+
+	if _, err = svc.cache.UpdatePaymentStatus(ctx, &model.CachePaymentStatus{}); err != nil {
 		return err
 	}
 
@@ -162,6 +171,16 @@ func (svc *OrderService) CancelOrder(ctx context.Context, payRel *model.PaymentR
 
 func (svc *OrderService) IsEqualStatus(s1, s2 int8) bool {
 	return s1 == s2
+}
+
+func (svc *OrderService) DeleteOrder(ctx context.Context, orderID int64) error {
+	if err := svc.cache.DeletePaymentStatus(ctx, orderID); err != nil {
+		return err
+	}
+	if err := svc.db.DeleteOrder(ctx, orderID); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (svc *OrderService) nextVal() int64 {

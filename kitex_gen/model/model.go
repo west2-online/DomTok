@@ -3317,8 +3317,7 @@ type BaseOrderGoods struct {
 	GoodsID          int64 `thrift:"goodsID,2,required" frugal:"2,required,i64" json:"goodsID"`
 	StyleID          int64 `thrift:"styleID,3,required" frugal:"3,required,i64" json:"styleID"`
 	PurchaseQuantity int64 `thrift:"purchaseQuantity,4,required" frugal:"4,required,i64" json:"purchaseQuantity"`
-	CouponID         int64 `thrift:"couponID,5" frugal:"5,default,i64" json:"couponID"`
-	GoodsVersion     int64 `thrift:"goodsVersion,6,required" frugal:"6,required,i64" json:"goodsVersion"`
+	GoodsVersion     int64 `thrift:"goodsVersion,5,required" frugal:"5,required,i64" json:"goodsVersion"`
 }
 
 func NewBaseOrderGoods() *BaseOrderGoods {
@@ -3344,10 +3343,6 @@ func (p *BaseOrderGoods) GetPurchaseQuantity() (v int64) {
 	return p.PurchaseQuantity
 }
 
-func (p *BaseOrderGoods) GetCouponID() (v int64) {
-	return p.CouponID
-}
-
 func (p *BaseOrderGoods) GetGoodsVersion() (v int64) {
 	return p.GoodsVersion
 }
@@ -3362,9 +3357,6 @@ func (p *BaseOrderGoods) SetStyleID(val int64) {
 }
 func (p *BaseOrderGoods) SetPurchaseQuantity(val int64) {
 	p.PurchaseQuantity = val
-}
-func (p *BaseOrderGoods) SetCouponID(val int64) {
-	p.CouponID = val
 }
 func (p *BaseOrderGoods) SetGoodsVersion(val int64) {
 	p.GoodsVersion = val
@@ -3395,10 +3387,7 @@ func (p *BaseOrderGoods) DeepEqual(ano *BaseOrderGoods) bool {
 	if !p.Field4DeepEqual(ano.PurchaseQuantity) {
 		return false
 	}
-	if !p.Field5DeepEqual(ano.CouponID) {
-		return false
-	}
-	if !p.Field6DeepEqual(ano.GoodsVersion) {
+	if !p.Field5DeepEqual(ano.GoodsVersion) {
 		return false
 	}
 	return true
@@ -3434,13 +3423,6 @@ func (p *BaseOrderGoods) Field4DeepEqual(src int64) bool {
 }
 func (p *BaseOrderGoods) Field5DeepEqual(src int64) bool {
 
-	if p.CouponID != src {
-		return false
-	}
-	return true
-}
-func (p *BaseOrderGoods) Field6DeepEqual(src int64) bool {
-
 	if p.GoodsVersion != src {
 		return false
 	}
@@ -3452,8 +3434,7 @@ var fieldIDToName_BaseOrderGoods = map[int16]string{
 	2: "goodsID",
 	3: "styleID",
 	4: "purchaseQuantity",
-	5: "couponID",
-	6: "goodsVersion",
+	5: "goodsVersion",
 }
 
 type CreditCardInfo struct {

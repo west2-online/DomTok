@@ -35,16 +35,16 @@ func InitOrderRPC() {
 }
 
 // CreateOrderRPC 创建订单RPC调用
-func CreateOrderRPC(ctx context.Context, req *order.CreateOrderReq) (orderID int64, err error) {
-	resp, err := orderClient.CreateOrder(ctx, req)
+func CreateOrderRPC(ctx context.Context, req *order.CreateOrderReq) (resp *order.CreateOrderResp, err error) {
+	resp, err = orderClient.CreateOrder(ctx, req)
 	if err != nil {
 		logger.Errorf("CreateOrderRPC: RPC called failed: %v", err.Error())
-		return 0, errno.InternalServiceError.WithError(err)
+		return nil, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsSuccess(resp.Base) {
-		return 0, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
 	}
-	return resp.OrderID, nil
+	return resp, nil
 }
 
 // ViewOrderListRPC 查看订单列表RPC调用

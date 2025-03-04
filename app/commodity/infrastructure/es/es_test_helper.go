@@ -14,20 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package mq
+package es
 
 import (
-	"sync/atomic"
+	"math/rand/v2"
+	"testing"
 
-	"github.com/west2-online/DomTok/app/commodity/domain/repository"
-	"github.com/west2-online/DomTok/pkg/kafka"
+	"github.com/west2-online/DomTok/app/commodity/domain/model"
 )
 
-type CommodityMQ struct {
-	client *kafka.Kafka
-	done   atomic.Bool
-}
-
-func NewCommodityMQ(client *kafka.Kafka) repository.CommodityMQ {
-	return &CommodityMQ{client: client}
+func buildTestSpu(t *testing.T, creatorId int64) *model.Spu {
+	t.Helper()
+	return &model.Spu{
+		SpuId:               rand.Int64(),
+		Name:                "我现在在这里",
+		CreatorId:           creatorId,
+		Description:         "desc",
+		CategoryId:          rand.Int64(),
+		Price:               rand.Float64(),
+		GoodsHeadDrawingUrl: "http://example.com",
+	}
 }

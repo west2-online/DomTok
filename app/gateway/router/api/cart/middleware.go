@@ -70,3 +70,8 @@ func _deleteallcartgoodsMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _purchasecartgoodsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
