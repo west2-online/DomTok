@@ -26,9 +26,10 @@ import (
 )
 
 type AddGoodsIntoCartRequest struct {
-	SkuId  int64 `thrift:"skuId,1,required" frugal:"1,required,i64" json:"skuId"`
-	ShopId int64 `thrift:"shop_id,2,required" frugal:"2,required,i64" json:"shop_id"`
-	Count  int64 `thrift:"count,3,required" frugal:"3,required,i64" json:"count"`
+	SkuId     int64 `thrift:"skuId,1,required" frugal:"1,required,i64" json:"skuId"`
+	ShopId    int64 `thrift:"shop_id,2,required" frugal:"2,required,i64" json:"shop_id"`
+	VersionId int64 `thrift:"version_id,3,required" frugal:"3,required,i64" json:"version_id"`
+	Count     int64 `thrift:"count,4,required" frugal:"4,required,i64" json:"count"`
 }
 
 func NewAddGoodsIntoCartRequest() *AddGoodsIntoCartRequest {
@@ -46,6 +47,10 @@ func (p *AddGoodsIntoCartRequest) GetShopId() (v int64) {
 	return p.ShopId
 }
 
+func (p *AddGoodsIntoCartRequest) GetVersionId() (v int64) {
+	return p.VersionId
+}
+
 func (p *AddGoodsIntoCartRequest) GetCount() (v int64) {
 	return p.Count
 }
@@ -54,6 +59,9 @@ func (p *AddGoodsIntoCartRequest) SetSkuId(val int64) {
 }
 func (p *AddGoodsIntoCartRequest) SetShopId(val int64) {
 	p.ShopId = val
+}
+func (p *AddGoodsIntoCartRequest) SetVersionId(val int64) {
+	p.VersionId = val
 }
 func (p *AddGoodsIntoCartRequest) SetCount(val int64) {
 	p.Count = val
@@ -78,7 +86,10 @@ func (p *AddGoodsIntoCartRequest) DeepEqual(ano *AddGoodsIntoCartRequest) bool {
 	if !p.Field2DeepEqual(ano.ShopId) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.Count) {
+	if !p.Field3DeepEqual(ano.VersionId) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.Count) {
 		return false
 	}
 	return true
@@ -100,6 +111,13 @@ func (p *AddGoodsIntoCartRequest) Field2DeepEqual(src int64) bool {
 }
 func (p *AddGoodsIntoCartRequest) Field3DeepEqual(src int64) bool {
 
+	if p.VersionId != src {
+		return false
+	}
+	return true
+}
+func (p *AddGoodsIntoCartRequest) Field4DeepEqual(src int64) bool {
+
 	if p.Count != src {
 		return false
 	}
@@ -109,7 +127,8 @@ func (p *AddGoodsIntoCartRequest) Field3DeepEqual(src int64) bool {
 var fieldIDToName_AddGoodsIntoCartRequest = map[int16]string{
 	1: "skuId",
 	2: "shop_id",
-	3: "count",
+	3: "version_id",
+	4: "count",
 }
 
 type AddGoodsIntoCartResponse struct {
@@ -220,9 +239,9 @@ var fieldIDToName_ShowCartGoodsListRequest = map[int16]string{
 }
 
 type ShowCartGoodsListResponse struct {
-	Base       *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
-	GoodsList  []*model.Sku    `thrift:"goodsList,2,required" frugal:"2,required,list<model.Sku>" json:"goodsList"`
-	GoodsCount int64           `thrift:"goodsCount,3,required" frugal:"3,required,i64" json:"goodsCount"`
+	Base       *model.BaseResp    `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+	GoodsList  []*model.CartGoods `thrift:"goodsList,2,required" frugal:"2,required,list<model.CartGoods>" json:"goodsList"`
+	GoodsCount int64              `thrift:"goodsCount,3,required" frugal:"3,required,i64" json:"goodsCount"`
 }
 
 func NewShowCartGoodsListResponse() *ShowCartGoodsListResponse {
@@ -241,7 +260,7 @@ func (p *ShowCartGoodsListResponse) GetBase() (v *model.BaseResp) {
 	return p.Base
 }
 
-func (p *ShowCartGoodsListResponse) GetGoodsList() (v []*model.Sku) {
+func (p *ShowCartGoodsListResponse) GetGoodsList() (v []*model.CartGoods) {
 	return p.GoodsList
 }
 
@@ -251,7 +270,7 @@ func (p *ShowCartGoodsListResponse) GetGoodsCount() (v int64) {
 func (p *ShowCartGoodsListResponse) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
-func (p *ShowCartGoodsListResponse) SetGoodsList(val []*model.Sku) {
+func (p *ShowCartGoodsListResponse) SetGoodsList(val []*model.CartGoods) {
 	p.GoodsList = val
 }
 func (p *ShowCartGoodsListResponse) SetGoodsCount(val int64) {
@@ -294,7 +313,7 @@ func (p *ShowCartGoodsListResponse) Field1DeepEqual(src *model.BaseResp) bool {
 	}
 	return true
 }
-func (p *ShowCartGoodsListResponse) Field2DeepEqual(src []*model.Sku) bool {
+func (p *ShowCartGoodsListResponse) Field2DeepEqual(src []*model.CartGoods) bool {
 
 	if len(p.GoodsList) != len(src) {
 		return false
@@ -466,96 +485,104 @@ var fieldIDToName_UpdateCartGoodsResponse = map[int16]string{
 	1: "base",
 }
 
-type DeleteCartGoodsRequest struct {
-	SkuIdList []int64 `thrift:"sku_id_list,1,required" frugal:"1,required,list<i64>" json:"sku_id_list"`
+type PurChaseCartGoodsRequest struct {
+	CartGoods []*model.CartGoods `thrift:"cartGoods,1,required" frugal:"1,required,list<model.CartGoods>" json:"cartGoods"`
 }
 
-func NewDeleteCartGoodsRequest() *DeleteCartGoodsRequest {
-	return &DeleteCartGoodsRequest{}
+func NewPurChaseCartGoodsRequest() *PurChaseCartGoodsRequest {
+	return &PurChaseCartGoodsRequest{}
 }
 
-func (p *DeleteCartGoodsRequest) InitDefault() {
+func (p *PurChaseCartGoodsRequest) InitDefault() {
 }
 
-func (p *DeleteCartGoodsRequest) GetSkuIdList() (v []int64) {
-	return p.SkuIdList
+func (p *PurChaseCartGoodsRequest) GetCartGoods() (v []*model.CartGoods) {
+	return p.CartGoods
 }
-func (p *DeleteCartGoodsRequest) SetSkuIdList(val []int64) {
-	p.SkuIdList = val
+func (p *PurChaseCartGoodsRequest) SetCartGoods(val []*model.CartGoods) {
+	p.CartGoods = val
 }
 
-func (p *DeleteCartGoodsRequest) String() string {
+func (p *PurChaseCartGoodsRequest) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("DeleteCartGoodsRequest(%+v)", *p)
+	return fmt.Sprintf("PurChaseCartGoodsRequest(%+v)", *p)
 }
 
-func (p *DeleteCartGoodsRequest) DeepEqual(ano *DeleteCartGoodsRequest) bool {
+func (p *PurChaseCartGoodsRequest) DeepEqual(ano *PurChaseCartGoodsRequest) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.SkuIdList) {
+	if !p.Field1DeepEqual(ano.CartGoods) {
 		return false
 	}
 	return true
 }
 
-func (p *DeleteCartGoodsRequest) Field1DeepEqual(src []int64) bool {
+func (p *PurChaseCartGoodsRequest) Field1DeepEqual(src []*model.CartGoods) bool {
 
-	if len(p.SkuIdList) != len(src) {
+	if len(p.CartGoods) != len(src) {
 		return false
 	}
-	for i, v := range p.SkuIdList {
+	for i, v := range p.CartGoods {
 		_src := src[i]
-		if v != _src {
+		if !v.DeepEqual(_src) {
 			return false
 		}
 	}
 	return true
 }
 
-var fieldIDToName_DeleteCartGoodsRequest = map[int16]string{
-	1: "sku_id_list",
+var fieldIDToName_PurChaseCartGoodsRequest = map[int16]string{
+	1: "cartGoods",
 }
 
-type DeleteCartGoodsResponse struct {
-	Base *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+type PurChaseCartGoodsResponse struct {
+	Base    *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+	OrderId int64           `thrift:"order_id,2,required" frugal:"2,required,i64" json:"order_id"`
 }
 
-func NewDeleteCartGoodsResponse() *DeleteCartGoodsResponse {
-	return &DeleteCartGoodsResponse{}
+func NewPurChaseCartGoodsResponse() *PurChaseCartGoodsResponse {
+	return &PurChaseCartGoodsResponse{}
 }
 
-func (p *DeleteCartGoodsResponse) InitDefault() {
+func (p *PurChaseCartGoodsResponse) InitDefault() {
 }
 
-var DeleteCartGoodsResponse_Base_DEFAULT *model.BaseResp
+var PurChaseCartGoodsResponse_Base_DEFAULT *model.BaseResp
 
-func (p *DeleteCartGoodsResponse) GetBase() (v *model.BaseResp) {
+func (p *PurChaseCartGoodsResponse) GetBase() (v *model.BaseResp) {
 	if !p.IsSetBase() {
-		return DeleteCartGoodsResponse_Base_DEFAULT
+		return PurChaseCartGoodsResponse_Base_DEFAULT
 	}
 	return p.Base
 }
-func (p *DeleteCartGoodsResponse) SetBase(val *model.BaseResp) {
+
+func (p *PurChaseCartGoodsResponse) GetOrderId() (v int64) {
+	return p.OrderId
+}
+func (p *PurChaseCartGoodsResponse) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
+func (p *PurChaseCartGoodsResponse) SetOrderId(val int64) {
+	p.OrderId = val
+}
 
-func (p *DeleteCartGoodsResponse) IsSetBase() bool {
+func (p *PurChaseCartGoodsResponse) IsSetBase() bool {
 	return p.Base != nil
 }
 
-func (p *DeleteCartGoodsResponse) String() string {
+func (p *PurChaseCartGoodsResponse) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("DeleteCartGoodsResponse(%+v)", *p)
+	return fmt.Sprintf("PurChaseCartGoodsResponse(%+v)", *p)
 }
 
-func (p *DeleteCartGoodsResponse) DeepEqual(ano *DeleteCartGoodsResponse) bool {
+func (p *PurChaseCartGoodsResponse) DeepEqual(ano *PurChaseCartGoodsResponse) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -564,19 +591,30 @@ func (p *DeleteCartGoodsResponse) DeepEqual(ano *DeleteCartGoodsResponse) bool {
 	if !p.Field1DeepEqual(ano.Base) {
 		return false
 	}
+	if !p.Field2DeepEqual(ano.OrderId) {
+		return false
+	}
 	return true
 }
 
-func (p *DeleteCartGoodsResponse) Field1DeepEqual(src *model.BaseResp) bool {
+func (p *PurChaseCartGoodsResponse) Field1DeepEqual(src *model.BaseResp) bool {
 
 	if !p.Base.DeepEqual(src) {
 		return false
 	}
 	return true
 }
+func (p *PurChaseCartGoodsResponse) Field2DeepEqual(src int64) bool {
 
-var fieldIDToName_DeleteCartGoodsResponse = map[int16]string{
+	if p.OrderId != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_PurChaseCartGoodsResponse = map[int16]string{
 	1: "base",
+	2: "order_id",
 }
 
 type DeleteAllCartGoodsRequest struct {
@@ -665,119 +703,6 @@ var fieldIDToName_DeleteAllCartGoodsResponse = map[int16]string{
 	1: "base",
 }
 
-type PayCartGoodsRequest struct {
-	SkuIdList []int64 `thrift:"sku_id_list,1,required" frugal:"1,required,list<i64>" json:"sku_id_list"`
-}
-
-func NewPayCartGoodsRequest() *PayCartGoodsRequest {
-	return &PayCartGoodsRequest{}
-}
-
-func (p *PayCartGoodsRequest) InitDefault() {
-}
-
-func (p *PayCartGoodsRequest) GetSkuIdList() (v []int64) {
-	return p.SkuIdList
-}
-func (p *PayCartGoodsRequest) SetSkuIdList(val []int64) {
-	p.SkuIdList = val
-}
-
-func (p *PayCartGoodsRequest) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("PayCartGoodsRequest(%+v)", *p)
-}
-
-func (p *PayCartGoodsRequest) DeepEqual(ano *PayCartGoodsRequest) bool {
-	if p == ano {
-		return true
-	} else if p == nil || ano == nil {
-		return false
-	}
-	if !p.Field1DeepEqual(ano.SkuIdList) {
-		return false
-	}
-	return true
-}
-
-func (p *PayCartGoodsRequest) Field1DeepEqual(src []int64) bool {
-
-	if len(p.SkuIdList) != len(src) {
-		return false
-	}
-	for i, v := range p.SkuIdList {
-		_src := src[i]
-		if v != _src {
-			return false
-		}
-	}
-	return true
-}
-
-var fieldIDToName_PayCartGoodsRequest = map[int16]string{
-	1: "sku_id_list",
-}
-
-type PayCartGoodsResponse struct {
-	Base *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
-}
-
-func NewPayCartGoodsResponse() *PayCartGoodsResponse {
-	return &PayCartGoodsResponse{}
-}
-
-func (p *PayCartGoodsResponse) InitDefault() {
-}
-
-var PayCartGoodsResponse_Base_DEFAULT *model.BaseResp
-
-func (p *PayCartGoodsResponse) GetBase() (v *model.BaseResp) {
-	if !p.IsSetBase() {
-		return PayCartGoodsResponse_Base_DEFAULT
-	}
-	return p.Base
-}
-func (p *PayCartGoodsResponse) SetBase(val *model.BaseResp) {
-	p.Base = val
-}
-
-func (p *PayCartGoodsResponse) IsSetBase() bool {
-	return p.Base != nil
-}
-
-func (p *PayCartGoodsResponse) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("PayCartGoodsResponse(%+v)", *p)
-}
-
-func (p *PayCartGoodsResponse) DeepEqual(ano *PayCartGoodsResponse) bool {
-	if p == ano {
-		return true
-	} else if p == nil || ano == nil {
-		return false
-	}
-	if !p.Field1DeepEqual(ano.Base) {
-		return false
-	}
-	return true
-}
-
-func (p *PayCartGoodsResponse) Field1DeepEqual(src *model.BaseResp) bool {
-
-	if !p.Base.DeepEqual(src) {
-		return false
-	}
-	return true
-}
-
-var fieldIDToName_PayCartGoodsResponse = map[int16]string{
-	1: "base",
-}
-
 type CartService interface {
 	AddGoodsIntoCart(ctx context.Context, req *AddGoodsIntoCartRequest) (r *AddGoodsIntoCartResponse, err error)
 
@@ -785,11 +710,9 @@ type CartService interface {
 
 	UpdateCartGoods(ctx context.Context, req *UpdateCartGoodsRequest) (r *UpdateCartGoodsResponse, err error)
 
-	DeleteCartGoods(ctx context.Context, req *DeleteAllCartGoodsRequest) (r *DeleteAllCartGoodsResponse, err error)
+	PurChaseCartGoods(ctx context.Context, req *PurChaseCartGoodsRequest) (r *PurChaseCartGoodsResponse, err error)
 
 	DeleteAllCartGoods(ctx context.Context, req *DeleteAllCartGoodsRequest) (r *DeleteAllCartGoodsResponse, err error)
-
-	PayCartGoods(ctx context.Context, req *PayCartGoodsRequest) (r *PayCartGoodsResponse, err error)
 }
 
 type CartServiceAddGoodsIntoCartArgs struct {
@@ -1140,41 +1063,41 @@ var fieldIDToName_CartServiceUpdateCartGoodsResult = map[int16]string{
 	0: "success",
 }
 
-type CartServiceDeleteCartGoodsArgs struct {
-	Req *DeleteAllCartGoodsRequest `thrift:"req,1" frugal:"1,default,DeleteAllCartGoodsRequest" json:"req"`
+type CartServicePurChaseCartGoodsArgs struct {
+	Req *PurChaseCartGoodsRequest `thrift:"req,1" frugal:"1,default,PurChaseCartGoodsRequest" json:"req"`
 }
 
-func NewCartServiceDeleteCartGoodsArgs() *CartServiceDeleteCartGoodsArgs {
-	return &CartServiceDeleteCartGoodsArgs{}
+func NewCartServicePurChaseCartGoodsArgs() *CartServicePurChaseCartGoodsArgs {
+	return &CartServicePurChaseCartGoodsArgs{}
 }
 
-func (p *CartServiceDeleteCartGoodsArgs) InitDefault() {
+func (p *CartServicePurChaseCartGoodsArgs) InitDefault() {
 }
 
-var CartServiceDeleteCartGoodsArgs_Req_DEFAULT *DeleteAllCartGoodsRequest
+var CartServicePurChaseCartGoodsArgs_Req_DEFAULT *PurChaseCartGoodsRequest
 
-func (p *CartServiceDeleteCartGoodsArgs) GetReq() (v *DeleteAllCartGoodsRequest) {
+func (p *CartServicePurChaseCartGoodsArgs) GetReq() (v *PurChaseCartGoodsRequest) {
 	if !p.IsSetReq() {
-		return CartServiceDeleteCartGoodsArgs_Req_DEFAULT
+		return CartServicePurChaseCartGoodsArgs_Req_DEFAULT
 	}
 	return p.Req
 }
-func (p *CartServiceDeleteCartGoodsArgs) SetReq(val *DeleteAllCartGoodsRequest) {
+func (p *CartServicePurChaseCartGoodsArgs) SetReq(val *PurChaseCartGoodsRequest) {
 	p.Req = val
 }
 
-func (p *CartServiceDeleteCartGoodsArgs) IsSetReq() bool {
+func (p *CartServicePurChaseCartGoodsArgs) IsSetReq() bool {
 	return p.Req != nil
 }
 
-func (p *CartServiceDeleteCartGoodsArgs) String() string {
+func (p *CartServicePurChaseCartGoodsArgs) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("CartServiceDeleteCartGoodsArgs(%+v)", *p)
+	return fmt.Sprintf("CartServicePurChaseCartGoodsArgs(%+v)", *p)
 }
 
-func (p *CartServiceDeleteCartGoodsArgs) DeepEqual(ano *CartServiceDeleteCartGoodsArgs) bool {
+func (p *CartServicePurChaseCartGoodsArgs) DeepEqual(ano *CartServicePurChaseCartGoodsArgs) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1186,7 +1109,7 @@ func (p *CartServiceDeleteCartGoodsArgs) DeepEqual(ano *CartServiceDeleteCartGoo
 	return true
 }
 
-func (p *CartServiceDeleteCartGoodsArgs) Field1DeepEqual(src *DeleteAllCartGoodsRequest) bool {
+func (p *CartServicePurChaseCartGoodsArgs) Field1DeepEqual(src *PurChaseCartGoodsRequest) bool {
 
 	if !p.Req.DeepEqual(src) {
 		return false
@@ -1194,45 +1117,45 @@ func (p *CartServiceDeleteCartGoodsArgs) Field1DeepEqual(src *DeleteAllCartGoods
 	return true
 }
 
-var fieldIDToName_CartServiceDeleteCartGoodsArgs = map[int16]string{
+var fieldIDToName_CartServicePurChaseCartGoodsArgs = map[int16]string{
 	1: "req",
 }
 
-type CartServiceDeleteCartGoodsResult struct {
-	Success *DeleteAllCartGoodsResponse `thrift:"success,0,optional" frugal:"0,optional,DeleteAllCartGoodsResponse" json:"success,omitempty"`
+type CartServicePurChaseCartGoodsResult struct {
+	Success *PurChaseCartGoodsResponse `thrift:"success,0,optional" frugal:"0,optional,PurChaseCartGoodsResponse" json:"success,omitempty"`
 }
 
-func NewCartServiceDeleteCartGoodsResult() *CartServiceDeleteCartGoodsResult {
-	return &CartServiceDeleteCartGoodsResult{}
+func NewCartServicePurChaseCartGoodsResult() *CartServicePurChaseCartGoodsResult {
+	return &CartServicePurChaseCartGoodsResult{}
 }
 
-func (p *CartServiceDeleteCartGoodsResult) InitDefault() {
+func (p *CartServicePurChaseCartGoodsResult) InitDefault() {
 }
 
-var CartServiceDeleteCartGoodsResult_Success_DEFAULT *DeleteAllCartGoodsResponse
+var CartServicePurChaseCartGoodsResult_Success_DEFAULT *PurChaseCartGoodsResponse
 
-func (p *CartServiceDeleteCartGoodsResult) GetSuccess() (v *DeleteAllCartGoodsResponse) {
+func (p *CartServicePurChaseCartGoodsResult) GetSuccess() (v *PurChaseCartGoodsResponse) {
 	if !p.IsSetSuccess() {
-		return CartServiceDeleteCartGoodsResult_Success_DEFAULT
+		return CartServicePurChaseCartGoodsResult_Success_DEFAULT
 	}
 	return p.Success
 }
-func (p *CartServiceDeleteCartGoodsResult) SetSuccess(x interface{}) {
-	p.Success = x.(*DeleteAllCartGoodsResponse)
+func (p *CartServicePurChaseCartGoodsResult) SetSuccess(x interface{}) {
+	p.Success = x.(*PurChaseCartGoodsResponse)
 }
 
-func (p *CartServiceDeleteCartGoodsResult) IsSetSuccess() bool {
+func (p *CartServicePurChaseCartGoodsResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
-func (p *CartServiceDeleteCartGoodsResult) String() string {
+func (p *CartServicePurChaseCartGoodsResult) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("CartServiceDeleteCartGoodsResult(%+v)", *p)
+	return fmt.Sprintf("CartServicePurChaseCartGoodsResult(%+v)", *p)
 }
 
-func (p *CartServiceDeleteCartGoodsResult) DeepEqual(ano *CartServiceDeleteCartGoodsResult) bool {
+func (p *CartServicePurChaseCartGoodsResult) DeepEqual(ano *CartServicePurChaseCartGoodsResult) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1244,7 +1167,7 @@ func (p *CartServiceDeleteCartGoodsResult) DeepEqual(ano *CartServiceDeleteCartG
 	return true
 }
 
-func (p *CartServiceDeleteCartGoodsResult) Field0DeepEqual(src *DeleteAllCartGoodsResponse) bool {
+func (p *CartServicePurChaseCartGoodsResult) Field0DeepEqual(src *PurChaseCartGoodsResponse) bool {
 
 	if !p.Success.DeepEqual(src) {
 		return false
@@ -1252,7 +1175,7 @@ func (p *CartServiceDeleteCartGoodsResult) Field0DeepEqual(src *DeleteAllCartGoo
 	return true
 }
 
-var fieldIDToName_CartServiceDeleteCartGoodsResult = map[int16]string{
+var fieldIDToName_CartServicePurChaseCartGoodsResult = map[int16]string{
 	0: "success",
 }
 
@@ -1369,121 +1292,5 @@ func (p *CartServiceDeleteAllCartGoodsResult) Field0DeepEqual(src *DeleteAllCart
 }
 
 var fieldIDToName_CartServiceDeleteAllCartGoodsResult = map[int16]string{
-	0: "success",
-}
-
-type CartServicePayCartGoodsArgs struct {
-	Req *PayCartGoodsRequest `thrift:"req,1" frugal:"1,default,PayCartGoodsRequest" json:"req"`
-}
-
-func NewCartServicePayCartGoodsArgs() *CartServicePayCartGoodsArgs {
-	return &CartServicePayCartGoodsArgs{}
-}
-
-func (p *CartServicePayCartGoodsArgs) InitDefault() {
-}
-
-var CartServicePayCartGoodsArgs_Req_DEFAULT *PayCartGoodsRequest
-
-func (p *CartServicePayCartGoodsArgs) GetReq() (v *PayCartGoodsRequest) {
-	if !p.IsSetReq() {
-		return CartServicePayCartGoodsArgs_Req_DEFAULT
-	}
-	return p.Req
-}
-func (p *CartServicePayCartGoodsArgs) SetReq(val *PayCartGoodsRequest) {
-	p.Req = val
-}
-
-func (p *CartServicePayCartGoodsArgs) IsSetReq() bool {
-	return p.Req != nil
-}
-
-func (p *CartServicePayCartGoodsArgs) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("CartServicePayCartGoodsArgs(%+v)", *p)
-}
-
-func (p *CartServicePayCartGoodsArgs) DeepEqual(ano *CartServicePayCartGoodsArgs) bool {
-	if p == ano {
-		return true
-	} else if p == nil || ano == nil {
-		return false
-	}
-	if !p.Field1DeepEqual(ano.Req) {
-		return false
-	}
-	return true
-}
-
-func (p *CartServicePayCartGoodsArgs) Field1DeepEqual(src *PayCartGoodsRequest) bool {
-
-	if !p.Req.DeepEqual(src) {
-		return false
-	}
-	return true
-}
-
-var fieldIDToName_CartServicePayCartGoodsArgs = map[int16]string{
-	1: "req",
-}
-
-type CartServicePayCartGoodsResult struct {
-	Success *PayCartGoodsResponse `thrift:"success,0,optional" frugal:"0,optional,PayCartGoodsResponse" json:"success,omitempty"`
-}
-
-func NewCartServicePayCartGoodsResult() *CartServicePayCartGoodsResult {
-	return &CartServicePayCartGoodsResult{}
-}
-
-func (p *CartServicePayCartGoodsResult) InitDefault() {
-}
-
-var CartServicePayCartGoodsResult_Success_DEFAULT *PayCartGoodsResponse
-
-func (p *CartServicePayCartGoodsResult) GetSuccess() (v *PayCartGoodsResponse) {
-	if !p.IsSetSuccess() {
-		return CartServicePayCartGoodsResult_Success_DEFAULT
-	}
-	return p.Success
-}
-func (p *CartServicePayCartGoodsResult) SetSuccess(x interface{}) {
-	p.Success = x.(*PayCartGoodsResponse)
-}
-
-func (p *CartServicePayCartGoodsResult) IsSetSuccess() bool {
-	return p.Success != nil
-}
-
-func (p *CartServicePayCartGoodsResult) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("CartServicePayCartGoodsResult(%+v)", *p)
-}
-
-func (p *CartServicePayCartGoodsResult) DeepEqual(ano *CartServicePayCartGoodsResult) bool {
-	if p == ano {
-		return true
-	} else if p == nil || ano == nil {
-		return false
-	}
-	if !p.Field0DeepEqual(ano.Success) {
-		return false
-	}
-	return true
-}
-
-func (p *CartServicePayCartGoodsResult) Field0DeepEqual(src *PayCartGoodsResponse) bool {
-
-	if !p.Success.DeepEqual(src) {
-		return false
-	}
-	return true
-}
-
-var fieldIDToName_CartServicePayCartGoodsResult = map[int16]string{
 	0: "success",
 }

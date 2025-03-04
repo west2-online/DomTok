@@ -20,6 +20,11 @@ package cart
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/samber/lo"
+
+	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -43,9 +48,10 @@ func AddGoodsIntoCart(ctx context.Context, c *app.RequestContext) {
 	}
 
 	err = rpc.AddGoodsIntoCartRPC(ctx, &cart.AddGoodsIntoCartRequest{
-		SkuId:  req.SkuID,
-		ShopId: req.ShopID,
-		Count:  req.Count,
+		SkuId:     req.SkuID,
+		ShopId:    req.ShopID,
+		Count:     req.Count,
+		VersionId: req.VersionID,
 	})
 	if err != nil {
 		pack.RespError(c, err)
@@ -61,13 +67,20 @@ func ShowCartGoodsList(ctx context.Context, c *app.RequestContext) {
 	var req api.ShowCartGoodsListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
 	resp := new(api.ShowCartGoodsListResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	cartGoods, err := rpc.ShowCartGoodsRPC(ctx, &cart.ShowCartGoodsListRequest{
+		PageNum: req.PageNum,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	resp.GoodsList = pack.BuildCartGoodsList(cartGoods)
+	pack.RespList(c, resp.GoodsList)
 }
 
 // UpdateCartGoods .
@@ -86,18 +99,52 @@ func UpdateCartGoods(ctx context.Context, c *app.RequestContext) {
 	c.JSON(consts.StatusOK, resp)
 }
 
-// DeleteCartGoods .
-// @router /api/v1/api/delete [DELETE]
-func DeleteCartGoods(ctx context.Context, c *app.RequestContext) {
+// DeleteAllCartGoods .
+// @router /api/v1/cart/empty [GET]
+func DeleteAllCartGoods(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req api.DeleteCartGoodsRequest
+	var req cart.DeleteAllCartGoodsRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	err = rpc.DeleteAllCartGoodsRPC(ctx, &cart.DeleteAllCartGoodsRequest{})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespSuccess(c)
+}
+
+// PurChaseCartGoods .
+// @router /api/v1/cart/purchase [POST]
+func PurChaseCartGoods(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req cart.PurChaseCartGoodsRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
-	resp := new(api.DeleteCartGoodsResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	rpcCartGoods := lo.Map(req.CartGoods, func(item *kmodel.CartGoods, index int) *kmodel.CartGoods {
+		fmt.Println(*item)
+		return &kmodel.CartGoods{
+			MerchantId:       item.MerchantId,
+			GoodsId:          item.GoodsId,
+			SkuId:            item.SkuId,
+			PurchaseQuantity: item.PurchaseQuantity,
+			GoodsVersion:     item.GoodsVersion,
+		}
+	})
+	orderId, err := rpc.PurchaseCartGoodsRPC(ctx, &cart.PurChaseCartGoodsRequest{
+		CartGoods: rpcCartGoods,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, orderId)
 }

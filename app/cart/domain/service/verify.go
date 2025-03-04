@@ -38,3 +38,12 @@ func (svc *CartService) VerifyCount(cnt int64) CartVerifyOps {
 		return nil
 	}
 }
+
+func (svc *CartService) VerifyPageNum(p int64) CartVerifyOps {
+	return func() error {
+		if p < 1 {
+			return errno.NewErrNo(errno.ParamVerifyErrorCode, "wrong goods count format")
+		}
+		return nil
+	}
+}

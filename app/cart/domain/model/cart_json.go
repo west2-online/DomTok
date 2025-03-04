@@ -35,8 +35,9 @@ type Store struct {
 }
 
 type Sku struct {
-	SkuID int64 `json:"sku_id"`
-	Count int64 `json:"count"`
+	SkuID     int64 `json:"sku_id"`
+	VersionID int64 `json:"version_id"`
+	Count     int64 `json:"count"`
 }
 
 // SortStoresByUpdatedAt 对CartJson进行降序排序（最近的时间在前）
@@ -78,8 +79,9 @@ func (cart *CartJson) InsertSku(info *GoodInfo) {
 			// skuID 不存在，插入新的 sku
 			store.Goods = append([]Sku{
 				{
-					SkuID: info.SkuId,
-					Count: info.Count,
+					SkuID:     info.SkuId,
+					Count:     info.Count,
+					VersionID: info.VersionId,
 				},
 			}, store.Goods...)
 		}
@@ -94,14 +96,63 @@ func (cart *CartJson) InsertSku(info *GoodInfo) {
 			StoreID: info.ShopId,
 			Goods: []Sku{
 				{
-					SkuID: info.SkuId,
-					Count: info.Count,
+					SkuID:     info.SkuId,
+					Count:     info.Count,
+					VersionID: info.VersionId,
 				},
 			},
 			UpdatedAt: time.Now(),
 		}
 		// 插到最前面
 		cart.Store = append([]Store{newStore}, cart.Store...)
+	}
+}
+
+func (cart *CartJson) DeleteSku(info *GoodInfo) {
+	index := -1
+	// 遍历查找是否已存在 shopID
+	for i, store := range cart.Store {
+		if store.StoreID == info.ShopId {
+			index = i
+			break
+		}
+	}
+
+	// shopID 存在
+	if index != -1 {
+		store := cart.Store[index]
+
+		// 查找是否已存在 skuID
+		skuIndex := -1
+		for i, sku := range store.Goods {
+			if sku.SkuID == info.SkuId {
+				skuIndex = i
+				break
+			}
+		}
+
+		// skuID 存在
+		if skuIndex != -1 {
+			if store.Goods[skuIndex].Count > info.Count {
+				// 只减少 count
+				store.Goods[skuIndex].Count -= info.Count
+			} else {
+				// 删除 sku
+				store.Goods = append(store.Goods[:skuIndex], store.Goods[skuIndex+1:]...)
+			}
+		}
+	}
+
+	if index != -1 {
+		store := cart.Store[index]
+		// 如果该商店的商品列表为空，则删除整个商店
+		if len(store.Goods) == 0 {
+			cart.Store = append(cart.Store[:index], cart.Store[index+1:]...)
+		} else {
+			// 更新商店顺序
+			cart.Store = append(cart.Store[:index], cart.Store[index+1:]...)
+			cart.Store = append([]Store{store}, cart.Store...)
+		}
 	}
 }
 
@@ -114,4 +165,18 @@ func (cart *CartJson) GetRecentNStores(n int) *CartJson {
 		cartJson.Store = cart.Store
 	}
 	return cartJson
+}
+
+func ConvertCartJsonToCartGoods(json *CartJson) []*CartGoods {
+	list := make([]*CartGoods, 0)
+	for _, store := range json.Store {
+		for _, good := range store.Goods {
+			list = append(list, &CartGoods{
+				SkuID:            good.SkuID,
+				GoodsVersion:     good.VersionID,
+				PurchaseQuantity: good.Count,
+			})
+		}
+	}
+	return list
 }

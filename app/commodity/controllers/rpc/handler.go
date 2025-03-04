@@ -339,7 +339,7 @@ func (c CommodityHandler) CreateSku(streamServer commodity.CommodityService_Crea
 		req.StyleHeadDrawing = bytes.Join([][]byte{req.StyleHeadDrawing, fileData.StyleHeadDrawing}, []byte(""))
 	}
 
-	id, err := c.useCase.CreateSku(streamServer.Context(), &model.Sku{
+	sku, err := c.useCase.CreateSku(streamServer.Context(), &model.Sku{
 		Name:             req.Name,
 		Stock:            req.Stock,
 		Description:      req.Description,
@@ -350,15 +350,15 @@ func (c CommodityHandler) CreateSku(streamServer commodity.CommodityService_Crea
 	}, req.Ext)
 	if err != nil {
 		r.Base = base.BuildBaseResp(err)
+		r.SkuInfo = pack.BuildSkuInfo(nil)
 		return streamServer.SendAndClose(r)
 	}
-
-	r.Base = base.BuildBaseResp(nil)
-	r.SkuID = id
+	r.Base = base.BuildSuccessResp()
+	r.SkuInfo = pack.BuildSkuInfo(sku)
 	return streamServer.SendAndClose(r)
 }
 
-func (c CommodityHandler) UpdateSku(streamServer commodity.CommodityService_UpdateSkuServer) (rr error) {
+func (c CommodityHandler) UpdateSku(streamServer commodity.CommodityService_UpdateSkuServer) (err error) {
 	r := new(commodity.UpdateSkuResp)
 
 	req, err := streamServer.Recv()
@@ -582,8 +582,21 @@ func (c CommodityHandler) ViewSkuImage(ctx context.Context, req *commodity.ViewS
 }
 
 func (c CommodityHandler) ViewHistory(ctx context.Context, req *commodity.ViewHistoryPriceReq) (r *commodity.ViewHistoryPriceResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ViewHistoryPriceResp)
+
+	skuPriceHistory := &model.SkuPriceHistory{
+		SkuId: req.SkuID,
+		Id:    req.HistoryID,
+	}
+
+	resp, err := c.useCase.ViewSkuPriceHistory(ctx, skuPriceHistory, req.PageNum, req.PageSize)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.Records = pack.BuildSkuPriceHistory(resp)
+	return
 }
 
 func (c CommodityHandler) DescSkuLockStock(ctx context.Context, req *commodity.DescSkuLockStockReq) (r *commodity.DescSkuLockStockResp, err error) {

@@ -32,9 +32,8 @@ type Client interface {
 	AddGoodsIntoCart(ctx context.Context, req *cart.AddGoodsIntoCartRequest, callOptions ...callopt.Option) (r *cart.AddGoodsIntoCartResponse, err error)
 	ShowCartGoodsList(ctx context.Context, req *cart.ShowCartGoodsListRequest, callOptions ...callopt.Option) (r *cart.ShowCartGoodsListResponse, err error)
 	UpdateCartGoods(ctx context.Context, req *cart.UpdateCartGoodsRequest, callOptions ...callopt.Option) (r *cart.UpdateCartGoodsResponse, err error)
-	DeleteCartGoods(ctx context.Context, req *cart.DeleteAllCartGoodsRequest, callOptions ...callopt.Option) (r *cart.DeleteAllCartGoodsResponse, err error)
+	PurChaseCartGoods(ctx context.Context, req *cart.PurChaseCartGoodsRequest, callOptions ...callopt.Option) (r *cart.PurChaseCartGoodsResponse, err error)
 	DeleteAllCartGoods(ctx context.Context, req *cart.DeleteAllCartGoodsRequest, callOptions ...callopt.Option) (r *cart.DeleteAllCartGoodsResponse, err error)
-	PayCartGoods(ctx context.Context, req *cart.PayCartGoodsRequest, callOptions ...callopt.Option) (r *cart.PayCartGoodsResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -81,17 +80,12 @@ func (p *kCartServiceClient) UpdateCartGoods(ctx context.Context, req *cart.Upda
 	return p.kClient.UpdateCartGoods(ctx, req)
 }
 
-func (p *kCartServiceClient) DeleteCartGoods(ctx context.Context, req *cart.DeleteAllCartGoodsRequest, callOptions ...callopt.Option) (r *cart.DeleteAllCartGoodsResponse, err error) {
+func (p *kCartServiceClient) PurChaseCartGoods(ctx context.Context, req *cart.PurChaseCartGoodsRequest, callOptions ...callopt.Option) (r *cart.PurChaseCartGoodsResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.DeleteCartGoods(ctx, req)
+	return p.kClient.PurChaseCartGoods(ctx, req)
 }
 
 func (p *kCartServiceClient) DeleteAllCartGoods(ctx context.Context, req *cart.DeleteAllCartGoodsRequest, callOptions ...callopt.Option) (r *cart.DeleteAllCartGoodsResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.DeleteAllCartGoods(ctx, req)
-}
-
-func (p *kCartServiceClient) PayCartGoods(ctx context.Context, req *cart.PayCartGoodsRequest, callOptions ...callopt.Option) (r *cart.PayCartGoodsResponse, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.PayCartGoods(ctx, req)
 }

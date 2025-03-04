@@ -11,7 +11,8 @@ namespace go cart
 struct AddGoodsIntoCartRequest{
     1: required i64 skuId,
     2: required i64 shop_id,
-    3: required i64 count,
+    3: required i64 version_id
+    4: required i64 count,
 }
 
 struct AddGoodsIntoCartResponse{
@@ -27,7 +28,7 @@ struct ShowCartGoodsListRequest{
 
 struct ShowCartGoodsListResponse{
     1: required model.BaseResp base,
-    2: required list<model.Sku> goodsList,
+    2: required list<model.CartGoods> goodsList,
     3: required i64 goodsCount,
 }
 
@@ -45,17 +46,17 @@ struct UpdateCartGoodsResponse{
     1: required model.BaseResp base,
 }
 
-/* struct DeleteCartGoodsRequest 删除购物车商品，暴露
+/* struct PurChaseCartGoodsRequest 购买购物车商品，暴露
 * @Param sku_id skuID
 */
-struct DeleteCartGoodsRequest{
-    1: required list<i64> sku_id_list,
+struct PurChaseCartGoodsRequest{
+    1: required list<model.CartGoods> cartGoods,
 }
 
-struct DeleteCartGoodsResponse{
+struct PurChaseCartGoodsResponse{
     1: required model.BaseResp base,
+    2: required i64 order_id,
 }
-
 /* struct DeleteAllCartGoodsRequest 清空购物车，暴露
 */
 struct DeleteAllCartGoodsRequest{
@@ -65,22 +66,10 @@ struct DeleteAllCartGoodsResponse{
     1: required model.BaseResp base,
 }
 
-/* struct UpdateCartGoodsRequest 支付接口调用的rpc，不暴露
-* @Param sku_id skuID
-*/
-struct PayCartGoodsRequest{
-    1: required list<i64> sku_id_list,
-}
-
-struct PayCartGoodsResponse{
-    1: required model.BaseResp base,
-}
-
 service CartService {
     AddGoodsIntoCartResponse AddGoodsIntoCart(1: AddGoodsIntoCartRequest req),
     ShowCartGoodsListResponse ShowCartGoodsList(1: ShowCartGoodsListRequest req),
     UpdateCartGoodsResponse UpdateCartGoods(1: UpdateCartGoodsRequest req),
-    DeleteAllCartGoodsResponse DeleteCartGoods(1: DeleteAllCartGoodsRequest req),
+    PurChaseCartGoodsResponse PurChaseCartGoods(1: PurChaseCartGoodsRequest req)
     DeleteAllCartGoodsResponse DeleteAllCartGoods(1:DeleteAllCartGoodsRequest req),
-    PayCartGoodsResponse PayCartGoods(1:PayCartGoodsRequest req),
 }

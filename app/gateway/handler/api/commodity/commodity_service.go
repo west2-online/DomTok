@@ -22,6 +22,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+
 	"github.com/cloudwego/hertz/pkg/protocol"
 
 	"github.com/west2-online/DomTok/app/gateway/pack"
@@ -378,7 +380,7 @@ func CreateSku(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	skuID, err := rpc.CreateSkuRPC(ctx, &commodity.CreateSkuReq{
+	skuInfo, err := rpc.CreateSkuRPC(ctx, &commodity.CreateSkuReq{
 		Name:        req.Name,
 		Description: req.Description,
 		Price:       req.Price,
@@ -392,7 +394,16 @@ func CreateSku(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	pack.RespData(c, skuID)
+	hlog.Info("CreateSku", "skuInfo", skuInfo)
+	pack.RespData(c, struct {
+		Id         int64
+		HistoryId  int64
+		MerchantId int64
+	}{
+		Id:         skuInfo.SkuID,
+		HistoryId:  skuInfo.HistoryID,
+		MerchantId: skuInfo.CreatorID,
+	})
 }
 
 // UpdateSku .
@@ -468,7 +479,7 @@ func DeleteSku(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	pack.RespData(c, nil)
+	pack.RespSuccess(c)
 }
 
 // ViewSkuImage .
@@ -491,7 +502,7 @@ func ViewSkuImage(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	pack.RespData(c, images)
+	pack.RespList(c, images)
 }
 
 // CreateSkuImage .
@@ -504,8 +515,6 @@ func CreateSkuImage(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
-
-	resp := new(commodity.CreateSkuImageResp)
 
 	file, err := c.FormFile("skuImage")
 	if err != nil {
@@ -532,8 +541,7 @@ func CreateSkuImage(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	resp.ImageID = id
-	pack.RespData(c, resp)
+	pack.RespData(c, id)
 }
 
 // UpdateSkuImage .
@@ -620,7 +628,7 @@ func ViewSku(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	pack.RespData(c, skus)
+	pack.RespList(c, skus)
 }
 
 // UploadSkuAttr .
@@ -653,13 +661,21 @@ func ViewHistory(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewHistoryPriceReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.ViewHistoryPriceResp)
-
-	c.JSON(consts.StatusOK, resp)
+	resp, err := rpc.ViewHistoryPriceRPC(ctx, &commodity.ViewHistoryPriceReq{
+		SkuID:     req.SkuID,
+		HistoryID: req.HistoryID,
+		PageNum:   req.PageNum,
+		PageSize:  req.PageSize,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespList(c, resp)
 }
 
 // CreateCategory .
@@ -672,6 +688,7 @@ func CreateCategory(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
+
 	resp := new(api.CreateCategoryResp)
 	id, err := rpc.CreateCategoryRPC(ctx, &commodity.CreateCategoryReq{
 		Name: req.Name,
@@ -727,7 +744,6 @@ func ViewCategory(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	resp.CategoryInfo = pack.BuildCategorys(res.CategoryInfo)
-
 	pack.RespData(c, resp)
 }
 

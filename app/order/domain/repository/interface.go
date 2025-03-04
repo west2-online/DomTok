@@ -41,7 +41,6 @@ type OrderDB interface {
 	DeleteOrder(ctx context.Context, orderID int64) error
 
 	IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error)
-	IsOrderPaid(ctx context.Context, orderID int64) (bool, error)
 }
 
 type MQ interface {

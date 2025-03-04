@@ -18,12 +18,12 @@ package redis
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/redis/go-redis/v9"
 
 	"github.com/west2-online/DomTok/app/payment/domain/repository"
+	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 type paymentRedis struct {
@@ -48,7 +48,8 @@ func (p *paymentRedis) IncrRedisKey(ctx context.Context, key string, expiration 
 	// 自增键值
 	count, err := p.client.Incr(ctx, key).Result()
 	if err != nil {
-		return 0, fmt.Errorf("failed to increment key %s: %w", key, err)
+		return 0, errno.Errorf(errno.InternalRedisErrorCode, "failed to increment key %s: %v", key, err)
+		// return 0, fmt.Errorf("failed to increment key %s: %w", key, err)
 	}
 	return count, nil
 }
@@ -57,7 +58,7 @@ func (p *paymentRedis) CheckRedisDayKey(ctx context.Context, key string) (bool, 
 	// exists返回1表示key存在，返回0表示key不存在
 	exists, err := p.client.Exists(ctx, key).Result()
 	if err != nil {
-		return false, fmt.Errorf("failed to check 24h existence of key %s: %w", key, err)
+		return false, errno.Errorf(errno.InternalRedisErrorCode, "failed to check 24h existence of key %s: %v", key, err)
 	}
 	return exists == 1, nil
 }
@@ -66,7 +67,7 @@ func (p *paymentRedis) CheckRedisDayKey(ctx context.Context, key string) (bool, 
 func (p *paymentRedis) SetRedisDayKey(ctx context.Context, key string, value string, expiration int) error {
 	err := p.client.Set(ctx, key, value, time.Duration(expiration)*time.Second).Err()
 	if err != nil {
-		return fmt.Errorf("failed to set key %s in Redis: %w", key, err)
+		return errno.Errorf(errno.InternalRedisErrorCode, "failed to set key %s in Redis: %v", key, err)
 	}
 	return nil
 }
@@ -84,11 +85,11 @@ func (p *paymentRedis) CheckAndDelPaymentToken(ctx context.Context, key string, 
 	// 执行脚本
 	result, err := p.execScript(ctx, CheckAndDelScript, []string{key}, value)
 	if err != nil {
-		return false, fmt.Errorf("failed to check and delete refund token: %w", err)
+		return false, errno.Errorf(errno.InternalRedisErrorCode, "failed to check and delete refund token: %v", err)
 	}
 	exist, ok := result.(int64)
 	if !ok {
-		return false, fmt.Errorf("failed to convert result to int64")
+		return false, errno.Errorf(errno.InternalRedisErrorCode, "failed to convert result to int64")
 	}
 	return exist == 1, nil
 }
@@ -97,19 +98,19 @@ func (p *paymentRedis) GetTTLAndDelPaymentToken(ctx context.Context, key string,
 	// 执行脚本
 	result, err := p.execScript(ctx, GetTTLAndDelScript, []string{key}, value)
 	if err != nil {
-		return false, -1, fmt.Errorf("failed to get ttl and delete refund token: %w", err)
+		return false, -1, errno.Errorf(errno.InternalRedisErrorCode, "failed to get ttl and delete refund token: %v", err)
 	}
 	res, ok := result.([]interface{})
 	if !ok || len(res) != 2 {
-		return false, -1, fmt.Errorf("failed to convert result to [2]interface{}")
+		return false, -1, errno.Errorf(errno.InternalRedisErrorCode, "failed to convert result to [2]interface{}")
 	}
 	redisTTL, ok := res[0].(int64)
 	if !ok {
-		return false, -1, fmt.Errorf("failed to convert ttl to int64")
+		return false, -1, errno.Errorf(errno.InternalRedisErrorCode, "failed to convert ttl to int64")
 	}
 	redisExist, ok := res[1].(int64)
 	if !ok {
-		return false, -1, fmt.Errorf("failed to convert exist to int64")
+		return false, -1, errno.Errorf(errno.InternalRedisErrorCode, "failed to convert exist to int64")
 	}
 	return redisExist == 1, time.Duration(redisTTL) * time.Second, nil
 }

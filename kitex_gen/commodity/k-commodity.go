@@ -6102,7 +6102,7 @@ func (p *CreateSkuResp) FastRead(buf []byte) (int, error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetBase bool = false
-	var issetSkuID bool = false
+	var issetSkuInfo bool = false
 	for {
 		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
 		offset += l
@@ -6129,13 +6129,13 @@ func (p *CreateSkuResp) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 2:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.STRUCT {
 				l, err = p.FastReadField2(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetSkuID = true
+				issetSkuInfo = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -6157,7 +6157,7 @@ func (p *CreateSkuResp) FastRead(buf []byte) (int, error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetSkuID {
+	if !issetSkuInfo {
 		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
@@ -6186,15 +6186,13 @@ func (p *CreateSkuResp) FastReadField1(buf []byte) (int, error) {
 
 func (p *CreateSkuResp) FastReadField2(buf []byte) (int, error) {
 	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+	_field := model.NewSkuInfo()
+	if l, err := _field.FastRead(buf[offset:]); err != nil {
 		return offset, err
 	} else {
 		offset += l
-		_field = v
 	}
-	p.SkuID = _field
+	p.SkuInfo = _field
 	return offset, nil
 }
 
@@ -6205,8 +6203,8 @@ func (p *CreateSkuResp) FastWrite(buf []byte) int {
 func (p *CreateSkuResp) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
-		offset += p.fastWriteField2(buf[offset:], w)
 		offset += p.fastWriteField1(buf[offset:], w)
+		offset += p.fastWriteField2(buf[offset:], w)
 	}
 	offset += thrift.Binary.WriteFieldStop(buf[offset:])
 	return offset
@@ -6231,8 +6229,8 @@ func (p *CreateSkuResp) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
 
 func (p *CreateSkuResp) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 2)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.SkuID)
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 2)
+	offset += p.SkuInfo.FastWriteNocopy(buf[offset:], w)
 	return offset
 }
 
@@ -6246,7 +6244,7 @@ func (p *CreateSkuResp) field1Length() int {
 func (p *CreateSkuResp) field2Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
+	l += p.SkuInfo.BLength()
 	return l
 }
 

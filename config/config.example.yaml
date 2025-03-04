@@ -64,6 +64,9 @@ rocketmq:
   accessKey: DomTok # 定义于 ./rocketmq/plain_acl.yml
   secretKey: DomTok # 同上
 
+otel:
+  collector-addr: 127.0.0.1:4317
+
 services:
   template:
     name: template
