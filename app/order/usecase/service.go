@@ -147,7 +147,7 @@ func (uc *useCase) DeleteOrder(ctx context.Context, orderID int64) error {
 }
 
 func (uc *useCase) IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error) {
-	return uc.db.IsOrderExist(ctx, orderID)
+	return uc.svc.IsOrderExist(ctx, orderID)
 }
 
 func (uc *useCase) OrderPaymentSuccess(ctx context.Context, req *model.PaymentResult) error {
