@@ -22,11 +22,11 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/schema"
-	"github.com/west2-online/DomTok/app/gateway/model/api/cart"
-	"github.com/west2-online/DomTok/app/gateway/model/model"
 
 	strategy "github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/model"
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/tools"
+	"github.com/west2-online/DomTok/app/gateway/model/api/cart"
+	"github.com/west2-online/DomTok/app/gateway/model/model"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
@@ -40,11 +40,11 @@ type ToolCartPurchaseArgs struct {
 }
 
 type _CartPurchaseBaseOrderGoods struct {
-	MerchantID       int64 `json:"merchant_id" desc:"填入商家ID" required:"true"`
-	GoodsID          int64 `json:"goods_id" desc:"填入商品ID" required:"true"`
-	SkuID            int64 `json:"sku_id" desc:"填入SKU ID" required:"true"`
-	GoodsVersion     int64 `json:"goods_version" desc:"填入商品版本" required:"true"`
-	PurchaseQuantity int64 `json:"purchase_quantity" desc:"填入购买数量" required:"true"`
+	MerchantID       int64 `json:"merchant_id"       desc:"填入商家ID"             required:"true"`
+	GoodsID          int64 `json:"goods_id"          desc:"填入商品ID"             required:"true"`
+	SkuID            int64 `json:"sku_id"            desc:"填入SKU ID"           required:"true"`
+	GoodsVersion     int64 `json:"goods_version"     desc:"填入商品版本"             required:"true"`
+	PurchaseQuantity int64 `json:"purchase_quantity" desc:"填入购买数量"             required:"true"`
 }
 
 var ToolCartPurchaseRequestBody = schema.NewParamsOneOfByParams(*tools.Reflect(ToolCartPurchaseArgs{}))

@@ -25,9 +25,9 @@ import (
 	. "github.com/bytedance/mockey"
 	"github.com/bytedance/sonic"
 	. "github.com/smartystreets/goconvey/convey"
-	"github.com/west2-online/DomTok/app/gateway/model/api/order"
 
 	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
+	"github.com/west2-online/DomTok/app/gateway/model/api/order"
 )
 
 func TestToolOrderList_InvokableRun(t *testing.T) {

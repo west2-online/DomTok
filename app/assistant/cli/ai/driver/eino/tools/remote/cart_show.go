@@ -22,10 +22,10 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/schema"
-	"github.com/west2-online/DomTok/app/gateway/model/api/cart"
 
 	strategy "github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/model"
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/tools"
+	"github.com/west2-online/DomTok/app/gateway/model/api/cart"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
