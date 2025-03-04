@@ -105,7 +105,7 @@ func (svc *CommodityService) UpdateSpuImage(ctx context.Context, spuImage *model
 	eg.Go(func() error {
 		err = svc.db.UpdateSpuImage(ctx, spuImage)
 		if err != nil {
-			return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
+			return fmt.Errorf("service.UpdateSpuImage: update spu failed: %w", err)
 		}
 		return nil
 	})
@@ -134,13 +134,22 @@ func (svc *CommodityService) UpdateSpuImage(ctx context.Context, spuImage *model
 }
 
 func (svc *CommodityService) UpdateSpu(ctx context.Context, spu *model.Spu, originSpu *model.Spu) error {
-	err := svc.db.UpdateSpu(ctx, spu)
-	if err != nil {
-		return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
-	}
+	var eg errgroup.Group
+	eg.Go(func() error {
+		err := svc.db.UpdateSpu(ctx, spu)
+		if err != nil {
+			return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
+		}
+		return nil
+	})
+	eg.Go(func() error {
+		if err := svc.SendUpdateSpuMsg(ctx, spu); err != nil {
+			return fmt.Errorf("service.UpdateSpu: send update spu message failed: %w", err)
+		}
+		return nil
+	})
 
 	if len(spu.GoodsHeadDrawing) > 0 {
-		var eg errgroup.Group
 		eg.Go(func() error {
 			err := upyun.UploadImg(spu.GoodsHeadDrawing, spu.GoodsHeadDrawingUrl)
 			if err != nil {
@@ -156,17 +165,9 @@ func (svc *CommodityService) UpdateSpu(ctx context.Context, spu *model.Spu, orig
 			}
 			return nil
 		})
-
-		eg.Go(func() error {
-			if err := svc.SendUpdateSpuMsg(ctx, spu); err != nil {
-				return fmt.Errorf("service.UpdateSpu: send update spu message failed: %w", err)
-			}
-			return nil
-		})
-
-		if err := eg.Wait(); err != nil {
-			return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
-		}
+	}
+	if err := eg.Wait(); err != nil {
+		return fmt.Errorf("service.UpdateSpu: update spu failed: %w", err)
 	}
 	return nil
 }
