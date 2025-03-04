@@ -24,9 +24,9 @@ import (
 	. "github.com/bytedance/mockey"
 	"github.com/bytedance/sonic"
 	. "github.com/smartystreets/goconvey/convey"
+	"github.com/west2-online/DomTok/app/gateway/model/api/cart"
 
 	"github.com/west2-online/DomTok/app/assistant/cli/server/adapter"
-	"github.com/west2-online/DomTok/app/gateway/model/api/order"
 )
 
 func TestToolCartPurchase_InvokableRun(t *testing.T) {
@@ -47,8 +47,8 @@ func TestToolCartPurchase_InvokableRun(t *testing.T) {
 		PatchConvey("success", func() {
 			mp := map[string]interface{}{}
 			MockValue(&f.getServerCaller).To(func(_ string) adapter.ServerCaller { return fakeServerCaller })
-			Mock((*MockServerCaller).CartPurchase).To(func(_ context.Context, params *order.CreateOrderReq) ([]byte, error) {
-				mp["base_order_goods"] = params.BaseOrderGoods
+			Mock((*MockServerCaller).CartPurchase).To(func(_ context.Context, params *cart.PurChaseCartGoodsRequest) ([]byte, error) {
+				mp["base_order_goods"] = params.CartGoods
 				return nil, nil
 			}).Build()
 
