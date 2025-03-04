@@ -18,7 +18,6 @@ package main
 
 import (
 	"context"
-	"github.com/west2-online/DomTok/pkg/base"
 
 	"github.com/cloudwego/eino-ext/components/model/ark"
 	"github.com/cloudwego/eino/components/model"
@@ -31,6 +30,7 @@ import (
 	"github.com/west2-online/DomTok/app/assistant/service"
 	"github.com/west2-online/DomTok/app/gateway/mw"
 	"github.com/west2-online/DomTok/config"
+	"github.com/west2-online/DomTok/pkg/base"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/utils"
