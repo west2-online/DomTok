@@ -27,7 +27,6 @@ import (
 	"github.com/west2-online/DomTok/pkg/constants"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // paymentDB impl domain.PaymentDB defined domain
@@ -192,16 +191,13 @@ func (db *paymentDB) CreateRefund(ctx context.Context, p *model.PaymentRefund) e
 	p.RefundAmount = paymentOrder.Amount
 	refundOrder, err := ConvertRefundToDBModel(p)
 	if err != nil {
-		logger.Errorf("CreateRefund: failed to convert refund order: %v", err)
 		return errno.Errorf(errno.InternalServiceErrorCode, "CreateRefund: failed to convert refund order: %v", err)
 	}
 
 	// 插入数据库
 	if err = db.client.WithContext(ctx).Create(refundOrder).Error; err != nil {
-		logger.Errorf("CreateRefund: failed to create refund order: %v", err)
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create refund: %v", err)
 	}
-	logger.Infof("CreateRefund: refund order created successfully")
 	return nil
 }
 

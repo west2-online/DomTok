@@ -1,5 +1,4 @@
 namespace go payment
-// TODO 后面来改注释
 include "model.thrift"
 /*
  * struct PaymentTokenRequest 支付令牌请求
