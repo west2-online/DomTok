@@ -23,7 +23,6 @@ import (
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // CreatePayment 这里定义一些具体的方法和函数，比如校验密码，加密密码，创建用户之类的
@@ -34,15 +33,13 @@ func (uc *paymentUseCase) CreatePayment(ctx context.Context, orderID int64) (*mo
 func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (token string, expTime int64, err error) {
 	// 1. 检查订单是否存在
 	// TODO 记得删除注释
-	/*var orderInfo bool
-	orderInfo, err = uc.svc.CheckOrderExist(ctx, orderID)
+	orderInfo, err := uc.svc.CheckOrderExist(ctx, orderID)
 	if err != nil {
 		return "", 0, fmt.Errorf("check order existed failed:%w", err)
 	}
 	if orderInfo == paymentStatus.OrderNotExist {
 		return "", 0, errno.NewErrNo(errno.ServicePaymentOrderNotExist, "order does not exist")
 	}
-	*/
 	// 2. 获取用户id,无需检查用户是否存在
 	// 获取用户id
 	var uid int64
@@ -59,8 +56,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	}
 	if paymentInfo == paymentStatus.PaymentNotExist { // 如果订单不存在
 		// 创建支付订单
-		// TODO 待完善
-		_, err := uc.svc.CreatePaymentInfo(ctx, orderID)
+		_, err = uc.svc.CreatePaymentInfo(ctx, orderID, uid)
 		if err != nil {
 			return "", 0, fmt.Errorf("create payment info failed:%w", err)
 		}
@@ -79,17 +75,14 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	// 4. HMAC生成支付令牌
 	token, expTime, err = uc.svc.GeneratePaymentToken(ctx, orderID)
 	if err != nil {
-		logger.Errorf("Error generating payment token: orderID:%d,err:%v", orderID, err)
 		return "", 0, fmt.Errorf("generate payment token failed:%w", err)
 	}
 	var redisStatus bool
 	// 5. 存储令牌到 Redis
 	redisStatus, err = uc.svc.StorePaymentToken(ctx, token, expTime, uid, orderID)
 	if err != nil && redisStatus != paymentStatus.RedisStoreSuccess {
-		logger.Errorf("Error store payment token: orderID:%d,userID:%d,err:%v", orderID, uid, err)
 		return "", 0, fmt.Errorf("store payment token failed:%w", err)
 	}
-	logger.Infof("Success generating payment token: orderID:%d,token:%s", orderID, token)
 	return token, expTime, nil
 }
 
@@ -97,13 +90,13 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 func (uc *paymentUseCase) CreateRefund(ctx context.Context, orderID int64) (refundStatus int64, refundID int64, err error) {
 	// 1. 检查订单是否存在
 	// TODO记得删除注释
-	/*orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
+	orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
 	if err != nil {
 		return 0, 0, fmt.Errorf("check order existence failed: %w", err)
 	}
 	if !orderExists {
 		return 0, 0, errno.NewErrNo(errno.ServicePaymentOrderNotExist, "order does not exist")
-	}*/
+	}
 	// 2. 获取用户ID
 	uid, err := uc.svc.GetUserID(ctx)
 	if err != nil {
