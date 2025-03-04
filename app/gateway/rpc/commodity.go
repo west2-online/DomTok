@@ -327,6 +327,7 @@ func CreateSkuRPC(ctx context.Context, req *commodity.CreateSkuReq, files [][]by
 	if !utils.IsSuccess(resp.Base) {
 		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
+
 	return resp.SkuInfo, nil
 }
 
@@ -485,6 +486,18 @@ func UploadSkuAttrRPC(ctx context.Context, req *commodity.UploadSkuAttrReq) (err
 		return errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	return nil
+}
+
+func ViewHistoryPriceRPC(ctx context.Context, req *commodity.ViewHistoryPriceReq) (prices []*model.PriceHistory, err error) {
+	resp, err := commodityClient.ViewHistory(ctx, req)
+	if err != nil {
+		logger.Errorf("ViewHistoryPriceRPC: RPC called failed: %v", err.Error())
+		return nil, errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return resp.Records, nil
 }
 
 func CreateCategoryRPC(ctx context.Context, req *commodity.CreateCategoryReq) (int64, error) {

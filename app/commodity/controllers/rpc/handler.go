@@ -573,8 +573,21 @@ func (c CommodityHandler) ViewSkuImage(ctx context.Context, req *commodity.ViewS
 }
 
 func (c CommodityHandler) ViewHistory(ctx context.Context, req *commodity.ViewHistoryPriceReq) (r *commodity.ViewHistoryPriceResp, err error) {
-	// TODO implement me
-	panic("implement me")
+	r = new(commodity.ViewHistoryPriceResp)
+
+	skuPriceHistory := &model.SkuPriceHistory{
+		SkuId: req.SkuID,
+		Id:    req.HistoryID,
+	}
+
+	resp, err := c.useCase.ViewSkuPriceHistory(ctx, skuPriceHistory, req.PageNum, req.PageSize)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.Records = pack.BuildSkuPriceHistory(resp)
+	return
 }
 
 func (c CommodityHandler) DescSkuLockStock(ctx context.Context, req *commodity.DescSkuLockStockReq) (r *commodity.DescSkuLockStockResp, err error) {

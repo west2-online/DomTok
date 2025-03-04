@@ -69,13 +69,14 @@ type CommodityDB interface {
 	IncrLockStockInNX(ctx context.Context, infos []*model.SkuBuyInfo) error
 
 	CreateSku(ctx context.Context, sku *model.Sku) error
-	UpdateSku(ctx context.Context, sku *model.Sku) error
+	UpdateSku(ctx context.Context, sku *model.Sku, originSku *model.Sku) error
 	ViewSku(ctx context.Context, skuIds []*int64, PageNum int, PageSize int) ([]*model.Sku, int64, error)
 	DeleteSku(ctx context.Context, sku *model.Sku) error
 	CreateSkuImage(ctx context.Context, skuImage *model.SkuImage) error
 	UpdateSkuImage(ctx context.Context, skuImage *model.SkuImage) error
 	ViewSkuImage(ctx context.Context, sku *model.Sku, PageNum int, PageSize int) ([]*model.SkuImage, int64, error)
 	DeleteSkuImage(ctx context.Context, imageId int64) error
+	ViewSkuPriceHistory(ctx context.Context, skuPrice *model.SkuPriceHistory, pageNum int, pageSize int) ([]*model.SkuPriceHistory, error)
 	IsSpuExist(ctx context.Context, spuId int64) (bool, error)
 	GetSkuBySkuId(ctx context.Context, skuId int64) (*model.Sku, error)
 	GetSkuImageByImageId(ctx context.Context, imageId int64) (*model.SkuImage, error)
