@@ -37,6 +37,7 @@ type OrderUseCase interface {
 	IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error)
 	OrderPaymentSuccess(ctx context.Context, req *model.PaymentResult) error
 	OrderPaymentCancel(ctx context.Context, req *model.PaymentResult) error
+	GetOrderPaymentAmount(ctx context.Context, orderID int64) (float64, error)
 }
 
 // useCase 实现了 OrderUseCase 接口

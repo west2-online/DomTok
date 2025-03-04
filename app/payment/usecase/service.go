@@ -32,15 +32,14 @@ func (uc *paymentUseCase) CreatePayment(ctx context.Context, orderID int64) (*mo
 
 func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (token string, expTime int64, err error) {
 	// 1. 检查订单是否存在
-	var orderInfo bool
-	orderInfo, err = uc.svc.CheckOrderExist(ctx, orderID)
+	// TODO 记得删除注释
+	orderInfo, err := uc.svc.CheckOrderExist(ctx, orderID)
 	if err != nil {
 		return "", 0, fmt.Errorf("check order existed failed:%w", err)
 	}
 	if orderInfo == paymentStatus.OrderNotExist {
 		return "", 0, errno.NewErrNo(errno.ServicePaymentOrderNotExist, "order does not exist")
 	}
-
 	// 2. 获取用户id,无需检查用户是否存在
 	// 获取用户id
 	var uid int64
@@ -57,7 +56,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 	}
 	if paymentInfo == paymentStatus.PaymentNotExist { // 如果订单不存在
 		// 创建支付订单
-		_, err := uc.svc.CreatePaymentInfo(ctx, orderID)
+		_, err = uc.svc.CreatePaymentInfo(ctx, orderID, uid)
 		if err != nil {
 			return "", 0, fmt.Errorf("create payment info failed:%w", err)
 		}
@@ -90,6 +89,7 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 // CreateRefund 发起退款请求
 func (uc *paymentUseCase) CreateRefund(ctx context.Context, orderID int64) (refundStatus int64, refundID int64, err error) {
 	// 1. 检查订单是否存在
+	// TODO记得删除注释
 	orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
 	if err != nil {
 		return 0, 0, fmt.Errorf("check order existence failed: %w", err)

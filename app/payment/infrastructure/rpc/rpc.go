@@ -81,3 +81,14 @@ func (rpc *paymentRPC) OrderPaymentSuccess(ctx context.Context, orderID int64, p
 	}
 	return nil
 }
+
+func (rpc *paymentRPC) GetOrderPaymentAmount(ctx context.Context, orderID int64) (float64, error) {
+	req := &orderrpc.GetOrderPaymentAmount{
+		OrderID: orderID,
+	}
+	resp, err := rpc.order.GetOrderPaymentAmount(ctx, req)
+	if err = utils.ProcessRpcError("rpc.order.GetOrderPaymentAmount", resp, err); err != nil {
+		return 0, err
+	}
+	return resp.GetAmount(), nil
+}
