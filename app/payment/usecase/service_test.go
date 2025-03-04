@@ -181,6 +181,7 @@ func TestPaymentUseCase_GetPaymentToken(t *testing.T) {
 			mockey.Mock(mockey.GetMethod(uc.db, "GetPaymentInfo")).Return(tc.MockPaymentInfo, tc.MockGetPaymentInfoError).Build()
 			mockey.Mock((*service.PaymentService).GeneratePaymentToken).Return(tc.MockToken, tc.MockExpTime, tc.MockGenTokenError).Build()
 			mockey.Mock((*service.PaymentService).StorePaymentToken).Return(tc.MockRedisStoreStatus, tc.MockStoreTokenError).Build()
+			mockey.Mock((*service.PaymentService).CheckOrderExist).Return(paymentStatus.PaymentExist, nil).Build()
 
 			token, expTime, err := uc.GetPaymentToken(ctx.Background(), orderID)
 			if err != nil && tc.ExpectedError != nil {
@@ -222,7 +223,7 @@ func TestPaymentUseCase_CreateRefund(t *testing.T) {
 			MockTimeValid:            true,
 			ExpectedRefundStatus:     0,
 			ExpectedRefundID:         0,
-			ExpectedError:            errors.New("too many refund requests in a short time"),
+			ExpectedError:            errors.New("check order existence failed: CheckOrderExistError"),
 		},
 		{
 			Name:                     "OrderNotExist",
@@ -235,7 +236,7 @@ func TestPaymentUseCase_CreateRefund(t *testing.T) {
 			MockTimeValid:            true,
 			ExpectedRefundStatus:     0,
 			ExpectedRefundID:         0,
-			ExpectedError:            errors.New("too many refund requests in a short time"),
+			ExpectedError:            errors.New("[4000] order does not exist"),
 		},
 		{
 			Name:                     "GetUserIDError",
