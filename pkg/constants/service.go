@@ -26,6 +26,7 @@ const (
 	PaymentServiceName   = "payment"
 	CommodityServiceName = "commodity"
 	CartServiceName      = "cart"
+	AssistantServiceName = "assistant"
 )
 
 // UserService

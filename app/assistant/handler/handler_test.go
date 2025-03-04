@@ -80,7 +80,7 @@ func TestEntrypoint(t *testing.T) {
 
 func WebsocketHandlerNormalize() {
 	Mock((*app.RequestContext).GetHeader).To(func(key string) []byte {
-		if key == constants.AccessTokenHeader {
+		if key == constants.AuthHeader {
 			return []byte("token")
 		}
 		return []byte("")

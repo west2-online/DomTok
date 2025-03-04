@@ -36,7 +36,7 @@ import (
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
-var serviceName = "assistant"
+var serviceName = constants.AssistantServiceName
 
 func init() {
 	config.Init(serviceName)

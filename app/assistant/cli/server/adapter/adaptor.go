@@ -16,14 +16,22 @@ limitations under the License.
 
 package adapter
 
-import "context"
+import (
+	"context"
+
+	"github.com/west2-online/DomTok/app/gateway/model/api/cart"
+	"github.com/west2-online/DomTok/app/gateway/model/api/order"
+)
 
 // ServerCaller is the interface for calling the server
 // It is used by the AI client to call the server
 // List required methods here
 type ServerCaller interface {
-	// Ping TODO: remove this method
+	// Ping An example method
 	Ping(ctx context.Context) ([]byte, error)
 
-	// TODO: add more methods here
+	CartShow(ctx context.Context, params *cart.ShowCartGoodsListRequest) ([]byte, error)
+	CartPurchase(ctx context.Context, params *cart.PurChaseCartGoodsRequest) ([]byte, error)
+	OrderList(ctx context.Context, params *order.ViewOrderListReq) ([]byte, error)
+	OrderView(ctx context.Context, params *order.ViewOrderReq) ([]byte, error)
 }

@@ -52,6 +52,10 @@ func RebuildTools(caller model.GetServerCaller) {
 // BuildTools builds the tools
 func BuildTools(strategy model.GetServerCaller) []tool.BaseTool {
 	return []tool.BaseTool{
-		remote.Ping(strategy),
+		// remote.Ping(strategy),
+		remote.CartShow(strategy),
+		remote.CartPurchase(strategy),
+		remote.OrderList(strategy),
+		remote.OrderView(strategy),
 	}
 }
