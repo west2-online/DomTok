@@ -162,7 +162,7 @@ func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
 		}
 	}
 
-	if len(spu.GoodsHeadDrawingUrl) > 0 {
+	if len(spu.GoodsHeadDrawing) > 0 {
 		spu.GoodsHeadDrawingUrl = utils.GenerateFileName(constants.SpuDirDest, spu.SpuId)
 	}
 
