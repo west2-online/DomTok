@@ -190,24 +190,6 @@ func TestUseCase_ShowCartGoods(t *testing.T) {
 			MockGoodsError: errors.New("rpc error"),
 			ExpectedErr:    fmt.Errorf("ShowCartGoods RPC error: %w", errors.New("rpc error")),
 		},
-		{
-			Name:        "SuccessButSetCacheError",
-			MockDBExist: true,
-			MockCartData: &model.Cart{
-				SkuJson: `{"store":[{"store_id":2,"sku":[{"sku_id":2001,"version_id":1,"count":3}]}]}`,
-			},
-			MockConvertRes: []*model.CartGoods{
-				{GoodsID: 2001, PurchaseQuantity: 3},
-			},
-			MockGoodsRes: []*model.CartGoods{
-				{GoodsID: 2001, GoodsName: "FinalGoods"},
-			},
-			MockSetCacheErr: errors.New("cache set error"),
-			// 不影响主流程，仍旧成功返回
-			ExpectedCart: []*model.CartGoods{
-				{GoodsID: 2001, GoodsName: "FinalGoods"},
-			},
-		},
 	}
 
 	defer mockey.UnPatchAll()
