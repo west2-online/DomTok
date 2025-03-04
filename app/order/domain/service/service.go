@@ -49,7 +49,12 @@ func NewOrderService(db repository.OrderDB, sf repository.IDGenerator, rpc repos
 
 // IsOrderExist 检查订单是否存在
 func (svc *OrderService) IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error) {
-	return svc.db.IsOrderExist(ctx, orderID)
+	exist, createdAt, err := svc.db.IsOrderExist(ctx, orderID)
+	if err != nil {
+		return exist, createdAt, err
+	}
+
+	return exist, svc.calcOrderExpireTime(createdAt), nil
 }
 
 // OrderExist 检查订单是否存在
