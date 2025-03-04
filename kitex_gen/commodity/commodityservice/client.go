@@ -38,7 +38,7 @@ type Client interface {
 	CreateUserCoupon(ctx context.Context, req *commodity.CreateUserCouponReq, callOptions ...callopt.Option) (r *commodity.CreateUserCouponResp, err error)
 	ViewCoupon(ctx context.Context, req *commodity.ViewCouponReq, callOptions ...callopt.Option) (r *commodity.ViewCouponResp, err error)
 	ViewUserAllCoupon(ctx context.Context, req *commodity.ViewUserAllCouponReq, callOptions ...callopt.Option) (r *commodity.ViewUserAllCouponResp, err error)
-	UseUserCoupon(ctx context.Context, req *commodity.UseUserCouponReq, callOptions ...callopt.Option) (r *commodity.UseUserCouponResp, err error)
+	GetCouponAndPrice(ctx context.Context, req *commodity.GetCouponAndPriceReq, callOptions ...callopt.Option) (r *commodity.GetCouponAndPriceResp, err error)
 	ViewSpu(ctx context.Context, req *commodity.ViewSpuReq, callOptions ...callopt.Option) (r *commodity.ViewSpuResp, err error)
 	DeleteSpu(ctx context.Context, req *commodity.DeleteSpuReq, callOptions ...callopt.Option) (r *commodity.DeleteSpuResp, err error)
 	ViewSpuImage(ctx context.Context, req *commodity.ViewSpuImageReq, callOptions ...callopt.Option) (r *commodity.ViewSpuImageResp, err error)
@@ -174,9 +174,9 @@ func (p *kCommodityServiceClient) ViewUserAllCoupon(ctx context.Context, req *co
 	return p.kClient.ViewUserAllCoupon(ctx, req)
 }
 
-func (p *kCommodityServiceClient) UseUserCoupon(ctx context.Context, req *commodity.UseUserCouponReq, callOptions ...callopt.Option) (r *commodity.UseUserCouponResp, err error) {
+func (p *kCommodityServiceClient) GetCouponAndPrice(ctx context.Context, req *commodity.GetCouponAndPriceReq, callOptions ...callopt.Option) (r *commodity.GetCouponAndPriceResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.UseUserCoupon(ctx, req)
+	return p.kClient.GetCouponAndPrice(ctx, req)
 }
 
 func (p *kCommodityServiceClient) ViewSpu(ctx context.Context, req *commodity.ViewSpuReq, callOptions ...callopt.Option) (r *commodity.ViewSpuResp, err error) {

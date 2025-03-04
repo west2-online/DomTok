@@ -204,8 +204,7 @@ struct BaseOrderGoods {
     2: required i64 goodsID; // 商品 ID
     3: required i64 styleID; // 商品款式 ID
     4: required i64 purchaseQuantity; // 购买数量
-    5: i64 couponID // 优惠券 ID
-    6: required i64 goodsVersion; // 商品历史号
+    5: required i64 goodsVersion; // 商品历史号
 }
 
 /*

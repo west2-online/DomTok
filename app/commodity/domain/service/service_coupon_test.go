@@ -34,142 +34,176 @@ import (
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-// TestCommodityService_CalculateWithCoupon 为 CalculateWithCoupon 接口编写测试
+// TestCommodityService_CalculateWithCoupon 用中文示例:
+// 1. 使用表格驱动(table‐driven)测试
+// 2. 使用 mockey 对依赖进行打桩
+// 3. 如果出错，只校验错误；如果成功，则校验返回值
 func TestCommodityService_CalculateWithCoupon(t *testing.T) {
-	// 定义测试用例结构体
 	type TestCase struct {
 		Name string
-		// 模拟登录数据
+		// 获取登录信息
 		MockLoginUID   int64
 		MockLoginError error
-		// 模拟 db.GetFullUserCouponsByUId 返回
-		MockUserCoupons             []*model.UserCoupon
+		// 模拟 GetFullUserCouponsByUId
+		MockGetFullUserCoupons      []*model.UserCoupon
 		MockGetFullUserCouponsError error
-		// 模拟 svc.GetCouponsByUserCoupons 返回（这里返回的优惠券列表中可能包含过期优惠券）
-		MockCouponList                   []*model.Coupon
+		// 模拟 GetCouponsByUserCoupons
+		MockCoupons                      []*model.Coupon
 		MockGetCouponsByUserCouponsError error
-		// 输入的 spu 列表
-		SpuList []*model.Spu
-		// 模拟 assignCoupons 返回结果
-		MockAssignedMap map[int64]*model.Coupon
-		MockPriceMap    map[int64]float64
-		MockTotalPrice  float64
-		// 模拟 ConvertMapsToAssignedCoupon 返回结果
-		ExpectedAssignedCoupons []*model.AssignedCoupon
-		// 预期的错误
+		// 传入的商品数据
+		OrderGoodsList []*model.OrderGoods
+		// 预期的返回错误
 		ExpectedError error
-		// 预期总价格（仅在无错误时校验）
-		ExpectedTotalPrice float64
+
+		// 如果成功(没有错误)时，需要断言的返回值
+		// 注意：因为你提到错误时会返回 totalPrice=-1，这里只在无错误时断言
+		// 对返回的 goods 进行断言
+		ExpectedGoodsResult []*model.OrderGoods
+		ExpectedTotalPrice  float64
 	}
 
-	// 构造测试用例
 	testCases := []TestCase{
 		{
 			Name:           "登录失败",
 			MockLoginError: errors.New("登录错误"),
-			ExpectedError:  fmt.Errorf("svc.GetCouponByCommoditie get logindata error: %w", errors.New("登录错误")),
+			// 期望最终返回的 error
+			ExpectedError: fmt.Errorf("svc.GetCouponByCommoditie get logindata error: %w", errors.New("登录错误")),
 		},
 		{
 			Name:                        "获取用户优惠券失败",
 			MockLoginUID:                101,
-			MockUserCoupons:             nil,
 			MockGetFullUserCouponsError: errors.New("数据库错误"),
-			ExpectedError:               errno.Errorf(errno.InternalDatabaseErrorCode, "service: failed to get coupons: %v", errors.New("数据库错误")),
+			ExpectedError: errno.Errorf(
+				errno.InternalDatabaseErrorCode,
+				"service: failed to get coupons: %v",
+				errors.New("数据库错误"),
+			),
 		},
 		{
-			Name:                             "获取优惠券列表失败",
+			Name:                             "获取优惠券信息失败",
 			MockLoginUID:                     101,
-			MockUserCoupons:                  []*model.UserCoupon{{CouponId: 1}},
-			MockGetFullUserCouponsError:      nil,
-			MockGetCouponsByUserCouponsError: errors.New("服务错误"),
-			ExpectedError:                    fmt.Errorf("svc.GetCouponByCommodities GetCouponsByUserCoupons error: %w", errors.New("服务错误")),
+			MockGetFullUserCoupons:           []*model.UserCoupon{{CouponId: 1}},
+			MockGetCouponsByUserCouponsError: errors.New("GetCouponsByUserCoupons error"),
+			ExpectedError: fmt.Errorf(
+				"svc.GetCouponByCommodities GetCouponsByUserCoupons error: %w",
+				errors.New("GetCouponsByUserCoupons error"),
+			),
 		},
 		{
-			Name:            "成功匹配优惠券",
-			MockLoginUID:    101,
-			MockLoginError:  nil,
-			MockUserCoupons: []*model.UserCoupon{{CouponId: 1}},
-			// 返回的优惠券列表中包含两个优惠券，其中一个未过期，一个已过期（已过期的会被过滤掉）
-			MockCouponList: []*model.Coupon{
+			Name:         "成功匹配优惠券",
+			MockLoginUID: 101,
+			MockGetFullUserCoupons: []*model.UserCoupon{
+				{CouponId: 1},
+			},
+			// 包含 2 张券：1 张未过期，1 张已过期
+			MockCoupons: []*model.Coupon{
 				{
 					Id:             1,
-					RangeType:      constants.CouponRangeTypeSPU, // 假设此常量在项目中已定义
+					TypeInfo:       constants.CouponTypeSubAmount,
+					RangeType:      constants.CouponRangeTypeSPU,
 					RangeId:        1001,
-					ExpireTime:     time.Now().Add(1 * time.Hour),
-					ConditionCost:  50,
-					DiscountAmount: 10,
+					ExpireTime:     time.Now().Add(1 * time.Hour), // 未过期
+					ConditionCost:  10,
+					DiscountAmount: 5,
 				},
 				{
 					Id:             2,
-					RangeType:      constants.CouponRangeTypeCategory,
-					RangeId:        2001,
-					ExpireTime:     time.Now().Add(-1 * time.Hour),
-					ConditionCost:  30,
-					DiscountAmount: 5,
+					TypeInfo:       constants.CouponTypeSubAmount,
+					RangeType:      constants.CouponRangeTypeSPU,
+					RangeId:        1002,
+					ExpireTime:     time.Now().Add(-1 * time.Hour), // 已过期
+					ConditionCost:  20,
+					DiscountAmount: 10,
 				},
 			},
-			MockGetCouponsByUserCouponsError: nil,
-			// 输入的商品列表：一个 SPUId 为 1001、CategoryId 随意；另一个 SPUId 为 1002
-			SpuList: []*model.Spu{
-				{SpuId: 1001, CategoryId: 3001, Price: 60},
-				{SpuId: 1002, CategoryId: 2001, Price: 40},
+			OrderGoodsList: []*model.OrderGoods{
+				// 其中第一个 GoodsId 正好和 RangeId=1001 匹配
+				{GoodsId: 1001, TotalAmount: 30, FreightAmount: 5, PurchaseQuantity: 1},
+				// 第二个 GoodsId=1002 对应的优惠券已过期
+				{GoodsId: 1002, TotalAmount: 40, FreightAmount: 5, PurchaseQuantity: 1},
 			},
-			// 模拟 assignCoupons 返回，假设只有第一个商品匹配到优惠券，计算折后价格为 55，而第二个商品无优惠
-			MockAssignedMap: map[int64]*model.Coupon{
-				1001: {Id: 1, RangeType: constants.CouponRangeTypeSPU, RangeId: 1001, ConditionCost: 50, DiscountAmount: 10},
+			// 无错误
+			ExpectedError: nil,
+			// 返回时，假设第一件商品 (GoodsId=1001) 被优惠 5 块，所以优惠后是 25 + 运费5 = 30
+			// 第二件商品 (GoodsId=1002) 没有优惠券可用或可用券已过期，所以最终=40 + 5 =45
+			// 因此 totalPrice=30+45=75
+			ExpectedGoodsResult: []*model.OrderGoods{
+				{
+					GoodsId:          1002,
+					CouponId:         0,
+					CouponName:       "",
+					TotalAmount:      40,
+					FreightAmount:    5,
+					DiscountAmount:   45,
+					PurchaseQuantity: 1,
+					SinglePrice:      45,
+				},
+				{
+					GoodsId:          1001,
+					CouponId:         1,
+					CouponName:       "", // 下面会 mock assignCouponsAndPrice 设置，如果需要可进一步模拟
+					TotalAmount:      30,
+					FreightAmount:    5,
+					DiscountAmount:   30, // 优惠后+运费
+					PurchaseQuantity: 1,
+					SinglePrice:      30, // 此处 = DiscountAmount / PurchaseQuantity
+				},
 			},
-			MockPriceMap: map[int64]float64{
-				1001: 55,
-				1002: 40,
-			},
-			MockTotalPrice: 95,
-			ExpectedAssignedCoupons: []*model.AssignedCoupon{
-				{SpuId: 1001, Coupon: &model.Coupon{
-					Id: 1, RangeType: constants.CouponRangeTypeSPU,
-					RangeId: 1001, ConditionCost: 50, DiscountAmount: 10,
-				}, DiscountedPrice: 55},
-			},
-			ExpectedError:      nil,
-			ExpectedTotalPrice: 95,
+			ExpectedTotalPrice: 75,
 		},
 	}
 
 	defer mockey.UnPatchAll()
 	for _, tc := range testCases {
 		mockey.PatchConvey(tc.Name, t, func() {
-			// 模拟获取登录数据
-			mockey.Mock(contextLogin.GetLoginData).Return(tc.MockLoginUID, tc.MockLoginError).Build()
+			// 1. mock 登录信息
+			mockey.Mock(contextLogin.GetLoginData).
+				Return(tc.MockLoginUID, tc.MockLoginError).
+				Build()
 
-			// 构造一个 db 对象并模拟 GetFullUserCouponsByUId
+			// 2. mock 数据库操作
+			//    这里先用一个假的 gormDB 生成 db
 			db := mysql.NewCommodityDB(new(gorm.DB))
-			mockey.Mock(mockey.GetMethod(db, "GetFullUserCouponsByUId")).Return(tc.MockUserCoupons, tc.MockGetFullUserCouponsError).Build()
+			// 模拟 GetFullUserCouponsByUId
+			mockey.
+				Mock(mockey.GetMethod(db, "GetFullUserCouponsByUId")).
+				Return(tc.MockGetFullUserCoupons, tc.MockGetFullUserCouponsError).
+				Build()
 
-			// 创建一个 CommodityService 对象，并将 db 注入
-			svc := new(CommodityService)
-			svc.db = db
-
-			// 模拟 svc.GetCouponsByUserCoupons 方法返回优惠券列表
-			mockey.Mock((*CommodityService).GetCouponsByUserCoupons).Return(tc.MockCouponList, tc.MockGetCouponsByUserCouponsError).Build()
-
-			// 模拟 assignCoupons 方法，返回预设的 assignedMap、priceMap 和 totalPrice
-			mockey.Mock((*CommodityService).assignCoupons).Return(tc.MockAssignedMap, tc.MockPriceMap, tc.MockTotalPrice).Build()
-
-			// 模拟 ConvertMapsToAssignedCoupon 函数，返回预期的 AssignedCoupon 列表
-			mockey.Mock(model.ConvertMapsToAssignedCoupon).Return(tc.ExpectedAssignedCoupons).Build()
-
-			// 调用 CalculateWithCoupon 方法
-			assignedCoupons, totalPrice, err := svc.CalculateWithCoupon(context.Background(), tc.SpuList)
-			if err != nil && tc.ExpectedError != nil {
-				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
-			} else {
-				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+			// 3. 新建 CommodityService 并替换其 db
+			svc := &CommodityService{
+				db: db,
 			}
 
-			// 如果没有错误，再对返回的优惠券列表和总价格进行校验
-			if err == nil {
-				convey.So(assignedCoupons, convey.ShouldResemble, tc.ExpectedAssignedCoupons)
-				convey.So(totalPrice, convey.ShouldEqual, tc.ExpectedTotalPrice)
+			// mock svc.GetCouponsByUserCoupons
+			mockey.
+				Mock((*CommodityService).GetCouponsByUserCoupons).
+				Return(tc.MockCoupons, tc.MockGetCouponsByUserCouponsError).
+				Build()
+
+			// 注意：如果 assignCouponsAndPrice 也需要 mock，你可以在这里再进行处理
+			// 比如你想完全控制最后返回的 goods 和 totalPrice，你可以 mock:
+			// mockey.Mock((*CommodityService).assignCouponsAndPrice).
+			//     Return(tc.ExpectedGoodsResult, tc.ExpectedTotalPrice).
+			//     Build()
+			// 不过上面你也可以直接依赖真实逻辑，以测试真实行为。
+
+			// 调用目标方法
+			goodsResult, totalPrice, err := svc.CalculateWithCoupon(context.Background(), tc.OrderGoodsList)
+
+			// 如果出错，就只判断错误，不断言返回值
+			if err != nil || tc.ExpectedError != nil {
+				if err != nil && tc.ExpectedError != nil {
+					convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+				} else {
+					convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+				}
+				return
 			}
+
+			// 没有错误时，断言结果
+			convey.So(goodsResult, convey.ShouldResemble, tc.ExpectedGoodsResult)
+			convey.So(totalPrice, convey.ShouldEqual, tc.ExpectedTotalPrice)
 		})
 	}
 }
