@@ -233,6 +233,11 @@ with-env-test-nowait:
     	export $(EtcdAddrEnv)=$(EtcdAddr) ;\
     	make test
 
+.PHONY: with-env-up
+with-env-up-%:
+	    export $(EnvironmentStartEnv)=$(EnvironmentStartFlag) ;\
+      	export $(EtcdAddrEnv)=$(EtcdAddr) ;\
+      	cd ${DIR}/app/$*/infrastructure && go test -v ./...
 
 # 手动暴露环境变量
 #export DOMTOK_ENVIRONMENT_STARTED=true
