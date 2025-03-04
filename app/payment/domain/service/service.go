@@ -30,7 +30,6 @@ import (
 	loginData "github.com/west2-online/DomTok/pkg/base/context"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 // CreatePaymentInfo sf可以生成id,详见user/domain/service/service.go
@@ -85,7 +84,6 @@ func (svc *PaymentService) CheckOrderExist(ctx context.Context, orderID int64) (
 func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int64) (token string, expirationTime int64, err error) {
 	// 1. 设定过期时间为15分钟后, 即现在时间加上15分钟之后的秒级时间戳
 	expirationTime = time.Now().Add(paymentStatus.ExpirationDuration).Unix()
-	logger.Infof("Generating payment token, orderID: %d, expirationTime: %d", orderID, expirationTime)
 	// 2. 获取 HMAC 密钥（可以从环境变量或配置文件获取）
 	secretKey := []byte(paymentStatus.PaymentSecretKey)
 
@@ -93,13 +91,11 @@ func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int
 	h := hmac.New(sha256.New, secretKey)
 	_, err = h.Write([]byte(fmt.Sprintf("%d:%d", orderID, expirationTime)))
 	if err != nil {
-		logger.Infof("failed to generate payment HMAC token, orderID: %d, expirationTime: %d", orderID, expirationTime)
 		return "", 0, fmt.Errorf("failed to generate payment HMAC token: %w", err)
 	}
 
 	// 4. 生成十六进制编码的 HMAC 签名
 	token = hex.EncodeToString(h.Sum(nil))
-	// logger.Infof("Generated payment HAMC token successfully, orderID: %d, expirationTime: %d", orderID, expirationTime)
 	// 5. 返回令牌和过期时间
 	return token, expirationTime, nil
 }
@@ -110,10 +106,8 @@ func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, 
 	// 这个expiration是expTime减去当前时间，得到的是过期剩余时间（如900s）
 	// 这样可以防止“直接用paymentStatus.ExpirationTime存redis的参数的话，
 	// 如果StorePaymentToken执行时expTime早就过期了，仍然会存15min”的bug
-	// TODO 我不知道是不是这样的，因为我感觉两个函数执行时间基本上只差几十毫秒，不可能出现这样的情况吧，但想想又有道理
 	expirationDuration := time.Until(time.Unix(expTime, 0))
 	if expirationDuration <= 0 {
-		logger.Warnf("Token expiration time has already passed: orderID: %d, userID: %d", orderID, userID)
 		return paymentStatus.RedisStoreFailed, fmt.Errorf("cannot store token: expiration time has already passed")
 	}
 	// 2. 构造 Redis Key
@@ -121,7 +115,6 @@ func (svc *PaymentService) StorePaymentToken(ctx context.Context, token string, 
 	// 3. 存储到 Redis
 	err := svc.redis.SetPaymentToken(ctx, redisKey, token, expirationDuration)
 	if err != nil {
-		logger.Infof("failed to store payment token in redis, orderID: %d, userID: %d", orderID, userID)
 		return paymentStatus.RedisStoreFailed, fmt.Errorf("failed to store payment token in redis: %w", err)
 	} // 4. 返回成功状态码
 	return paymentStatus.RedisStoreSuccess, nil
@@ -188,53 +181,6 @@ func (svc *PaymentService) GetPaymentStatusMsg(code int8) string {
 func (svc *PaymentService) GetRefundStatusMsg(code int8) string {
 	return paymentStatus.GetRefundStatus(code)
 }
-
-/*func (svc *PaymentService) GenerateRefundToken(ctx context.Context, refundID int64) (string, int64, error) {
-	// 1. 设定过期时间（15 分钟后）
-	expirationTime := time.Now().Add(paymentStatus.RefundExpirationDuration).Unix()
-	logger.Infof("Generating refund token, refundID: %d, expirationTime: %d", refundID, expirationTime)
-
-	// 2. 获取 HMAC 密钥
-	secretKey := []byte(paymentStatus.RefundSecretKey)
-
-	// 3. 计算 HMAC-SHA256 哈希
-	h := hmac.New(sha256.New, secretKey)
-	_, err := h.Write([]byte(fmt.Sprintf("%d:%d", refundID, expirationTime)))
-	if err != nil {
-		logger.Infof("failed to generate refund HMAC token, refundID: %d, expirationTime: %d", refundID, expirationTime)
-		return "", 0, fmt.Errorf("failed to generate refund HMAC token: %w", err)
-	}
-
-	// 4. 生成十六进制编码的 HMAC 签名
-	token := hex.EncodeToString(h.Sum(nil))
-	// logger.Infof("Generated refund HMAC token successfully, refundID: %d, expirationTime: %d", refundID, expirationTime)
-
-	// 5. 返回令牌和过期时间
-	return token, expirationTime, nil
-}
-
-func (svc *PaymentService) StoreRefundToken(ctx context.Context, token string, expTime int64, userID int64, refundID int64) (bool, error) {
-	// 1. 计算剩余过期时间
-	expirationDuration := time.Until(time.Unix(expTime, 0))
-	if expirationDuration <= 0 {
-		logger.Warnf("Token expiration time has already passed: refundID: %d, userID: %d", refundID, userID)
-		return paymentStatus.RedisStoreFailed, fmt.Errorf("cannot store refund token: expiration time has already passed")
-	}
-
-	// 2. 构造 Redis Key
-	redisKey := fmt.Sprintf("refund_token:%d:%d", userID, refundID)
-
-	// 3. 存储到 Redis
-	err := svc.redis.SetRefundToken(ctx, redisKey, token, expirationDuration)
-	if err != nil {
-		logger.Infof("failed to store refund token in redis, refundID: %d, userID: %d", refundID, userID)
-		return paymentStatus.RedisStoreFailed, fmt.Errorf("failed to store refund token in redis: %w", err)
-	}
-
-	// 4. 返回成功状态码
-	return paymentStatus.RedisStoreSuccess, nil
-}
-*/
 
 func (svc *PaymentService) CheckAdminPermission(_ context.Context, uid int64) (bool, error) {
 	return uid == 1, nil
