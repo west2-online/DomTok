@@ -19,7 +19,6 @@ package mysql
 import (
 	"context"
 	"errors"
-	"log"
 
 	"gorm.io/gorm"
 
