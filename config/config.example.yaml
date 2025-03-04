@@ -10,6 +10,7 @@ server:
   version: "1.0"
   name: "DomTok"
   log-level: "INFO" # OPTIONS: TRACE, DEBUG, INFO(default), NOTICE, WARN, ERROR, FATAL
+  intranet-url: "" # 网关地址
 
 defaultUser:
   account: ""
