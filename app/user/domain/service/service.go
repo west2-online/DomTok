@@ -49,3 +49,19 @@ func (svc *UserService) CreateUser(ctx context.Context, u *model.User) (int64, e
 	}
 	return uid, nil
 }
+
+func (svc *UserService) GetAddress(ctx context.Context, addressID int64) (address *model.Address, err error) {
+	address, err = svc.db.GetAddressInfo(ctx, addressID)
+	if err != nil {
+		return nil, fmt.Errorf("domain.svc.GetAddress failed: %w", err)
+	}
+	return address, nil
+}
+
+func (svc *UserService) AddAddress(ctx context.Context, address *model.Address) (addressID int64, err error) {
+	addressID, err = svc.db.CreateAddress(ctx, address)
+	if err != nil {
+		return 0, fmt.Errorf("domain.svc.AddAddress failed: %w", err)
+	}
+	return addressID, nil
+}

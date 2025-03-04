@@ -34,7 +34,8 @@ const (
 
 const (
 	UserTableName       = "users"
-	CategoryTableName   = "category"
+	AddressTableName    = "address"
+	CategoryTableName   = "categories"
 	OrderTableName      = "orders"
 	OrderGoodsTableName = "order_goods"
 	SpuTableName        = "spu_info"

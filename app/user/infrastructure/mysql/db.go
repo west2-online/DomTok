@@ -45,7 +45,7 @@ func (db *userDB) CreateUser(ctx context.Context, u *model.User) (int64, error) 
 		Email:    u.Email,
 	}
 
-	if err := db.client.WithContext(ctx).Create(&user).Error; err != nil {
+	if err := db.client.WithContext(ctx).Table(User{}.TableName()).Create(&user).Error; err != nil {
 		return -1, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create user: %v", err)
 	}
 
@@ -54,7 +54,7 @@ func (db *userDB) CreateUser(ctx context.Context, u *model.User) (int64, error) 
 
 func (db *userDB) IsUserExist(ctx context.Context, username string) (bool, error) {
 	var user User
-	err := db.client.WithContext(ctx).Where("username = ?", username).First(&user).Error
+	err := db.client.WithContext(ctx).Table(User{}.TableName()).Where("username = ?", username).First(&user).Error
 	if err != nil {
 		// 这里虽然是数据库返回的 err 不为 nil,
 		// 但这显然是业务上的错误, 而不是我们服务本身的
@@ -86,4 +86,38 @@ func (db *userDB) GetUserInfo(ctx context.Context, username string) (*model.User
 	}
 
 	return resp, nil
+}
+
+func (db *userDB) GetAddressInfo(ctx context.Context, addressID int64) (*model.Address, error) {
+	var address Address
+	err := db.client.WithContext(ctx).Table(Address{}.TableName()).Where("id = ?", addressID).First(&address).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errno.Errorf(errno.AddressNotExist, "mysql: address not exist")
+		}
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query address: %v", err)
+	}
+
+	resp := &model.Address{
+		AddressID: address.ID,
+		Province:  address.Province,
+		City:      address.City,
+		Detail:    address.Detail,
+	}
+
+	return resp, nil
+}
+
+func (db *userDB) CreateAddress(ctx context.Context, address *model.Address) (int64, error) {
+	addr := Address{
+		Province: address.Province,
+		City:     address.City,
+		Detail:   address.Detail,
+	}
+
+	if err := db.client.WithContext(ctx).Table(Address{}.TableName()).Create(&addr).Error; err != nil {
+		return -1, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create address: %v", err)
+	}
+
+	return addr.ID, nil
 }

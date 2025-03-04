@@ -29,4 +29,6 @@ type UserDB interface {
 	IsUserExist(ctx context.Context, username string) (bool, error)
 	CreateUser(ctx context.Context, user *model.User) (int64, error)
 	GetUserInfo(ctx context.Context, username string) (*model.User, error)
+	GetAddressInfo(ctx context.Context, addressID int64) (*model.Address, error)
+	CreateAddress(ctx context.Context, address *model.Address) (int64, error)
 }

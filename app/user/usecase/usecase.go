@@ -28,6 +28,8 @@ import (
 type UserUseCase interface {
 	RegisterUser(ctx context.Context, user *model.User) (uid int64, err error)
 	Login(ctx context.Context, user *model.User) (*model.User, error)
+	GetAddress(ctx context.Context, addressID int64) (*model.Address, error)
+	AddAddress(ctx context.Context, address *model.Address) (addressID int64, err error)
 }
 
 // useCase 实现了 domain.UserUseCase

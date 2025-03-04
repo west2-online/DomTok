@@ -45,6 +45,20 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"GetAddress": kitex.NewMethodInfo(
+		getAddressHandler,
+		newUserServiceGetAddressArgs,
+		newUserServiceGetAddressResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"AddAddress": kitex.NewMethodInfo(
+		addAddressHandler,
+		newUserServiceAddAddressArgs,
+		newUserServiceAddAddressResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -147,6 +161,42 @@ func newUserServiceLoginResult() interface{} {
 	return user.NewUserServiceLoginResult()
 }
 
+func getAddressHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceGetAddressArgs)
+	realResult := result.(*user.UserServiceGetAddressResult)
+	success, err := handler.(user.UserService).GetAddress(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceGetAddressArgs() interface{} {
+	return user.NewUserServiceGetAddressArgs()
+}
+
+func newUserServiceGetAddressResult() interface{} {
+	return user.NewUserServiceGetAddressResult()
+}
+
+func addAddressHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceAddAddressArgs)
+	realResult := result.(*user.UserServiceAddAddressResult)
+	success, err := handler.(user.UserService).AddAddress(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceAddAddressArgs() interface{} {
+	return user.NewUserServiceAddAddressArgs()
+}
+
+func newUserServiceAddAddressResult() interface{} {
+	return user.NewUserServiceAddAddressResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -172,6 +222,26 @@ func (p *kClient) Login(ctx context.Context, req *user.LoginRequest) (r *user.Lo
 	_args.Req = req
 	var _result user.UserServiceLoginResult
 	if err = p.c.Call(ctx, "Login", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetAddress(ctx context.Context, req *user.GetAddressRequest) (r *user.GetAddressResponse, err error) {
+	var _args user.UserServiceGetAddressArgs
+	_args.Req = req
+	var _result user.UserServiceGetAddressResult
+	if err = p.c.Call(ctx, "GetAddress", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) AddAddress(ctx context.Context, req *user.AddAddressRequest) (r *user.AddAddressResponse, err error) {
+	var _args user.UserServiceAddAddressArgs
+	_args.Req = req
+	var _result user.UserServiceAddAddressResult
+	if err = p.c.Call(ctx, "AddAddress", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

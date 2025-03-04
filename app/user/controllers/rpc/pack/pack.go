@@ -17,14 +17,26 @@ limitations under the License.
 package pack
 
 import (
-	model2 "github.com/west2-online/DomTok/app/user/domain/model"
+	domainModel "github.com/west2-online/DomTok/app/user/domain/model"
 	"github.com/west2-online/DomTok/kitex_gen/model"
 )
 
 // BuildUser 将 entities 定义的 User 实体转换成 idl 定义的 RPC 交流实体，类似 dto
-func BuildUser(u *model2.User) *model.UserInfo {
+func BuildUser(u *domainModel.User) *model.UserInfo {
 	return &model.UserInfo{
 		UserId: u.Uid,
 		Name:   u.UserName,
+	}
+}
+
+func BuildAddress(address *domainModel.Address) *model.AddressInfo {
+	if address == nil {
+		return nil
+	}
+	return &model.AddressInfo{
+		AddressID: address.AddressID,
+		Province:  address.Province,
+		City:      address.City,
+		Detail:    address.Detail,
 	}
 }

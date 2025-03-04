@@ -10,6 +10,13 @@ struct UserInfo {
     2: string name,
 }
 
+struct AddressInfo {
+    1: string province
+    2: string city
+    3: string detail // 具体地址信息
+    4: i64 addressID
+}
+
 struct LoginData {
     1: i64 userId,
 }

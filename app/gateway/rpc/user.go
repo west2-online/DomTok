@@ -71,3 +71,37 @@ func LoginRPC(ctx context.Context, req *user.LoginRequest) (response *api.LoginR
 
 	return response, nil
 }
+
+func GetAddressRPC(ctx context.Context, req *user.GetAddressRequest) (response *api.GetAddressResponse, err error) {
+	resp, err := userClient.GetAddress(ctx, req)
+	if err != nil {
+		logger.Errorf("GetAddressRPC: RPC called failed: %v", err.Error())
+		return nil, errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+
+	response = &api.GetAddressResponse{
+		Address: &model.AddressInfo{
+			AddressID: resp.Address.AddressID,
+			Province:  resp.Address.Province,
+			City:      resp.Address.City,
+			Detail:    resp.Address.Detail,
+		},
+	}
+
+	return response, nil
+}
+
+func AddAddressRPC(ctx context.Context, req *user.AddAddressRequest) (addressID int64, err error) {
+	resp, err := userClient.AddAddress(ctx, req)
+	if err != nil {
+		logger.Errorf("AddAddressRPC: RPC called failed: %v", err.Error())
+		return 0, errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return 0, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return resp.AddressID, nil
+}

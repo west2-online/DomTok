@@ -85,3 +85,47 @@ func Login(ctx context.Context, c *app.RequestContext) {
 
 	pack.RespData(c, resp)
 }
+
+// GetAddress .
+// @router api/v1/user/address [GET]
+func GetAddress(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req user.GetAddressRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	resp := new(api.GetAddressResponse)
+	resp, err = rpc.GetAddressRPC(ctx, &user.GetAddressRequest{AddressId: req.AddressId})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, resp.Address)
+}
+
+// AddAddress .
+// @router api/v1/user/address [POST]
+func AddAddress(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req user.AddAddressRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	resp := new(api.AddAddressResponse)
+	resp.AddressID, err = rpc.AddAddressRPC(ctx, &user.AddAddressRequest{
+		Province: req.Province,
+		City:     req.City,
+		Detail:   req.Detail,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, resp.AddressID)
+}

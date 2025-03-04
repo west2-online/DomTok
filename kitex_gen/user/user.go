@@ -382,10 +382,313 @@ var fieldIDToName_LoginResponse = map[int16]string{
 	2: "user",
 }
 
+type GetAddressRequest struct {
+	AddressId int64 `thrift:"address_id,1,required" frugal:"1,required,i64" json:"address_id"`
+}
+
+func NewGetAddressRequest() *GetAddressRequest {
+	return &GetAddressRequest{}
+}
+
+func (p *GetAddressRequest) InitDefault() {
+}
+
+func (p *GetAddressRequest) GetAddressId() (v int64) {
+	return p.AddressId
+}
+func (p *GetAddressRequest) SetAddressId(val int64) {
+	p.AddressId = val
+}
+
+func (p *GetAddressRequest) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetAddressRequest(%+v)", *p)
+}
+
+func (p *GetAddressRequest) DeepEqual(ano *GetAddressRequest) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.AddressId) {
+		return false
+	}
+	return true
+}
+
+func (p *GetAddressRequest) Field1DeepEqual(src int64) bool {
+
+	if p.AddressId != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_GetAddressRequest = map[int16]string{
+	1: "address_id",
+}
+
+type GetAddressResponse struct {
+	Base    *model.BaseResp    `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+	Address *model.AddressInfo `thrift:"address,2,optional" frugal:"2,optional,model.AddressInfo" json:"address,omitempty"`
+}
+
+func NewGetAddressResponse() *GetAddressResponse {
+	return &GetAddressResponse{}
+}
+
+func (p *GetAddressResponse) InitDefault() {
+}
+
+var GetAddressResponse_Base_DEFAULT *model.BaseResp
+
+func (p *GetAddressResponse) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return GetAddressResponse_Base_DEFAULT
+	}
+	return p.Base
+}
+
+var GetAddressResponse_Address_DEFAULT *model.AddressInfo
+
+func (p *GetAddressResponse) GetAddress() (v *model.AddressInfo) {
+	if !p.IsSetAddress() {
+		return GetAddressResponse_Address_DEFAULT
+	}
+	return p.Address
+}
+func (p *GetAddressResponse) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+func (p *GetAddressResponse) SetAddress(val *model.AddressInfo) {
+	p.Address = val
+}
+
+func (p *GetAddressResponse) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *GetAddressResponse) IsSetAddress() bool {
+	return p.Address != nil
+}
+
+func (p *GetAddressResponse) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetAddressResponse(%+v)", *p)
+}
+
+func (p *GetAddressResponse) DeepEqual(ano *GetAddressResponse) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Address) {
+		return false
+	}
+	return true
+}
+
+func (p *GetAddressResponse) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+func (p *GetAddressResponse) Field2DeepEqual(src *model.AddressInfo) bool {
+
+	if !p.Address.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_GetAddressResponse = map[int16]string{
+	1: "base",
+	2: "address",
+}
+
+type AddAddressRequest struct {
+	Province string `thrift:"province,1,required" frugal:"1,required,string" json:"province"`
+	City     string `thrift:"city,2,required" frugal:"2,required,string" json:"city"`
+	Detail   string `thrift:"detail,3,required" frugal:"3,required,string" json:"detail"`
+}
+
+func NewAddAddressRequest() *AddAddressRequest {
+	return &AddAddressRequest{}
+}
+
+func (p *AddAddressRequest) InitDefault() {
+}
+
+func (p *AddAddressRequest) GetProvince() (v string) {
+	return p.Province
+}
+
+func (p *AddAddressRequest) GetCity() (v string) {
+	return p.City
+}
+
+func (p *AddAddressRequest) GetDetail() (v string) {
+	return p.Detail
+}
+func (p *AddAddressRequest) SetProvince(val string) {
+	p.Province = val
+}
+func (p *AddAddressRequest) SetCity(val string) {
+	p.City = val
+}
+func (p *AddAddressRequest) SetDetail(val string) {
+	p.Detail = val
+}
+
+func (p *AddAddressRequest) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AddAddressRequest(%+v)", *p)
+}
+
+func (p *AddAddressRequest) DeepEqual(ano *AddAddressRequest) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Province) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.City) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Detail) {
+		return false
+	}
+	return true
+}
+
+func (p *AddAddressRequest) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.Province, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddAddressRequest) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.City, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddAddressRequest) Field3DeepEqual(src string) bool {
+
+	if strings.Compare(p.Detail, src) != 0 {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_AddAddressRequest = map[int16]string{
+	1: "province",
+	2: "city",
+	3: "detail",
+}
+
+type AddAddressResponse struct {
+	Base      *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+	AddressID int64           `thrift:"addressID,2,required" frugal:"2,required,i64" json:"addressID"`
+}
+
+func NewAddAddressResponse() *AddAddressResponse {
+	return &AddAddressResponse{}
+}
+
+func (p *AddAddressResponse) InitDefault() {
+}
+
+var AddAddressResponse_Base_DEFAULT *model.BaseResp
+
+func (p *AddAddressResponse) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return AddAddressResponse_Base_DEFAULT
+	}
+	return p.Base
+}
+
+func (p *AddAddressResponse) GetAddressID() (v int64) {
+	return p.AddressID
+}
+func (p *AddAddressResponse) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+func (p *AddAddressResponse) SetAddressID(val int64) {
+	p.AddressID = val
+}
+
+func (p *AddAddressResponse) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *AddAddressResponse) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AddAddressResponse(%+v)", *p)
+}
+
+func (p *AddAddressResponse) DeepEqual(ano *AddAddressResponse) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.AddressID) {
+		return false
+	}
+	return true
+}
+
+func (p *AddAddressResponse) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+func (p *AddAddressResponse) Field2DeepEqual(src int64) bool {
+
+	if p.AddressID != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_AddAddressResponse = map[int16]string{
+	1: "base",
+	2: "addressID",
+}
+
 type UserService interface {
 	Register(ctx context.Context, req *RegisterRequest) (r *RegisterResponse, err error)
 
 	Login(ctx context.Context, req *LoginRequest) (r *LoginResponse, err error)
+
+	GetAddress(ctx context.Context, req *GetAddressRequest) (r *GetAddressResponse, err error)
+
+	AddAddress(ctx context.Context, req *AddAddressRequest) (r *AddAddressResponse, err error)
 }
 
 type UserServiceRegisterArgs struct {
@@ -617,5 +920,237 @@ func (p *UserServiceLoginResult) Field0DeepEqual(src *LoginResponse) bool {
 }
 
 var fieldIDToName_UserServiceLoginResult = map[int16]string{
+	0: "success",
+}
+
+type UserServiceGetAddressArgs struct {
+	Req *GetAddressRequest `thrift:"req,1" frugal:"1,default,GetAddressRequest" json:"req"`
+}
+
+func NewUserServiceGetAddressArgs() *UserServiceGetAddressArgs {
+	return &UserServiceGetAddressArgs{}
+}
+
+func (p *UserServiceGetAddressArgs) InitDefault() {
+}
+
+var UserServiceGetAddressArgs_Req_DEFAULT *GetAddressRequest
+
+func (p *UserServiceGetAddressArgs) GetReq() (v *GetAddressRequest) {
+	if !p.IsSetReq() {
+		return UserServiceGetAddressArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *UserServiceGetAddressArgs) SetReq(val *GetAddressRequest) {
+	p.Req = val
+}
+
+func (p *UserServiceGetAddressArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *UserServiceGetAddressArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceGetAddressArgs(%+v)", *p)
+}
+
+func (p *UserServiceGetAddressArgs) DeepEqual(ano *UserServiceGetAddressArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceGetAddressArgs) Field1DeepEqual(src *GetAddressRequest) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceGetAddressArgs = map[int16]string{
+	1: "req",
+}
+
+type UserServiceGetAddressResult struct {
+	Success *GetAddressResponse `thrift:"success,0,optional" frugal:"0,optional,GetAddressResponse" json:"success,omitempty"`
+}
+
+func NewUserServiceGetAddressResult() *UserServiceGetAddressResult {
+	return &UserServiceGetAddressResult{}
+}
+
+func (p *UserServiceGetAddressResult) InitDefault() {
+}
+
+var UserServiceGetAddressResult_Success_DEFAULT *GetAddressResponse
+
+func (p *UserServiceGetAddressResult) GetSuccess() (v *GetAddressResponse) {
+	if !p.IsSetSuccess() {
+		return UserServiceGetAddressResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *UserServiceGetAddressResult) SetSuccess(x interface{}) {
+	p.Success = x.(*GetAddressResponse)
+}
+
+func (p *UserServiceGetAddressResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *UserServiceGetAddressResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceGetAddressResult(%+v)", *p)
+}
+
+func (p *UserServiceGetAddressResult) DeepEqual(ano *UserServiceGetAddressResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceGetAddressResult) Field0DeepEqual(src *GetAddressResponse) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceGetAddressResult = map[int16]string{
+	0: "success",
+}
+
+type UserServiceAddAddressArgs struct {
+	Req *AddAddressRequest `thrift:"req,1" frugal:"1,default,AddAddressRequest" json:"req"`
+}
+
+func NewUserServiceAddAddressArgs() *UserServiceAddAddressArgs {
+	return &UserServiceAddAddressArgs{}
+}
+
+func (p *UserServiceAddAddressArgs) InitDefault() {
+}
+
+var UserServiceAddAddressArgs_Req_DEFAULT *AddAddressRequest
+
+func (p *UserServiceAddAddressArgs) GetReq() (v *AddAddressRequest) {
+	if !p.IsSetReq() {
+		return UserServiceAddAddressArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *UserServiceAddAddressArgs) SetReq(val *AddAddressRequest) {
+	p.Req = val
+}
+
+func (p *UserServiceAddAddressArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *UserServiceAddAddressArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceAddAddressArgs(%+v)", *p)
+}
+
+func (p *UserServiceAddAddressArgs) DeepEqual(ano *UserServiceAddAddressArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceAddAddressArgs) Field1DeepEqual(src *AddAddressRequest) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceAddAddressArgs = map[int16]string{
+	1: "req",
+}
+
+type UserServiceAddAddressResult struct {
+	Success *AddAddressResponse `thrift:"success,0,optional" frugal:"0,optional,AddAddressResponse" json:"success,omitempty"`
+}
+
+func NewUserServiceAddAddressResult() *UserServiceAddAddressResult {
+	return &UserServiceAddAddressResult{}
+}
+
+func (p *UserServiceAddAddressResult) InitDefault() {
+}
+
+var UserServiceAddAddressResult_Success_DEFAULT *AddAddressResponse
+
+func (p *UserServiceAddAddressResult) GetSuccess() (v *AddAddressResponse) {
+	if !p.IsSetSuccess() {
+		return UserServiceAddAddressResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *UserServiceAddAddressResult) SetSuccess(x interface{}) {
+	p.Success = x.(*AddAddressResponse)
+}
+
+func (p *UserServiceAddAddressResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *UserServiceAddAddressResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceAddAddressResult(%+v)", *p)
+}
+
+func (p *UserServiceAddAddressResult) DeepEqual(ano *UserServiceAddAddressResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceAddAddressResult) Field0DeepEqual(src *AddAddressResponse) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceAddAddressResult = map[int16]string{
 	0: "success",
 }
