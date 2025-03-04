@@ -433,7 +433,6 @@ func (c *commodityDB) DecrStockInNX(ctx context.Context, infos []*model.SkuBuyIn
 			if stock < info.Count || stock <= 0 {
 				return errno.Errorf(errno.InsufficientStockErrorCode, "mysql: not enough  stock to decrease (available: %d, requested: %d)", stock, info.Count)
 			}
-			log.Println(s)
 			if lockStock > stock || lockStock <= 0 || lockStock-info.Count < 0 {
 				return errno.Errorf(errno.InsufficientStockErrorCode, "mysql: not enough  stock to decrease, lockStock = %d, stock = %d", lockStock, stock)
 			}
