@@ -18,6 +18,7 @@ package main
 
 import (
 	"context"
+	"github.com/west2-online/DomTok/pkg/base"
 	"net"
 
 	"github.com/cloudwego/kitex/pkg/limit"
@@ -55,7 +56,7 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Payment: resolve tcp addr failed, err: %v", err)
 	}
-	p := middleware.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
+	p := base.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
 	defer func() { logger.LogError(p.Shutdown(context.Background())) }()
 
 	svr := paymentservice.NewServer(
