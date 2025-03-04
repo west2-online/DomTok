@@ -185,21 +185,27 @@ func (db *commodityDB) GetFullUserCouponsByUId(ctx context.Context, uid int64) (
 }
 
 func (db *commodityDB) DeleteUserCoupon(ctx context.Context, coupon *model.UserCoupon) error {
-	dbModel := &UserCoupon{
-		Uid:      coupon.Uid,
-		CouponId: coupon.CouponId,
-	}
-	if err := db.client.WithContext(ctx).First(dbModel).Error; err != nil {
+	dbModel := &UserCoupon{}
+	err := db.client.WithContext(ctx).
+		Where("uid = ? AND coupon_id = ?", coupon.Uid, coupon.CouponId).
+		First(dbModel).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: user coupon not found")
+		}
 		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to find user coupon: %v", err)
 	}
-	dbModel.RemainingUses--
-	if dbModel.RemainingUses == 0 {
-		if err := db.client.WithContext(ctx).Delete(dbModel).Error; err != nil {
-			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete user coupon: %v", err)
+
+	if dbModel.RemainingUses > 1 {
+		dbModel.RemainingUses--
+		if err := db.client.WithContext(ctx).Where("uid = ? AND coupon_id = ?", coupon.Uid, coupon.CouponId).Save(dbModel).Error; err != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to save user coupon: %v", err)
 		}
 	} else {
-		if err := db.client.WithContext(ctx).Save(dbModel).Error; err != nil {
-			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to save user coupon: %v", err)
+		if err := db.client.WithContext(ctx).
+			Where("uid = ? AND coupon_id = ?", coupon.Uid, coupon.CouponId).
+			Delete(&UserCoupon{}).Error; err != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete user coupon: %v", err)
 		}
 	}
 	return nil
