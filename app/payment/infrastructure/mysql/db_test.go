@@ -18,11 +18,15 @@ package mysql
 
 import (
 	"context"
+	"errors"
 	"math/rand/v2"
 	"testing"
 
+	"github.com/bytedance/mockey"
 	"github.com/shopspring/decimal"
 	. "github.com/smartystreets/goconvey/convey"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	"github.com/west2-online/DomTok/app/payment/domain/repository"
@@ -200,6 +204,220 @@ func TestConvertFunctions(t *testing.T) {
 
 			// 测试传入nil
 			dbModel, err = ConvertRefundToDBModel(nil)
+			So(err, ShouldNotBeNil)
+			So(dbModel, ShouldBeNil)
+		})
+	})
+}
+
+func _ResetTables(models ...schema.Tabler) {
+	for _, m := range models {
+		tableName := m.TableName()
+		err := _paymentDB.(*paymentDB).client.Exec("TRUNCATE TABLE " + tableName).Error //nolint:forcetypeassert
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func TestPaymentDB_UpdatePaymentStatus(t *testing.T) {
+	if !initConfig() {
+		return
+	}
+
+	ctx := context.Background()
+	paymentOrder := buildTestModelPaymentOrder(t)
+	paymentOrder.Status = constants.PaymentStatusPendingCode
+
+	Convey("TestPaymentDB_UpdatePaymentStatus", t, func() {
+		_ResetTables(PaymentOrder{})
+		err := _paymentDB.CreatePayment(ctx, paymentOrder)
+		So(err, ShouldBeNil)
+		err = _paymentDB.UpdatePaymentStatus(ctx, paymentOrder.OrderID, constants.PaymentStatusSuccessCode)
+		So(err, ShouldBeNil)
+		newOrder, err := _paymentDB.GetPaymentInfo(ctx, paymentOrder.OrderID)
+		So(err, ShouldBeNil)
+		paymentOrder.Status = constants.PaymentStatusSuccessCode
+		So(paymentOrder.Amount.Equal(newOrder.Amount), ShouldBeTrue)
+		paymentOrder.Amount = newOrder.Amount // To avoid the amount's precise doesn't match but the value is the same
+		So(newOrder, ShouldResemble, paymentOrder)
+	})
+}
+
+func TestPaymentDB_UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction(t *testing.T) {
+	if !initConfig() {
+		return
+	}
+
+	ctx := context.Background()
+	paymentOrder := buildTestModelPaymentOrder(t)
+	paymentOrder.Status = constants.PaymentStatusPendingCode
+
+	defer mockey.UnPatchAll()
+
+	Convey("TestPaymentDB_UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction", t, func() {
+		Convey("TestPaymentDB_UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction Success", func() {
+			_ResetTables(PaymentOrder{}, PaymentLedger{})
+			err := _paymentDB.CreatePayment(ctx, paymentOrder)
+			So(err, ShouldBeNil)
+			err = _paymentDB.UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction(ctx, paymentOrder)
+			So(err, ShouldBeNil)
+			newOrder, err := _paymentDB.GetPaymentInfo(ctx, paymentOrder.OrderID)
+			So(err, ShouldBeNil)
+			paymentOrder.Status = constants.PaymentStatusSuccessCode
+			So(paymentOrder.Amount.Equal(newOrder.Amount), ShouldBeTrue)
+			paymentOrder.Amount = newOrder.Amount // To avoid the amount's precise doesn't match but the value is the same
+			So(newOrder, ShouldResemble, paymentOrder)
+			err = _paymentDB.(*paymentDB).client.First(&PaymentLedger{}, "reference_id = ?", paymentOrder.ID).Error //nolint:forcetypeassert
+			So(errors.Is(err, gorm.ErrRecordNotFound), ShouldBeFalse)
+			So(err, ShouldBeNil)
+		})
+
+		Convey("TestPaymentDB_UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction Fail", func() {
+			_ResetTables(PaymentOrder{}, PaymentLedger{})
+			mockey.Mock(ConvertLedgerToDBModel).Return(nil, errors.New("error")).Build()
+			err := _paymentDB.CreatePayment(ctx, paymentOrder)
+			So(err, ShouldBeNil)
+			err = _paymentDB.UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction(ctx, paymentOrder)
+			So(err, ShouldNotBeNil)
+			err = _paymentDB.(*paymentDB).client.First(&PaymentLedger{}, "reference_id = ?", paymentOrder.ID).Error //nolint:forcetypeassert
+			So(errors.Is(err, gorm.ErrRecordNotFound), ShouldBeTrue)
+			order, err := _paymentDB.GetPaymentInfo(ctx, paymentOrder.OrderID)
+			So(err, ShouldBeNil)
+			So(order.Amount.Equal(paymentOrder.Amount), ShouldBeTrue)
+			order.Amount = paymentOrder.Amount // To avoid the amount's precise doesn't match but the value is the same
+			So(order, ShouldResemble, paymentOrder)
+		})
+	})
+}
+
+func TestPaymentDB_GetRefundInfoByOrderID(t *testing.T) {
+	if !initConfig() {
+		return
+	}
+
+	ctx := context.Background()
+	paymentOrder := buildTestModelPaymentOrder(t)
+	refundOrder := buildTestModelPaymentRefund(t, paymentOrder.OrderID)
+
+	Convey("TestPaymentDB_GetRefundInfoByOrderID", t, func() {
+		Convey("TestPaymentDB_GetRefundInfoByOrderID Success", func() {
+			_ResetTables(PaymentOrder{}, PaymentRefund{})
+			err := _paymentDB.CreatePayment(ctx, paymentOrder)
+			So(err, ShouldBeNil)
+			err = _paymentDB.CreateRefund(ctx, refundOrder)
+			So(err, ShouldBeNil)
+			newRefund, err := _paymentDB.GetRefundInfoByOrderID(ctx, refundOrder.OrderID)
+			So(err, ShouldBeNil)
+			So(newRefund.RefundAmount.Equal(refundOrder.RefundAmount), ShouldBeTrue)
+			refundOrder.RefundAmount = newRefund.RefundAmount // To avoid the amount's precise doesn't match but the value is the same
+			So(newRefund, ShouldResemble, refundOrder)
+		})
+	})
+}
+
+func TestPaymentDB_UpdateRefundStatusByOrderIDAndStatus(t *testing.T) {
+	if !initConfig() {
+		return
+	}
+
+	ctx := context.Background()
+	paymentOrder := buildTestModelPaymentOrder(t)
+	refundOrder := buildTestModelPaymentRefund(t, paymentOrder.OrderID)
+
+	Convey("TestPaymentDB_UpdateRefundStatusByOrderIDAndStatus", t, func() {
+		Convey("TestPaymentDB_UpdateRefundStatusByOrderIDAndStatus Success", func() {
+			_ResetTables(PaymentOrder{}, PaymentRefund{})
+			err := _paymentDB.CreatePayment(ctx, paymentOrder)
+			So(err, ShouldBeNil)
+			err = _paymentDB.CreateRefund(ctx, refundOrder)
+			So(err, ShouldBeNil)
+			err = _paymentDB.UpdateRefundStatusByOrderIDAndStatus(ctx, refundOrder.OrderID, constants.RefundStatusPendingCode, constants.RefundStatusSuccessCode)
+			So(err, ShouldBeNil)
+			newRefund, err := _paymentDB.GetRefundInfoByOrderID(ctx, refundOrder.OrderID)
+			So(err, ShouldBeNil)
+			So(newRefund.RefundAmount.Equal(refundOrder.RefundAmount), ShouldBeTrue)
+			refundOrder.RefundAmount = newRefund.RefundAmount // To avoid the amount's precise doesn't match but the value is the same
+			refundOrder.Status = constants.RefundStatusSuccessCode
+			So(newRefund, ShouldResemble, refundOrder)
+		})
+	})
+}
+
+func TestPaymentDB_UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction(t *testing.T) {
+	if !initConfig() {
+		return
+	}
+
+	ctx := context.Background()
+	paymentOrder := buildTestModelPaymentOrder(t)
+	refundOrder := buildTestModelPaymentRefund(t, paymentOrder.OrderID)
+
+	defer mockey.UnPatchAll()
+
+	Convey("TestPaymentDB_UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction", t, func() {
+		Convey("TestPaymentDB_UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction Success", func() {
+			_ResetTables(PaymentOrder{}, PaymentRefund{}, PaymentLedger{})
+			err := _paymentDB.CreatePayment(ctx, paymentOrder)
+			So(err, ShouldBeNil)
+			err = _paymentDB.CreateRefund(ctx, refundOrder)
+			So(err, ShouldBeNil)
+			err = _paymentDB.UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction(ctx, refundOrder)
+			So(err, ShouldBeNil)
+			newRefund, err := _paymentDB.GetRefundInfoByOrderID(ctx, refundOrder.OrderID)
+			So(err, ShouldBeNil)
+			So(newRefund.RefundAmount.Equal(refundOrder.RefundAmount), ShouldBeTrue)
+			refundOrder.RefundAmount = newRefund.RefundAmount // To avoid the amount's precise doesn't match but the value is the same
+			refundOrder.Status = constants.RefundStatusSuccessCode
+			So(newRefund, ShouldResemble, refundOrder)
+			err = _paymentDB.(*paymentDB).client.First(&PaymentLedger{}, "reference_id = ?", refundOrder.ID).Error //nolint:forcetypeassert
+			So(errors.Is(err, gorm.ErrRecordNotFound), ShouldBeFalse)
+			So(err, ShouldBeNil)
+		})
+
+		Convey("TestPaymentDB_UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction Fail", func() {
+			_ResetTables(PaymentOrder{}, PaymentRefund{}, PaymentLedger{})
+			mockey.Mock(ConvertLedgerToDBModel).Return(nil, errors.New("error")).Build()
+			err := _paymentDB.CreatePayment(ctx, paymentOrder)
+			So(err, ShouldBeNil)
+			err = _paymentDB.CreateRefund(ctx, refundOrder)
+			So(err, ShouldBeNil)
+			err = _paymentDB.UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction(ctx, refundOrder)
+			So(err, ShouldNotBeNil)
+			err = _paymentDB.(*paymentDB).client.First(&PaymentLedger{}, "reference_id = ?", refundOrder.ID).Error //nolint:forcetypeassert
+			So(errors.Is(err, gorm.ErrRecordNotFound), ShouldBeTrue)
+			newRefund, err := _paymentDB.GetRefundInfoByOrderID(ctx, refundOrder.OrderID)
+			So(err, ShouldBeNil)
+			So(newRefund.RefundAmount.Equal(refundOrder.RefundAmount), ShouldBeTrue)
+			refundOrder.RefundAmount = newRefund.RefundAmount // To avoid the amount's precise doesn't match but the value is the same
+			So(newRefund, ShouldResemble, refundOrder)
+		})
+	})
+}
+
+func TestConvertLedgerToDBModel(t *testing.T) {
+	Convey("TestConvertLedgerToDBModel", t, func() {
+		Convey("TestConvertLedgerToDBModel Success", func() {
+			ledger := &model.PaymentLedger{
+				ID:              rand.Int64(),
+				ReferenceID:     rand.Int64(),
+				UserID:          rand.Int64(),
+				Amount:          decimal.NewFromFloat(100.50),
+				TransactionType: constants.LedgerTransactionTypePaymentCode,
+				Status:          constants.LedgerStatusSuccessCode,
+			}
+			dbModel, err := ConvertLedgerToDBModel(ledger)
+			So(err, ShouldBeNil)
+			So(dbModel.ID, ShouldEqual, ledger.ID)
+			So(dbModel.ReferenceID, ShouldEqual, ledger.ReferenceID)
+			So(dbModel.UserID, ShouldEqual, ledger.UserID)
+			So(dbModel.Amount.Equal(ledger.Amount), ShouldBeTrue)
+			So(dbModel.TransactionType, ShouldEqual, ledger.TransactionType)
+			So(dbModel.Status, ShouldEqual, ledger.Status)
+		})
+
+		Convey("TestConvertLedgerToDBModel Fail", func() {
+			dbModel, err := ConvertLedgerToDBModel(nil)
 			So(err, ShouldNotBeNil)
 			So(dbModel, ShouldBeNil)
 		})

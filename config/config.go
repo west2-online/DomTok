@@ -42,6 +42,7 @@ var (
 	Volcengine    *volcengine
 	Upyun         *upyun
 	Rocketmq      *rocketmq
+	Otel          *otel
 	runtimeViper  = viper.New()
 )
 
@@ -106,6 +107,7 @@ func configMapping(srv string) {
 	Upyun = &c.Upyun
 	Rocketmq = &c.Rocketmq
 	Service = getService(srv)
+	Otel = &c.Otel
 }
 
 func getService(name string) *service {
