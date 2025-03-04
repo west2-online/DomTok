@@ -128,6 +128,62 @@ func (rpc *orderRpcImpl) DescSkuStock(ctx context.Context, stock *model.OrderSto
 	return nil
 }
 
+// CalcOrderGoodsPrice 通过 coupon 的接口计算订单商品的最终价格
+func (rpc *orderRpcImpl) CalcOrderGoodsPrice(ctx context.Context, goods []*model.OrderGoods) ([]*model.OrderGoods, error) {
+	rpcOrderGoods := lo.Map(goods, func(g *model.OrderGoods, index int) *kmodel.OrderGoods {
+		return &kmodel.OrderGoods{
+			OrderId:            g.OrderID,
+			MerchantId:         g.MerchantID,
+			GoodsId:            g.GoodsID,
+			GoodsName:          g.GoodsName,
+			StyleId:            g.StyleID,
+			StyleName:          g.StyleName,
+			GoodsVersion:       g.GoodsVersion,
+			StyleHeadDrawing:   g.StyleHeadDrawing,
+			OriginPrice:        utils.DecimalFloat64(&g.OriginPrice),
+			SalePrice:          utils.DecimalFloat64(&g.SalePrice),
+			SingleFreightPrice: utils.DecimalFloat64(&g.SingleFreightPrice),
+			PurchaseQuantity:   g.PurchaseQuantity,
+			TotalAmount:        utils.DecimalFloat64(&g.TotalAmount),
+			FreightAmount:      utils.DecimalFloat64(&g.FreightAmount),
+			DiscountAmount:     utils.DecimalFloat64(&g.DiscountAmount),
+			PaymentAmount:      utils.DecimalFloat64(&g.PaymentAmount),
+			SinglePrice:        utils.DecimalFloat64(&g.SinglePrice),
+			CouponId:           g.CouponId,
+			CouponName:         g.CouponName,
+		}
+	})
+
+	resp, err := rpc.commodity.GetCouponAndPrice(ctx, &commodity.GetCouponAndPriceReq{GoodsList: rpcOrderGoods})
+	if err = utils.ProcessRpcError("commodity.GetCouponAndPrice", resp, err); err != nil {
+		return nil, err
+	}
+
+	return lo.Map(resp.AssignedGoodsList, func(item *kmodel.OrderGoods, index int) *model.OrderGoods {
+		return &model.OrderGoods{
+			OrderID:            item.OrderId,
+			MerchantID:         item.MerchantId,
+			GoodsID:            item.GoodsId,
+			GoodsName:          item.GoodsName,
+			StyleID:            item.StyleId,
+			StyleName:          item.StyleName,
+			GoodsVersion:       item.GoodsVersion,
+			StyleHeadDrawing:   item.StyleHeadDrawing,
+			OriginPrice:        decimal.NewFromFloat(item.OriginPrice),
+			SalePrice:          decimal.NewFromFloat(item.SalePrice),
+			SingleFreightPrice: decimal.NewFromFloat(item.SingleFreightPrice),
+			PurchaseQuantity:   item.PurchaseQuantity,
+			TotalAmount:        decimal.NewFromFloat(item.TotalAmount),
+			FreightAmount:      decimal.NewFromFloat(item.FreightAmount),
+			DiscountAmount:     decimal.NewFromFloat(item.DiscountAmount),
+			PaymentAmount:      decimal.NewFromFloat(item.PaymentAmount),
+			SinglePrice:        decimal.NewFromFloat(item.SinglePrice),
+			CouponId:           item.CouponId,
+			CouponName:         item.CouponName,
+		}
+	}), nil
+}
+
 func stockToSkuBuyInfo(stocks *model.OrderStock) []*kmodel.SkuBuyInfo {
 	return lo.Map(stocks.Stocks, func(item *model.Stock, index int) *kmodel.SkuBuyInfo {
 		return &kmodel.SkuBuyInfo{

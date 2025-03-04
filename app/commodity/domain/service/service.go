@@ -621,6 +621,7 @@ func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku, ext 
 		if err := svc.db.CreateSku(ctx, sku); err != nil {
 			return fmt.Errorf("service.CreateSku: create sku failed: %w", err)
 		}
+		svc.Cached(ctx, []*model.SkuBuyInfo{{SkuID: sku.SkuID}})
 		return nil
 	})
 
@@ -634,6 +635,7 @@ func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku, ext 
 	if err := eg.Wait(); err != nil {
 		return nil, err
 	}
+
 	s := &model.Sku{
 		SkuID:     sku.SkuID,
 		CreatorID: sku.CreatorID,

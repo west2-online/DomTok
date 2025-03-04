@@ -55,6 +55,7 @@ type RPC interface {
 	WithholdSkuStock(ctx context.Context, stocks *model.OrderStock) error
 	RollbackSkuStock(ctx context.Context, stocks *model.OrderStock) error
 	DescSkuStock(ctx context.Context, stocks *model.OrderStock) error
+	CalcOrderGoodsPrice(ctx context.Context, goods []*model.OrderGoods) ([]*model.OrderGoods, error)
 }
 
 type Cache interface {

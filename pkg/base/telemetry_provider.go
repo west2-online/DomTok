@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package middleware
+package base
 
 import "github.com/kitex-contrib/obs-opentelemetry/provider"
 
