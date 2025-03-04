@@ -513,9 +513,8 @@ var fieldIDToName_RefundTokenResponse = map[int16]string{
 }
 
 type RefundRequest struct {
-	OrderID      int64   `thrift:"orderID,1,required" frugal:"1,required,i64" json:"orderID"`
-	RefundAmount float64 `thrift:"refundAmount,2,required" frugal:"2,required,double" json:"refundAmount"`
-	RefundReason string  `thrift:"refundReason,3,required" frugal:"3,required,string" json:"refundReason"`
+	OrderID      int64  `thrift:"orderID,1,required" frugal:"1,required,i64" json:"orderID"`
+	RefundReason string `thrift:"refundReason,2,required" frugal:"2,required,string" json:"refundReason"`
 }
 
 func NewRefundRequest() *RefundRequest {
@@ -529,18 +528,11 @@ func (p *RefundRequest) GetOrderID() (v int64) {
 	return p.OrderID
 }
 
-func (p *RefundRequest) GetRefundAmount() (v float64) {
-	return p.RefundAmount
-}
-
 func (p *RefundRequest) GetRefundReason() (v string) {
 	return p.RefundReason
 }
 func (p *RefundRequest) SetOrderID(val int64) {
 	p.OrderID = val
-}
-func (p *RefundRequest) SetRefundAmount(val float64) {
-	p.RefundAmount = val
 }
 func (p *RefundRequest) SetRefundReason(val string) {
 	p.RefundReason = val
@@ -562,10 +554,7 @@ func (p *RefundRequest) DeepEqual(ano *RefundRequest) bool {
 	if !p.Field1DeepEqual(ano.OrderID) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.RefundAmount) {
-		return false
-	}
-	if !p.Field3DeepEqual(ano.RefundReason) {
+	if !p.Field2DeepEqual(ano.RefundReason) {
 		return false
 	}
 	return true
@@ -578,14 +567,7 @@ func (p *RefundRequest) Field1DeepEqual(src int64) bool {
 	}
 	return true
 }
-func (p *RefundRequest) Field2DeepEqual(src float64) bool {
-
-	if p.RefundAmount != src {
-		return false
-	}
-	return true
-}
-func (p *RefundRequest) Field3DeepEqual(src string) bool {
+func (p *RefundRequest) Field2DeepEqual(src string) bool {
 
 	if strings.Compare(p.RefundReason, src) != 0 {
 		return false
@@ -595,8 +577,7 @@ func (p *RefundRequest) Field3DeepEqual(src string) bool {
 
 var fieldIDToName_RefundRequest = map[int16]string{
 	1: "orderID",
-	2: "refundAmount",
-	3: "refundReason",
+	2: "refundReason",
 }
 
 type RefundResponse struct {
