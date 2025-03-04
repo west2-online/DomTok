@@ -31,7 +31,7 @@ type ServerCaller interface {
 	Ping(ctx context.Context) ([]byte, error)
 
 	CartShow(ctx context.Context, params *cart.ShowCartGoodsListRequest) ([]byte, error)
-	OrderCreate(ctx context.Context, params *order.CreateOrderReq) ([]byte, error)
+	CartPurchase(ctx context.Context, params *cart.PurChaseCartGoodsRequest) ([]byte, error)
 	OrderList(ctx context.Context, params *order.ViewOrderListReq) ([]byte, error)
 	OrderView(ctx context.Context, params *order.ViewOrderReq) ([]byte, error)
 }

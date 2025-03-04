@@ -26,24 +26,30 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol"
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/west2-online/DomTok/app/gateway/model/api/cart"
-	"github.com/west2-online/DomTok/app/gateway/model/api/order"
 	"github.com/west2-online/DomTok/app/gateway/model/model"
 )
 
-func TestClient_OrderCreate(t *testing.T) {
+func TestClient_CartPurchase(t *testing.T) {
 	c := &Client{}
-	PatchConvey("HTTP Client.OrderCreate", t, func() {
+	PatchConvey("HTTP Client.CartPurchase", t, func() {
 		PatchConvey("success resp", func() {
 			Mock((*Client).do).To(func(ctx context.Context, req *protocol.Request, resp *protocol.Response) error {
 				resp.SetBody(req.Body())
 				return nil
 			}).Build()
 
-			req := &order.CreateOrderReq{
-				AddressID:      1,
-				BaseOrderGoods: []*model.BaseOrderGoods{{}},
+			req := &cart.PurChaseCartGoodsRequest{
+				CartGoods: []*model.CartGoods{
+					{
+						MerchantId:       1,
+						GoodsId:          2,
+						SkuId:            3,
+						GoodsVersion:     4,
+						PurchaseQuantity: 5,
+					},
+				},
 			}
-			resp, err := c.OrderCreate(context.Background(), req)
+			resp, err := c.CartPurchase(context.Background(), req)
 			expect, _ := sonic.Marshal(req)
 			So(err, ShouldBeNil)
 			So(string(resp), ShouldEqual, string(expect))
@@ -54,7 +60,7 @@ func TestClient_OrderCreate(t *testing.T) {
 				return errors.ErrTimeout
 			}).Build()
 
-			_, err := c.CartShow(context.Background(), &cart.ShowCartGoodsListRequest{})
+			_, err := c.CartPurchase(context.Background(), &cart.PurChaseCartGoodsRequest{})
 			So(err, ShouldEqual, errors.ErrTimeout)
 		})
 	})

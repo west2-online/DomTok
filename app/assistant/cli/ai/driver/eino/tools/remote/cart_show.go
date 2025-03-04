@@ -31,7 +31,7 @@ import (
 
 const (
 	ToolCartShowName = "show_cart"
-	ToolCartShowDesc = "当用户想查看购物车或想要从购物车下单时，可以使用此工具"
+	ToolCartShowDesc = "当用户想查看购物车或从购物车下单时，可以使用此工具"
 )
 
 type ToolCartShowArgs struct {

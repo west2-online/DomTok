@@ -22,7 +22,7 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/schema"
-	"github.com/west2-online/DomTok/app/gateway/model/api/order"
+	"github.com/west2-online/DomTok/app/gateway/model/api/cart"
 	"github.com/west2-online/DomTok/app/gateway/model/model"
 
 	strategy "github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/model"
@@ -31,49 +31,47 @@ import (
 )
 
 const (
-	ToolOrderCreateName = "create_order"
-	ToolOrderCreateDesc = "当用户想要下单时，可以使用此工具，目前只支持从购物车下单"
+	ToolCartPurchaseName = "cart_purchase"
+	ToolCartPurchaseDesc = "当用户想要下单时，可以使用此工具。从购物车中购买商品，需要购物车中的商品信息(调用Tool: show_cart)"
 )
 
-type ToolOrderCreateArgs struct {
-	AddressID      int64                        `json:"address_id" desc:"填入用户地址ID" required:"true"`
-	BaseOrderGoods []_OrderCreateBaseOrderGoods `json:"base_order_goods" desc:"填入订单商品信息" required:"true"`
+type ToolCartPurchaseArgs struct {
+	BaseOrderGoods []_CartPurchaseBaseOrderGoods `json:"base_order_goods" desc:"填入订单商品信息" required:"true"`
 }
 
-type _OrderCreateBaseOrderGoods struct {
+type _CartPurchaseBaseOrderGoods struct {
 	MerchantID       int64 `json:"merchant_id" desc:"填入商家ID" required:"true"`
 	GoodsID          int64 `json:"goods_id" desc:"填入商品ID" required:"true"`
 	SkuID            int64 `json:"sku_id" desc:"填入SKU ID" required:"true"`
-	GoodsVersionID   int64 `json:"goods_version_id" desc:"填入商品版本ID" required:"true"`
+	GoodsVersion     int64 `json:"goods_version" desc:"填入商品版本" required:"true"`
 	PurchaseQuantity int64 `json:"purchase_quantity" desc:"填入购买数量" required:"true"`
 }
 
-var ToolOrderCreateRequestBody = schema.NewParamsOneOfByParams(*tools.Reflect(ToolOrderCreateArgs{}))
+var ToolCartPurchaseRequestBody = schema.NewParamsOneOfByParams(*tools.Reflect(ToolCartPurchaseArgs{}))
 
-type ToolOrderCreate struct {
+type ToolCartPurchase struct {
 	tool.InvokableTool
 
 	getServerCaller strategy.GetServerCaller
 }
 
-func OrderCreate(strategy strategy.GetServerCaller) *ToolOrderCreate {
-	return &ToolOrderCreate{
+func CartPurchase(strategy strategy.GetServerCaller) *ToolCartPurchase {
+	return &ToolCartPurchase{
 		getServerCaller: strategy,
 	}
 }
 
-func (t *ToolOrderCreate) InvokableRun(ctx context.Context, argumentsInJSON string, opts ...tool.Option) (string, error) {
-	s := t.getServerCaller(ToolOrderCreateName)
+func (t *ToolCartPurchase) InvokableRun(ctx context.Context, argumentsInJSON string, opts ...tool.Option) (string, error) {
+	s := t.getServerCaller(ToolCartPurchaseName)
 	if s == nil {
 		return "", errno.NewErrNoWithStack(errno.InternalServiceErrorCode, "server is nil")
 	}
-	params := &ToolOrderCreateArgs{}
+	params := &ToolCartPurchaseArgs{}
 	if err := sonic.Unmarshal([]byte(argumentsInJSON), params); err != nil {
 		return "", errno.NewErrNoWithStack(errno.InternalServiceErrorCode, "unmarshal arguments failed")
 	}
-	resp, err := s.OrderCreate(ctx, &order.CreateOrderReq{
-		AddressID:      params.AddressID,
-		BaseOrderGoods: ConvertArgsOrderGoodsToRequestGoods(params.BaseOrderGoods...),
+	resp, err := s.CartPurchase(ctx, &cart.PurChaseCartGoodsRequest{
+		CartGoods: ConvertArgsOrderGoodsToRequestGoods(params.BaseOrderGoods...),
 	})
 	if err != nil {
 		return err.Error(), nil //nolint: nilerr
@@ -82,25 +80,26 @@ func (t *ToolOrderCreate) InvokableRun(ctx context.Context, argumentsInJSON stri
 	return string(resp), nil
 }
 
-func (t *ToolOrderCreate) Info(_ context.Context) (*schema.ToolInfo, error) {
+func (t *ToolCartPurchase) Info(_ context.Context) (*schema.ToolInfo, error) {
 	return &schema.ToolInfo{
-		Name:        ToolOrderCreateName,
-		Desc:        ToolOrderCreateDesc,
-		ParamsOneOf: ToolOrderCreateRequestBody,
+		Name:        ToolCartPurchaseName,
+		Desc:        ToolCartPurchaseDesc,
+		ParamsOneOf: ToolCartPurchaseRequestBody,
 	}, nil
 }
 
-func (b *_OrderCreateBaseOrderGoods) ToRequestGoods() *model.BaseOrderGoods {
-	return &model.BaseOrderGoods{
-		MerchantID:       b.MerchantID,
-		GoodsID:          b.GoodsID,
-		GoodsVersion:     b.GoodsVersionID,
+func (b *_CartPurchaseBaseOrderGoods) ToRequestGoods() *model.CartGoods {
+	return &model.CartGoods{
+		MerchantId:       b.MerchantID,
+		GoodsId:          b.GoodsID,
+		SkuId:            b.SkuID,
+		GoodsVersion:     b.GoodsVersion,
 		PurchaseQuantity: b.PurchaseQuantity,
 	}
 }
 
-func ConvertArgsOrderGoodsToRequestGoods(gs ..._OrderCreateBaseOrderGoods) []*model.BaseOrderGoods {
-	res := make([]*model.BaseOrderGoods, len(gs))
+func ConvertArgsOrderGoodsToRequestGoods(gs ..._CartPurchaseBaseOrderGoods) []*model.CartGoods {
+	res := make([]*model.CartGoods, len(gs))
 	for i, g := range gs {
 		res[i] = g.ToRequestGoods()
 	}

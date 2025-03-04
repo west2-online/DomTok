@@ -18,7 +18,6 @@ package eino
 
 import (
 	"github.com/cloudwego/eino/components/tool"
-
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/model"
 	"github.com/west2-online/DomTok/app/assistant/cli/ai/driver/eino/tools/remote"
 )
@@ -52,8 +51,9 @@ func RebuildTools(caller model.GetServerCaller) {
 // BuildTools builds the tools
 func BuildTools(strategy model.GetServerCaller) []tool.BaseTool {
 	return []tool.BaseTool{
+		//remote.Ping(strategy),
 		remote.CartShow(strategy),
-		remote.OrderCreate(strategy),
+		remote.CartPurchase(strategy),
 		remote.OrderList(strategy),
 		remote.OrderView(strategy),
 	}

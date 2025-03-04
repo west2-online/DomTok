@@ -22,23 +22,23 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/cloudwego/hertz/pkg/protocol"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/west2-online/DomTok/app/gateway/model/api/order"
+	"github.com/west2-online/DomTok/app/gateway/model/api/cart"
 )
 
 const (
-	_OrderCreatePath   = "/api/v1/order/create"
-	_OrderCreateMethod = consts.MethodPost
+	_CartPurchasePath   = "/api/v1/cart/purchase"
+	_CartPurchaseMethod = consts.MethodPost
 )
 
-func (c *Client) OrderCreate(ctx context.Context, params *order.CreateOrderReq) ([]byte, error) {
+func (c *Client) CartPurchase(ctx context.Context, params *cart.PurChaseCartGoodsRequest) ([]byte, error) {
 	body, err := sonic.Marshal(params)
 	if err != nil {
 		return nil, err
 	}
 
 	req, resp := protocol.AcquireRequest(), protocol.AcquireResponse()
-	req.SetRequestURI(c.buildUrl(_OrderCreatePath))
-	req.SetMethod(_OrderCreateMethod)
+	req.SetRequestURI(c.buildUrl(_CartPurchasePath))
+	req.SetMethod(_CartPurchaseMethod)
 	req.SetBody(body)
 
 	err = c.do(ctx, req, resp)

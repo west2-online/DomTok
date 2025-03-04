@@ -49,6 +49,12 @@ kafka:
   user: domtok
   password: domtok-password
 
+volcengine:
+  api-key: ""
+  base-url: ""
+  region: ""
+  model: ""
+
 upyun:
   bucket: "w2-domtok"
   operator: "penqee"
@@ -109,3 +115,9 @@ services:
     load-balance: false
     addr:
       - 0.0.0.0:20006
+
+  assistant:
+    name: assistant
+    load-balance: false
+    addr:
+      - 0.0.0.0:20007
