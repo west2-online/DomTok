@@ -19,12 +19,9 @@ package rpc
 import (
 	"context"
 
-	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/metadata"
-
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	"github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/base/client"
-	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/utils"
@@ -47,8 +44,6 @@ func InitCommodityStreamClientRPC() {
 }
 
 func CreateSpuRPC(ctx context.Context, req *commodity.CreateSpuReq, files [][]byte) (id int64, err error) {
-	ctx = metadata.AppendToOutgoingContext(ctx, constants.LoginDataKey, "1")
-
 	stream, err := commodityStreamClient.CreateSpu(ctx)
 	if err != nil {
 		logger.Errorf("rpc.CreateSpuRPC CreateSpu failed, err  %v", err)

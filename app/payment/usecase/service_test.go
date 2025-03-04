@@ -181,6 +181,7 @@ func TestPaymentUseCase_GetPaymentToken(t *testing.T) {
 			mockey.Mock(mockey.GetMethod(uc.db, "GetPaymentInfo")).Return(tc.MockPaymentInfo, tc.MockGetPaymentInfoError).Build()
 			mockey.Mock((*service.PaymentService).GeneratePaymentToken).Return(tc.MockToken, tc.MockExpTime, tc.MockGenTokenError).Build()
 			mockey.Mock((*service.PaymentService).StorePaymentToken).Return(tc.MockRedisStoreStatus, tc.MockStoreTokenError).Build()
+			mockey.Mock((*service.PaymentService).CheckOrderExist).Return(paymentStatus.PaymentExist, nil).Build()
 
 			token, expTime, err := uc.GetPaymentToken(ctx.Background(), orderID)
 			if err != nil && tc.ExpectedError != nil {
@@ -215,30 +216,27 @@ func TestPaymentUseCase_CreateRefund(t *testing.T) {
 		{
 			Name:                     "CheckOrderExistError",
 			MockCheckOrderExistError: errors.New("CheckOrderExistError"),
-			// TODO 这个错误信息后面可能要改动，因为今晚跑太多次了
-			MockGetUserIDError: nil,
-			MockUserID:         1,
-			MockRateLimitError: nil,
-			// TODO这个可能要改
-			MockFrequencyValid:   false,
-			MockTimeValid:        true,
-			ExpectedRefundStatus: 0,
-			ExpectedRefundID:     0,
-			ExpectedError:        errors.New("too many refund requests in a short time"),
+			MockGetUserIDError:       nil,
+			MockUserID:               1,
+			MockRateLimitError:       nil,
+			MockFrequencyValid:       false,
+			MockTimeValid:            true,
+			ExpectedRefundStatus:     0,
+			ExpectedRefundID:         0,
+			ExpectedError:            errors.New("check order existence failed: CheckOrderExistError"),
 		},
 		{
 			Name:                     "OrderNotExist",
 			MockCheckOrderExistError: nil,
 			MockOrderExists:          false,
-			// TODO 这个错误信息后面可能要改动，因为今晚跑太多次了
-			MockGetUserIDError:   nil,
-			MockUserID:           1,
-			MockRateLimitError:   nil,
-			MockFrequencyValid:   false,
-			MockTimeValid:        true,
-			ExpectedRefundStatus: 0,
-			ExpectedRefundID:     0,
-			ExpectedError:        errors.New("too many refund requests in a short time"),
+			MockGetUserIDError:       nil,
+			MockUserID:               1,
+			MockRateLimitError:       nil,
+			MockFrequencyValid:       false,
+			MockTimeValid:            true,
+			ExpectedRefundStatus:     0,
+			ExpectedRefundID:         0,
+			ExpectedError:            errors.New("[4000] order does not exist"),
 		},
 		{
 			Name:                     "GetUserIDError",

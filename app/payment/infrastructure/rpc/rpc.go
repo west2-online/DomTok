@@ -39,12 +39,6 @@ func (rpc *paymentRPC) PaymentIsOrderExist(ctx context.Context, orderID int64) (
 		OrderID: orderID,
 	}
 	resp, err := rpc.order.IsOrderExist(ctx, orderRpcReq)
-	/*if err != nil {
-		return false, fmt.Errorf("rpc.order.IsOrderExist: %w", err)
-	}
-	if !utils.IsSuccess(resp.Base) {
-		return false, fmt.Errorf("rpc.order.IsOrderExist: %v", resp.Base.Msg)
-	}*/
 	if err = utils.ProcessRpcError("payment.IsOrderExist", resp, err); err != nil {
 		return false, err
 	}
@@ -86,4 +80,15 @@ func (rpc *paymentRPC) OrderPaymentSuccess(ctx context.Context, orderID int64, p
 		return err
 	}
 	return nil
+}
+
+func (rpc *paymentRPC) GetOrderPaymentAmount(ctx context.Context, orderID int64) (float64, error) {
+	req := &orderrpc.GetOrderPaymentAmount{
+		OrderID: orderID,
+	}
+	resp, err := rpc.order.GetOrderPaymentAmount(ctx, req)
+	if err = utils.ProcessRpcError("rpc.order.GetOrderPaymentAmount", resp, err); err != nil {
+		return 0, err
+	}
+	return resp.GetAmount(), nil
 }

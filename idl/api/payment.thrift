@@ -75,8 +75,7 @@ struct RefundTokenResponse {
  */
 struct RefundRequest {
     1: required i64 orderID
-    2: required double refundAmount
-    3: required string refundReason
+    2: required string refundReason
 }
 
 /*

@@ -91,7 +91,6 @@ func RequestRefund(ctx context.Context, c *app.RequestContext) {
 	// 调用 RPC 获取退款令牌
 	resp, err := rpc.RequestRefundRPC(ctx, &payment.RefundRequest{
 		OrderID:      req.OrderID,
-		RefundAmount: req.RefundAmount,
 		RefundReason: req.RefundReason,
 	})
 	if err != nil {

@@ -1,5 +1,4 @@
 namespace go payment
-// TODO 后面来改注释
 include "model.thrift"
 /*
  * struct PaymentTokenRequest 支付令牌请求
@@ -74,8 +73,7 @@ struct RefundTokenResponse {
  */
 struct RefundRequest {
     1: required i64 orderID
-    2: required double refundAmount
-    3: required string refundReason
+    2: required string refundReason
 }
 
 /*

@@ -23,6 +23,7 @@ import (
 	basecontext "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 func (uc *useCase) CreateOrder(ctx context.Context, addressID int64, baseGoods []*model.BaseOrderGoods) (int64, error) {
@@ -182,4 +183,12 @@ func (uc *useCase) OrderPaymentCancel(ctx context.Context, req *model.PaymentRes
 		return err
 	}
 	return nil
+}
+
+func (uc *useCase) GetOrderPaymentAmount(ctx context.Context, orderID int64) (float64, error) {
+	o, err := uc.db.GetOrderByID(ctx, orderID)
+	if err != nil {
+		return 0, err
+	}
+	return utils.DecimalFloat64(&o.PaymentAmount), nil
 }

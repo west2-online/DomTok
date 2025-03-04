@@ -71,37 +71,31 @@ func (svc *OrderService) MakeOrderByGoods(ctx context.Context, addressID int64, 
 		DeliveryAt:            0, // 等后续发货更新
 		AddressID:             addressID,
 		AddressInfo:           addressInfo,
-		CouponId:              0,  // TODO 订单级别的优惠券应该为全局活动, 考虑在优惠券接口进行实现
-		CouponName:            "", // TODO 同上
 	}
 	lo.ForEach(goods, func(item *model.OrderGoods, index int) {
 		item.OrderID = order.Id
 	})
 
-	if err = svc.CalculateTheAmount(goods, order); err != nil {
+	if err = svc.CalculateTheAmount(ctx, goods, order); err != nil {
 		return nil, err
 	}
 
 	return order, nil
 }
 
-// TODO 优惠券接口完善后可以考虑接入优惠券的接口来实现这个方法的功能
-func (svc *OrderService) CalculateTheAmount(goods []*model.OrderGoods, order *model.Order) error {
+func (svc *OrderService) CalculateTheAmount(ctx context.Context, goods []*model.OrderGoods, order *model.Order) (err error) {
+	if goods, err = svc.rpc.CalcOrderGoodsPrice(ctx, goods); err != nil {
+		return err
+	}
+
 	// orderGoods 的  DiscountAmount PaymentAmount SinglePrice, couponName 还未赋值
 	lo.ForEach(goods, func(item *model.OrderGoods, index int) {
-		item.DiscountAmount = decimal.NewFromInt(0)
-		item.PaymentAmount = item.TotalAmount.Add(item.DiscountAmount)
-		item.SinglePrice = item.PaymentAmount.Div(decimal.NewFromInt(item.PurchaseQuantity))
-
 		order.TotalAmountOfGoods = order.TotalAmountOfGoods.Add(item.TotalAmount)
 		order.TotalAmountOfDiscount = order.TotalAmountOfDiscount.Add(item.DiscountAmount)
 		order.TotalAmountOfFreight = order.TotalAmountOfFreight.Add(item.FreightAmount)
 		order.PaymentAmount = order.PaymentAmount.Add(item.PaymentAmount)
 	})
 
-	// 全局活动, 应该调用 coupon 接口实现
-	order.CouponId = 0
-	order.CouponName = ""
 	return nil
 }
 

@@ -29,9 +29,9 @@ import (
 	"github.com/west2-online/DomTok/app/commodity"
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
+	"github.com/west2-online/DomTok/pkg/base"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
-	"github.com/west2-online/DomTok/pkg/middleware"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
@@ -42,7 +42,7 @@ var (
 
 func init() {
 	config.Init(serviceName)
-	// logger.Init(serviceName, config.GetLoggerLevel())
+	logger.Init(serviceName, config.GetLoggerLevel())
 }
 
 func main() {
@@ -59,7 +59,7 @@ func main() {
 		logger.Fatalf("Commodity: resolve tcp addr failed, err: %v", err)
 	}
 
-	p := middleware.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
+	p := base.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
 	defer func() { logger.LogError(p.Shutdown(context.Background())) }()
 
 	svr := commodityservice.NewServer(
