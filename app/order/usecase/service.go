@@ -18,12 +18,12 @@ package usecase
 
 import (
 	"context"
-	"github.com/west2-online/DomTok/pkg/utils"
 
 	"github.com/west2-online/DomTok/app/order/domain/model"
 	basecontext "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 func (uc *useCase) CreateOrder(ctx context.Context, addressID int64, baseGoods []*model.BaseOrderGoods) (int64, error) {

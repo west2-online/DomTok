@@ -22,8 +22,9 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"github.com/shopspring/decimal"
 	"time"
+
+	"github.com/shopspring/decimal"
 
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	loginData "github.com/west2-online/DomTok/pkg/base/context"
