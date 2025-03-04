@@ -178,6 +178,7 @@ func (uc *useCase) OrderPaymentCancel(ctx context.Context, req *model.PaymentRes
 		return nil
 	}
 
+	req.PaymentStatus = status
 	if err = uc.svc.CancelOrder(ctx, req); err != nil {
 		return err
 	}

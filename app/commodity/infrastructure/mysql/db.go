@@ -507,7 +507,7 @@ func (db *commodityDB) CreateSku(ctx context.Context, sku *model.Sku) (err error
 		Description:      sku.Description,
 		ForSale:          sku.ForSale,
 		Stock:            sku.Stock,
-		LockStock:        sku.Stock,
+		LockStock:        0,
 		StyleHeadDrawing: sku.StyleHeadDrawingUrl,
 		HistoryVersionId: sku.HistoryID,
 	}

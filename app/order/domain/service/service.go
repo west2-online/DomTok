@@ -142,7 +142,7 @@ func (svc *OrderService) UpdateOrderAsSuccess(ctx context.Context, expired int64
 
 func (svc *OrderService) CancelOrder(ctx context.Context, payRel *model.PaymentResult) error {
 	// 如果订单是失败，那说明回滚过了
-	if payRel.PaymentStatus != constants.PaymentStatusFailedCode {
+	if payRel.PaymentStatus == constants.PaymentStatusFailedCode {
 		return errno.NewErrNo(errno.ServiceOrderStatusInvalid, "failed orders cannot be canceled")
 	}
 
@@ -157,11 +157,14 @@ func (svc *OrderService) CancelOrder(ctx context.Context, payRel *model.PaymentR
 		return err
 	}
 
-	// 释放锁定库存
-	orderStock := model.ConvertOrderGoodsToOrderStock(payRel.OrderID, goods)
-	if err = svc.rpc.RollbackSkuStock(ctx, orderStock); err != nil {
-		return err
+	// 如果是订单还未支付，那么直接取消订单
+	if payRel.PaymentStatus != constants.PaymentStatusSuccessCode {
+		orderStock := model.ConvertOrderGoodsToOrderStock(payRel.OrderID, goods)
+		if err = svc.rpc.RollbackSkuStock(ctx, orderStock); err != nil {
+			return err
+		}
 	}
+	// TODO 需要一个增加库存的 rpc 接口
 
 	if err = svc.db.UpdatePaymentStatus(ctx, payRel); err != nil {
 		return err
