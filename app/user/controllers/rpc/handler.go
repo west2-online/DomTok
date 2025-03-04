@@ -19,8 +19,6 @@ package rpc
 import (
 	"context"
 
-	"github.com/cloudwego/hertz/pkg/common/hlog"
-
 	"github.com/west2-online/DomTok/app/user/controllers/rpc/pack"
 	"github.com/west2-online/DomTok/app/user/domain/model"
 	"github.com/west2-online/DomTok/app/user/usecase"
@@ -49,7 +47,6 @@ func (h *UserHandler) Register(ctx context.Context, req *user.RegisterRequest) (
 	if uid, err = h.useCase.RegisterUser(ctx, u); err != nil {
 		return
 	}
-	hlog.Info("register success")
 	r.UserID = uid
 	return
 }

@@ -58,7 +58,7 @@ func buildWebsocketHandler(
 
 		// assign user info to ctx
 		ctx = context.WithValue(ctx, service.CtxKeyID, id)
-		ctx = context.WithValue(ctx, service.CtxKeyAccessToken, token)
+		ctx = context.WithValue(ctx, service.CtxKeyAuthHeader, token)
 
 		// although the service is like a non-stateful service, we still need to log in
 		// in this case, we need to log in to check some args is properly set

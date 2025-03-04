@@ -20,8 +20,6 @@ import (
 	"context"
 	"fmt"
 
-	"golang.org/x/sync/errgroup"
-
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
@@ -38,54 +36,49 @@ func (uc *useCase) CreateCategory(ctx context.Context, category *model.Category)
 	if exist {
 		return 0, errno.NewErrNo(errno.ServiceUserExist, "category  exist")
 	}
-
-	if err = uc.svc.CreateCategory(ctx, category); err != nil {
-		return 0, fmt.Errorf("create category failed: %w", err)
+	category.CreatorId, err = contextLogin.GetLoginData(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("get category creatorid failed: %w", err)
 	}
-
+	if err = uc.svc.CreateCategory(ctx, category); err != nil {
+		return 0, fmt.Errorf("mysql create category failed: %w", err)
+	}
 	return category.Id, nil
 }
 
 func (uc *useCase) DeleteCategory(ctx context.Context, category *model.Category) (err error) {
-	// 判断是否存在
-	exist, err := uc.db.IsCategoryExistById(ctx, category.Id)
+	// 获取
+	category, err = uc.db.GetCategoryById(ctx, category.Id)
 	if err != nil {
-		return fmt.Errorf("check category exist failed: %w", err)
+		return err
 	}
-	if !exist {
-		return errno.NewErrNo(errno.ServiceUserNotExist, "category does not exist")
-	}
-	// 判断用户是否有权限
 	err = uc.svc.IdentifyUser(ctx, category.CreatorId)
 	if err != nil {
-		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
+		return err
 	}
-	err = uc.db.DeleteCategory(ctx, category)
+	// 删除
+	err = uc.svc.DeleteCategory(ctx, category)
 	if err != nil {
-		return fmt.Errorf("delete category failed: %w", err)
+		return err
 	}
 	return nil
 }
 
 func (uc *useCase) UpdateCategory(ctx context.Context, category *model.Category) (err error) {
-	// 判断是否存在
-	exist, err := uc.db.IsCategoryExistById(ctx, category.Id)
+	// 	获取
+	category, err = uc.db.GetCategoryById(ctx, category.Id)
 	if err != nil {
-		return fmt.Errorf("check category exist failed: %w", err)
+		return err
 	}
-	if !exist {
-		return errno.NewErrNo(errno.ServiceUserNotExist, "category does not exist")
-	}
-	// 判断用户是否有权限
 	err = uc.svc.IdentifyUser(ctx, category.CreatorId)
 	if err != nil {
-		return errno.NewErrNo(errno.AuthInvalidCode, " Get login data fail")
+		return err
 	}
-	err = uc.db.UpdateCategory(ctx, category)
+	err = uc.svc.UpdateCategory(ctx, category)
 	if err != nil {
-		return fmt.Errorf("update category failed: %w", err)
+		return err
 	}
-	return err
+	return nil
 }
 
 func (uc *useCase) ViewCategory(ctx context.Context, pageNum, pageSize int) (resp []*model.CategoryInfo, err error) {
@@ -103,7 +96,7 @@ func (us *useCase) CreateSpu(ctx context.Context, spu *model.Spu) (id int64, err
 	}
 	spu.CreatorId = loginData
 
-	if err = us.svc.Verify(us.svc.VerifyForSaleStatus(spu.ForSale)); err != nil {
+	if err = us.svc.Verify(us.svc.VerifyForSaleStatus(spu.ForSale), us.svc.VerifyCategoryId(ctx, spu.CategoryId)); err != nil {
 		return 0, fmt.Errorf("usecase.CreateSpu verify failed: %w", err)
 	}
 
@@ -163,6 +156,12 @@ func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
 		return fmt.Errorf("usecase.UpdateSpu verify failed: %w", err)
 	}
 
+	if spu.CategoryId != 0 {
+		if err = us.svc.Verify(us.svc.VerifyCategoryId(ctx, spu.CategoryId)); err != nil {
+			return fmt.Errorf("usecase.UpdateSpu verify failed: %w", err)
+		}
+	}
+
 	spu.GoodsHeadDrawingUrl = utils.GenerateFileName(constants.SpuDirDest, spu.SpuId)
 	if err = us.svc.UpdateSpu(ctx, spu, ret); err != nil {
 		return fmt.Errorf("usecase.UpdateSpu failed: %w", err)
@@ -173,7 +172,7 @@ func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
 func (us *useCase) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage) error {
 	spu, img, err := us.svc.GetSpuFromImageId(ctx, spuImage.ImageID)
 	if err != nil {
-		return fmt.Errorf("usecase.DeleteSpuImage failed: %w", err)
+		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
 	}
 
 	err = us.svc.IdentifyUserInStreamCtx(ctx, spu.CreatorId)
@@ -227,60 +226,225 @@ func (us *useCase) ListSpuInfo(ctx context.Context, ids []int64) ([]*model.Spu, 
 }
 
 func (us *useCase) IncrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	if !us.svc.Cached(ctx, infos) {
-		return errno.Errorf(errno.RedisKeyNotExist, "useCase.IncrLockStock failed")
-	}
-
-	var eg errgroup.Group
-
-	eg.Go(func() error {
-		err := us.cache.IncrLockStockNum(ctx, infos)
-		if err != nil {
-			return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
-		}
-		return nil
-	})
-
-	eg.Go(func() error {
+	if !us.svc.IsHealthy() {
 		err := us.db.IncrLockStock(ctx, infos)
 		if err != nil {
 			return fmt.Errorf("usecase.IncrLockStock failed: %w", err)
 		}
-		return nil
-	})
-
-	if err := eg.Wait(); err != nil {
 		return err
+	} else {
+		return us.svc.IncrLockStockInNX(ctx, infos)
 	}
-	return nil
 }
 
 func (us *useCase) DecrLockStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	if !us.svc.Cached(ctx, infos) {
-		return errno.Errorf(errno.RedisKeyNotExist, "useCase.DecrLockStock failed")
-	}
-
-	var eg errgroup.Group
-
-	eg.Go(func() error {
-		err := us.cache.DecrLockStockNum(ctx, infos)
-		if err != nil {
-			return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
-		}
-		return nil
-	})
-
-	eg.Go(func() error {
+	if !us.svc.IsHealthy() {
 		err := us.db.DecrLockStock(ctx, infos)
 		if err != nil {
 			return fmt.Errorf("usecase.DecrLockStock failed: %w", err)
 		}
-		return nil
-	})
+		return err
+	} else {
+		return us.svc.DecrLockStockInNX(ctx, infos)
+	}
+}
+
+func (us *useCase) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
+	if !us.svc.IsHealthy() {
+		err := us.db.DecrStock(ctx, infos)
+		if err != nil {
+			return fmt.Errorf("usecase.DecrStock failed: %w", err)
+		}
+		return err
+	} else {
+		return us.svc.DecrStockInNX(ctx, infos)
+	}
+}
+
+func (us *useCase) CreateSku(ctx context.Context, sku *model.Sku, ext string) (s *model.Sku, err error) {
+	loginData, err := contextLogin.GetStreamLoginData(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("usecase.CreateSku failed: %w", err)
+	}
+	sku.CreatorID = loginData
+
+	ok, err := us.db.IsSpuExist(ctx, sku.SpuID)
+	if err != nil {
+		return nil, fmt.Errorf("usecase.CreateSku: check spu exist failed: %w", err)
+	}
+	if !ok {
+		return nil, errno.NewErrNo(errno.ServiceSpuNotExist, "spu does not exist")
+	}
+	s, err = us.svc.CreateSku(ctx, sku, ext)
+	if err != nil {
+		return nil, fmt.Errorf("usecase.CreateSku failed: %w", err)
+	}
+
+	return s, nil
+}
+
+func (us *useCase) UpdateSku(ctx context.Context, sku *model.Sku, ext string) (err error) {
+	ret, err := us.db.GetSkuBySkuId(ctx, sku.SkuID)
+	if err != nil {
+		return fmt.Errorf("service.UpdateSku: get sku by sku id failed: %w", err)
+	}
+
+	if err := us.svc.IdentifyUserInStreamCtx(ctx, ret.CreatorID); err != nil {
+		return fmt.Errorf("service.UpdateSku: %w", err)
+	}
+
+	sku.StyleHeadDrawingUrl = utils.GenerateFileName(constants.SkuDirDest, sku.SkuID) + ext
+	if err = us.svc.UpdateSku(ctx, sku, ret); err != nil {
+		return fmt.Errorf("usecase.UpdateSku failed: %w", err)
+	}
 
 	return nil
 }
 
-func (us *useCase) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo) error {
-	return us.db.DecrStock(ctx, infos)
+func (us *useCase) DeleteSku(ctx context.Context, sku *model.Sku) (err error) {
+	ret, err := us.db.GetSkuBySkuId(ctx, sku.SkuID)
+	if err != nil {
+		return fmt.Errorf("service.UpdateSku: get sku by sku id failed: %w", err)
+	}
+
+	if err := us.svc.IdentifyUser(ctx, ret.CreatorID); err != nil {
+		return fmt.Errorf("service.UpdateSku: %w", err)
+	}
+
+	if err = us.svc.DeleteSku(ctx, ret); err != nil {
+		return fmt.Errorf("usecase.DeleteSku failed: %w", err)
+	}
+	return nil
+}
+
+func (us *useCase) ViewSku(ctx context.Context, sku *model.Sku, pageNum *int64, pageSize *int64, isSpuId bool) (skus []*model.Sku, total int64, err error) {
+	pNum, pSize := us.svc.NormalizePagination(pageNum, pageSize)
+	if pNum < 1 || pSize < 1 {
+		return nil, -1, fmt.Errorf("usecase.ViewSku failed: invalid PageNum or PageSize")
+	}
+
+	var skuIDs []*int64
+	if isSpuId {
+		ids, err := us.svc.GetSkuIdBySpuID(ctx, sku.SpuID, pNum, pSize)
+		if err != nil {
+			return nil, -1, fmt.Errorf("usecase.ViewSku failed: %w", err)
+		}
+		skuIDs = ids
+	} else {
+		skuIDs = []*int64{&sku.SkuID}
+	}
+
+	skus, total, err = us.svc.ViewSku(ctx, skuIDs, pNum, pSize)
+	if err != nil {
+		return nil, -1, fmt.Errorf("usecase.ViewSku failed: %w", err)
+	}
+	return skus, total, nil
+}
+
+func (us *useCase) UploadSkuAttr(ctx context.Context, attr *model.AttrValue, sku *model.Sku) (err error) {
+	ret, err := us.db.GetSkuBySkuId(ctx, sku.SkuID)
+	if err != nil {
+		return fmt.Errorf("service.UpdateSku: get sku by sku id failed: %w", err)
+	}
+
+	if err := us.svc.IdentifyUser(ctx, ret.CreatorID); err != nil {
+		return fmt.Errorf("service.UpdateSku: %w", err)
+	}
+
+	sku.HistoryID = ret.HistoryID
+
+	err = us.svc.UploadSkuAttr(ctx, attr, sku)
+	if err != nil {
+		return fmt.Errorf("usecase.UploadSkuAttr failed: %w", err)
+	}
+
+	return nil
+}
+
+func (us *useCase) ListSkuInfo(ctx context.Context, skuInfo []*model.SkuVersion, pageNum int64, pageSize int64) ([]*model.Sku, int64, error) {
+	if pageNum < 1 || pageSize < 1 {
+		return nil, -1, fmt.Errorf("usecase.ListSkuInfo failed: invalid PageNum or PageSize")
+	}
+
+	skuInfos, total, err := us.svc.ListSkuInfo(ctx, skuInfo, pageNum, pageSize)
+	if err != nil {
+		return nil, -1, fmt.Errorf("usecase.ListSkuInfo failed: %w", err)
+	}
+	return skuInfos, total, nil
+}
+
+func (us *useCase) ViewSkuPriceHistory(ctx context.Context, skuPrice *model.SkuPriceHistory, pageNum int64, pageSize int64) ([]*model.SkuPriceHistory, error) {
+	if pageNum < 1 || pageSize < 1 {
+		return nil, fmt.Errorf("usecase.ViewSkuPriceHistory failed: invalid PageNum or PageSize")
+	}
+
+	histories, err := us.svc.ViewSkuPriceHistory(ctx, skuPrice, pageNum, pageSize)
+	if err != nil {
+		return nil, fmt.Errorf("usecase.ViewSkuPriceHistory failed: %w", err)
+	}
+	return histories, nil
+}
+
+func (us *useCase) CreateSkuImage(ctx context.Context, skuImage *model.SkuImage, data []byte) (int64, error) {
+	ret, err := us.db.GetSkuBySkuId(ctx, skuImage.SkuID)
+	if err != nil {
+		return 0, fmt.Errorf("usecase.CreateSkuImage failed: %w", err)
+	}
+	if err := us.svc.IdentifyUserInStreamCtx(ctx, ret.CreatorID); err != nil {
+		return 0, fmt.Errorf("usecase.CreateSkuImage failed: %w", err)
+	}
+
+	id, err := us.svc.CreateSkuImage(ctx, skuImage, data)
+	if err != nil {
+		return 0, fmt.Errorf("usecase.CreateSkuImage failed: %w", err)
+	}
+	return id, nil
+}
+
+func (us *useCase) UpdateSkuImage(ctx context.Context, skuImage *model.SkuImage, data []byte) (err error) {
+	sku, img, err := us.svc.GetSkuFromImageId(ctx, skuImage.ImageID)
+	if err != nil {
+		return fmt.Errorf("usecase.UpdateSkuImage failed: %w", err)
+	}
+
+	if err := us.svc.IdentifyUserInStreamCtx(ctx, sku.CreatorID); err != nil {
+		return fmt.Errorf("usecase.UpdateSkuImage failed: %w", err)
+	}
+
+	skuImage.Url = utils.GenerateFileName(constants.SkuImageDirDest, skuImage.ImageID)
+	err = us.svc.UpdateSkuImage(ctx, skuImage, img, data)
+	if err != nil {
+		return fmt.Errorf("usecase.UpdateSkuImage failed: %w", err)
+	}
+	return nil
+}
+
+func (us *useCase) ViewSkuImages(ctx context.Context, sku *model.Sku, pageNum *int64, pageSize *int64) (images []*model.SkuImage, total int64, err error) {
+	pNum, pSize := us.svc.NormalizePagination(pageNum, pageSize)
+
+	if pNum < 1 || pSize < 1 {
+		return nil, -1, fmt.Errorf("usecase.ViewSkuImage failed: invalid PageNum or PageSize")
+	}
+
+	images, total, err = us.svc.ViewSkuImages(ctx, sku, pNum, pSize)
+	if err != nil {
+		return nil, -1, fmt.Errorf("usecase.ViewSkuImage failed: %w", err)
+	}
+	return images, total, nil
+}
+
+func (us *useCase) DeleteSkuImage(ctx context.Context, imageId int64) (err error) {
+	sku, img, err := us.svc.GetSkuFromImageId(ctx, imageId)
+	if err != nil {
+		return fmt.Errorf("usecase.DeleteSkuImage failed: %w", err)
+	}
+
+	if err := us.svc.IdentifyUser(ctx, sku.CreatorID); err != nil {
+		return fmt.Errorf("usecase.DeleteSkuImage failed: %w", err)
+	}
+
+	if err = us.svc.DeleteSkuImage(ctx, imageId, img.Url); err != nil {
+		return fmt.Errorf("usecase.DeleteSkuImage failed: %w", err)
+	}
+	return nil
 }

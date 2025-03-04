@@ -17,16 +17,19 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"net"
 
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	etcd "github.com/kitex-contrib/registry-etcd"
 
 	"github.com/west2-online/DomTok/app/commodity"
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/kitex_gen/commodity/commodityservice"
+	"github.com/west2-online/DomTok/pkg/base"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/utils"
@@ -56,8 +59,12 @@ func main() {
 		logger.Fatalf("Commodity: resolve tcp addr failed, err: %v", err)
 	}
 
+	p := base.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
+	defer func() { logger.LogError(p.Shutdown(context.Background())) }()
+
 	svr := commodityservice.NewServer(
-		commodity.InjectCommodityHandlerr(),
+		commodity.InjectCommodityHandler(),
+		server.WithSuite(tracing.NewServerSuite()),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
 			ServiceName: serviceName,
 		}),

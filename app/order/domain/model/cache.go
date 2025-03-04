@@ -14,4 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package service
+package model
+
+type CachePaymentStatus struct {
+	OrderID       int64
+	OrderExpire   int64 // ms 时间戳
+	PaymentStatus int8
+}

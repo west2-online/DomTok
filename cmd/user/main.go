@@ -17,16 +17,19 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"net"
 
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	etcd "github.com/kitex-contrib/registry-etcd"
 
 	"github.com/west2-online/DomTok/app/user"
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
+	"github.com/west2-online/DomTok/pkg/base"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/middleware"
@@ -53,9 +56,13 @@ func main() {
 	if err != nil {
 		logger.Fatalf("User: resolve tcp addr failed, err: %v", err)
 	}
+	p := base.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
+	defer func() { logger.LogError(p.Shutdown(context.Background())) }()
+
 	svr := userservice.NewServer(
 		// 注入依赖
 		user.InjectUserHandler(),
+		server.WithSuite(tracing.NewServerSuite()),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
 			ServiceName: serviceName,
 		}),

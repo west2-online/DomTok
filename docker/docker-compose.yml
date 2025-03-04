@@ -1,7 +1,8 @@
 services:
+  # Redis 服务，用于缓存、会话管理等，提供键值存储功能
   domtok-redis:
     container_name: domtok-redis
-    image: redis:bookworm # 选择使用 redis 官方的 bookworm tag
+    image: redis:bookworm
     volumes:
       - ./data/redis:/data
     ports:
@@ -11,9 +12,10 @@ services:
     networks:
       - domtok
 
+  # MySQL 服务，提供关系型数据库，用于存储结构化数据
   domtok-mysql:
     container_name: domtok-mysql
-    image: mysql:9.0.1 # 选择使用 mysql 官方的 9.0.1 版本
+    image: mysql:9.0.1
     env_file:
       - "./env/mysql.env"
     ports:
@@ -24,10 +26,10 @@ services:
       - ../config/sql:/docker-entrypoint-initdb.d
       - ./data/mysql:/var/lib/mysql
 
+  # etcd 服务，分布式键值存储系统，用于服务发现、配置管理
   domtok-etcd:
     container_name: domtok-etcd
-    # image: bitnami/etcd:3.5-debian-12
-    image: quay.io/coreos/etcd:v3.5.5 # 计划使用 vmware 的 etcd3.5，但是似乎遇到了权限问题，data 挂载不上
+    image: quay.io/coreos/etcd:v3.5.5
     restart: always
     ports:
       - 2379:2379
@@ -42,30 +44,13 @@ services:
       - domtok
     entrypoint: [ "sh", "-c", "chmod +x /script/etcd-monitor.sh && /script/etcd-monitor.sh & exec etcd" ]
 
-#  etcd-keeper:
-#    hostname: domtok-etcdkeeper
-#    image: evildecay/etcdkeeper
-#    environment:
-#      - ETCD_HOSTS=http://etcd:2379
-#      - SW_STORAGE_ETCD_CLUSTER_NODES=etcd:2379
-#      - HOST=0.0.0.0
-#      - HOSTNAME=etcd-keeper
-#    links:
-#      - etcd
-#    ports:
-#      - 8099:8080
-#    depends_on:
-#      - etcd
-#    networks:
-#      - domtok
-#
   elasticsearch:
     image: elasticsearch:8.4.2
     container_name: domtok-elasticsearch
     env_file:
       - ./env/es.env
     healthcheck:
-      test: [ "CMD-SHELL", "curl -sf http://127.0.0.1:9200/_cluster/health || exit 1" ] # ⼼跳检测，成功之后不再执⾏后⾯的退出
+      test: [ "CMD-SHELL", "curl -sf http://elasticsearch:9200/_cluster/health || exit 1" ] # ⼼跳检测，成功之后不再执⾏后⾯的退出
       interval: 60s # ⼼跳检测间隔周期
       timeout: 10s
       retries: 3
@@ -114,98 +99,7 @@ services:
     networks:
       - domtok
 
-#
-#    jaeger:
-#      container_name: domtok-jaeger
-#      image: "jaegertracing/all-in-one:latest"
-#      restart: always
-#      ports:
-#        - 16686:16686
-#        - 6831:6831/udp
-#      volumes:
-#        - ./data/jaeger:/var/lib/jaeger
-#        - ../config/jaeger:/etc/jaeger
-#      networks:
-#        - domtok
-#
-#    prometheus:
-#      image: prom/prometheus
-#      container_name: domtok-prometheus
-#      hostname: prometheus
-#      restart: always
-#      volumes:
-#        - ../config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-#      ports:
-#        - 9090:9090
-#      networks:
-#        - domtok
-#
-#    grafana:
-#      image: grafana/grafana
-#      container_name: domtok-grafana
-#      restart: always
-#      ports:
-#        - 3000:3000
-#      volumes:
-#        - ../config/grafana:/etc/grafana
-#      networks:
-#        - domtok
-#
-#    alertmanager: #预警模块
-#      image: prom/alertmanager
-#      container_name: domtok-alertmanager
-#      restart: always
-#      ports:
-#        - 9093:9093
-#      networks:
-#        - domtok
-#
-#    node-exporter:
-#      image: quay.io/prometheus/node-exporter
-#      container_name: domtok-node-exporter
-#      restart: always
-#      ports:
-#        - 9100:9100
-#      networks:
-#        - domtok
-#
-#    cadvisor:
-#      image: google/cadvisor:latest
-#      container_name: domtok-cadvisor
-#      restart: always
-#      platform: linux/amd64
-#      volumes:
-#        - /:/rootfs:ro
-#        - /var/run:/var/run:rw
-#        - /sys:/sys:ro
-#        - /var/lib/docker/:/var/lib/docker:ro
-#      ports:
-#        - 8899:8080
-#      networks:
-#        - domtok
-#
-#    redis-exporter:
-#      image: oliver006/redis_exporter
-#      container_name: domtok-redis-exporter
-#      restart: always
-#      ports:
-#        - 9121:9121
-#      command:
-#        - "--redis.addr=redis://127.0.0.1:6379"
-#      networks:
-#        - domtok
-#
-#  mysql_xporter:
-#    image: prom/mysqld-exporter
-#    container_name: domtok-mysql-exporter
-#    restart: always
-#    ports:
-#      - 9104:9104
-#    environment:
-#      DATA_SOURCE_NAME: 'exporter:123456@(127.0.0.1:3306)'
-#    networks:
-#       - domtok
-#
+  # Kafka 服务，分布式流处理平台，用于构建实时数据管道和流应用
   kafka:
     container_name: domtok-kafka
     image: bitnami/kafka:latest
@@ -221,6 +115,7 @@ services:
     networks:
       - domtok
 
+  # Kafka UI 服务，为 Kafka 提供可视化管理和监控界面
   kafka-ui:
     container_name: domtok-kafka-ui
     image: provectuslabs/kafka-ui:latest
@@ -232,9 +127,10 @@ services:
     networks:
       - domtok
 
+  # RocketMQ NameServer 服务，负责管理 Broker 的元数据
   rmqnamesrv:
     image: apache/rocketmq:4.9.6
-    container_name: rmqnamesrv
+    container_name: domtok-rmqnamesrv
     ports:
       - "9876:9876"
     volumes:
@@ -246,9 +142,10 @@ services:
         aliases:
           - rmqnamesrv
 
+  # RocketMQ Broker 服务，负责消息的存储、转发等核心功能
   rmqbroker:
     image: apache/rocketmq:4.9.6
-    container_name: rmqbroker
+    container_name: domtok-rmqbroker
     ports:
       - "10909:10909"
       - "10911:10911"
@@ -266,6 +163,137 @@ services:
       domtok:
         aliases:
           - rmqbroker
+
+  # OpenTelemetry 收集器，收集、处理和导出可观测性数据（指标、追踪等）
+  domtok-otel-collector:
+    image: otel/opentelemetry-collector-contrib-dev:latest
+    container_name: domtok-otel-collector
+    command: [ "--config=/etc/otel-collector-config.yaml", "${OTELCOL_ARGS}" ]
+    volumes:
+      - ../config/otel-collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "1888:1888"   # pprof extension
+      - "8888"   # Prometheus metrics exposed by the collector
+      - "8889:8889"   # Prometheus exporter metrics
+      - "13133:13133" # health_check extension
+      - "4317:4317"   # OTLP gRPC receiver
+      - "55679" # zpages extension
+    depends_on:
+      - domtok-jaeger
+    networks:
+      - domtok
+
+  # Jaeger 服务，分布式追踪系统，用于监控和排查微服务性能问题
+  domtok-jaeger:
+    container_name: domtok-jaeger
+    image: jaegertracing/all-in-one:latest
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "16686:16686"
+      - "6831:6831"
+      - "4317"
+    networks:
+      - domtok
+
+  # VictoriaMetrics 服务，时间序列数据库，存储和查询大规模时间序列数据
+  domtok-victoriametrics:
+    container_name: domtok-victoriametrics
+    image: victoriametrics/victoria-metrics
+    ports:
+      - "8428:8428" # 映射 HTTP 服务端口，用于通过 HTTP 协议进行数据查询、管理接口访问等操作
+      - "8089:8089" # 映射 InfluxDB 协议监听端口，支持使用 InfluxDB 协议向 VictoriaMetrics 写入数据
+      - "8089:8089/udp" # 映射 InfluxDB 协议 UDP 监听端口，支持使用 UDP 方式通过 InfluxDB 协议写入数据
+      - "2003:2003" # 映射 Graphite 协议监听端口，支持使用 Graphite 协议向 VictoriaMetrics 写入数据
+      - "2003:2003/udp" # 映射 Graphite 协议 UDP 监听端口，支持使用 UDP 方式通过 Graphite 协议写入数据
+      - "4242:4242" # 映射 OpenTSDB 协议监听端口，支持使用 OpenTSDB 协议向 VictoriaMetrics 写入数据
+    command:
+      - '--storageDataPath=/storage' # 指定 VictoriaMetrics 存储数据的路径为容器内的 /storage 目录
+      - '--graphiteListenAddr=:2003' # 设置 Graphite 协议的监听地址为 2003 端口，用于接收 Graphite 格式的指标数据
+      - '--opentsdbListenAddr=:4242' # 设置 OpenTSDB 协议的监听地址为 4242 端口，用于接收 OpenTSDB 格式的指标数据
+      - '--httpListenAddr=:8428' # 设置 HTTP 服务的监听地址为 8428 端口，可通过该端口进行数据查询、管理操作等
+      - '--influxListenAddr=:8089' # 设置 InfluxDB 协议的监听地址为 8089 端口，用于接收 InfluxDB 格式的指标数据
+    restart: always
+    networks:
+      - domtok
+
+  # Prometheus 服务，系统监控和警报工具，收集和存储指标数据
+  domtok-prometheus:
+    image: prom/prometheus
+    container_name: domtok-prometheus
+    hostname: prometheus
+    volumes:
+      - ../config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../config/prometheus/mysqld_rules.yml:/etc/prometheus/mysqld_rules.yml
+      - ../config/prometheus/redis_rules.yml:/etc/prometheus/redis_rules.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - domtok-otel-collector
+    networks:
+      - domtok
+
+  # Node Exporter 服务，收集主机系统级指标（CPU、内存等）供 Prometheus 采集
+  domtok-node-exporter:
+    image: quay.io/prometheus/node-exporter
+    container_name: domtok-node-exporter
+    restart: always
+    ports:
+      - "9100:9100"
+    networks:
+      - domtok
+
+  # cAdvisor 服务，收集容器资源使用和性能指标（CPU、内存等）
+  domtok-cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: domtok-cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - "8080"
+    networks:
+      - domtok
+
+  # Redis Exporter 服务，收集 Redis 实例指标数据供 Prometheus 采集
+  domtok-redis-exporter:
+    image: oliver006/redis_exporter
+    container_name: domtok-redis-exporter
+    ports:
+      - "9121:9121"
+    command:
+      - "--redis.addr=redis://domtok-redis:6379"
+    networks:
+      - domtok
+
+  # MySQL Exporter 服务，收集 MySQL 数据库指标数据供 Prometheus 采集
+  domtok-mysql-exporter:
+    image: prom/mysqld-exporter
+    container_name: domtok-mysql-exporter
+    ports:
+      - "9104:9104"
+    command:
+      - "--mysqld.username=DomTok:DomTok"
+      - "--mysqld.address=domtok-mysql:3306"
+    environment:
+      DATA_SOURCE_NAME: 'DomTok:DomTok@(domtok-mysql:3306)/'
+    networks:
+      - domtok
+    depends_on:
+      - domtok-mysql
+
+  # Grafana 服务，可视化和分析平台，展示 Prometheus 等数据源的指标数据
+  domtok-grafana:
+    container_name: domtok-grafana
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../config/grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - domtok
 
 networks:
   domtok:

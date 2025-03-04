@@ -32,7 +32,7 @@ import (
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
-func InjectCommodityHandlerr() commodity.CommodityService {
+func InjectCommodityHandler() commodity.CommodityService {
 	gormDB, err := client.InitMySQL()
 	if err != nil {
 		panic(err)

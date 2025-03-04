@@ -28,6 +28,7 @@ struct DeleteCouponResp {
 
 struct CreateUserCouponReq {
     1: required i64 couponID;
+    2: required i64 remaining_use,
 }
 
 struct CreateUserCouponResp {
@@ -35,23 +36,20 @@ struct CreateUserCouponResp {
 }
 
 struct ViewCouponReq {
-    1: required i64 couponID;
-    2: optional i64 pageNum;
-    3: optional i64 pageSize;
+    1: required i64 pageNum;
 }
 
 struct ViewCouponResp {
-    1: required model.Coupon couponInfo;
+    1: required list<model.Coupon> couponInfo;
 }
 
 struct ViewUserAllCouponReq {
     1: required i64 isIncludeExpired;
-    2: required i64 pageNum;
-    3: required i64 pageSize;
+    3: required i64 pageNum;
 }
 
 struct ViewUserAllCouponResp {
-    1: required list<model.UserCoupon> coupons;
+    1: required list<model.Coupon> coupons;
 }
 
 struct UseUserCouponReq {
@@ -150,36 +148,47 @@ struct DeleteSpuImageResp {
 }
 
 struct CreateSkuReq {
-    1: optional list<binary> skuImages;
-    2: required string name;
-    3: required i64 stock;
-    4: required string description;
-    5: required string styleHeadDrawing;
-    6: required double price;
-    7: required i32 forSale;
-    8: required double shipping;
-    9: required i64 spuID;
+    1: required string name;
+    2: required i64 stock;
+    3: required string description;
+    5: required double price;
+    6: required i32 forSale;
+    7: required double shipping;
+    8: required i64 spuID;
 
 }
 
 struct CreateSkuResp {
+    1: required model.SkuInfo skuInfo;
+}
+
+struct CreateSkuImageReq {
     1: required i64 skuID;
+}
+
+struct CreateSkuImageResp {
+    1: required i64 imageID;
 }
 
 struct UpdateSkuReq {
     1: required i64 skuID;
     2: optional double shipping;
-    3: optional list<binary> skuImages;
-    4: optional string description;
-    5: optional string styleHeadDrawing;
-    6: optional double price;
-    7: optional i32 forSale;
-    8: optional i64 Stock;
+    3: optional string description;
+    5: optional double price;
+    6: optional i32 forSale;
+    7: optional i64 Stock;
 
 }
 
 struct UpdateSkuResp {
 
+}
+
+struct UpdateSkuImageReq {
+    1: required i64 imageID;
+}
+
+struct UpdateSkuImageResp {
 }
 
 
@@ -189,6 +198,13 @@ struct DeleteSkuReq {
 
 struct DeleteSkuResp {
 
+}
+
+struct DeleteSkuImageReq {
+    1: required i64 skuImageID;
+}
+
+struct DeleteSkuImageResp {
 }
 
 struct ViewSkuImageReq {
@@ -255,15 +271,6 @@ struct ViewCategoryResp {
 
  }
 
-struct ListSkuInfoReq {
-    1: required list<i64> skuIDs;
-    2: required i64 pageNum;
-    3: required i64 pageSize;
-}
-
-struct ListSkuInfoResp {
-    1: required list<model.SkuInfo> skuInfos;
-}
 
 struct ViewHistoryPriceReq {
     1: required i64 historyID;
@@ -276,6 +283,7 @@ struct ViewHistoryPriceResp {
     1: required list<model.PriceHistory> records;
 }
 
+
 service CommodityService {
     // 优惠券
     CreateCouponResp CreateCoupon(1: CreateCouponReq req) (api.post="/api/v1/commodity/coupon/create");
@@ -283,7 +291,6 @@ service CommodityService {
     CreateUserCouponResp CreateUserCoupon(1: CreateUserCouponReq req) (api.post="/api/v1/commodity/coupon/receive");
     ViewCouponResp ViewCoupon(1: ViewCouponReq req) (api.get="/api/v1/commodity/coupon/search");
     ViewUserAllCouponResp ViewUserAllCoupon(1: ViewUserAllCouponReq req) (api.get="/api/v1/commodity/coupon/all");
-    UseUserCouponResp UseUserCoupon(1: UseUserCouponReq req) (api.post="/api/v1/commodity/coupon/use");
 
     // SPU
     CreateSpuResp CreateSpu(1: CreateSpuReq req) (api.post="/api/v1/commodity/spu/create");
@@ -303,7 +310,9 @@ service CommodityService {
     ViewSkuImageResp ViewSkuImage(1: ViewSkuImageReq req) (api.get="/api/v1/commodity/sku/image");
     ViewSkuResp ViewSku(1: ViewSkuReq req) (api.get="/api/v1/commodity/sku/search");
     UploadSkuAttrResp UploadSkuAttr(1: UploadSkuAttrReq req) (api.post="/api/v1/commodity/sku/attr");
-    ListSkuInfoResp ListSkuInfo(1: ListSkuInfoReq req) (api.get="/api/v1/commodity/sku/list");
+    CreateSkuImageResp CreateSkuImage(1: CreateSkuImageReq req) (api.post = "/api/v1/commodity/sku/image/create");
+    UpdateSkuImageResp UpdateSkuImage(1: UpdateSkuImageReq req) (api.post = "/api/v1/commodity/sku/image/update");
+    DeleteSkuImageResp DeleteSkuImage(1: DeleteSkuImageReq req) (api.delete="/api/v1/commodity/sku/image/delete");
     ViewHistoryPriceResp ViewHistory(1: ViewHistoryPriceReq req) (api.get="/api/v1/commodity/price/history")
 
     //category

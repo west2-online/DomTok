@@ -1619,25 +1619,16 @@ func (p *Coupon) field15Length() int {
 	return l
 }
 
-func (p *UserCoupon) FastRead(buf []byte) (int, error) {
+func (p *AssignedCouponSpuInfo) FastRead(buf []byte) (int, error) {
 
 	var err error
 	var offset int
 	var l int
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetCouponID bool = false
-	var issetCreatorID bool = false
-	var issetUserID bool = false
-	var issetName bool = false
-	var issetTypeInfo bool = false
-	var issetConditionCost bool = false
-	var issetRangeType bool = false
-	var issetRangeId bool = false
-	var issetExpireAt bool = false
-	var issetDescription bool = false
-	var issetRemainUserUseCount bool = false
-	var issetCreatedAt bool = false
+	var issetSpuId bool = false
+	var issetCoupon bool = false
+	var issetDiscountPrice bool = false
 	for {
 		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
 		offset += l
@@ -1655,7 +1646,7 @@ func (p *UserCoupon) FastRead(buf []byte) (int, error) {
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetCouponID = true
+				issetSpuId = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -1664,13 +1655,13 @@ func (p *UserCoupon) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 2:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.STRUCT {
 				l, err = p.FastReadField2(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetCreatorID = true
+				issetCoupon = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -1679,13 +1670,13 @@ func (p *UserCoupon) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 3:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.DOUBLE {
 				l, err = p.FastReadField3(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetUserID = true
+				issetDiscountPrice = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -1693,132 +1684,175 @@ func (p *UserCoupon) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
-		case 4:
-			if fieldTypeId == thrift.STRING {
-				l, err = p.FastReadField4(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetName = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
+		default:
+			l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+			offset += l
+			if err != nil {
+				goto SkipFieldError
 			}
-		case 5:
-			if fieldTypeId == thrift.I32 {
-				l, err = p.FastReadField5(buf[offset:])
+		}
+	}
+
+	if !issetSpuId {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetCoupon {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetDiscountPrice {
+		fieldId = 3
+		goto RequiredFieldNotSetError
+	}
+	return offset, nil
+ReadFieldBeginError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AssignedCouponSpuInfo[fieldId]), err)
+SkipFieldError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+RequiredFieldNotSetError:
+	return offset, thrift.NewProtocolException(thrift.INVALID_DATA, fmt.Sprintf("required field %s is not set", fieldIDToName_AssignedCouponSpuInfo[fieldId]))
+}
+
+func (p *AssignedCouponSpuInfo) FastReadField1(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.SpuId = _field
+	return offset, nil
+}
+
+func (p *AssignedCouponSpuInfo) FastReadField2(buf []byte) (int, error) {
+	offset := 0
+	_field := NewCoupon()
+	if l, err := _field.FastRead(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+	}
+	p.Coupon = _field
+	return offset, nil
+}
+
+func (p *AssignedCouponSpuInfo) FastReadField3(buf []byte) (int, error) {
+	offset := 0
+
+	var _field float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.DiscountPrice = _field
+	return offset, nil
+}
+
+func (p *AssignedCouponSpuInfo) FastWrite(buf []byte) int {
+	return p.FastWriteNocopy(buf, nil)
+}
+
+func (p *AssignedCouponSpuInfo) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	if p != nil {
+		offset += p.fastWriteField1(buf[offset:], w)
+		offset += p.fastWriteField3(buf[offset:], w)
+		offset += p.fastWriteField2(buf[offset:], w)
+	}
+	offset += thrift.Binary.WriteFieldStop(buf[offset:])
+	return offset
+}
+
+func (p *AssignedCouponSpuInfo) BLength() int {
+	l := 0
+	if p != nil {
+		l += p.field1Length()
+		l += p.field2Length()
+		l += p.field3Length()
+	}
+	l += thrift.Binary.FieldStopLength()
+	return l
+}
+
+func (p *AssignedCouponSpuInfo) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 1)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.SpuId)
+	return offset
+}
+
+func (p *AssignedCouponSpuInfo) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 2)
+	offset += p.Coupon.FastWriteNocopy(buf[offset:], w)
+	return offset
+}
+
+func (p *AssignedCouponSpuInfo) fastWriteField3(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 3)
+	offset += thrift.Binary.WriteDouble(buf[offset:], p.DiscountPrice)
+	return offset
+}
+
+func (p *AssignedCouponSpuInfo) field1Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *AssignedCouponSpuInfo) field2Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += p.Coupon.BLength()
+	return l
+}
+
+func (p *AssignedCouponSpuInfo) field3Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.DoubleLength()
+	return l
+}
+
+func (p *UserCoupon) FastRead(buf []byte) (int, error) {
+
+	var err error
+	var offset int
+	var l int
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetCoupon bool = false
+	var issetRemainUserUseCount bool = false
+	for {
+		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
+		offset += l
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				l, err = p.FastReadField1(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetTypeInfo = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 6:
-			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField6(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetConditionCost = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 7:
-			if fieldTypeId == thrift.DOUBLE {
-				l, err = p.FastReadField7(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 8:
-			if fieldTypeId == thrift.DOUBLE {
-				l, err = p.FastReadField8(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 9:
-			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField9(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetRangeType = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 10:
-			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField10(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetRangeId = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 11:
-			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField11(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetExpireAt = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 12:
-			if fieldTypeId == thrift.STRING {
-				l, err = p.FastReadField12(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetDescription = true
+				issetCoupon = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -1841,21 +1875,6 @@ func (p *UserCoupon) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
-		case 14:
-			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField14(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetCreatedAt = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
 		default:
 			l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -1865,63 +1884,13 @@ func (p *UserCoupon) FastRead(buf []byte) (int, error) {
 		}
 	}
 
-	if !issetCouponID {
+	if !issetCoupon {
 		fieldId = 1
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetCreatorID {
-		fieldId = 2
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetUserID {
-		fieldId = 3
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetName {
-		fieldId = 4
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetTypeInfo {
-		fieldId = 5
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetConditionCost {
-		fieldId = 6
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetRangeType {
-		fieldId = 9
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetRangeId {
-		fieldId = 10
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetExpireAt {
-		fieldId = 11
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetDescription {
-		fieldId = 12
 		goto RequiredFieldNotSetError
 	}
 
 	if !issetRemainUserUseCount {
 		fieldId = 13
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetCreatedAt {
-		fieldId = 14
 		goto RequiredFieldNotSetError
 	}
 	return offset, nil
@@ -1937,169 +1906,13 @@ RequiredFieldNotSetError:
 
 func (p *UserCoupon) FastReadField1(buf []byte) (int, error) {
 	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+	_field := NewCoupon()
+	if l, err := _field.FastRead(buf[offset:]); err != nil {
 		return offset, err
 	} else {
 		offset += l
-		_field = v
 	}
-	p.CouponID = _field
-	return offset, nil
-}
-
-func (p *UserCoupon) FastReadField2(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.CreatorID = _field
-	return offset, nil
-}
-
-func (p *UserCoupon) FastReadField3(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.UserID = _field
-	return offset, nil
-}
-
-func (p *UserCoupon) FastReadField4(buf []byte) (int, error) {
-	offset := 0
-
-	var _field string
-	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.Name = _field
-	return offset, nil
-}
-
-func (p *UserCoupon) FastReadField5(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int32
-	if v, l, err := thrift.Binary.ReadI32(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.TypeInfo = _field
-	return offset, nil
-}
-
-func (p *UserCoupon) FastReadField6(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.ConditionCost = _field
-	return offset, nil
-}
-
-func (p *UserCoupon) FastReadField7(buf []byte) (int, error) {
-	offset := 0
-
-	var _field *float64
-	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = &v
-	}
-	p.DiscountAmount = _field
-	return offset, nil
-}
-
-func (p *UserCoupon) FastReadField8(buf []byte) (int, error) {
-	offset := 0
-
-	var _field *float64
-	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = &v
-	}
-	p.Discount = _field
-	return offset, nil
-}
-
-func (p *UserCoupon) FastReadField9(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.RangeType = _field
-	return offset, nil
-}
-
-func (p *UserCoupon) FastReadField10(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.RangeId = _field
-	return offset, nil
-}
-
-func (p *UserCoupon) FastReadField11(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.ExpireAt = _field
-	return offset, nil
-}
-
-func (p *UserCoupon) FastReadField12(buf []byte) (int, error) {
-	offset := 0
-
-	var _field string
-	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.Description = _field
+	p.Coupon = _field
 	return offset, nil
 }
 
@@ -2117,20 +1930,6 @@ func (p *UserCoupon) FastReadField13(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *UserCoupon) FastReadField14(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.CreatedAt = _field
-	return offset, nil
-}
-
 func (p *UserCoupon) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
@@ -2138,20 +1937,8 @@ func (p *UserCoupon) FastWrite(buf []byte) int {
 func (p *UserCoupon) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
-		offset += p.fastWriteField1(buf[offset:], w)
-		offset += p.fastWriteField2(buf[offset:], w)
-		offset += p.fastWriteField3(buf[offset:], w)
-		offset += p.fastWriteField5(buf[offset:], w)
-		offset += p.fastWriteField6(buf[offset:], w)
-		offset += p.fastWriteField7(buf[offset:], w)
-		offset += p.fastWriteField8(buf[offset:], w)
-		offset += p.fastWriteField9(buf[offset:], w)
-		offset += p.fastWriteField10(buf[offset:], w)
-		offset += p.fastWriteField11(buf[offset:], w)
 		offset += p.fastWriteField13(buf[offset:], w)
-		offset += p.fastWriteField14(buf[offset:], w)
-		offset += p.fastWriteField4(buf[offset:], w)
-		offset += p.fastWriteField12(buf[offset:], w)
+		offset += p.fastWriteField1(buf[offset:], w)
 	}
 	offset += thrift.Binary.WriteFieldStop(buf[offset:])
 	return offset
@@ -2161,19 +1948,7 @@ func (p *UserCoupon) BLength() int {
 	l := 0
 	if p != nil {
 		l += p.field1Length()
-		l += p.field2Length()
-		l += p.field3Length()
-		l += p.field4Length()
-		l += p.field5Length()
-		l += p.field6Length()
-		l += p.field7Length()
-		l += p.field8Length()
-		l += p.field9Length()
-		l += p.field10Length()
-		l += p.field11Length()
-		l += p.field12Length()
 		l += p.field13Length()
-		l += p.field14Length()
 	}
 	l += thrift.Binary.FieldStopLength()
 	return l
@@ -2181,89 +1956,8 @@ func (p *UserCoupon) BLength() int {
 
 func (p *UserCoupon) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 1)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.CouponID)
-	return offset
-}
-
-func (p *UserCoupon) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 2)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.CreatorID)
-	return offset
-}
-
-func (p *UserCoupon) fastWriteField3(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 3)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.UserID)
-	return offset
-}
-
-func (p *UserCoupon) fastWriteField4(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 4)
-	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.Name)
-	return offset
-}
-
-func (p *UserCoupon) fastWriteField5(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I32, 5)
-	offset += thrift.Binary.WriteI32(buf[offset:], p.TypeInfo)
-	return offset
-}
-
-func (p *UserCoupon) fastWriteField6(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 6)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.ConditionCost)
-	return offset
-}
-
-func (p *UserCoupon) fastWriteField7(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	if p.IsSetDiscountAmount() {
-		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 7)
-		offset += thrift.Binary.WriteDouble(buf[offset:], *p.DiscountAmount)
-	}
-	return offset
-}
-
-func (p *UserCoupon) fastWriteField8(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	if p.IsSetDiscount() {
-		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 8)
-		offset += thrift.Binary.WriteDouble(buf[offset:], *p.Discount)
-	}
-	return offset
-}
-
-func (p *UserCoupon) fastWriteField9(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 9)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.RangeType)
-	return offset
-}
-
-func (p *UserCoupon) fastWriteField10(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 10)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.RangeId)
-	return offset
-}
-
-func (p *UserCoupon) fastWriteField11(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 11)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.ExpireAt)
-	return offset
-}
-
-func (p *UserCoupon) fastWriteField12(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 12)
-	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.Description)
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 1)
+	offset += p.Coupon.FastWriteNocopy(buf[offset:], w)
 	return offset
 }
 
@@ -2274,109 +1968,14 @@ func (p *UserCoupon) fastWriteField13(buf []byte, w thrift.NocopyWriter) int {
 	return offset
 }
 
-func (p *UserCoupon) fastWriteField14(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 14)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.CreatedAt)
-	return offset
-}
-
 func (p *UserCoupon) field1Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *UserCoupon) field2Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *UserCoupon) field3Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *UserCoupon) field4Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.StringLengthNocopy(p.Name)
-	return l
-}
-
-func (p *UserCoupon) field5Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I32Length()
-	return l
-}
-
-func (p *UserCoupon) field6Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *UserCoupon) field7Length() int {
-	l := 0
-	if p.IsSetDiscountAmount() {
-		l += thrift.Binary.FieldBeginLength()
-		l += thrift.Binary.DoubleLength()
-	}
-	return l
-}
-
-func (p *UserCoupon) field8Length() int {
-	l := 0
-	if p.IsSetDiscount() {
-		l += thrift.Binary.FieldBeginLength()
-		l += thrift.Binary.DoubleLength()
-	}
-	return l
-}
-
-func (p *UserCoupon) field9Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *UserCoupon) field10Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *UserCoupon) field11Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *UserCoupon) field12Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.StringLengthNocopy(p.Description)
+	l += p.Coupon.BLength()
 	return l
 }
 
 func (p *UserCoupon) field13Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *UserCoupon) field14Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.I64Length()
@@ -6106,6 +5705,34 @@ func (p *Order) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
+		case 16:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField16(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 17:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField17(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -6410,6 +6037,34 @@ func (p *Order) FastReadField15(buf []byte) (int, error) {
 	return offset, nil
 }
 
+func (p *Order) FastReadField16(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.CouponId = _field
+	return offset, nil
+}
+
+func (p *Order) FastReadField17(buf []byte) (int, error) {
+	offset := 0
+
+	var _field string
+	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.CouponName = _field
+	return offset, nil
+}
+
 func (p *Order) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
@@ -6428,10 +6083,12 @@ func (p *Order) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 		offset += p.fastWriteField12(buf[offset:], w)
 		offset += p.fastWriteField13(buf[offset:], w)
 		offset += p.fastWriteField14(buf[offset:], w)
+		offset += p.fastWriteField16(buf[offset:], w)
 		offset += p.fastWriteField2(buf[offset:], w)
 		offset += p.fastWriteField8(buf[offset:], w)
 		offset += p.fastWriteField10(buf[offset:], w)
 		offset += p.fastWriteField15(buf[offset:], w)
+		offset += p.fastWriteField17(buf[offset:], w)
 	}
 	offset += thrift.Binary.WriteFieldStop(buf[offset:])
 	return offset
@@ -6455,6 +6112,8 @@ func (p *Order) BLength() int {
 		l += p.field13Length()
 		l += p.field14Length()
 		l += p.field15Length()
+		l += p.field16Length()
+		l += p.field17Length()
 	}
 	l += thrift.Binary.FieldStopLength()
 	return l
@@ -6565,6 +6224,20 @@ func (p *Order) fastWriteField15(buf []byte, w thrift.NocopyWriter) int {
 	return offset
 }
 
+func (p *Order) fastWriteField16(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 16)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.CouponId)
+	return offset
+}
+
+func (p *Order) fastWriteField17(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 17)
+	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.CouponName)
+	return offset
+}
+
 func (p *Order) field1Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
@@ -6667,6 +6340,20 @@ func (p *Order) field15Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.StringLengthNocopy(p.AddressInfo)
+	return l
+}
+
+func (p *Order) field16Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *Order) field17Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.StringLengthNocopy(p.CouponName)
 	return l
 }
 
@@ -7344,22 +7031,1021 @@ func (p *OrderGoods) FastRead(buf []byte) (int, error) {
 	var l int
 	var fieldTypeId thrift.TType
 	var fieldId int16
+	var issetMerchantId bool = false
+	var issetGoodsId bool = false
+	var issetGoodsName bool = false
+	var issetStyleId bool = false
+	var issetStyleName bool = false
+	var issetGoodsVersion bool = false
+	var issetStyleHeadDrawing bool = false
+	var issetOriginPrice bool = false
+	var issetSalePrice bool = false
+	var issetSingleFreightPrice bool = false
+	var issetPurchaseQuantity bool = false
+	var issetTotalAmount bool = false
+	var issetFreightAmount bool = false
+	var issetDiscountAmount bool = false
+	var issetPaymentAmount bool = false
+	var issetSinglePrice bool = false
+	var issetOrderId bool = false
+	for {
+		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
+		offset += l
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField1(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetMerchantId = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField2(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetGoodsId = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField3(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetGoodsName = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 4:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField4(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetStyleId = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 5:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField5(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetStyleName = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 6:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField6(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetGoodsVersion = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 7:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField7(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetStyleHeadDrawing = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 8:
+			if fieldTypeId == thrift.DOUBLE {
+				l, err = p.FastReadField8(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetOriginPrice = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 9:
+			if fieldTypeId == thrift.DOUBLE {
+				l, err = p.FastReadField9(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetSalePrice = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 10:
+			if fieldTypeId == thrift.DOUBLE {
+				l, err = p.FastReadField10(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetSingleFreightPrice = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 11:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField11(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetPurchaseQuantity = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 12:
+			if fieldTypeId == thrift.DOUBLE {
+				l, err = p.FastReadField12(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetTotalAmount = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 13:
+			if fieldTypeId == thrift.DOUBLE {
+				l, err = p.FastReadField13(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetFreightAmount = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 14:
+			if fieldTypeId == thrift.DOUBLE {
+				l, err = p.FastReadField14(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetDiscountAmount = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 15:
+			if fieldTypeId == thrift.DOUBLE {
+				l, err = p.FastReadField15(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetPaymentAmount = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 16:
+			if fieldTypeId == thrift.DOUBLE {
+				l, err = p.FastReadField16(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetSinglePrice = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 17:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField17(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 18:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField18(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 19:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField19(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetOrderId = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+			offset += l
+			if err != nil {
+				goto SkipFieldError
+			}
+		}
+	}
+
+	if !issetMerchantId {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetGoodsId {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetGoodsName {
+		fieldId = 3
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetStyleId {
+		fieldId = 4
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetStyleName {
+		fieldId = 5
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetGoodsVersion {
+		fieldId = 6
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetStyleHeadDrawing {
+		fieldId = 7
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetOriginPrice {
+		fieldId = 8
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetSalePrice {
+		fieldId = 9
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetSingleFreightPrice {
+		fieldId = 10
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetPurchaseQuantity {
+		fieldId = 11
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetTotalAmount {
+		fieldId = 12
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetFreightAmount {
+		fieldId = 13
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetDiscountAmount {
+		fieldId = 14
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetPaymentAmount {
+		fieldId = 15
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetSinglePrice {
+		fieldId = 16
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetOrderId {
+		fieldId = 19
+		goto RequiredFieldNotSetError
+	}
+	return offset, nil
+ReadFieldBeginError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_OrderGoods[fieldId]), err)
+SkipFieldError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+RequiredFieldNotSetError:
+	return offset, thrift.NewProtocolException(thrift.INVALID_DATA, fmt.Sprintf("required field %s is not set", fieldIDToName_OrderGoods[fieldId]))
+}
+
+func (p *OrderGoods) FastReadField1(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.MerchantId = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField2(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.GoodsId = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField3(buf []byte) (int, error) {
+	offset := 0
+
+	var _field string
+	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.GoodsName = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField4(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.StyleId = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField5(buf []byte) (int, error) {
+	offset := 0
+
+	var _field string
+	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.StyleName = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField6(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.GoodsVersion = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField7(buf []byte) (int, error) {
+	offset := 0
+
+	var _field string
+	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.StyleHeadDrawing = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField8(buf []byte) (int, error) {
+	offset := 0
+
+	var _field float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.OriginPrice = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField9(buf []byte) (int, error) {
+	offset := 0
+
+	var _field float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.SalePrice = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField10(buf []byte) (int, error) {
+	offset := 0
+
+	var _field float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.SingleFreightPrice = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField11(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.PurchaseQuantity = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField12(buf []byte) (int, error) {
+	offset := 0
+
+	var _field float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.TotalAmount = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField13(buf []byte) (int, error) {
+	offset := 0
+
+	var _field float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.FreightAmount = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField14(buf []byte) (int, error) {
+	offset := 0
+
+	var _field float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.DiscountAmount = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField15(buf []byte) (int, error) {
+	offset := 0
+
+	var _field float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.PaymentAmount = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField16(buf []byte) (int, error) {
+	offset := 0
+
+	var _field float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.SinglePrice = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField17(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.CouponId = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField18(buf []byte) (int, error) {
+	offset := 0
+
+	var _field string
+	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.CouponName = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastReadField19(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.OrderId = _field
+	return offset, nil
+}
+
+func (p *OrderGoods) FastWrite(buf []byte) int {
+	return p.FastWriteNocopy(buf, nil)
+}
+
+func (p *OrderGoods) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	if p != nil {
+		offset += p.fastWriteField1(buf[offset:], w)
+		offset += p.fastWriteField2(buf[offset:], w)
+		offset += p.fastWriteField4(buf[offset:], w)
+		offset += p.fastWriteField6(buf[offset:], w)
+		offset += p.fastWriteField8(buf[offset:], w)
+		offset += p.fastWriteField9(buf[offset:], w)
+		offset += p.fastWriteField10(buf[offset:], w)
+		offset += p.fastWriteField11(buf[offset:], w)
+		offset += p.fastWriteField12(buf[offset:], w)
+		offset += p.fastWriteField13(buf[offset:], w)
+		offset += p.fastWriteField14(buf[offset:], w)
+		offset += p.fastWriteField15(buf[offset:], w)
+		offset += p.fastWriteField16(buf[offset:], w)
+		offset += p.fastWriteField17(buf[offset:], w)
+		offset += p.fastWriteField19(buf[offset:], w)
+		offset += p.fastWriteField3(buf[offset:], w)
+		offset += p.fastWriteField5(buf[offset:], w)
+		offset += p.fastWriteField7(buf[offset:], w)
+		offset += p.fastWriteField18(buf[offset:], w)
+	}
+	offset += thrift.Binary.WriteFieldStop(buf[offset:])
+	return offset
+}
+
+func (p *OrderGoods) BLength() int {
+	l := 0
+	if p != nil {
+		l += p.field1Length()
+		l += p.field2Length()
+		l += p.field3Length()
+		l += p.field4Length()
+		l += p.field5Length()
+		l += p.field6Length()
+		l += p.field7Length()
+		l += p.field8Length()
+		l += p.field9Length()
+		l += p.field10Length()
+		l += p.field11Length()
+		l += p.field12Length()
+		l += p.field13Length()
+		l += p.field14Length()
+		l += p.field15Length()
+		l += p.field16Length()
+		l += p.field17Length()
+		l += p.field18Length()
+		l += p.field19Length()
+	}
+	l += thrift.Binary.FieldStopLength()
+	return l
+}
+
+func (p *OrderGoods) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 1)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.MerchantId)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 2)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.GoodsId)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField3(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 3)
+	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.GoodsName)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField4(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 4)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.StyleId)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField5(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 5)
+	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.StyleName)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField6(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 6)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.GoodsVersion)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField7(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 7)
+	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.StyleHeadDrawing)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField8(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 8)
+	offset += thrift.Binary.WriteDouble(buf[offset:], p.OriginPrice)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField9(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 9)
+	offset += thrift.Binary.WriteDouble(buf[offset:], p.SalePrice)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField10(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 10)
+	offset += thrift.Binary.WriteDouble(buf[offset:], p.SingleFreightPrice)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField11(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 11)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.PurchaseQuantity)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField12(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 12)
+	offset += thrift.Binary.WriteDouble(buf[offset:], p.TotalAmount)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField13(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 13)
+	offset += thrift.Binary.WriteDouble(buf[offset:], p.FreightAmount)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField14(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 14)
+	offset += thrift.Binary.WriteDouble(buf[offset:], p.DiscountAmount)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField15(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 15)
+	offset += thrift.Binary.WriteDouble(buf[offset:], p.PaymentAmount)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField16(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 16)
+	offset += thrift.Binary.WriteDouble(buf[offset:], p.SinglePrice)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField17(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 17)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.CouponId)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField18(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 18)
+	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.CouponName)
+	return offset
+}
+
+func (p *OrderGoods) fastWriteField19(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 19)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.OrderId)
+	return offset
+}
+
+func (p *OrderGoods) field1Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *OrderGoods) field2Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *OrderGoods) field3Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.StringLengthNocopy(p.GoodsName)
+	return l
+}
+
+func (p *OrderGoods) field4Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *OrderGoods) field5Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.StringLengthNocopy(p.StyleName)
+	return l
+}
+
+func (p *OrderGoods) field6Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *OrderGoods) field7Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.StringLengthNocopy(p.StyleHeadDrawing)
+	return l
+}
+
+func (p *OrderGoods) field8Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.DoubleLength()
+	return l
+}
+
+func (p *OrderGoods) field9Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.DoubleLength()
+	return l
+}
+
+func (p *OrderGoods) field10Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.DoubleLength()
+	return l
+}
+
+func (p *OrderGoods) field11Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *OrderGoods) field12Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.DoubleLength()
+	return l
+}
+
+func (p *OrderGoods) field13Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.DoubleLength()
+	return l
+}
+
+func (p *OrderGoods) field14Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.DoubleLength()
+	return l
+}
+
+func (p *OrderGoods) field15Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.DoubleLength()
+	return l
+}
+
+func (p *OrderGoods) field16Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.DoubleLength()
+	return l
+}
+
+func (p *OrderGoods) field17Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *OrderGoods) field18Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.StringLengthNocopy(p.CouponName)
+	return l
+}
+
+func (p *OrderGoods) field19Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *BaseOrderGoods) FastRead(buf []byte) (int, error) {
+
+	var err error
+	var offset int
+	var l int
+	var fieldTypeId thrift.TType
+	var fieldId int16
 	var issetMerchantID bool = false
 	var issetGoodsID bool = false
-	var issetGoodsName bool = false
-	var issetGoodsHeadDrawing bool = false
 	var issetStyleID bool = false
-	var issetStyleName bool = false
-	var issetStyleHeadDrawing bool = false
-	var issetOriginCast bool = false
-	var issetSaleCast bool = false
 	var issetPurchaseQuantity bool = false
-	var issetPaymentAmount bool = false
-	var issetFreightAmount bool = false
-	var issetSettlementAmount bool = false
-	var issetDiscountAmount bool = false
-	var issetSingleCast bool = false
-	var issetOrderID bool = false
 	var issetGoodsVersion bool = false
 	for {
 		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
@@ -7402,38 +8088,8 @@ func (p *OrderGoods) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 3:
-			if fieldTypeId == thrift.STRING {
-				l, err = p.FastReadField3(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetGoodsName = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 4:
-			if fieldTypeId == thrift.STRING {
-				l, err = p.FastReadField4(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetGoodsHeadDrawing = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 5:
 			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField5(buf[offset:])
+				l, err = p.FastReadField3(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -7446,69 +8102,9 @@ func (p *OrderGoods) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
-		case 6:
-			if fieldTypeId == thrift.STRING {
-				l, err = p.FastReadField6(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetStyleName = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 7:
-			if fieldTypeId == thrift.STRING {
-				l, err = p.FastReadField7(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetStyleHeadDrawing = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 8:
-			if fieldTypeId == thrift.DOUBLE {
-				l, err = p.FastReadField8(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetOriginCast = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 9:
-			if fieldTypeId == thrift.DOUBLE {
-				l, err = p.FastReadField9(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetSaleCast = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 10:
+		case 4:
 			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField10(buf[offset:])
+				l, err = p.FastReadField4(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -7521,113 +8117,9 @@ func (p *OrderGoods) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
-		case 11:
-			if fieldTypeId == thrift.DOUBLE {
-				l, err = p.FastReadField11(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetPaymentAmount = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 12:
-			if fieldTypeId == thrift.DOUBLE {
-				l, err = p.FastReadField12(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetFreightAmount = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 13:
-			if fieldTypeId == thrift.DOUBLE {
-				l, err = p.FastReadField13(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetSettlementAmount = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 14:
-			if fieldTypeId == thrift.DOUBLE {
-				l, err = p.FastReadField14(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetDiscountAmount = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 15:
-			if fieldTypeId == thrift.DOUBLE {
-				l, err = p.FastReadField15(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetSingleCast = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 16:
+		case 5:
 			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField16(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 17:
-			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField17(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetOrderID = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 18:
-			if fieldTypeId == thrift.I32 {
-				l, err = p.FastReadField18(buf[offset:])
+				l, err = p.FastReadField5(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -7659,792 +8151,17 @@ func (p *OrderGoods) FastRead(buf []byte) (int, error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetGoodsName {
+	if !issetStyleID {
 		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetGoodsHeadDrawing {
-		fieldId = 4
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetStyleID {
-		fieldId = 5
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetStyleName {
-		fieldId = 6
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetStyleHeadDrawing {
-		fieldId = 7
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetOriginCast {
-		fieldId = 8
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetSaleCast {
-		fieldId = 9
-		goto RequiredFieldNotSetError
-	}
-
 	if !issetPurchaseQuantity {
-		fieldId = 10
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetPaymentAmount {
-		fieldId = 11
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetFreightAmount {
-		fieldId = 12
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetSettlementAmount {
-		fieldId = 13
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetDiscountAmount {
-		fieldId = 14
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetSingleCast {
-		fieldId = 15
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetOrderID {
-		fieldId = 17
+		fieldId = 4
 		goto RequiredFieldNotSetError
 	}
 
 	if !issetGoodsVersion {
-		fieldId = 18
-		goto RequiredFieldNotSetError
-	}
-	return offset, nil
-ReadFieldBeginError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_OrderGoods[fieldId]), err)
-SkipFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
-RequiredFieldNotSetError:
-	return offset, thrift.NewProtocolException(thrift.INVALID_DATA, fmt.Sprintf("required field %s is not set", fieldIDToName_OrderGoods[fieldId]))
-}
-
-func (p *OrderGoods) FastReadField1(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.MerchantID = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField2(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.GoodsID = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField3(buf []byte) (int, error) {
-	offset := 0
-
-	var _field string
-	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.GoodsName = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField4(buf []byte) (int, error) {
-	offset := 0
-
-	var _field string
-	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.GoodsHeadDrawing = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField5(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.StyleID = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField6(buf []byte) (int, error) {
-	offset := 0
-
-	var _field string
-	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.StyleName = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField7(buf []byte) (int, error) {
-	offset := 0
-
-	var _field string
-	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.StyleHeadDrawing = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField8(buf []byte) (int, error) {
-	offset := 0
-
-	var _field float64
-	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.OriginCast = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField9(buf []byte) (int, error) {
-	offset := 0
-
-	var _field float64
-	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.SaleCast = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField10(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.PurchaseQuantity = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField11(buf []byte) (int, error) {
-	offset := 0
-
-	var _field float64
-	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.PaymentAmount = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField12(buf []byte) (int, error) {
-	offset := 0
-
-	var _field float64
-	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.FreightAmount = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField13(buf []byte) (int, error) {
-	offset := 0
-
-	var _field float64
-	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.SettlementAmount = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField14(buf []byte) (int, error) {
-	offset := 0
-
-	var _field float64
-	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.DiscountAmount = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField15(buf []byte) (int, error) {
-	offset := 0
-
-	var _field float64
-	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.SingleCast = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField16(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.CouponID = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField17(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int64
-	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.OrderID = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastReadField18(buf []byte) (int, error) {
-	offset := 0
-
-	var _field int32
-	if v, l, err := thrift.Binary.ReadI32(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.GoodsVersion = _field
-	return offset, nil
-}
-
-func (p *OrderGoods) FastWrite(buf []byte) int {
-	return p.FastWriteNocopy(buf, nil)
-}
-
-func (p *OrderGoods) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	if p != nil {
-		offset += p.fastWriteField1(buf[offset:], w)
-		offset += p.fastWriteField2(buf[offset:], w)
-		offset += p.fastWriteField5(buf[offset:], w)
-		offset += p.fastWriteField8(buf[offset:], w)
-		offset += p.fastWriteField9(buf[offset:], w)
-		offset += p.fastWriteField10(buf[offset:], w)
-		offset += p.fastWriteField11(buf[offset:], w)
-		offset += p.fastWriteField12(buf[offset:], w)
-		offset += p.fastWriteField13(buf[offset:], w)
-		offset += p.fastWriteField14(buf[offset:], w)
-		offset += p.fastWriteField15(buf[offset:], w)
-		offset += p.fastWriteField16(buf[offset:], w)
-		offset += p.fastWriteField17(buf[offset:], w)
-		offset += p.fastWriteField18(buf[offset:], w)
-		offset += p.fastWriteField3(buf[offset:], w)
-		offset += p.fastWriteField4(buf[offset:], w)
-		offset += p.fastWriteField6(buf[offset:], w)
-		offset += p.fastWriteField7(buf[offset:], w)
-	}
-	offset += thrift.Binary.WriteFieldStop(buf[offset:])
-	return offset
-}
-
-func (p *OrderGoods) BLength() int {
-	l := 0
-	if p != nil {
-		l += p.field1Length()
-		l += p.field2Length()
-		l += p.field3Length()
-		l += p.field4Length()
-		l += p.field5Length()
-		l += p.field6Length()
-		l += p.field7Length()
-		l += p.field8Length()
-		l += p.field9Length()
-		l += p.field10Length()
-		l += p.field11Length()
-		l += p.field12Length()
-		l += p.field13Length()
-		l += p.field14Length()
-		l += p.field15Length()
-		l += p.field16Length()
-		l += p.field17Length()
-		l += p.field18Length()
-	}
-	l += thrift.Binary.FieldStopLength()
-	return l
-}
-
-func (p *OrderGoods) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 1)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.MerchantID)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 2)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.GoodsID)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField3(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 3)
-	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.GoodsName)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField4(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 4)
-	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.GoodsHeadDrawing)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField5(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 5)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.StyleID)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField6(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 6)
-	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.StyleName)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField7(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 7)
-	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.StyleHeadDrawing)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField8(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 8)
-	offset += thrift.Binary.WriteDouble(buf[offset:], p.OriginCast)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField9(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 9)
-	offset += thrift.Binary.WriteDouble(buf[offset:], p.SaleCast)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField10(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 10)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.PurchaseQuantity)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField11(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 11)
-	offset += thrift.Binary.WriteDouble(buf[offset:], p.PaymentAmount)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField12(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 12)
-	offset += thrift.Binary.WriteDouble(buf[offset:], p.FreightAmount)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField13(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 13)
-	offset += thrift.Binary.WriteDouble(buf[offset:], p.SettlementAmount)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField14(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 14)
-	offset += thrift.Binary.WriteDouble(buf[offset:], p.DiscountAmount)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField15(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 15)
-	offset += thrift.Binary.WriteDouble(buf[offset:], p.SingleCast)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField16(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 16)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.CouponID)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField17(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 17)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.OrderID)
-	return offset
-}
-
-func (p *OrderGoods) fastWriteField18(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I32, 18)
-	offset += thrift.Binary.WriteI32(buf[offset:], p.GoodsVersion)
-	return offset
-}
-
-func (p *OrderGoods) field1Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *OrderGoods) field2Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *OrderGoods) field3Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.StringLengthNocopy(p.GoodsName)
-	return l
-}
-
-func (p *OrderGoods) field4Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.StringLengthNocopy(p.GoodsHeadDrawing)
-	return l
-}
-
-func (p *OrderGoods) field5Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *OrderGoods) field6Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.StringLengthNocopy(p.StyleName)
-	return l
-}
-
-func (p *OrderGoods) field7Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.StringLengthNocopy(p.StyleHeadDrawing)
-	return l
-}
-
-func (p *OrderGoods) field8Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.DoubleLength()
-	return l
-}
-
-func (p *OrderGoods) field9Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.DoubleLength()
-	return l
-}
-
-func (p *OrderGoods) field10Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *OrderGoods) field11Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.DoubleLength()
-	return l
-}
-
-func (p *OrderGoods) field12Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.DoubleLength()
-	return l
-}
-
-func (p *OrderGoods) field13Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.DoubleLength()
-	return l
-}
-
-func (p *OrderGoods) field14Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.DoubleLength()
-	return l
-}
-
-func (p *OrderGoods) field15Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.DoubleLength()
-	return l
-}
-
-func (p *OrderGoods) field16Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *OrderGoods) field17Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I64Length()
-	return l
-}
-
-func (p *OrderGoods) field18Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.I32Length()
-	return l
-}
-
-func (p *BaseOrderGoods) FastRead(buf []byte) (int, error) {
-
-	var err error
-	var offset int
-	var l int
-	var fieldTypeId thrift.TType
-	var fieldId int16
-	var issetMerchantName bool = false
-	var issetGoodsName bool = false
-	var issetStyleName bool = false
-	var issetPurchaseQuantity bool = false
-	var issetStyleHeadDrawing bool = false
-	for {
-		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
-		offset += l
-		if err != nil {
-			goto ReadFieldBeginError
-		}
-		if fieldTypeId == thrift.STOP {
-			break
-		}
-		switch fieldId {
-		case 1:
-			if fieldTypeId == thrift.STRING {
-				l, err = p.FastReadField1(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetMerchantName = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 2:
-			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField2(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetGoodsName = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 3:
-			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField3(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetStyleName = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 4:
-			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField4(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetPurchaseQuantity = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 5:
-			if fieldTypeId == thrift.STRING {
-				l, err = p.FastReadField5(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-				issetStyleHeadDrawing = true
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 6:
-			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField6(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		default:
-			l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
-			offset += l
-			if err != nil {
-				goto SkipFieldError
-			}
-		}
-	}
-
-	if !issetMerchantName {
-		fieldId = 1
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetGoodsName {
-		fieldId = 2
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetStyleName {
-		fieldId = 3
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetPurchaseQuantity {
-		fieldId = 4
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetStyleHeadDrawing {
 		fieldId = 5
 		goto RequiredFieldNotSetError
 	}
@@ -8462,14 +8179,14 @@ RequiredFieldNotSetError:
 func (p *BaseOrderGoods) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
-	var _field string
-	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
 		return offset, err
 	} else {
 		offset += l
 		_field = v
 	}
-	p.MerchantName = _field
+	p.MerchantID = _field
 	return offset, nil
 }
 
@@ -8483,7 +8200,7 @@ func (p *BaseOrderGoods) FastReadField2(buf []byte) (int, error) {
 		offset += l
 		_field = v
 	}
-	p.GoodsName = _field
+	p.GoodsID = _field
 	return offset, nil
 }
 
@@ -8497,7 +8214,7 @@ func (p *BaseOrderGoods) FastReadField3(buf []byte) (int, error) {
 		offset += l
 		_field = v
 	}
-	p.StyleName = _field
+	p.StyleID = _field
 	return offset, nil
 }
 
@@ -8518,20 +8235,6 @@ func (p *BaseOrderGoods) FastReadField4(buf []byte) (int, error) {
 func (p *BaseOrderGoods) FastReadField5(buf []byte) (int, error) {
 	offset := 0
 
-	var _field string
-	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-		_field = v
-	}
-	p.StyleHeadDrawing = _field
-	return offset, nil
-}
-
-func (p *BaseOrderGoods) FastReadField6(buf []byte) (int, error) {
-	offset := 0
-
 	var _field int64
 	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
 		return offset, err
@@ -8539,7 +8242,7 @@ func (p *BaseOrderGoods) FastReadField6(buf []byte) (int, error) {
 		offset += l
 		_field = v
 	}
-	p.CouponID = _field
+	p.GoodsVersion = _field
 	return offset, nil
 }
 
@@ -8550,11 +8253,10 @@ func (p *BaseOrderGoods) FastWrite(buf []byte) int {
 func (p *BaseOrderGoods) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
+		offset += p.fastWriteField1(buf[offset:], w)
 		offset += p.fastWriteField2(buf[offset:], w)
 		offset += p.fastWriteField3(buf[offset:], w)
 		offset += p.fastWriteField4(buf[offset:], w)
-		offset += p.fastWriteField6(buf[offset:], w)
-		offset += p.fastWriteField1(buf[offset:], w)
 		offset += p.fastWriteField5(buf[offset:], w)
 	}
 	offset += thrift.Binary.WriteFieldStop(buf[offset:])
@@ -8569,7 +8271,6 @@ func (p *BaseOrderGoods) BLength() int {
 		l += p.field3Length()
 		l += p.field4Length()
 		l += p.field5Length()
-		l += p.field6Length()
 	}
 	l += thrift.Binary.FieldStopLength()
 	return l
@@ -8577,22 +8278,22 @@ func (p *BaseOrderGoods) BLength() int {
 
 func (p *BaseOrderGoods) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 1)
-	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.MerchantName)
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 1)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.MerchantID)
 	return offset
 }
 
 func (p *BaseOrderGoods) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 2)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.GoodsName)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.GoodsID)
 	return offset
 }
 
 func (p *BaseOrderGoods) fastWriteField3(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 3)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.StyleName)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.StyleID)
 	return offset
 }
 
@@ -8605,22 +8306,15 @@ func (p *BaseOrderGoods) fastWriteField4(buf []byte, w thrift.NocopyWriter) int 
 
 func (p *BaseOrderGoods) fastWriteField5(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 5)
-	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.StyleHeadDrawing)
-	return offset
-}
-
-func (p *BaseOrderGoods) fastWriteField6(buf []byte, w thrift.NocopyWriter) int {
-	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 6)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.CouponID)
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 5)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.GoodsVersion)
 	return offset
 }
 
 func (p *BaseOrderGoods) field1Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.StringLengthNocopy(p.MerchantName)
+	l += thrift.Binary.I64Length()
 	return l
 }
 
@@ -8646,13 +8340,6 @@ func (p *BaseOrderGoods) field4Length() int {
 }
 
 func (p *BaseOrderGoods) field5Length() int {
-	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += thrift.Binary.StringLengthNocopy(p.StyleHeadDrawing)
-	return l
-}
-
-func (p *BaseOrderGoods) field6Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.I64Length()
@@ -9232,5 +8919,571 @@ func (p *RefundResponseInfo) field2Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *CartGoods) FastRead(buf []byte) (int, error) {
+
+	var err error
+	var offset int
+	var l int
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetMerchantId bool = false
+	var issetGoodsId bool = false
+	var issetGoodsName bool = false
+	var issetSkuId bool = false
+	var issetSkuName bool = false
+	var issetGoodsVersion bool = false
+	var issetStyleHeadDrawing bool = false
+	var issetPurchaseQuantity bool = false
+	var issetTotalAmount bool = false
+	var issetDiscountAmount bool = false
+	for {
+		fieldTypeId, fieldId, l, err = thrift.Binary.ReadFieldBegin(buf[offset:])
+		offset += l
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField1(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetMerchantId = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField2(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetGoodsId = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField3(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetGoodsName = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 4:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField4(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetSkuId = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 5:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField5(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetSkuName = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 6:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField6(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetGoodsVersion = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 7:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField7(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetStyleHeadDrawing = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 11:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField11(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetPurchaseQuantity = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 12:
+			if fieldTypeId == thrift.DOUBLE {
+				l, err = p.FastReadField12(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetTotalAmount = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 14:
+			if fieldTypeId == thrift.DOUBLE {
+				l, err = p.FastReadField14(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+				issetDiscountAmount = true
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+			offset += l
+			if err != nil {
+				goto SkipFieldError
+			}
+		}
+	}
+
+	if !issetMerchantId {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetGoodsId {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetGoodsName {
+		fieldId = 3
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetSkuId {
+		fieldId = 4
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetSkuName {
+		fieldId = 5
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetGoodsVersion {
+		fieldId = 6
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetStyleHeadDrawing {
+		fieldId = 7
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetPurchaseQuantity {
+		fieldId = 11
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetTotalAmount {
+		fieldId = 12
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetDiscountAmount {
+		fieldId = 14
+		goto RequiredFieldNotSetError
+	}
+	return offset, nil
+ReadFieldBeginError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_CartGoods[fieldId]), err)
+SkipFieldError:
+	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+RequiredFieldNotSetError:
+	return offset, thrift.NewProtocolException(thrift.INVALID_DATA, fmt.Sprintf("required field %s is not set", fieldIDToName_CartGoods[fieldId]))
+}
+
+func (p *CartGoods) FastReadField1(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.MerchantId = _field
+	return offset, nil
+}
+
+func (p *CartGoods) FastReadField2(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.GoodsId = _field
+	return offset, nil
+}
+
+func (p *CartGoods) FastReadField3(buf []byte) (int, error) {
+	offset := 0
+
+	var _field string
+	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.GoodsName = _field
+	return offset, nil
+}
+
+func (p *CartGoods) FastReadField4(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.SkuId = _field
+	return offset, nil
+}
+
+func (p *CartGoods) FastReadField5(buf []byte) (int, error) {
+	offset := 0
+
+	var _field string
+	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.SkuName = _field
+	return offset, nil
+}
+
+func (p *CartGoods) FastReadField6(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.GoodsVersion = _field
+	return offset, nil
+}
+
+func (p *CartGoods) FastReadField7(buf []byte) (int, error) {
+	offset := 0
+
+	var _field string
+	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.StyleHeadDrawing = _field
+	return offset, nil
+}
+
+func (p *CartGoods) FastReadField11(buf []byte) (int, error) {
+	offset := 0
+
+	var _field int64
+	if v, l, err := thrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.PurchaseQuantity = _field
+	return offset, nil
+}
+
+func (p *CartGoods) FastReadField12(buf []byte) (int, error) {
+	offset := 0
+
+	var _field float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.TotalAmount = _field
+	return offset, nil
+}
+
+func (p *CartGoods) FastReadField14(buf []byte) (int, error) {
+	offset := 0
+
+	var _field float64
+	if v, l, err := thrift.Binary.ReadDouble(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = v
+	}
+	p.DiscountAmount = _field
+	return offset, nil
+}
+
+func (p *CartGoods) FastWrite(buf []byte) int {
+	return p.FastWriteNocopy(buf, nil)
+}
+
+func (p *CartGoods) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	if p != nil {
+		offset += p.fastWriteField1(buf[offset:], w)
+		offset += p.fastWriteField2(buf[offset:], w)
+		offset += p.fastWriteField4(buf[offset:], w)
+		offset += p.fastWriteField6(buf[offset:], w)
+		offset += p.fastWriteField11(buf[offset:], w)
+		offset += p.fastWriteField12(buf[offset:], w)
+		offset += p.fastWriteField14(buf[offset:], w)
+		offset += p.fastWriteField3(buf[offset:], w)
+		offset += p.fastWriteField5(buf[offset:], w)
+		offset += p.fastWriteField7(buf[offset:], w)
+	}
+	offset += thrift.Binary.WriteFieldStop(buf[offset:])
+	return offset
+}
+
+func (p *CartGoods) BLength() int {
+	l := 0
+	if p != nil {
+		l += p.field1Length()
+		l += p.field2Length()
+		l += p.field3Length()
+		l += p.field4Length()
+		l += p.field5Length()
+		l += p.field6Length()
+		l += p.field7Length()
+		l += p.field11Length()
+		l += p.field12Length()
+		l += p.field14Length()
+	}
+	l += thrift.Binary.FieldStopLength()
+	return l
+}
+
+func (p *CartGoods) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 1)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.MerchantId)
+	return offset
+}
+
+func (p *CartGoods) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 2)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.GoodsId)
+	return offset
+}
+
+func (p *CartGoods) fastWriteField3(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 3)
+	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.GoodsName)
+	return offset
+}
+
+func (p *CartGoods) fastWriteField4(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 4)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.SkuId)
+	return offset
+}
+
+func (p *CartGoods) fastWriteField5(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 5)
+	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.SkuName)
+	return offset
+}
+
+func (p *CartGoods) fastWriteField6(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 6)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.GoodsVersion)
+	return offset
+}
+
+func (p *CartGoods) fastWriteField7(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 7)
+	offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, p.StyleHeadDrawing)
+	return offset
+}
+
+func (p *CartGoods) fastWriteField11(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 11)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.PurchaseQuantity)
+	return offset
+}
+
+func (p *CartGoods) fastWriteField12(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 12)
+	offset += thrift.Binary.WriteDouble(buf[offset:], p.TotalAmount)
+	return offset
+}
+
+func (p *CartGoods) fastWriteField14(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.DOUBLE, 14)
+	offset += thrift.Binary.WriteDouble(buf[offset:], p.DiscountAmount)
+	return offset
+}
+
+func (p *CartGoods) field1Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *CartGoods) field2Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *CartGoods) field3Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.StringLengthNocopy(p.GoodsName)
+	return l
+}
+
+func (p *CartGoods) field4Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *CartGoods) field5Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.StringLengthNocopy(p.SkuName)
+	return l
+}
+
+func (p *CartGoods) field6Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *CartGoods) field7Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.StringLengthNocopy(p.StyleHeadDrawing)
+	return l
+}
+
+func (p *CartGoods) field11Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.I64Length()
+	return l
+}
+
+func (p *CartGoods) field12Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.DoubleLength()
+	return l
+}
+
+func (p *CartGoods) field14Length() int {
+	l := 0
+	l += thrift.Binary.FieldBeginLength()
+	l += thrift.Binary.DoubleLength()
 	return l
 }

@@ -67,6 +67,33 @@ type SpuToSku struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
+type Coupon struct {
+	Id             int64 `gorm:"primary_key"`
+	Uid            int64
+	Name           string
+	TypeInfo       int64
+	ConditionCost  float64
+	DiscountAmount float64
+	Discount       float64
+	RangeType      int64
+	RangeId        int64
+	Description    string
+	ExpireTime     time.Time
+	DeadlineForGet time.Time
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      gorm.DeletedAt `gorm:"index"`
+}
+
+type UserCoupon struct {
+	Uid           int64
+	CouponId      int64
+	RemainingUses int64
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	DeletedAt     gorm.DeletedAt `gorm:"index"`
+}
+
 type Sku struct {
 	Id               int64 `gorm:"primary_key"`
 	CreatorId        int64
@@ -74,13 +101,41 @@ type Sku struct {
 	Name             string
 	Description      string
 	ForSale          int
-	HistoryStock     int64
+	Stock            int64
+	LockStock        int64
+	HistoryVersionId int64
 	StyleHeadDrawing string
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
 	DeletedAt        gorm.DeletedAt `gorm:"index"`
-	Stock            int64
-	LockStock        int64
+}
+
+type SkuImages struct {
+	Id        int64 `gorm:"primary_key"`
+	Url       string
+	SkuId     int64
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
+type SkuSaleAttr struct {
+	Id               int64 `gorm:"primary_key"`
+	SkuId            int64
+	HistoryVersionId int64
+	SaleAttr         string
+	SaleValue        string
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+	DeletedAt        gorm.DeletedAt `gorm:"index"`
+}
+
+type SkuPriceHistory struct {
+	Id          int64 `gorm:"primary_key"`
+	SkuId       int64
+	MarkPrice   float64
+	CreatedAt   time.Time
+	PrevVersion int64
 }
 
 // 对应表名
@@ -99,4 +154,28 @@ func (Category) TableName() string {
 
 func (s *SpuToSku) TableName() string {
 	return constants.SpuSkuTableName
+}
+
+func (Coupon) TableName() string {
+	return constants.CouponTableName
+}
+
+func (UserCoupon) TableName() string {
+	return constants.UserCouponTableName
+}
+
+func (Sku) TableName() string {
+	return constants.SkuTableName
+}
+
+func (SkuImages) TableName() string {
+	return constants.SkuImagesTableName
+}
+
+func (SkuSaleAttr) TableName() string {
+	return constants.SkuSaleAttrTableName
+}
+
+func (SkuPriceHistory) TableName() string {
+	return constants.SkuPriceHistoryTableName
 }

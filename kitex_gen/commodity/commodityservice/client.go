@@ -35,22 +35,21 @@ import (
 type Client interface {
 	CreateCoupon(ctx context.Context, req *commodity.CreateCouponReq, callOptions ...callopt.Option) (r *commodity.CreateCouponResp, err error)
 	DeleteCoupon(ctx context.Context, req *commodity.DeleteCouponReq, callOptions ...callopt.Option) (r *commodity.DeleteCouponResp, err error)
-	CreateUserCoupon(ctx context.Context, req *commodity.CreateCouponReq, callOptions ...callopt.Option) (r *commodity.CreateUserCouponResp, err error)
+	CreateUserCoupon(ctx context.Context, req *commodity.CreateUserCouponReq, callOptions ...callopt.Option) (r *commodity.CreateUserCouponResp, err error)
 	ViewCoupon(ctx context.Context, req *commodity.ViewCouponReq, callOptions ...callopt.Option) (r *commodity.ViewCouponResp, err error)
-	ViewUserAllCoupon(ctx context.Context, req *commodity.ViewCouponReq, callOptions ...callopt.Option) (r *commodity.ViewUserAllCouponResp, err error)
-	UseUserCoupon(ctx context.Context, req *commodity.UseUserCouponReq, callOptions ...callopt.Option) (r *commodity.UseUserCouponResp, err error)
+	ViewUserAllCoupon(ctx context.Context, req *commodity.ViewUserAllCouponReq, callOptions ...callopt.Option) (r *commodity.ViewUserAllCouponResp, err error)
+	GetCouponAndPrice(ctx context.Context, req *commodity.GetCouponAndPriceReq, callOptions ...callopt.Option) (r *commodity.GetCouponAndPriceResp, err error)
 	ViewSpu(ctx context.Context, req *commodity.ViewSpuReq, callOptions ...callopt.Option) (r *commodity.ViewSpuResp, err error)
 	DeleteSpu(ctx context.Context, req *commodity.DeleteSpuReq, callOptions ...callopt.Option) (r *commodity.DeleteSpuResp, err error)
 	ViewSpuImage(ctx context.Context, req *commodity.ViewSpuImageReq, callOptions ...callopt.Option) (r *commodity.ViewSpuImageResp, err error)
 	DeleteSpuImage(ctx context.Context, req *commodity.DeleteSpuImageReq, callOptions ...callopt.Option) (r *commodity.DeleteSpuImageResp, err error)
-	CreateSku(ctx context.Context, req *commodity.CreateSkuReq, callOptions ...callopt.Option) (r *commodity.CreateSkuResp, err error)
-	UpdateSku(ctx context.Context, req *commodity.UpdateSkuReq, callOptions ...callopt.Option) (r *commodity.UpdateSkuResp, err error)
 	DeleteSku(ctx context.Context, req *commodity.DeleteSkuReq, callOptions ...callopt.Option) (r *commodity.DeleteSkuResp, err error)
 	ViewSkuImage(ctx context.Context, req *commodity.ViewSkuImageReq, callOptions ...callopt.Option) (r *commodity.ViewSkuImageResp, err error)
 	ViewSku(ctx context.Context, req *commodity.ViewSkuReq, callOptions ...callopt.Option) (r *commodity.ViewSkuResp, err error)
 	UploadSkuAttr(ctx context.Context, req *commodity.UploadSkuAttrReq, callOptions ...callopt.Option) (r *commodity.UploadSkuAttrResp, err error)
 	ListSkuInfo(ctx context.Context, req *commodity.ListSkuInfoReq, callOptions ...callopt.Option) (r *commodity.ListSkuInfoResp, err error)
 	ViewHistory(ctx context.Context, req *commodity.ViewHistoryPriceReq, callOptions ...callopt.Option) (r *commodity.ViewHistoryPriceResp, err error)
+	DeleteSkuImage(ctx context.Context, req *commodity.DeleteSkuImageReq, callOptions ...callopt.Option) (r *commodity.DeleteSkuImageResp, err error)
 	DescSkuLockStock(ctx context.Context, req *commodity.DescSkuLockStockReq, callOptions ...callopt.Option) (r *commodity.DescSkuLockStockResp, err error)
 	IncrSkuLockStock(ctx context.Context, req *commodity.IncrSkuLockStockReq, callOptions ...callopt.Option) (r *commodity.IncrSkuLockStockResp, err error)
 	DescSkuStock(ctx context.Context, req *commodity.DescSkuStockReq, callOptions ...callopt.Option) (r *commodity.DescSkuStockResp, err error)
@@ -67,6 +66,10 @@ type StreamClient interface {
 	UpdateSpu(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_UpdateSpuClient, err error)
 	CreateSpuImage(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_CreateSpuImageClient, err error)
 	UpdateSpuImage(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_UpdateSpuImageClient, err error)
+	CreateSku(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_CreateSkuClient, err error)
+	UpdateSku(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_UpdateSkuClient, err error)
+	CreateSkuImage(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_CreateSkuImageClient, err error)
+	UpdateSkuImage(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_UpdateSkuImageClient, err error)
 }
 
 type CommodityService_CreateSpuClient interface {
@@ -91,6 +94,30 @@ type CommodityService_UpdateSpuImageClient interface {
 	streaming.Stream
 	Send(*commodity.UpdateSpuImageReq) error
 	CloseAndRecv() (*commodity.UpdateSpuImageResp, error)
+}
+
+type CommodityService_CreateSkuClient interface {
+	streaming.Stream
+	Send(*commodity.CreateSkuReq) error
+	CloseAndRecv() (*commodity.CreateSkuResp, error)
+}
+
+type CommodityService_UpdateSkuClient interface {
+	streaming.Stream
+	Send(*commodity.UpdateSkuReq) error
+	CloseAndRecv() (*commodity.UpdateSkuResp, error)
+}
+
+type CommodityService_CreateSkuImageClient interface {
+	streaming.Stream
+	Send(*commodity.CreateSkuImageReq) error
+	CloseAndRecv() (*commodity.CreateSkuImageResp, error)
+}
+
+type CommodityService_UpdateSkuImageClient interface {
+	streaming.Stream
+	Send(*commodity.UpdateSkuImageReq) error
+	CloseAndRecv() (*commodity.UpdateSkuImageResp, error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -132,7 +159,7 @@ func (p *kCommodityServiceClient) DeleteCoupon(ctx context.Context, req *commodi
 	return p.kClient.DeleteCoupon(ctx, req)
 }
 
-func (p *kCommodityServiceClient) CreateUserCoupon(ctx context.Context, req *commodity.CreateCouponReq, callOptions ...callopt.Option) (r *commodity.CreateUserCouponResp, err error) {
+func (p *kCommodityServiceClient) CreateUserCoupon(ctx context.Context, req *commodity.CreateUserCouponReq, callOptions ...callopt.Option) (r *commodity.CreateUserCouponResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.CreateUserCoupon(ctx, req)
 }
@@ -142,14 +169,14 @@ func (p *kCommodityServiceClient) ViewCoupon(ctx context.Context, req *commodity
 	return p.kClient.ViewCoupon(ctx, req)
 }
 
-func (p *kCommodityServiceClient) ViewUserAllCoupon(ctx context.Context, req *commodity.ViewCouponReq, callOptions ...callopt.Option) (r *commodity.ViewUserAllCouponResp, err error) {
+func (p *kCommodityServiceClient) ViewUserAllCoupon(ctx context.Context, req *commodity.ViewUserAllCouponReq, callOptions ...callopt.Option) (r *commodity.ViewUserAllCouponResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.ViewUserAllCoupon(ctx, req)
 }
 
-func (p *kCommodityServiceClient) UseUserCoupon(ctx context.Context, req *commodity.UseUserCouponReq, callOptions ...callopt.Option) (r *commodity.UseUserCouponResp, err error) {
+func (p *kCommodityServiceClient) GetCouponAndPrice(ctx context.Context, req *commodity.GetCouponAndPriceReq, callOptions ...callopt.Option) (r *commodity.GetCouponAndPriceResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.UseUserCoupon(ctx, req)
+	return p.kClient.GetCouponAndPrice(ctx, req)
 }
 
 func (p *kCommodityServiceClient) ViewSpu(ctx context.Context, req *commodity.ViewSpuReq, callOptions ...callopt.Option) (r *commodity.ViewSpuResp, err error) {
@@ -170,16 +197,6 @@ func (p *kCommodityServiceClient) ViewSpuImage(ctx context.Context, req *commodi
 func (p *kCommodityServiceClient) DeleteSpuImage(ctx context.Context, req *commodity.DeleteSpuImageReq, callOptions ...callopt.Option) (r *commodity.DeleteSpuImageResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.DeleteSpuImage(ctx, req)
-}
-
-func (p *kCommodityServiceClient) CreateSku(ctx context.Context, req *commodity.CreateSkuReq, callOptions ...callopt.Option) (r *commodity.CreateSkuResp, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.CreateSku(ctx, req)
-}
-
-func (p *kCommodityServiceClient) UpdateSku(ctx context.Context, req *commodity.UpdateSkuReq, callOptions ...callopt.Option) (r *commodity.UpdateSkuResp, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.UpdateSku(ctx, req)
 }
 
 func (p *kCommodityServiceClient) DeleteSku(ctx context.Context, req *commodity.DeleteSkuReq, callOptions ...callopt.Option) (r *commodity.DeleteSkuResp, err error) {
@@ -210,6 +227,11 @@ func (p *kCommodityServiceClient) ListSkuInfo(ctx context.Context, req *commodit
 func (p *kCommodityServiceClient) ViewHistory(ctx context.Context, req *commodity.ViewHistoryPriceReq, callOptions ...callopt.Option) (r *commodity.ViewHistoryPriceResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.ViewHistory(ctx, req)
+}
+
+func (p *kCommodityServiceClient) DeleteSkuImage(ctx context.Context, req *commodity.DeleteSkuImageReq, callOptions ...callopt.Option) (r *commodity.DeleteSkuImageResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.DeleteSkuImage(ctx, req)
 }
 
 func (p *kCommodityServiceClient) DescSkuLockStock(ctx context.Context, req *commodity.DescSkuLockStockReq, callOptions ...callopt.Option) (r *commodity.DescSkuLockStockResp, err error) {
@@ -300,4 +322,24 @@ func (p *kCommodityServiceStreamClient) CreateSpuImage(ctx context.Context, call
 func (p *kCommodityServiceStreamClient) UpdateSpuImage(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_UpdateSpuImageClient, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, streamcall.GetCallOptions(callOptions))
 	return p.kClient.UpdateSpuImage(ctx)
+}
+
+func (p *kCommodityServiceStreamClient) CreateSku(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_CreateSkuClient, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, streamcall.GetCallOptions(callOptions))
+	return p.kClient.CreateSku(ctx)
+}
+
+func (p *kCommodityServiceStreamClient) UpdateSku(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_UpdateSkuClient, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, streamcall.GetCallOptions(callOptions))
+	return p.kClient.UpdateSku(ctx)
+}
+
+func (p *kCommodityServiceStreamClient) CreateSkuImage(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_CreateSkuImageClient, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, streamcall.GetCallOptions(callOptions))
+	return p.kClient.CreateSkuImage(ctx)
+}
+
+func (p *kCommodityServiceStreamClient) UpdateSkuImage(ctx context.Context, callOptions ...streamcall.Option) (stream CommodityService_UpdateSkuImageClient, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, streamcall.GetCallOptions(callOptions))
+	return p.kClient.UpdateSkuImage(ctx)
 }

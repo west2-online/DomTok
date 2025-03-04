@@ -60,10 +60,6 @@ func (handler *PaymentHandler) RequestPaymentToken(ctx context.Context, req *pay
 	return
 }
 
-func (handler *PaymentHandler) ProcessRefund(ctx context.Context, req *payment.RefundReviewRequest) (r *payment.RefundReviewResponse, err error) {
-	return nil, err
-}
-
 func (handler *PaymentHandler) RequestRefund(ctx context.Context, req *payment.RefundRequest) (r *payment.RefundResponse, err error) {
 	r = new(payment.RefundResponse)
 	/*var token string
@@ -78,5 +74,27 @@ func (handler *PaymentHandler) RequestRefund(ctx context.Context, req *payment.R
 	}
 	r.Base = base.BuildBaseResp(err)
 	r.RefundInfo = pack.BuildRefundTokenInfo(refundID, refundStatus)
+	return
+}
+
+func (handler *PaymentHandler) RequestPaymentCheckout(ctx context.Context,
+	request *payment.PaymentCheckoutRequest,
+) (r *payment.PaymentCheckoutResponse, err error) {
+	r = new(payment.PaymentCheckoutResponse)
+	err = handler.useCase.PaymentCheckout(ctx, request.OrderID, request.Token)
+	if err != nil {
+		return
+	}
+	r.Base = base.BuildBaseResp(err)
+	return
+}
+
+func (handler *PaymentHandler) RefundReview(ctx context.Context, request *payment.RefundReviewRequest) (r *payment.RefundReviewResponse, err error) {
+	r = new(payment.RefundReviewResponse)
+	err = handler.useCase.RefundReview(ctx, request.OrderID, request.Passed)
+	if err != nil {
+		return
+	}
+	r.Base = base.BuildBaseResp(err)
 	return
 }

@@ -27,6 +27,7 @@ type PersistencePort interface {
 	CreateCart(ctx context.Context, uid int64, cart string) error
 	GetCartByUserId(ctx context.Context, uid int64) (bool, *model.Cart, error)
 	SaveCart(ctx context.Context, uid int64, cart string) error
+	DeleteCart(ctx context.Context, uid int64) error
 }
 
 type CachePort interface {
@@ -38,4 +39,9 @@ type CachePort interface {
 type MqPort interface {
 	SendAddGoods(ctx context.Context, uid int64, goods *model.GoodInfo) error
 	ConsumeAddGoods(ctx context.Context) <-chan *kafka.Message
+}
+
+type RpcPort interface {
+	GetGoodsInfo(ctx context.Context, cartGoods []*model.CartGoods) ([]*model.CartGoods, error)
+	PurchaseCartGoods(ctx context.Context, cartGoods []*model.CartGoods) (int64, error)
 }

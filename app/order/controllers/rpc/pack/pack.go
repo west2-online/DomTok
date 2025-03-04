@@ -21,6 +21,8 @@ import (
 
 	"github.com/west2-online/DomTok/app/order/domain/model"
 	idlmodel "github.com/west2-online/DomTok/kitex_gen/model"
+	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 func BuildOrder(o *model.Order) *idlmodel.Order {
@@ -28,11 +30,11 @@ func BuildOrder(o *model.Order) *idlmodel.Order {
 		Id:                    o.Id,
 		Status:                strconv.Itoa(int(o.Status)),
 		Uid:                   o.Uid,
-		TotalAmountOfGoods:    o.TotalAmountOfGoods,
-		TotalAmountOfFreight:  o.TotalAmountOfFreight,
-		TotalAmountOfDiscount: o.TotalAmountOfDiscount,
-		PaymentAmount:         o.PaymentAmount,
-		PaymentStatus:         o.PaymentStatus,
+		TotalAmountOfGoods:    utils.DecimalFloat64(&o.TotalAmountOfGoods),
+		TotalAmountOfFreight:  utils.DecimalFloat64(&o.TotalAmountOfFreight),
+		TotalAmountOfDiscount: utils.DecimalFloat64(&o.TotalAmountOfDiscount),
+		PaymentAmount:         utils.DecimalFloat64(&o.PaymentAmount),
+		PaymentStatus:         "待支付", // TODO
 		PaymentAt:             o.PaymentAt,
 		PaymentStyle:          o.PaymentStyle,
 		OrderedAt:             o.OrderedAt,
@@ -40,27 +42,32 @@ func BuildOrder(o *model.Order) *idlmodel.Order {
 		DeliveryAt:            o.DeliveryAt,
 		AddressID:             o.AddressID,
 		AddressInfo:           o.AddressInfo,
+		CouponId:              o.CouponId,
+		CouponName:            o.CouponName,
 	}
 }
 
 func BuildOrderGoods(g *model.OrderGoods) *idlmodel.OrderGoods {
 	return &idlmodel.OrderGoods{
-		MerchantID:       g.MerchantID,
-		GoodsID:          g.GoodsID,
-		GoodsName:        g.GoodsName,
-		GoodsHeadDrawing: g.GoodsHeadDrawing,
-		StyleID:          g.StyleID,
-		StyleName:        g.StyleName,
-		StyleHeadDrawing: g.StyleHeadDrawing,
-		OriginCast:       g.OriginCast,
-		SaleCast:         g.SaleCast,
-		PurchaseQuantity: g.PurchaseQuantity,
-		PaymentAmount:    g.PaymentAmount,
-		FreightAmount:    g.FreightAmount,
-		SettlementAmount: g.SettlementAmount,
-		DiscountAmount:   g.DiscountAmount,
-		SingleCast:       g.SingleCast,
-		CouponID:         g.CouponID,
+		OrderId:            g.OrderID,
+		MerchantId:         g.MerchantID,
+		GoodsId:            g.GoodsID,
+		GoodsName:          g.GoodsName,
+		StyleId:            g.StyleID,
+		StyleName:          g.StyleName,
+		GoodsVersion:       g.GoodsVersion,
+		StyleHeadDrawing:   g.StyleHeadDrawing,
+		OriginPrice:        utils.DecimalFloat64(&g.OriginPrice),
+		SalePrice:          utils.DecimalFloat64(&g.SalePrice),
+		SingleFreightPrice: utils.DecimalFloat64(&g.SingleFreightPrice),
+		PurchaseQuantity:   g.PurchaseQuantity,
+		TotalAmount:        utils.DecimalFloat64(&g.TotalAmount),
+		FreightAmount:      utils.DecimalFloat64(&g.FreightAmount),
+		DiscountAmount:     utils.DecimalFloat64(&g.DiscountAmount),
+		PaymentAmount:      utils.DecimalFloat64(&g.PaymentAmount),
+		SinglePrice:        utils.DecimalFloat64(&g.SinglePrice),
+		CouponId:           g.CouponId,
+		CouponName:         g.CouponName,
 	}
 }
 
@@ -71,23 +78,7 @@ func BuildOrderWithGoods(o *model.Order, goods []*model.OrderGoods) *idlmodel.Or
 	}
 
 	return &idlmodel.OrderWithGoods{
-		Order: &idlmodel.Order{
-			Id:                    o.Id,
-			Status:                strconv.Itoa(int(o.Status)),
-			Uid:                   o.Uid,
-			TotalAmountOfGoods:    o.TotalAmountOfGoods,
-			TotalAmountOfFreight:  o.TotalAmountOfFreight,
-			TotalAmountOfDiscount: o.TotalAmountOfDiscount,
-			PaymentAmount:         o.PaymentAmount,
-			PaymentStatus:         o.PaymentStatus,
-			PaymentAt:             o.PaymentAt,
-			PaymentStyle:          o.PaymentStyle,
-			OrderedAt:             o.OrderedAt,
-			DeletedAt:             o.DeletedAt,
-			DeliveryAt:            o.DeliveryAt,
-			AddressID:             o.AddressID,
-			AddressInfo:           o.AddressInfo,
-		},
+		Order: BuildOrder(o),
 		Goods: idlGoods,
 	}
 }
@@ -95,20 +86,19 @@ func BuildOrderWithGoods(o *model.Order, goods []*model.OrderGoods) *idlmodel.Or
 func BuildBaseOrder(o *model.Order) *idlmodel.BaseOrder {
 	return &idlmodel.BaseOrder{
 		Id:                 o.Id,
-		Status:             strconv.Itoa(int(o.Status)),
-		TotalAmountOfGoods: o.TotalAmountOfGoods,
-		PaymentAmount:      o.PaymentAmount,
-		PaymentStatus:      o.PaymentStatus,
+		Status:             constants.GetOrderStatusMsg(o.Status),
+		TotalAmountOfGoods: utils.DecimalFloat64(&o.TotalAmountOfGoods),
+		PaymentAmount:      utils.DecimalFloat64(&o.PaymentAmount),
+		PaymentStatus:      "", // TODO 根据 o.paymentStatus 转化
 	}
 }
 
 func BuildBaseOrderGoods(g *model.OrderGoods) *idlmodel.BaseOrderGoods {
 	return &idlmodel.BaseOrderGoods{
-		MerchantName:     strconv.FormatInt(g.MerchantID, 10),
-		GoodsName:        g.GoodsID,
-		StyleName:        g.StyleID,
+		MerchantID:       g.MerchantID,
+		GoodsID:          g.GoodsID,
+		StyleID:          g.StyleID,
 		PurchaseQuantity: g.PurchaseQuantity,
-		StyleHeadDrawing: g.StyleHeadDrawing,
-		CouponID:         g.CouponID,
+		GoodsVersion:     g.GoodsVersion,
 	}
 }

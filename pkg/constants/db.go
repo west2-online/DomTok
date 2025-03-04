@@ -23,6 +23,13 @@ const (
 	MaxIdleConns    = 10               // (DB) 最大空闲连接数
 	ConnMaxLifetime = 10 * time.Second // (DB) 最大可复用时间
 	ConnMaxIdleTime = 5 * time.Minute  // (DB) 最长保持空闲状态时间
+
+	CouponMaxVarCharLen     = 255 // coupon的varchar相关字段最大值
+	CouponRangeTypeSPU      = 1
+	CouponRangeTypeCategory = 2
+	CouponPageSize          = 15
+	CouponTypeSubAmount     = 1
+	CouponTypeDiscount      = 2
 )
 
 const (
@@ -33,11 +40,17 @@ const (
 	OrderGoodsTableName = "order_goods"
 	SpuTableName        = "spu_info"
 	SpuImageTableName   = "spu_image"
-	SkuTableName        = "sku_info"
+	CouponTableName     = "coupon_info"
+	UserCouponTableName = "user_coupon"
 
 	SpuSkuTableName        = "spu_to_sku"
 	CartTableName          = "cart"
 	PaymentTableName       = "payment_orders"
 	PaymentRefundTableName = "payment_refunds"
-	PaymentLedgerTableName = "payment_ledgers"
+	PaymentLedgerTableName = "payment_ledger"
+
+	SkuTableName             = "sku_info"
+	SkuImagesTableName       = "sku_image"
+	SkuSaleAttrTableName     = "sku_sale_attr"
+	SkuPriceHistoryTableName = "sku_price_history"
 )

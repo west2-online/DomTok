@@ -37,7 +37,7 @@ elasticsearch:
   host: 127.0.0.1
 
 redis:
-  addr: domtok-redis:6379
+  addr: 127.0.0.1:6379
   password: DomTok
 
 jaeger:
@@ -49,7 +49,7 @@ kafka:
   user: domtok
   password: domtok-password
 
-upyuns:
+upyun:
   bucket: "w2-domtok"
   operator: "penqee"
   password: ""
@@ -63,6 +63,9 @@ rocketmq:
   nameSrvAddr: 127.0.0.1:9876 # 同上
   accessKey: DomTok # 定义于 ./rocketmq/plain_acl.yml
   secretKey: DomTok # 同上
+
+otel:
+  collector-addr: 127.0.0.1:4317
 
 services:
   template:
@@ -100,3 +103,9 @@ services:
     load-balance: false
     addr:
       - 0.0.0.0:20005
+
+  cart:
+    name: cart
+    load-balance: false
+    addr:
+      - 0.0.0.0:20006

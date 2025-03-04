@@ -30,10 +30,8 @@ import (
 type CreateOrderReq struct {
 	// 地址信息 ID
 	AddressID int64 `thrift:"addressID,1,required" form:"addressID,required" json:"addressID,required" query:"addressID,required"`
-	// 简略地址信息
-	AddressInfo string `thrift:"addressInfo,2,required" form:"addressInfo,required" json:"addressInfo,required" query:"addressInfo,required"`
 	// 商品列表
-	BaseOrderGoods []*model.BaseOrderGoods `thrift:"baseOrderGoods,3,required" form:"baseOrderGoods,required" json:"baseOrderGoods,required" query:"baseOrderGoods,required"`
+	BaseOrderGoods []*model.BaseOrderGoods `thrift:"baseOrderGoods,2,required" form:"baseOrderGoods,required" json:"baseOrderGoods,required" query:"baseOrderGoods,required"`
 }
 
 func NewCreateOrderReq() *CreateOrderReq {
@@ -47,18 +45,13 @@ func (p *CreateOrderReq) GetAddressID() (v int64) {
 	return p.AddressID
 }
 
-func (p *CreateOrderReq) GetAddressInfo() (v string) {
-	return p.AddressInfo
-}
-
 func (p *CreateOrderReq) GetBaseOrderGoods() (v []*model.BaseOrderGoods) {
 	return p.BaseOrderGoods
 }
 
 var fieldIDToName_CreateOrderReq = map[int16]string{
 	1: "addressID",
-	2: "addressInfo",
-	3: "baseOrderGoods",
+	2: "baseOrderGoods",
 }
 
 func (p *CreateOrderReq) Read(iprot thrift.TProtocol) (err error) {
@@ -66,7 +59,6 @@ func (p *CreateOrderReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetAddressID bool = false
-	var issetAddressInfo bool = false
 	var issetBaseOrderGoods bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
@@ -93,17 +85,8 @@ func (p *CreateOrderReq) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 2:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetAddressInfo = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 3:
 			if fieldTypeId == thrift.LIST {
-				if err = p.ReadField3(iprot); err != nil {
+				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetBaseOrderGoods = true
@@ -128,13 +111,8 @@ func (p *CreateOrderReq) Read(iprot thrift.TProtocol) (err error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetAddressInfo {
-		fieldId = 2
-		goto RequiredFieldNotSetError
-	}
-
 	if !issetBaseOrderGoods {
-		fieldId = 3
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -167,17 +145,6 @@ func (p *CreateOrderReq) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 func (p *CreateOrderReq) ReadField2(iprot thrift.TProtocol) error {
-
-	var _field string
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.AddressInfo = _field
-	return nil
-}
-func (p *CreateOrderReq) ReadField3(iprot thrift.TProtocol) error {
 	_, size, err := iprot.ReadListBegin()
 	if err != nil {
 		return err
@@ -216,10 +183,6 @@ func (p *CreateOrderReq) Write(oprot thrift.TProtocol) (err error) {
 			fieldId = 2
 			goto WriteFieldError
 		}
-		if err = p.writeField3(oprot); err != nil {
-			fieldId = 3
-			goto WriteFieldError
-		}
 	}
 	if err = oprot.WriteFieldStop(); err != nil {
 		goto WriteFieldStopError
@@ -256,24 +219,7 @@ WriteFieldEndError:
 }
 
 func (p *CreateOrderReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("addressInfo", thrift.STRING, 2); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteString(p.AddressInfo); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *CreateOrderReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("baseOrderGoods", thrift.LIST, 3); err != nil {
+	if err = oprot.WriteFieldBegin("baseOrderGoods", thrift.LIST, 2); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.BaseOrderGoods)); err != nil {
@@ -292,9 +238,9 @@ func (p *CreateOrderReq) writeField3(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *CreateOrderReq) String() string {

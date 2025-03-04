@@ -21,12 +21,14 @@ package order
 import (
 	"context"
 
-	"github.com/west2-online/DomTok/app/gateway/pack"
-
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/samber/lo"
 
 	api "github.com/west2-online/DomTok/app/gateway/model/api/order"
+	hmodel "github.com/west2-online/DomTok/app/gateway/model/model"
+	"github.com/west2-online/DomTok/app/gateway/pack"
 	"github.com/west2-online/DomTok/app/gateway/rpc"
+	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	orderrpc "github.com/west2-online/DomTok/kitex_gen/order"
 )
 
@@ -41,9 +43,20 @@ func CreateOrder(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// todo: 未实现
+	rpcOrderGoods := lo.Map(req.BaseOrderGoods, func(item *hmodel.BaseOrderGoods, index int) *kmodel.BaseOrderGoods {
+		return &kmodel.BaseOrderGoods{
+			MerchantID:       item.MerchantID,
+			GoodsID:          item.GoodsID,
+			StyleID:          item.StyleID,
+			PurchaseQuantity: item.PurchaseQuantity,
+			GoodsVersion:     item.GoodsVersion,
+		}
+	})
 
-	resp, err := rpc.CreateOrderRPC(ctx, nil)
+	resp, err := rpc.CreateOrderRPC(ctx, &orderrpc.CreateOrderReq{
+		AddressID:      req.AddressID,
+		BaseOrderGoods: rpcOrderGoods,
+	})
 	if err != nil {
 		pack.RespError(c, err)
 		return

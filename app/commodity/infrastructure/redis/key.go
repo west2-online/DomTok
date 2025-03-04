@@ -27,3 +27,5 @@ func (c *commodityCache) GetLockStockKey(id int64) string {
 func (c *commodityCache) GetStockKey(id int64) string {
 	return fmt.Sprintf("goods:%d:stock", id)
 }
+
+func (c *commodityCache) GetSkuKey(id int64) string { return fmt.Sprintf("sku:%d", id) }

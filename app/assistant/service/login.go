@@ -28,9 +28,9 @@ func (s Core) Login(ctx context.Context) error {
 	if !ok {
 		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, "missing id in context")
 	}
-	_, ok = ctx.Value(CtxKeyAccessToken).(string)
+	_, ok = ctx.Value(CtxKeyAuthHeader).(string)
 	if !ok {
-		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, "missing access token in context")
+		return errno.NewErrNoWithStack(errno.InternalServiceErrorCode, "missing auth header in context")
 	}
 
 	return nil

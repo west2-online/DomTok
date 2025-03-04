@@ -24,4 +24,6 @@ const (
 	MaxQPS           = 100                   // (RPC) 最大 QPS
 	RPCTimeout       = 3 * time.Second       // (RPC) RPC请求超时时间
 	ConnectTimeout   = 50 * time.Millisecond // (RPC) 连接超时时间
+
+	KitexClientEndpointInfoFormat = "%s-client" // serviceName-client
 )

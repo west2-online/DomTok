@@ -60,7 +60,7 @@ func (db *paymentDB) GetPaymentInfo(ctx context.Context, orderID int64) (*model.
 	err := db.client.WithContext(ctx).Table(constants.PaymentTableName).Where("order_id = ?", orderID).First(&paymentOrder).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errno.NewErrNo(errno.PaymentOrderNotExist, "payment order not found")
+			return nil, errno.NewErrNo(errno.ServicePaymentOrderNotExist, "payment order not found")
 		}
 		// 这里报错了就不是业务错误了, 而是服务级别的错误
 		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query payment order_id: %v", err)
@@ -110,6 +110,55 @@ func (db *paymentDB) CreatePayment(ctx context.Context, p *model.PaymentOrder) e
 	return nil
 }
 
+func (db *paymentDB) UpdatePaymentStatus(ctx context.Context, orderID int64, status int) error {
+	// 更新支付状态
+	result := db.client.WithContext(ctx).Table(constants.PaymentTableName).
+		Where("order_id = ?", orderID).
+		Update("status", status)
+	if result.Error != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update payment status: %v", result.Error)
+	}
+	if result.RowsAffected <= 0 {
+		return errno.Errorf(errno.ServicePaymentOrderNotExist, "mysql: payment order not found but tried to update")
+	}
+	return nil
+}
+
+// UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction 更新支付状态为成功并创建流水表项(作为事务)
+func (db *paymentDB) UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction(ctx context.Context,
+	order *model.PaymentOrder,
+) error {
+	err := db.client.Transaction(func(tx *gorm.DB) error {
+		tx = tx.WithContext(ctx)
+		// 更新支付状态
+		result := tx.Table(constants.PaymentTableName).
+			Where("order_id = ?", order.OrderID).
+			Update("status", paymentStatus.PaymentStatusSuccessCode)
+		if result.Error != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update payment status: %v", result.Error)
+		}
+		if result.RowsAffected <= 0 {
+			return errno.Errorf(errno.ServicePaymentOrderNotExist, "mysql: payment order not found but tried to update")
+		}
+
+		ledger := order.ToLedger()
+		ledger.Status = paymentStatus.LedgerStatusSuccessCode
+		dbLedger, err := ConvertLedgerToDBModel(ledger)
+		if err != nil {
+			return errno.Errorf(errno.InternalServiceErrorCode, "failed to convert ledger: %v", err)
+		}
+		// 创建流水表项
+		if err = tx.Table(constants.PaymentLedgerTableName).WithContext(ctx).Create(dbLedger).Error; err != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create ledger: %v", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update payment status and ledger status: %v", err)
+	}
+	return nil
+}
+
 // ConvertRefundToDBModel 转换函数
 func ConvertRefundToDBModel(p *model.PaymentRefund) (*PaymentRefund, error) {
 	if p == nil {
@@ -153,4 +202,90 @@ func (db *paymentDB) CreateRefund(ctx context.Context, p *model.PaymentRefund) e
 	}
 	logger.Infof("CreateRefund: refund order created successfully")
 	return nil
+}
+
+func (db *paymentDB) GetRefundInfoByOrderID(ctx context.Context, orderID int64) (*model.PaymentRefund, error) {
+	var refundOrder PaymentRefund
+	err := db.client.WithContext(ctx).Table(constants.PaymentRefundTableName).Where("order_id = ?", orderID).First(&refundOrder).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errno.NewErrNo(errno.ServicePaymentRefundNotExist, "refund order not found")
+		}
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query refund order_id: %v", err)
+	}
+	return &model.PaymentRefund{
+		ID:                        refundOrder.ID,
+		OrderID:                   refundOrder.OrderID,
+		UserID:                    refundOrder.UserID,
+		RefundAmount:              refundOrder.RefundAmount,
+		RefundReason:              refundOrder.RefundReason,
+		Status:                    refundOrder.Status,
+		MaskedCreditCardNumber:    refundOrder.MaskedCreditCardNumber,
+		CreditCardExpirationYear:  refundOrder.CreditCardExpirationYear,
+		CreditCardExpirationMonth: refundOrder.CreditCardExpirationMonth,
+	}, nil
+}
+
+// UpdateRefundStatusByOrderIDAndStatus 更新退款状态
+func (db *paymentDB) UpdateRefundStatusByOrderIDAndStatus(ctx context.Context, orderID int64, prevStatus, nextStatus int) error {
+	result := db.client.WithContext(ctx).Table(constants.PaymentRefundTableName).
+		Where("order_id = ?", orderID).Where("status = ?", prevStatus).
+		Update("status", nextStatus)
+	if result.Error != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update refund status: %v", result.Error)
+	}
+	if result.RowsAffected <= 0 {
+		return errno.Errorf(errno.ServicePaymentRefundNotExist, "mysql: refund order not found but tried to update")
+	}
+	return nil
+}
+
+// UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction 更新退款状态为成功并创建流水表项(作为事务)
+func (db *paymentDB) UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction(ctx context.Context,
+	refund *model.PaymentRefund,
+) error {
+	err := db.client.Transaction(func(tx *gorm.DB) error {
+		tx = tx.WithContext(ctx)
+		// 更新退款状态
+		result := tx.Table(constants.PaymentRefundTableName).
+			Where("order_id = ?", refund.OrderID).
+			Update("status", paymentStatus.RefundStatusSuccessCode)
+		if result.Error != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update refund status: %v", result.Error)
+		}
+		if result.RowsAffected <= 0 {
+			return errno.Errorf(errno.ServicePaymentRefundNotExist, "mysql: refund order not found but tried to update")
+		}
+
+		ledger := refund.ToLedger()
+		ledger.Status = paymentStatus.LedgerStatusSuccessCode
+		dbLedger, err := ConvertLedgerToDBModel(ledger)
+		if err != nil {
+			return errno.Errorf(errno.InternalServiceErrorCode, "failed to convert ledger: %v", err)
+		}
+		// 创建流水表项
+		if err = tx.Table(constants.PaymentLedgerTableName).WithContext(ctx).Create(dbLedger).Error; err != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to create ledger: %v", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update refund status and ledger status: %v", err)
+	}
+	return nil
+}
+
+// ConvertLedgerToDBModel 转换函数
+func ConvertLedgerToDBModel(p *model.PaymentLedger) (*PaymentLedger, error) {
+	if p == nil {
+		return nil, errno.Errorf(errno.ParamVerifyErrorCode, "ConvertToDBModel: input payment order is nil")
+	}
+	return &PaymentLedger{
+		ID:              p.ID,
+		ReferenceID:     p.ReferenceID,
+		UserID:          p.UserID,
+		Amount:          p.Amount,
+		TransactionType: p.TransactionType,
+		Status:          p.Status,
+	}, nil
 }

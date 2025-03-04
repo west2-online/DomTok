@@ -22,6 +22,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+
 	"github.com/cloudwego/hertz/pkg/protocol"
 
 	"github.com/west2-online/DomTok/app/gateway/pack"
@@ -43,13 +45,30 @@ func CreateCoupon(ctx context.Context, c *app.RequestContext) {
 	var req api.CreateCouponReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	// 调用 RPC 创建优惠券
+	res, err := rpc.CreateCouponRPC(ctx, &commodity.CreateCouponReq{
+		Name:           req.Name,
+		TypeInfo:       req.TypeInfo,
+		ConditionCost:  req.ConditionCost,
+		DiscountAmount: req.DiscountAmount,
+		Discount:       req.Discount,
+		RangeType:      req.RangeType,
+		RangeID:        req.RangeID,
+		Description:    req.Description,
+		ExpireTime:     req.ExpireTime,
+	})
+	if err != nil {
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.CreateCouponResp)
-
-	c.JSON(consts.StatusOK, resp)
+	resp.CouponID = res.CouponID
+	pack.RespData(c, resp.CouponID)
 }
 
 // DeleteCoupon .
@@ -59,13 +78,20 @@ func DeleteCoupon(ctx context.Context, c *app.RequestContext) {
 	var req api.DeleteCouponReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.DeleteCouponResp)
+	// 调用 RPC 删除优惠券
+	err = rpc.DeleteCouponRPC(ctx, &commodity.DeleteCouponReq{
+		CouponID: req.CouponID,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	pack.RespSuccess(c)
 }
 
 // CreateUserCoupon .
@@ -75,13 +101,21 @@ func CreateUserCoupon(ctx context.Context, c *app.RequestContext) {
 	var req api.CreateUserCouponReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.CreateUserCouponResp)
+	// 调用 RPC 领取优惠券
+	err = rpc.CreateUserCouponRPC(ctx, &commodity.CreateUserCouponReq{
+		CouponID:     req.CouponID,
+		RemainingUse: req.RemainingUse,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	pack.RespSuccess(c)
 }
 
 // ViewCoupon .
@@ -91,13 +125,22 @@ func ViewCoupon(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewCouponReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	// 调用 RPC 获取商家创建的优惠券
+	res, err := rpc.ViewCouponRPC(ctx, &commodity.ViewCouponReq{
+		PageNum: req.PageNum,
+	})
+	if err != nil {
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.ViewCouponResp)
-
-	c.JSON(consts.StatusOK, resp)
+	resp.CouponInfo = pack.BuildCoupons(res.CouponInfo)
+	pack.RespList(c, resp.CouponInfo)
 }
 
 // ViewUserAllCoupon .
@@ -107,29 +150,22 @@ func ViewUserAllCoupon(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewUserAllCouponReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	// 调用 RPC 获取用户所有优惠券
+	res, err := rpc.ViewUserAllCouponRPC(ctx, &commodity.ViewUserAllCouponReq{
+		PageNum: req.PageNum,
+	})
+	if err != nil {
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.ViewUserAllCouponResp)
-
-	c.JSON(consts.StatusOK, resp)
-}
-
-// UseUserCoupon .
-// @router /api/commodity/coupon/use [POST]
-func UseUserCoupon(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req api.UseUserCouponReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
-		return
-	}
-
-	resp := new(api.UseUserCouponResp)
-
-	c.JSON(consts.StatusOK, resp)
+	resp.Coupons = pack.BuildCoupons(res.Coupons)
+	pack.RespList(c, resp.Coupons)
 }
 
 // CreateSpu .
@@ -322,13 +358,52 @@ func CreateSku(ctx context.Context, c *app.RequestContext) {
 	var req api.CreateSkuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.CreateSkuResp)
+	file, err := c.FormFile("skuImages")
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	ext, ok := utils.CheckImageFileType(file)
+	if !ok {
+		pack.RespError(c, errno.ParamVerifyError)
+		return
+	}
+
+	datas, err := utils.FileToBytes(file)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	skuInfo, err := rpc.CreateSkuRPC(ctx, &commodity.CreateSkuReq{
+		Name:        req.Name,
+		Description: req.Description,
+		Price:       req.Price,
+		ForSale:     req.ForSale,
+		SpuID:       req.SpuID,
+		Stock:       req.Stock,
+		BufferCount: int64(len(datas)),
+		Ext:         ext,
+	}, datas)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	hlog.Info("CreateSku", "skuInfo", skuInfo)
+	pack.RespData(c, struct {
+		Id         int64
+		HistoryId  int64
+		MerchantId int64
+	}{
+		Id:         skuInfo.SkuID,
+		HistoryId:  skuInfo.HistoryID,
+		MerchantId: skuInfo.CreatorID,
+	})
 }
 
 // UpdateSku .
@@ -338,13 +413,52 @@ func UpdateSku(ctx context.Context, c *app.RequestContext) {
 	var req api.UpdateSkuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.UpdateSkuResp)
+	var (
+		l     int64
+		datas [][]byte
+		ext   string
+		ok    bool
+	)
 
-	c.JSON(consts.StatusOK, resp)
+	file, err := c.FormFile("skuImage")
+	if err != nil {
+		if !errors.Is(err, protocol.ErrMissingFile) {
+			pack.RespError(c, errno.ParamVerifyError.WithError(err))
+			return
+		}
+	} else {
+		ext, ok = utils.CheckImageFileType(file)
+		if !ok {
+			pack.RespError(c, errno.ParamVerifyError)
+			return
+		}
+		datas, err = utils.FileToBytes(file)
+		if err != nil {
+			pack.RespError(c, err)
+			return
+		}
+		l = int64(len(datas))
+	}
+
+	err = rpc.UpdateSkuRPC(ctx, &commodity.UpdateSkuReq{
+		SkuID:       req.SkuID,
+		Description: req.Description,
+		Price:       req.Price,
+		ForSale:     req.ForSale,
+		Stock:       req.Stock,
+		BufferCount: &l,
+		Ext:         ext,
+	}, datas)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespSuccess(c)
 }
 
 // DeleteSku .
@@ -354,13 +468,18 @@ func DeleteSku(ctx context.Context, c *app.RequestContext) {
 	var req api.DeleteSkuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.DeleteSkuResp)
-
-	c.JSON(consts.StatusOK, resp)
+	err = rpc.DeleteSkuRPC(ctx, &commodity.DeleteSkuReq{
+		SkuID: req.SkuID,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespSuccess(c)
 }
 
 // ViewSkuImage .
@@ -370,13 +489,122 @@ func ViewSkuImage(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewSkuImageReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.ViewSkuImageResp)
+	images, err := rpc.ViewSkuImageRPC(ctx, &commodity.ViewSkuImageReq{
+		SkuID:    req.SkuID,
+		PageNum:  req.PageNum,
+		PageSize: req.PageSize,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespList(c, images)
+}
 
-	c.JSON(consts.StatusOK, resp)
+// CreateSkuImage .
+// @router /api/v1/commodity/sku/image/create [POST]
+func CreateSkuImage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.CreateSkuImageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	file, err := c.FormFile("skuImage")
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	_, ok := utils.CheckImageFileType(file)
+	if !ok {
+		pack.RespError(c, errno.ParamVerifyError)
+		return
+	}
+
+	datas, err := utils.FileToBytes(file)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	id, err := rpc.CreateSkuImageRPC(ctx, &commodity.CreateSkuImageReq{
+		BufferCount: int64(len(datas)),
+		SkuID:       req.SkuID,
+	}, datas)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, id)
+}
+
+// UpdateSkuImage .
+// @router /api/v1/commodity/sku/image/update [POST]
+func UpdateSkuImage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.UpdateSkuImageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	file, err := c.FormFile("skuImage")
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	_, ok := utils.CheckImageFileType(file)
+	if !ok {
+		pack.RespError(c, errno.ParamVerifyError)
+		return
+	}
+
+	datas, err := utils.FileToBytes(file)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	err = rpc.UpdateSkuImageRPC(ctx, &commodity.UpdateSkuImageReq{
+		BufferCount: int64(len(datas)),
+		ImageID:     req.ImageID,
+	}, datas)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespSuccess(c)
+}
+
+// DeleteSkuImage .
+// @router /api/v1/commodity/sku/image/delete [DELETE]
+func DeleteSkuImage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.DeleteSkuImageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	err = rpc.DeleteSkuImageRPC(ctx, &commodity.DeleteSkuImageReq{
+		SkuImageID: req.SkuImageID,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespSuccess(c)
 }
 
 // ViewSku .
@@ -386,13 +614,21 @@ func ViewSku(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewSkuReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.ViewSkuResp)
-
-	c.JSON(consts.StatusOK, resp)
+	skus, err := rpc.ViewSkuRPC(ctx, &commodity.ViewSkuReq{
+		SkuID:    req.SkuID,
+		SpuID:    req.SpuID,
+		PageNum:  req.PageNum,
+		PageSize: req.PageSize,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespList(c, skus)
 }
 
 // UploadSkuAttr .
@@ -402,29 +638,20 @@ func UploadSkuAttr(ctx context.Context, c *app.RequestContext) {
 	var req api.UploadSkuAttrReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.UploadSkuAttrResp)
-
-	c.JSON(consts.StatusOK, resp)
-}
-
-// ListSkuInfo .
-// @router /api/commodity/sku/list [GET]
-func ListSkuInfo(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req api.ListSkuInfoReq
-	err = c.BindAndValidate(&req)
+	err = rpc.UploadSkuAttrRPC(ctx, &commodity.UploadSkuAttrReq{
+		SkuID:     req.SkuID,
+		SaleAttr:  req.SaleAttr,
+		SaleValue: req.SaleValue,
+	})
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
-
-	resp := new(api.ListSkuInfoResp)
-
-	c.JSON(consts.StatusOK, resp)
+	pack.RespSuccess(c)
 }
 
 // ViewHistory .
@@ -434,13 +661,21 @@ func ViewHistory(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewHistoryPriceReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
 		return
 	}
 
-	resp := new(api.ViewHistoryPriceResp)
-
-	c.JSON(consts.StatusOK, resp)
+	resp, err := rpc.ViewHistoryPriceRPC(ctx, &commodity.ViewHistoryPriceReq{
+		SkuID:     req.SkuID,
+		HistoryID: req.HistoryID,
+		PageNum:   req.PageNum,
+		PageSize:  req.PageSize,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespList(c, resp)
 }
 
 // CreateCategory .
@@ -455,8 +690,15 @@ func CreateCategory(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(api.CreateCategoryResp)
-
-	c.JSON(consts.StatusOK, resp)
+	id, err := rpc.CreateCategoryRPC(ctx, &commodity.CreateCategoryReq{
+		Name: req.Name,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	resp.CategoryID = id
+	pack.RespData(c, resp)
 }
 
 // DeleteCategory .
@@ -466,13 +708,19 @@ func DeleteCategory(ctx context.Context, c *app.RequestContext) {
 	var req api.DeleteCategoryReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.DeleteCategoryResp)
-
-	c.JSON(consts.StatusOK, resp)
+	err = rpc.DeleteCategoryRPC(ctx, &commodity.DeleteCategoryReq{
+		CategoryID: req.CategoryID,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, resp)
 }
 
 // ViewCategory .
@@ -482,13 +730,21 @@ func ViewCategory(ctx context.Context, c *app.RequestContext) {
 	var req api.ViewCategoryReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.ViewCategoryResp)
-
-	c.JSON(consts.StatusOK, resp)
+	res, err := rpc.ViewCategoryRPC(ctx, &commodity.ViewCategoryReq{
+		PageNum:  req.PageNum,
+		PageSize: req.PageSize,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	resp.CategoryInfo = pack.BuildCategorys(res.CategoryInfo)
+	pack.RespData(c, resp)
 }
 
 // UpdateCategory .
@@ -498,13 +754,20 @@ func UpdateCategory(ctx context.Context, c *app.RequestContext) {
 	var req api.UpdateCategoryReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, err)
 		return
 	}
 
 	resp := new(api.UpdateCategoryResp)
-
-	c.JSON(consts.StatusOK, resp)
+	err = rpc.UpdateCategoryRPC(ctx, &commodity.UpdateCategoryReq{
+		CategoryID: req.CategoryID,
+		Name:       req.Name,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, resp)
 }
 
 // CreateSpuImage .
