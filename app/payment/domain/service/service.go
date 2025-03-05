@@ -24,6 +24,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/west2-online/DomTok/app/payment/domain/model"
 	loginData "github.com/west2-online/DomTok/pkg/base/context"
 	paymentStatus "github.com/west2-online/DomTok/pkg/constants"
@@ -31,23 +33,29 @@ import (
 )
 
 // CreatePaymentInfo sf可以生成id,详见user/domain/service/service.go
-func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64) (paymentID int64, err error) {
+func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64, uid int64) (paymentID int64, err error) {
 	// 1. 生成支付 ID（雪花算法）
 	paymentID, err = svc.sf.NextVal()
 	if err != nil {
 		return 0, fmt.Errorf("failed to create payment information order: %w", err)
 	}
 
+	amount, err := svc.rpc.GetOrderPaymentAmount(ctx, orderID)
+	if err != nil {
+		return 0, err
+	}
+
 	// 2. 构造支付订单对象
 	paymentOrder := &model.PaymentOrder{
 		ID:      paymentID,
+		UserID:  uid,
 		OrderID: orderID,
 		Status:  paymentStatus.PaymentStatusPendingCode, // 设定初始状态
+		Amount:  decimal.NewFromFloat(amount),
 	}
 
 	// 3. 存入数据库
-	err = svc.db.CreatePayment(ctx, paymentOrder)
-	if err != nil {
+	if err = svc.db.CreatePayment(ctx, paymentOrder); err != nil {
 		return 0, fmt.Errorf("failed to create refund order: %w", err)
 	}
 
@@ -57,8 +65,7 @@ func (svc *PaymentService) CreatePaymentInfo(ctx context.Context, orderID int64)
 
 // GetUserID 等User模块完成了再写这个，从ctx里获取userID
 func (svc *PaymentService) GetUserID(ctx context.Context) (uid int64, err error) {
-	uid, err = loginData.GetLoginData(ctx)
-	if err != nil {
+	if uid, err = loginData.GetLoginData(ctx); err != nil {
 		return 0, fmt.Errorf("failed to get login data: %w", err)
 	}
 	return uid, nil

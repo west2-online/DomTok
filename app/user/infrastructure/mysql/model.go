@@ -31,3 +31,15 @@ type User struct {
 func (User) TableName() string {
 	return constants.UserTableName
 }
+
+type Address struct {
+	ID       int64 `gorm:"primaryKey;autoIncrement"`
+	UserID   int64
+	Province string
+	City     string
+	Detail   string
+}
+
+func (Address) TableName() string {
+	return constants.AddressTableName
+}
