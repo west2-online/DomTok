@@ -1,35 +1,29 @@
-# efk 体系的必要性
+# The Necessity of the EFK System
+During local deployments, logs are conveniently output to the `output/log/svc` directory, enabling easy log inspection. However, this approach proves inadequate when dealing with large data volumes or cloud - based services. Relying on the traditional method would require SSH access to the server for log queries. In a distributed deployment scenario, a single debugging session might demand connections to multiple servers, followed by manual retrieval of relevant logs from numerous files.
 
-当我们在本地部署的时候, 日志全部输出到 `output/log/svc` 下, 那我们想要查看日志显然是很方便的,
-但如果数据量比较大, 或者我们的服务运行在云端, 这样的方法显然并不合适, 如果还按照这种原始的方法, 那就需要
-ssh 到服务器进行查询, 如果是分布式部署, 那可能一次 debug 就需要连接多台服务器, 然后从这些文件中检索出自己想要的日志.
-为了解决这个问题, 我们引入了 **"efk"(es-filebeat-kibana)** 体系, filebeat 部署于每一个服务器上, 收集服务器上的日志
-并发送到 es 集群, 最终我们可以在 kibana 上进行统一的查询.
+To address these challenges, we have implemented the **"EFK" (Elasticsearch - Filebeat - Kibana) system**. Filebeat, deployed on each server, collects local logs and forwards them to the Elasticsearch cluster. This setup allows for unified log queries on Kibana.
 
-# 为什么不是 elk？
+# Why EFK Instead of ELK?
+Constrained by budget limitations and the simplicity of our requirements, we opted for the more lightweight Filebeat as a substitute for Logstash, which is a core component in the ELK stack.
 
-预算有限, 上不起 logStash, 再加上我们的需求本来就不复杂, 所以选择更轻量的 filebeat 作为替代品
+# How to Query Logs?
+Using the locally - deployed EFK as an example, we'll introduce some basic yet commonly used query methods in Kibana's Dev Tools. (Note: A more user - friendly visualization dashboard will be developed in the future for more intuitive log queries.)
 
-# 如何查询？
+## Query Steps:
+1. Navigate to your Kibana homepage. If you haven't modified the Docker Compose configuration, the URL should be [kibana - home](http://localhost:5601/app/home#/).
+2. Open the sidebar and locate the "Dev Tools" option under "Management" at the bottom. Click to enter the query interface.
+3. Execute your queries.
 
-这边以部署在本地的 efk 为例, 举一些简单但常用的 dev tools 的方法(画个饼, 后续我写好面板给大家可视化查询)
+If you're new to query statements, don't worry. The following are some simple examples. Just follow the provided comments and adjust the "size" and "from" parameters according to your needs. It's important to note that in Filebeat, we've set the log index name as `domtok - logs`.
 
-## 步骤: 
-1. 打开你的 kibana 主页: 如果你没有更改 docker compose 的话, 那应该是 [kibana-home](http://localhost:5601/app/home#/)
-2. 打开侧边栏, 找到最下方 Management 的开发工具, 点击然后进入到查询界面
-3. 查询
-
-可能你不太会相关的查询语句, 没关系, 下面是一些简单的使用, 你按照注释来就可以, size 和 from 你可以按需更改  
-这里值得一提的是, 我们在 filebeat 中设置了日志的索引名字为为 domtok-logs
-
-### 查看 logs index 的结构
+### View the Structure of the logs index
 ```logstash
-GET /domtok-logs
+GET /domtok - logs
 ```
 
-### 查询指定范围的所有doc
+### Query All Docs within a Specified Range
 ```logstash
-GET /domtok-logs/_search
+GET /domtok - logs/_search
 {
   "query": {
     "match_all": {}
@@ -37,12 +31,11 @@ GET /domtok-logs/_search
   "from": 0, 
   "size": 20
 }
-
 ```
 
-### 查询指定 service 的doc
+### Query Docs of a Specified Service
 ```logstash
-GET /domtok-logs/_search
+GET /domtok - logs/_search
 {
   "query": {
     "match": {
@@ -54,9 +47,9 @@ GET /domtok-logs/_search
 }
 ```
 
-### 查询指定 service 和 指定 source 的 doc, service 的默认 source 是 app-serviceName 比如 app-user
+### Query Docs of a Specified Service and a Specified Source. The default source format for a service is `app - serviceName`, e.g., `app - user`.
 ```logstash
-GET /domtok-logs/_search
+GET /domtok - logs/_search
 {
   "query": {
     "bool": {
@@ -71,9 +64,9 @@ GET /domtok-logs/_search
 }
 ```
 
-### 在上一个查询的基础上加上对 msg 内容的匹配
+### Add a Match for the `msg` Content Based on the Previous Query
 ```logstash
-GET /domtok-logs/_search
+GET /domtok - logs/_search
 {
   "query": {
     "bool": {
@@ -89,5 +82,5 @@ GET /domtok-logs/_search
 }
 ```
 
-点击右边的箭头即可发送请求
+To send a query request, simply click the arrow on the right side of the query input area.
 ![img.png](img/kibana-dev-tools-sendRequest.png)
