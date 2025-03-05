@@ -7,14 +7,14 @@
 </div>
 
 ## Overview
-DomTok is a simple backend project for Douyin e-commerce based on HTTP and RPC protocols, adopting the clean architecture and distributed architecture. It utilizes technologies such as Kitex, Hertz, Mysql, Redis, Etcd, Kafka, Elasticsearch, Kibana, Filebeat, Jaeger, Rocketmq, Otel - Collector, several exporters, Prometheus, VictoriaMetrics, Cadvisor, and Grafana.
+DomTok is a simple backend project for Douyin e-commerce based on HTTP and RPC protocols, adopting the clean architecture and distributed architecture. It utilizes technologies such as Kitex, Hertz, Mysql, Redis, Etcd, Kafka, Elasticsearch, Kibana, Filebeat, Jaeger, Rocketmq, Otel-Collector, several exporters, Prometheus, VictoriaMetrics, Cadvisor, and Grafana.
 
 ## Features
-- Cloud - native: Designed with a native Golang distributed architecture, based on the best practices of ByteDance.
-- High - performance: Supports asynchronous RPC, non - blocking I/O, message queues, and Just - In - Time (JIT) compilation.
+- Cloud-native: Designed with a native Golang distributed architecture, based on the best practices of ByteDance.
+- High-performance: Supports asynchronous RPC, non-blocking I/O, message queues, and Just-In-Time (JIT) compilation.
 - Scalability: With a modular and layered structure design based on the clean architecture, the code is clear and readable, reducing the development difficulty.
 - Observability: Implements distributed tracing based on OpenTelemetry, uses Prometheus for monitoring, leverages Elasticsearch for log collection, and provides visualization through Grafana.
-- Code quality: Implements the CI/CD process based on GitHub Actions, has rich unit tests, and ensures high - quality and secure code.
+- Code quality: Implements the CI/CD process based on GitHub Actions, has rich unit tests, and ensures high-quality and secure code.
 - AI functionality: Based on ByteDance's Eino framework and Large Language Model (LLM), it enables text input to call interfaces through **Function Calling**.
 - DevOps: Abundant scripts and tools reduce unnecessary manual operations and simplify the usage and deployment processes.
 
@@ -76,17 +76,17 @@ We have carried out a layered design for the project based on the clean architec
 │   ├── repository    # Define interfaces used within the module
 │   └── service       # Implement reusable core business logic
 ├── infrastructure    # Interface layer in the clean architecture, named infrastructure to avoid ambiguity
-│   ├── locker        # Specific implementation of the locker interface in domain - repository
-│   ├── mq            # Specific implementation of the mq interface in domain - repository
-│   ├── mysql         # Specific implementation of the db interface in domain - repository
-│   ├── redis         # Specific implementation of the cache interface in domain - repository
-│   └── rpc           # Specific implementation of the rpc interface in domain - repository
+│   ├── locker        # Specific implementation of the locker interface in domain-repository
+│   ├── mq            # Specific implementation of the mq interface in domain-repository
+│   ├── mysql         # Specific implementation of the db interface in domain-repository
+│   ├── redis         # Specific implementation of the cache interface in domain-repository
+│   └── rpc           # Specific implementation of the rpc interface in domain-repository
 └── usecase
 ```
 
 ## Testing
 - Unit tests: This project uses `GitHub/bytedance/mockey` and `GitHub.com/smartystreets/goconvey/convey` to write rich unit tests. You can use `make test` to run these tests.
-- Unit tests with environment: In addition to unit tests that require mocking, we also use environment variables to control the test environment, allowing some of our unit tests to run in a real environment. You can use `make with - env - test` to start the environment and run these tests.
+- Unit tests with environment: In addition to unit tests that require mocking, we also use environment variables to control the test environment, allowing some of our unit tests to run in a real environment. You can use `make with-env-test` to start the environment and run these tests.
 - API interface tests: We use **Apifox** to conduct fully automated tests on the interfaces to ensure their correctness. We export the test reports in **html** format. You can [click here](./resource/domtok-apifox-reports.html) to view our test cases.
 - GitHub Workflow: We use GitHub Actions for the CI/CD process to ensure code quality and security.
 
@@ -99,7 +99,7 @@ This project greatly simplifies the process through scripts. You can refer to th
 We embed span logging in the middleware and use `Jaeger` for tracing, as shown in the following figure:
 #### Jaeger
 ![Jaeger Monitoring Diagram](./docs/img/metrics/jaeger.png)
-
+![jaeger-tracing.png](./docs/img/jaeger-tracing.png)
 ### Logging System
 We use `go.uber.org/zap` to serialize logs into json format and output them to specific files. Then, `filebeat` collects the log files and sends them to `elasticsearch`, and finally, the logs are displayed in `kibana`.
 
