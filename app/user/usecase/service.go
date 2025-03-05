@@ -67,3 +67,11 @@ func (uc *useCase) RegisterUser(ctx context.Context, u *model.User) (uid int64, 
 
 	return uid, nil
 }
+
+func (uc *useCase) GetAddress(ctx context.Context, addressID int64) (*model.Address, error) {
+	return uc.svc.GetAddress(ctx, addressID)
+}
+
+func (uc *useCase) AddAddress(ctx context.Context, address *model.Address) (addressID int64, err error) {
+	return uc.svc.AddAddress(ctx, address)
+}

@@ -67,3 +67,13 @@ func _addgoodsintocartMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _getaddressMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _addaddressMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
