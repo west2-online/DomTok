@@ -89,6 +89,9 @@ The project has been layered designed based on the clean architecture, as shown 
 - Unit tests with environment: In addition to unit tests that require mocking, we also use environment variables to control the test environment, allowing some of our unit tests to run in a real environment. You can use `make with-env-test` to start the environment and run these tests.
 - API interface tests: We use **Apifox** for fully automated testing of interfaces to ensure the interfaces. You can view our test cases [here]().
 
+## Quick start and deploy
+This project has greatly simplified the process through scripts. You can refer to the [deployment document](docs/deploy.md) to quickly start and deploy the project.
+
 ## Visualization Example
 Next, we will show the visualization effects achieved through tools such as `Prometheus`, `Grafana`, `VictoriaMetrics`, `Jaeger`, `Filebeat`, `Otel-Collector`, etc. (Only part of the data is shown due to the large amount of data.)
 
@@ -110,8 +113,6 @@ Next, we will show the visualization effects achieved through tools such as `Pro
 ### Jaeger
 ![system.png](docs/img/metrics/jaeger.png)
 
-## Quick start and deploy
-This project has greatly simplified the process through scripts. You can refer to the [deployment document](docs/deploy.md) to quickly start and deploy the project.
 
 ## Contributors
 
