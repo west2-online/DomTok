@@ -18,7 +18,6 @@ package rpc
 
 import (
 	"context"
-	"github.com/west2-online/DomTok/pkg/constants"
 
 	"github.com/samber/lo"
 	"github.com/shopspring/decimal"
@@ -30,6 +29,7 @@ import (
 	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/kitex_gen/order"
 	"github.com/west2-online/DomTok/kitex_gen/order/orderservice"
+	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
