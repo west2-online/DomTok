@@ -14,22 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package db
+package model
 
-import (
-	"gorm.io/gorm"
-
-	"github.com/west2-online/DomTok/pkg/utils"
-)
-
-type Database struct {
-	Client *gorm.DB
-	SF     *utils.Snowflake
-}
-
-func NewDatabase(client *gorm.DB, sf *utils.Snowflake) *Database {
-	return &Database{
-		Client: client,
-		SF:     sf,
-	}
+type Address struct {
+	AddressID int64
+	Province  string
+	City      string
+	Detail    string
 }

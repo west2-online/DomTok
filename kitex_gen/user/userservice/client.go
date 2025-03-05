@@ -31,6 +31,8 @@ import (
 type Client interface {
 	Register(ctx context.Context, req *user.RegisterRequest, callOptions ...callopt.Option) (r *user.RegisterResponse, err error)
 	Login(ctx context.Context, req *user.LoginRequest, callOptions ...callopt.Option) (r *user.LoginResponse, err error)
+	GetAddress(ctx context.Context, req *user.GetAddressRequest, callOptions ...callopt.Option) (r *user.GetAddressResponse, err error)
+	AddAddress(ctx context.Context, req *user.AddAddressRequest, callOptions ...callopt.Option) (r *user.AddAddressResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -70,4 +72,14 @@ func (p *kUserServiceClient) Register(ctx context.Context, req *user.RegisterReq
 func (p *kUserServiceClient) Login(ctx context.Context, req *user.LoginRequest, callOptions ...callopt.Option) (r *user.LoginResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.Login(ctx, req)
+}
+
+func (p *kUserServiceClient) GetAddress(ctx context.Context, req *user.GetAddressRequest, callOptions ...callopt.Option) (r *user.GetAddressResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetAddress(ctx, req)
+}
+
+func (p *kUserServiceClient) AddAddress(ctx context.Context, req *user.AddAddressRequest, callOptions ...callopt.Option) (r *user.AddAddressResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.AddAddress(ctx, req)
 }

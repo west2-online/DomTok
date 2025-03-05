@@ -29,6 +29,7 @@ import (
 	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/kitex_gen/order"
 	"github.com/west2-online/DomTok/kitex_gen/order/orderservice"
+	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
@@ -91,6 +92,7 @@ func (rpc *CartRpcImpl) PurchaseCartGoods(ctx context.Context, cartGoods []*mode
 		}
 	})
 	resp, err := rpc.order.CreateOrder(ctx, &order.CreateOrderReq{
+		AddressID:      constants.UserTestAddr,
 		BaseOrderGoods: baseOrderGoods,
 	})
 	if err = utils.ProcessRpcError("order.CreateOrder", resp, err); err != nil {
