@@ -31,7 +31,6 @@ type PaymentUseCase interface {
 	CreateRefund(ctx context.Context, orderID int64) (int64, int64, error)
 	RefundReview(ctx context.Context, orderID int64, passed bool) error
 	PaymentCheckout(ctx context.Context, orderID int64, token string) error
-	// RequestRefundToken
 }
 
 type paymentUseCase struct {

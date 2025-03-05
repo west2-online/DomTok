@@ -81,6 +81,15 @@ struct UpdateOrderStatusResp {
     1: required model.BaseResp base
 }
 
+struct GetOrderPaymentAmount {
+    1: required i64 orderID
+}
+
+struct GetOrderPaymentAmountResp {
+    1: required model.BaseResp base
+    2: required double amount
+}
+
 service OrderService {
     CreateOrderResp CreateOrder(1:CreateOrderReq req) (api.post="/api/order/create")
     ViewOrderListResp ViewOrderList(1:ViewOrderListReq req) (api.get="/api/order/list")
@@ -90,6 +99,7 @@ service OrderService {
     DeleteOrderResp DeleteOrder(1:DeleteOrderReq req) (api.delete="/api/order/delete")
     IsOrderExistResp IsOrderExist(1:IsOrderExistReq req) (api.get="/api/order/exist")
 
+    GetOrderPaymentAmountResp GetOrderPaymentAmount(1:GetOrderPaymentAmount req)
     UpdateOrderStatusResp OrderPaymentSuccess(1:UpdateOrderStatusReq req)
     UpdateOrderStatusResp OrderPaymentCancel(1:UpdateOrderStatusReq req)
 }
