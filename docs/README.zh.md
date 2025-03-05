@@ -10,7 +10,7 @@ DomTok 是一个基于 HTTP 和 RPC 协议的简单抖音电商后端项目，�
 - 高性能：支持异步 RPC、非阻塞 I/O、消息队列和即时（JIT）编译。
 - 可扩展性：基于整洁架构进行模块化和分层结构设计，代码清晰易读，降低了开发难度。
 - 可观测性：基于 OpenTelemetry 进行分布式追踪，使用 Prometheus 进行监控，利用 Elasticsearch 进行日志收集，通过 Grafana 进行可视化展示。
-- 代码质量：基于 Github Actions 实现 CI/CD 流程，拥有丰富的单元测试，代码质量高且安全性强。
+- 代码质量：基于 GitHub Actions 实现 CI/CD 流程，拥有丰富的单元测试，代码质量高且安全性强。
 - AI 功能：基于字节跳动的 Eino 框架和大语言模型（LLM），通过**函数调用**实现文本输入调用接口。
 - 开发运维：丰富的脚本和工具减少了不必要的手动操作，简化了使用和部署流程。
 
@@ -18,7 +18,7 @@ DomTok 是一个基于 HTTP 和 RPC 协议的简单抖音电商后端项目，�
 ![架构图](./img/Architecture.png)
 
 ### 编码架构
-基于整洁架构对项目进行了分层设计，如下图所示：
+我们基于整洁架构对项目进行了分层设计，如下图所示：
 ![编码架构图](./img/Coding-architecture.png)
 
 ## 项目结构
@@ -81,33 +81,57 @@ DomTok 是一个基于 HTTP 和 RPC 协议的简单抖音电商后端项目，�
 ```
 
 ## 测试
-- 单元测试：本项目使用 `github/bytedance/mockey` 和 `github.com/smartystreets/goconvey/convey` 进行丰富的单元测试。你可以使用 `make test` 来运行这些测试。
-- 带环境的单元测试：除了需要模拟的单元测试外，我们还使用环境变量来控制测试环境，使我们的一些单元测试可以在真实环境中运行。你可以使用 `make with - env - test` 来启动环境并运行这些测试。
-- API 接口测试：我们使用 **Apifox** 对接口进行全自动测试以确保接口的正确性。你可以[点击此处]()查看我们的测试用例。
-
-## 可视化示例
-接下来，我们将展示通过 `Prometheus`、`Grafana`、`VictoriaMetrics`、`Jaeger`、`Filebeat`、`Otel - Collector` 等工具实现的可视化效果（由于数据量较大，仅展示部分数据）。
-
-### Docker
-![docker 监控图](./img/metrics/docker.png)
-
-### Go 程序（总计）
-![Go 程序监控图](./img/metrics/go.png)
-
-### Mysql
-![Mysql 监控图](./img/metrics/mysql.png)
-
-### Redis
-![Redis 监控图](./img/metrics/redis.png)
-
-### 系统
-![系统监控图](./img/metrics/system.png)
-
-### Jaeger
-![Jaeger 监控图](./img/metrics/jaeger.png)
+- 单元测试：本项目使用 `GitHub/bytedance/mockey` 和 `GitHub.com/smartystreets/goconvey/convey` 编写了丰富的单元测试。你可以使用 `make test` 来运行这些测试。
+- 带环境的单元测试：除了需要模拟的单元测试外，我们还使用环境变量来控制测试环境，使我们的一些单元测试可以在真实环境中运行。你可以使用 `make with-env-test` 来启动环境并运行这些测试。
+- API 接口测试：我们使用 **Apifox** 对接口进行全自动测试以确保接口的正确性。我们将测试报告导出为 **html** 格式，你可以[点击此处](./resource/domtok-apifox-reports.html)查看我们的测试用例。
+- GitHub Workflow：我们使用 GitHub Actions 进行 CI/CD 流程，确保代码质量和安全性。
 
 ## 快速启动和部署
 本项目通过脚本极大地简化了流程。你可以参考[部署文档](deploy.zh.md)来快速启动和部署项目。
+
+
+## 可视化示例
+
+### 链路追踪
+我们将 span 埋点在中间件中，使用 `Jaeger` 进行链路追踪，如下图所示：
+#### Jaeger
+![Jaeger 监控图](./img/metrics/jaeger.png)
+![jaeger-tracing.png](img/jaeger-tracing.png)
+
+### 日志体系
+我们利用 `go.uber.org/zap` 将日志序列化为 json 格式并输出到特定的文件，让 `filebeat` 对日志文件进行收集 并发送到 `elasticsearch`，最终在 `kibana` 展示。
+
+我们使用 **"efk"** 而不是 **"elk"** 体系，原因与分析在[这里](./efk-log.zh.md)。
+
+#### 可视化日志查询
+我们使用 `kibana` 的创建了简洁有效的数据视图，并且可以使用 
+[KQL](https://learn.microsoft.com/en-us/kusto/query/?view=microsoft-fabric) 进行可视化查询
+样例如下：
+![kibana-data-graph.png](img/kibana-data-graph.png)
+![kql-demo.png](img/kql-demo.png)
+
+#### Kibana-dev-tools 查询
+除了利用 **kql** 与 **kibana-dataGraph** 进行可视化查询之外，当然也可以进行常规的查询。如下：
+![kibana-dev-tool.png](img/kibana-dev-tool.png)
+
+
+### 监控
+我们将展示通过 `Prometheus`、`Grafana`、`VictoriaMetrics`、`Otel - Collector` 等诸多工具实现了监控的可视化（由于示例较多，仅展示部分）。
+
+#### Docker
+![docker 监控图](./img/metrics/docker.png)
+
+#### Go 程序（总计）
+![Go 程序监控图](./img/metrics/go.png)
+
+#### Mysql
+![Mysql 监控图](./img/metrics/mysql.png)
+
+#### Redis
+![Redis 监控图](./img/metrics/redis.png)
+
+#### 系统
+![系统监控图](./img/metrics/system.png)
 
 ## 贡献者
 

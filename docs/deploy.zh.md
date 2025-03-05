@@ -22,8 +22,8 @@
 ### 预备操作
 
 修改 `config/config.yaml` 的配置，将数据库等配置的 ip 修改为 `localhost`（如果没有请新增这个文件）。  
-我们使用了 oss 来存储图像数据，所以你还需要在 `config/config.yaml` 中配置 oss（upyun） 的相关信息。  
-出于安全性考虑，你需要修改 `config/config.yaml` 中的密钥部分，将其设置为你自己的密钥与公钥。  
+出于安全性考虑，你需要修改 `config/config.yaml` 中的密钥部分，将其设置为你自己的密钥与公钥。
+此外，由于我们使用了 oss 来存储图像数据，所以你还需要在 `config/config.yaml` 中配置 oss（upyun） 的相关信息。  
 配置示例请参考 `config.example.yaml`。
 
 ### 启动环境
@@ -62,9 +62,14 @@ make <target>
 │   ├── docker-compose.yaml
 ├── config
 │   ├── sql
-│   │   └── init.sql
 │   └── config.yaml
-└── hack
-    │── image-refresh.sh
-    └── docker-run.sh
+└── output
+    ├── cart
+    ├── commodity
+    ├── gateway
+    ├── log
+    ├── order
+    ├── payment
+    └── user
+
 ```
