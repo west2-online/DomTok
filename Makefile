@@ -224,6 +224,7 @@ with-env-test:
 		echo "waiting for env up" ;\
 		sleep 3 ;\
 		export $(EnvironmentStartEnv)=$(EnvironmentStartFlag) ;\
+		export $(EtcdAddrEnv)=$(EtcdAddr) ;\
 		make test
 
 .PHONY: with-env-test-nowait
