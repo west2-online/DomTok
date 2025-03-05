@@ -7,7 +7,7 @@
 </div>
 
 ## Overview
-DomTok is a simple backend project for Douyin e-commerce based on HTTP and RPC protocols, adopting the clean architecture and distributed architecture. It utilizes technologies such as Kitex, Hertz, Mysql, Redis, Etcd, Kafka, Elasticsearch, Kibana, Filebeat, Jaeger, Rocketmq, Otel-Collector, several exporters, Prometheus, VictoriaMetrics, Cadvisor, and Grafana.
+DomTok is a simple backend project for Douyin e-commerce based on HTTP and RPC protocols, adopting the clean architecture and distributed architecture. It utilizes technologies such as Kitex, Hertz, Eino, Mysql, Redis, Etcd, Kafka, Elasticsearch, Kibana, Filebeat, Jaeger, Rocketmq, Otel-Collector, several exporters, Prometheus, VictoriaMetrics, Cadvisor, and Grafana.
 
 ## Features
 - Cloud-native: Designed with a native Golang distributed architecture, based on the best practices of ByteDance.
@@ -83,6 +83,22 @@ We have carried out a layered design for the project based on the clean architec
 │   └── rpc           # Specific implementation of the rpc interface in domain-repository
 └── usecase
 ```
+
+
+## LLM Application
+Based on ByteDance's Eino framework and Large Language Model (LLM), this project implements a simple AI function.
+
+### Node Topology
+Initially, we planned to use the **Eino Dev** plugin provided by Eino's official Goland tool to complete the node orchestration for the LLM:  
+![Using Eino Dev plugin for node orchestration](./docs/img/llm/llm-node-compile-1.png)
+
+Later, in the official documentation, we discovered a similar feature called [React Agent](https://www.cloudwego.io/zh/docs/eino/core_modules/flow_integration_components/react_agent_manual/).
+
+The **React Agent** node topology and data flow diagram closely matched our original design:  
+![React Agent node topology](./docs/img/llm/llm-node-compile-2.png)
+
+Additionally, **React Agent** offered a simpler usage method, so we ultimately chose it to implement the LLM application (images sourced from the [React Agent Manual](https://www.cloudwego.io/zh/docs/eino/core_modules/flow_integration_components/react_agent_manual/)):  
+![React Agent workflow](./docs/img/llm/llm-node-compile-3.png)
 
 ## Testing
 - Unit tests: This project uses `GitHub/bytedance/mockey` and `GitHub.com/smartystreets/goconvey/convey` to write rich unit tests. You can use `make test` to run these tests.
