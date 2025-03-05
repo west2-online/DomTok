@@ -92,7 +92,7 @@ Jaeger，Rocketmq，Otel-Collector，several-exporter，Prometheus，VictoriaMet
 - API 接口测试：我们使用了 **Apifox** 来进行接口的全自动测试，保证了接口。你可以在 [这里]() 查看我们的测试用例。
 
 ## Visualization Example
-接下来将展示我们通过 Prometheus、Grafana、VictoriaMetrics、Jaeger、Filebeat、Otel-Collector 等工具实现的可视化效果。（由于数据过多故仅展示部分）
+接下来将展示我们通过 `Prometheus`、`Grafana`、`VictoriaMetrics`、`Jaeger`、`Filebeat`、`Otel-Collector` 等工具实现的可视化效果。（由于数据过多故仅展示部分）
 
 ### Docker 
 ![docker.png](docs/img/metrics/docker.png)
@@ -107,7 +107,7 @@ Jaeger，Rocketmq，Otel-Collector，several-exporter，Prometheus，VictoriaMet
 ![redis.png](docs/img/metrics/redis.png)
 
 ### System
-![redis.png](docs/img/metrics/c.png)
+![system.png](docs/img/metrics/system.png)
 
 ### Jaeger
 
