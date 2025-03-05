@@ -43,7 +43,6 @@ func (c *Client) CartPurchase(ctx context.Context, params *cart.PurChaseCartGood
 	req.SetBody(body)
 	req.Header.Set("Content-Type", "application/json") //nolint:golint
 
-
 	err = c.do(ctx, req, resp)
 	if err != nil {
 		return nil, err
