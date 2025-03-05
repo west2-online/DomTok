@@ -19,7 +19,6 @@ package db
 import (
 	"context"
 	"errors"
-
 	"gorm.io/gorm"
 
 	"github.com/west2-online/DomTok/app/cart/domain/model"

@@ -18,7 +18,6 @@ package rpc
 
 import (
 	"context"
-
 	"github.com/samber/lo"
 
 	"github.com/west2-online/DomTok/app/cart/controllers/rpc/pack"
