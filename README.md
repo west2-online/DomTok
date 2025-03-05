@@ -3,7 +3,7 @@
 </div>
 
 <div align="center">
-  <a href="#overview">English</a> | <a href="deploy/README.zh.md">简体中文</a>
+  <a href="#overview">English</a> | <a href="docs/README.zh.md">简体中文</a>
 </div>
 
 ## Overview
@@ -21,7 +21,10 @@ Jaeger，Rocketmq，Otel-Collector，several-exporter，Prometheus，VictoriaMet
 
 ## Architecture
 
-### Project architecture
+![Architecture](./docs/img/Architecture.png)
+
+### Coding architecture
+
 
 
 ## Project structure
@@ -86,15 +89,32 @@ Jaeger，Rocketmq，Otel-Collector，several-exporter，Prometheus，VictoriaMet
 ## Test
 - 单元测试：本项目利用 `github/bytedance/mockey` 与 `github.com/smartystreets/goconvey/convey` 进行了丰富的单元测试，你可以使用 `make test` 来运行测试。  
 - 带环境的单元测试：除了需要 mock 的单元测试之外，我们还利用了环境变量来控制了测试环境，让我们的部分单元测试可以在真实的环境中运行。你可以使用 `make with-env-test` 来启动环境并运行这些测试。  
-- API 接口测试：我们使用了 **Apifox** 来进行接口的全自动测试，保证了接口的正确性。你可以在 [这里](https://apifox.cn/preview/5f9b1b7e-0b7b-4b3b-8b7b-7b4b3b8b7b4b) 查看我们的测试用例。
+- API 接口测试：我们使用了 **Apifox** 来进行接口的全自动测试，保证了接口。你可以在 [这里]() 查看我们的测试用例。
 
 ## Visualization Example
+接下来将展示我们通过 Prometheus、Grafana、VictoriaMetrics、Jaeger、Filebeat、Otel-Collector 等工具实现的可视化效果。（由于数据过多故仅展示部分）
+
+### Docker 
+![docker.png](docs/img/metrics/docker.png)
+
+### Go Programs（total） 
+![go.png](docs/img/metrics/go.png)
+
+### Mysql
+![mysql.png](docs/img/metrics/mysql.png)
+
+### Redis
+![redis.png](docs/img/metrics/redis.png)
+
+### System
+![redis.png](docs/img/metrics/c.png)
 
 ### Jaeger
 
 
+
 ## Quick start and deploy
-这个项目已经通过脚本大大的简化了流程，你可以参考[部署文档](deploy/deploy.md)来快速启动和部署项目。
+这个项目已经通过脚本大大的简化了流程，你可以参考[部署文档](docs/deploy.md)来快速启动和部署项目。
 
 ## Contributors
 
