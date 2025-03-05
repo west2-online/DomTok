@@ -3,7 +3,7 @@
 </div>
 
 ## 概述
-DomTok 是一个基于 HTTP 和 RPC 协议的简单抖音电商后端项目，采用了整洁架构和分布式架构。它使用了 Kitex、Hertz、Mysql、Redis、Etcd、Kafka、Elasticsearch、Kibana、Filebeat、Jaeger、Rocketmq、Otel - Collector、多个导出器、Prometheus、VictoriaMetrics、Cadvisor 和 Grafana 等技术。
+DomTok 是一个基于 HTTP 和 RPC 协议的简单抖音电商后端项目，采用了整洁架构和分布式架构。它使用了 Kitex、Hertz、Eino、Mysql、Redis、Etcd、Kafka、Elasticsearch、Kibana、Filebeat、Jaeger、Rocketmq、Otel - Collector、多个导出器、Prometheus、VictoriaMetrics、Cadvisor 和 Grafana 等技术。
 
 ## 特性
 - 云原生：采用原生 Go 语言分布式架构设计，基于字节跳动的最佳实践。
@@ -79,6 +79,21 @@ DomTok 是一个基于 HTTP 和 RPC 协议的简单抖音电商后端项目，�
 │   └── rpc           # 领域仓库中 rpc 接口的具体实现
 └── usecase
 ```
+
+## LLM 应用
+基于字节跳动的 Eino 框架和大语言模型（LLM），本项目实现了一个简单的 AI 功能。
+
+### 节点拓扑
+最开始我们打算用 Eino 官方提供的 Goland 插件 **Eino Dev** 来完成 LLM 的节点编排操作：
+![使用 Eino Dev 插件完成节点编排](./img/llm/llm-node-compile-1.png)
+
+后来，在官方文档中，我们发现一个很相似的功能——[React Agent](https://www.cloudwego.io/zh/docs/eino/core_modules/flow_integration_components/react_agent_manual/)
+
+**React Agent** 的节点拓扑和数据流图与我们最初的设计非常相似：
+![React Agent 节点拓扑](./img/llm/llm-node-compile-2.png)
+
+同时，**React Agent** 的使用方式更加简单，所以我们最终选择了 **React Agent** 来完成 LLM 应用的实现（图片来自[React Agent使用手册](https://www.cloudwego.io/zh/docs/eino/core_modules/flow_integration_components/react_agent_manual/)）：
+![React Agent 流程](./img/llm/llm-node-compile-3.png)
 
 ## 测试
 - 单元测试：本项目使用 `GitHub/bytedance/mockey` 和 `GitHub.com/smartystreets/goconvey/convey` 编写了丰富的单元测试。你可以使用 `make test` 来运行这些测试。
