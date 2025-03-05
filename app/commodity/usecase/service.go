@@ -162,7 +162,10 @@ func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
 		}
 	}
 
-	spu.GoodsHeadDrawingUrl = utils.GenerateFileName(constants.SpuDirDest, spu.SpuId)
+	if len(spu.GoodsHeadDrawing) > 0 {
+		spu.GoodsHeadDrawingUrl = utils.GenerateFileName(constants.SpuDirDest, spu.SpuId)
+	}
+
 	if err = us.svc.UpdateSpu(ctx, spu, ret); err != nil {
 		return fmt.Errorf("usecase.UpdateSpu failed: %w", err)
 	}
@@ -371,6 +374,18 @@ func (us *useCase) ListSkuInfo(ctx context.Context, skuInfo []*model.SkuVersion,
 		return nil, -1, fmt.Errorf("usecase.ListSkuInfo failed: %w", err)
 	}
 	return skuInfos, total, nil
+}
+
+func (us *useCase) ViewSkuPriceHistory(ctx context.Context, skuPrice *model.SkuPriceHistory, pageNum int64, pageSize int64) ([]*model.SkuPriceHistory, error) {
+	if pageNum < 1 || pageSize < 1 {
+		return nil, fmt.Errorf("usecase.ViewSkuPriceHistory failed: invalid PageNum or PageSize")
+	}
+
+	histories, err := us.svc.ViewSkuPriceHistory(ctx, skuPrice, pageNum, pageSize)
+	if err != nil {
+		return nil, fmt.Errorf("usecase.ViewSkuPriceHistory failed: %w", err)
+	}
+	return histories, nil
 }
 
 func (us *useCase) CreateSkuImage(ctx context.Context, skuImage *model.SkuImage, data []byte) (int64, error) {

@@ -80,6 +80,13 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"GetOrderPaymentAmount": kitex.NewMethodInfo(
+		getOrderPaymentAmountHandler,
+		newOrderServiceGetOrderPaymentAmountArgs,
+		newOrderServiceGetOrderPaymentAmountResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 	"OrderPaymentSuccess": kitex.NewMethodInfo(
 		orderPaymentSuccessHandler,
 		newOrderServiceOrderPaymentSuccessArgs,
@@ -286,6 +293,24 @@ func newOrderServiceIsOrderExistResult() interface{} {
 	return order.NewOrderServiceIsOrderExistResult()
 }
 
+func getOrderPaymentAmountHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*order.OrderServiceGetOrderPaymentAmountArgs)
+	realResult := result.(*order.OrderServiceGetOrderPaymentAmountResult)
+	success, err := handler.(order.OrderService).GetOrderPaymentAmount(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newOrderServiceGetOrderPaymentAmountArgs() interface{} {
+	return order.NewOrderServiceGetOrderPaymentAmountArgs()
+}
+
+func newOrderServiceGetOrderPaymentAmountResult() interface{} {
+	return order.NewOrderServiceGetOrderPaymentAmountResult()
+}
+
 func orderPaymentSuccessHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
 	realArg := arg.(*order.OrderServiceOrderPaymentSuccessArgs)
 	realResult := result.(*order.OrderServiceOrderPaymentSuccessResult)
@@ -397,6 +422,16 @@ func (p *kClient) IsOrderExist(ctx context.Context, req *order.IsOrderExistReq) 
 	_args.Req = req
 	var _result order.OrderServiceIsOrderExistResult
 	if err = p.c.Call(ctx, "IsOrderExist", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetOrderPaymentAmount(ctx context.Context, req *order.GetOrderPaymentAmount) (r *order.GetOrderPaymentAmountResp, err error) {
+	var _args order.OrderServiceGetOrderPaymentAmountArgs
+	_args.Req = req
+	var _result order.OrderServiceGetOrderPaymentAmountResult
+	if err = p.c.Call(ctx, "GetOrderPaymentAmount", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

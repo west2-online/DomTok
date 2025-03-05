@@ -91,6 +91,14 @@ func (cache *orderCache) UpdatePaymentStatus(ctx context.Context, s *model.Cache
 	return rel == constants.OrderCacheLuaKeyExistFlag, nil
 }
 
+func (cache *orderCache) DeletePaymentStatus(ctx context.Context, orderID int64) error {
+	exK, sK := getExpireKey(orderID), getStatusKey(orderID)
+	if err := cache.client.Del(ctx, exK, sK).Err(); err != nil {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("failed to delete key: %s, %s, err: %v", exK, sK, err))
+	}
+	return nil
+}
+
 func (cache *orderCache) loadUpdateLUAScript() {
 	sha1, err := cache.client.ScriptLoad(context.Background(), constants.OrderUpdatePaymentStatusLuaScript).Result()
 	if err != nil {

@@ -85,15 +85,16 @@ struct ViewUserAllCouponResp {
 }
 
 /*
-* struct UseUserCouponReq 使用用户优惠券
-* @Param CouponID 优惠券ID
+* struct GetCouponAndPrice 获取优惠券和优惠价格的rpc
 */
-struct UseUserCouponReq {
-    1: required i64 couponID;
+struct GetCouponAndPriceReq {
+    1: required list<model.OrderGoods> goods_list
 }
 
-struct UseUserCouponResp {
-    1: required model.BaseResp base;
+struct GetCouponAndPriceResp {
+    1: required model.BaseResp base
+    2: required list<model.OrderGoods> assigned_goods_list
+    3: required double total_price
 }
 
 /*
@@ -535,7 +536,7 @@ service CommodityService {
     CreateUserCouponResp CreateUserCoupon(1: CreateUserCouponReq req);
     ViewCouponResp ViewCoupon(1: ViewCouponReq req);
     ViewUserAllCouponResp ViewUserAllCoupon(1: ViewUserAllCouponReq req);
-    UseUserCouponResp UseUserCoupon(1: UseUserCouponReq req);
+    GetCouponAndPriceResp GetCouponAndPrice(1: GetCouponAndPriceReq req);
 
     // SPU
     CreateSpuResp CreateSpu(1: CreateSpuReq req) (streaming.mode="client");

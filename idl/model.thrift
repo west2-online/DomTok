@@ -10,6 +10,13 @@ struct UserInfo {
     2: string name,
 }
 
+struct AddressInfo {
+    1: string province
+    2: string city
+    3: string detail // 具体地址信息
+    4: i64 addressID
+}
+
 struct LoginData {
     1: i64 userId,
 }
@@ -204,8 +211,7 @@ struct BaseOrderGoods {
     2: required i64 goodsID; // 商品 ID
     3: required i64 styleID; // 商品款式 ID
     4: required i64 purchaseQuantity; // 购买数量
-    5: i64 couponID // 优惠券 ID
-    6: required i64 goodsVersion; // 商品历史号
+    5: required i64 goodsVersion; // 商品历史号
 }
 
 /*

@@ -17,12 +17,15 @@ limitations under the License.
 package mq
 
 import (
+	"sync/atomic"
+
 	"github.com/west2-online/DomTok/app/commodity/domain/repository"
 	"github.com/west2-online/DomTok/pkg/kafka"
 )
 
 type CommodityMQ struct {
 	client *kafka.Kafka
+	done   atomic.Bool
 }
 
 func NewCommodityMQ(client *kafka.Kafka) repository.CommodityMQ {

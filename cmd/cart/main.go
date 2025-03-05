@@ -29,6 +29,7 @@ import (
 	"github.com/west2-online/DomTok/app/cart"
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/kitex_gen/cart/cartservice"
+	"github.com/west2-online/DomTok/pkg/base"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/middleware"
@@ -56,7 +57,7 @@ func main() {
 		logger.Fatalf("Cart: resolve tcp addr failed, err: %v", err)
 	}
 
-	p := middleware.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
+	p := base.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
 	defer func() { logger.LogError(p.Shutdown(context.Background())) }()
 
 	svr := cartservice.NewServer(

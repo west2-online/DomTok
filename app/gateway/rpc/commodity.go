@@ -19,12 +19,9 @@ package rpc
 import (
 	"context"
 
-	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/metadata"
-
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	"github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/base/client"
-	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/utils"
@@ -47,8 +44,6 @@ func InitCommodityStreamClientRPC() {
 }
 
 func CreateSpuRPC(ctx context.Context, req *commodity.CreateSpuReq, files [][]byte) (id int64, err error) {
-	ctx = metadata.AppendToOutgoingContext(ctx, constants.LoginDataKey, "1")
-
 	stream, err := commodityStreamClient.CreateSpu(ctx)
 	if err != nil {
 		logger.Errorf("rpc.CreateSpuRPC CreateSpu failed, err  %v", err)
@@ -327,6 +322,7 @@ func CreateSkuRPC(ctx context.Context, req *commodity.CreateSkuReq, files [][]by
 	if !utils.IsSuccess(resp.Base) {
 		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
+
 	return resp.SkuInfo, nil
 }
 
@@ -485,6 +481,18 @@ func UploadSkuAttrRPC(ctx context.Context, req *commodity.UploadSkuAttrReq) (err
 		return errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	return nil
+}
+
+func ViewHistoryPriceRPC(ctx context.Context, req *commodity.ViewHistoryPriceReq) (prices []*model.PriceHistory, err error) {
+	resp, err := commodityClient.ViewHistory(ctx, req)
+	if err != nil {
+		logger.Errorf("ViewHistoryPriceRPC: RPC called failed: %v", err.Error())
+		return nil, errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
+	}
+	return resp.Records, nil
 }
 
 func CreateCategoryRPC(ctx context.Context, req *commodity.CreateCategoryReq) (int64, error) {

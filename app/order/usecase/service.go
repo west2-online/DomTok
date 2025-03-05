@@ -23,6 +23,7 @@ import (
 	basecontext "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 func (uc *useCase) CreateOrder(ctx context.Context, addressID int64, baseGoods []*model.BaseOrderGoods) (int64, error) {
@@ -49,7 +50,7 @@ func (uc *useCase) CreateOrder(ctx context.Context, addressID int64, baseGoods [
 		return 0, err
 	}
 
-	if err = uc.svc.DescSkuLockStock(ctx, order.Id, goods); err != nil {
+	if err = uc.svc.WithholdSkuStock(ctx, order.Id, goods); err != nil {
 		return 0, err
 	}
 
@@ -61,7 +62,7 @@ func (uc *useCase) ViewOrderList(ctx context.Context, page, size int32) ([]*mode
 	// 从 RPC 上下文中获取用户ID
 	userID, err := basecontext.GetLoginData(ctx)
 	if err != nil {
-		return nil, nil, 0, err
+		return nil, nil, 0, errno.NewErrNo(errno.AuthInvalidCode, "invalid user id")
 	}
 
 	return uc.svc.ViewOrderList(ctx, userID, page, size)
@@ -69,26 +70,13 @@ func (uc *useCase) ViewOrderList(ctx context.Context, page, size int32) ([]*mode
 
 // ViewOrder 获取订单详情
 func (uc *useCase) ViewOrder(ctx context.Context, orderID int64) (*model.Order, []*model.OrderGoods, error) {
-	// 1. 获取当前登录用户ID
-	userID, err := basecontext.GetLoginData(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	// 2. 检查订单是否存在
 	if err := uc.svc.OrderExist(ctx, orderID); err != nil {
 		return nil, nil, err
 	}
 
-	// 3. 获取订单和商品信息
 	order, orderGoods, err := uc.db.GetOrderAndGoods(ctx, orderID)
 	if err != nil {
 		return nil, nil, err
-	}
-
-	// 4. 检查订单所有者
-	if order.Uid != userID {
-		return nil, nil, errno.NewErrNo(errno.IllegalOperatorCode, "permission denied: not order owner")
 	}
 
 	return order, orderGoods, nil
@@ -96,13 +84,7 @@ func (uc *useCase) ViewOrder(ctx context.Context, orderID int64) (*model.Order, 
 
 // CancelOrder 取消订单
 func (uc *useCase) CancelOrder(ctx context.Context, orderID int64) error {
-	// 1. 获取当前登录用户ID
-	userID, err := basecontext.GetLoginData(ctx)
-	if err != nil {
-		return err
-	}
-
-	// 2. 检查订单是否存在
+	// 1. 检查订单是否存在
 	exist, _, err := uc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
@@ -111,35 +93,24 @@ func (uc *useCase) CancelOrder(ctx context.Context, orderID int64) error {
 		return errno.NewErrNo(errno.ServiceOrderNotFound, "order not found")
 	}
 
-	// 3. 获取订单信息检查状态
+	// 2. 获取订单信息检查状态
 	order, err := uc.db.GetOrderByID(ctx, orderID)
 	if err != nil {
 		return err
 	}
 
-	// 4. 检查订单所有者
-	if order.Uid != userID {
-		return errno.NewErrNo(errno.IllegalOperatorCode, "permission denied: not order owner")
-	}
-
-	// 5. 只有待支付的订单可以取消
+	// 3. 只有待支付的订单可以取消
 	if order.Status != constants.OrderStatusUnpaidCode {
 		return errno.NewErrNo(errno.IllegalOperatorCode, "order cannot be canceled")
 	}
 
-	// 6. 更新订单状态为已取消
+	// 4. 更新订单状态为已取消
 	return uc.db.UpdateOrderStatus(ctx, orderID, constants.OrderStatusCancelledCode)
 }
 
 // ChangeDeliverAddress 更改配送地址
 func (uc *useCase) ChangeDeliverAddress(ctx context.Context, orderID, addressID int64, addressInfo string) error {
-	// 1. 获取当前登录用户ID
-	userID, err := basecontext.GetLoginData(ctx)
-	if err != nil {
-		return err
-	}
-
-	// 2. 检查订单是否存在
+	// 1. 检查订单是否存在
 	exist, _, err := uc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
@@ -148,35 +119,23 @@ func (uc *useCase) ChangeDeliverAddress(ctx context.Context, orderID, addressID 
 		return errno.NewErrNo(errno.ServiceOrderNotFound, "order not found")
 	}
 
-	// 3. 获取订单信息检查状态
+	// 2. 获取订单信息检查状态
 	order, err := uc.db.GetOrderByID(ctx, orderID)
 	if err != nil {
 		return err
 	}
 
-	// 4. 检查订单所有者
-	if order.Uid != userID {
-		return errno.NewErrNo(errno.IllegalOperatorCode, "permission denied: not order owner")
+	// 3. 已完成/取消的订单不能修改地址
+	if order.Status >= constants.OrderStatusCompletedCode {
+		return errno.NewErrNo(errno.IllegalOperatorCode, "order cannot change address")
 	}
 
-	// 5. 只有待支付的订单可以修改地址
-	if order.Status != constants.OrderStatusUnpaidCode {
-		return errno.NewErrNo(errno.IllegalOperatorCode, "order cannot change address: only unpaid order can be modified")
-	}
-
-	// 6. 更新地址信息
+	// 4. 更新地址信息
 	return uc.db.UpdateOrderAddress(ctx, orderID, addressID, addressInfo)
 }
 
 // DeleteOrder 删除订单
 func (uc *useCase) DeleteOrder(ctx context.Context, orderID int64) error {
-	// 1. 获取当前登录用户ID
-	userID, err := basecontext.GetLoginData(ctx)
-	if err != nil {
-		return err
-	}
-
-	// 2. 检查订单是否存在
 	exist, _, err := uc.db.IsOrderExist(ctx, orderID)
 	if err != nil {
 		return err
@@ -185,23 +144,11 @@ func (uc *useCase) DeleteOrder(ctx context.Context, orderID int64) error {
 		return errno.NewErrNo(errno.ServiceOrderNotFound, "order not found")
 	}
 
-	// 3. 获取订单信息
-	order, err := uc.db.GetOrderByID(ctx, orderID)
-	if err != nil {
-		return err
-	}
-
-	// 4. 检查订单所有者
-	if order.Uid != userID {
-		return errno.NewErrNo(errno.IllegalOperatorCode, "permission denied: not order owner")
-	}
-
-	// 5. 删除订单（包含订单商品）
-	return uc.db.DeleteOrder(ctx, orderID)
+	return uc.svc.DeleteOrder(ctx, orderID)
 }
 
 func (uc *useCase) IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error) {
-	return uc.db.IsOrderExist(ctx, orderID)
+	return uc.svc.IsOrderExist(ctx, orderID)
 }
 
 func (uc *useCase) OrderPaymentSuccess(ctx context.Context, req *model.PaymentResult) error {
@@ -232,8 +179,17 @@ func (uc *useCase) OrderPaymentCancel(ctx context.Context, req *model.PaymentRes
 		return nil
 	}
 
+	req.PaymentStatus = status
 	if err = uc.svc.CancelOrder(ctx, req); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (uc *useCase) GetOrderPaymentAmount(ctx context.Context, orderID int64) (float64, error) {
+	o, err := uc.db.GetOrderByID(ctx, orderID)
+	if err != nil {
+		return 0, err
+	}
+	return utils.DecimalFloat64(&o.PaymentAmount), nil
 }

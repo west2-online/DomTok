@@ -30,13 +30,13 @@ import (
 	"github.com/west2-online/DomTok/app/assistant/service"
 	"github.com/west2-online/DomTok/app/gateway/mw"
 	"github.com/west2-online/DomTok/config"
+	"github.com/west2-online/DomTok/pkg/base"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
-	"github.com/west2-online/DomTok/pkg/middleware"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
-var serviceName = "assistant"
+var serviceName = constants.AssistantServiceName
 
 func init() {
 	config.Init(serviceName)
@@ -68,7 +68,7 @@ func main() {
 		logger.Fatalf("get available port failed, err: %v", err)
 	}
 
-	p := middleware.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
+	p := base.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
 	defer func() { logger.LogError(p.Shutdown(context.Background())) }()
 
 	h := server.New(

@@ -159,6 +159,112 @@ var fieldIDToName_UserInfo = map[int16]string{
 	2: "name",
 }
 
+type AddressInfo struct {
+	Province  string `thrift:"province,1" frugal:"1,default,string" json:"province"`
+	City      string `thrift:"city,2" frugal:"2,default,string" json:"city"`
+	Detail    string `thrift:"detail,3" frugal:"3,default,string" json:"detail"`
+	AddressID int64  `thrift:"addressID,4" frugal:"4,default,i64" json:"addressID"`
+}
+
+func NewAddressInfo() *AddressInfo {
+	return &AddressInfo{}
+}
+
+func (p *AddressInfo) InitDefault() {
+}
+
+func (p *AddressInfo) GetProvince() (v string) {
+	return p.Province
+}
+
+func (p *AddressInfo) GetCity() (v string) {
+	return p.City
+}
+
+func (p *AddressInfo) GetDetail() (v string) {
+	return p.Detail
+}
+
+func (p *AddressInfo) GetAddressID() (v int64) {
+	return p.AddressID
+}
+func (p *AddressInfo) SetProvince(val string) {
+	p.Province = val
+}
+func (p *AddressInfo) SetCity(val string) {
+	p.City = val
+}
+func (p *AddressInfo) SetDetail(val string) {
+	p.Detail = val
+}
+func (p *AddressInfo) SetAddressID(val int64) {
+	p.AddressID = val
+}
+
+func (p *AddressInfo) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AddressInfo(%+v)", *p)
+}
+
+func (p *AddressInfo) DeepEqual(ano *AddressInfo) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Province) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.City) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Detail) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.AddressID) {
+		return false
+	}
+	return true
+}
+
+func (p *AddressInfo) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.Province, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddressInfo) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.City, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddressInfo) Field3DeepEqual(src string) bool {
+
+	if strings.Compare(p.Detail, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddressInfo) Field4DeepEqual(src int64) bool {
+
+	if p.AddressID != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_AddressInfo = map[int16]string{
+	1: "province",
+	2: "city",
+	3: "detail",
+	4: "addressID",
+}
+
 type LoginData struct {
 	UserId int64 `thrift:"userId,1" frugal:"1,default,i64" json:"userId"`
 }
@@ -3317,8 +3423,7 @@ type BaseOrderGoods struct {
 	GoodsID          int64 `thrift:"goodsID,2,required" frugal:"2,required,i64" json:"goodsID"`
 	StyleID          int64 `thrift:"styleID,3,required" frugal:"3,required,i64" json:"styleID"`
 	PurchaseQuantity int64 `thrift:"purchaseQuantity,4,required" frugal:"4,required,i64" json:"purchaseQuantity"`
-	CouponID         int64 `thrift:"couponID,5" frugal:"5,default,i64" json:"couponID"`
-	GoodsVersion     int64 `thrift:"goodsVersion,6,required" frugal:"6,required,i64" json:"goodsVersion"`
+	GoodsVersion     int64 `thrift:"goodsVersion,5,required" frugal:"5,required,i64" json:"goodsVersion"`
 }
 
 func NewBaseOrderGoods() *BaseOrderGoods {
@@ -3344,10 +3449,6 @@ func (p *BaseOrderGoods) GetPurchaseQuantity() (v int64) {
 	return p.PurchaseQuantity
 }
 
-func (p *BaseOrderGoods) GetCouponID() (v int64) {
-	return p.CouponID
-}
-
 func (p *BaseOrderGoods) GetGoodsVersion() (v int64) {
 	return p.GoodsVersion
 }
@@ -3362,9 +3463,6 @@ func (p *BaseOrderGoods) SetStyleID(val int64) {
 }
 func (p *BaseOrderGoods) SetPurchaseQuantity(val int64) {
 	p.PurchaseQuantity = val
-}
-func (p *BaseOrderGoods) SetCouponID(val int64) {
-	p.CouponID = val
 }
 func (p *BaseOrderGoods) SetGoodsVersion(val int64) {
 	p.GoodsVersion = val
@@ -3395,10 +3493,7 @@ func (p *BaseOrderGoods) DeepEqual(ano *BaseOrderGoods) bool {
 	if !p.Field4DeepEqual(ano.PurchaseQuantity) {
 		return false
 	}
-	if !p.Field5DeepEqual(ano.CouponID) {
-		return false
-	}
-	if !p.Field6DeepEqual(ano.GoodsVersion) {
+	if !p.Field5DeepEqual(ano.GoodsVersion) {
 		return false
 	}
 	return true
@@ -3434,13 +3529,6 @@ func (p *BaseOrderGoods) Field4DeepEqual(src int64) bool {
 }
 func (p *BaseOrderGoods) Field5DeepEqual(src int64) bool {
 
-	if p.CouponID != src {
-		return false
-	}
-	return true
-}
-func (p *BaseOrderGoods) Field6DeepEqual(src int64) bool {
-
 	if p.GoodsVersion != src {
 		return false
 	}
@@ -3452,8 +3540,7 @@ var fieldIDToName_BaseOrderGoods = map[int16]string{
 	2: "goodsID",
 	3: "styleID",
 	4: "purchaseQuantity",
-	5: "couponID",
-	6: "goodsVersion",
+	5: "goodsVersion",
 }
 
 type CreditCardInfo struct {

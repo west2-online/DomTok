@@ -17,11 +17,14 @@ limitations under the License.
 package client
 
 import (
+	"strings"
+
 	"github.com/apache/rocketmq-client-go/v2"
 	"github.com/apache/rocketmq-client-go/v2/admin"
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/apache/rocketmq-client-go/v2/producer"
+	"github.com/apache/rocketmq-client-go/v2/rlog"
 
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/pkg/logger"
@@ -86,4 +89,8 @@ func GetRocketmqPushConsumer(group string, opts ...consumer.Option) rocketmq.Pus
 		logger.Fatalf("create rocketmq push consumer error: %v", err)
 	}
 	return p
+}
+
+func SetRocketMqLoggerLevel(level string) {
+	rlog.SetLogLevel(strings.ToLower(level))
 }

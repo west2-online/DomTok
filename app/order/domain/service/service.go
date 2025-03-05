@@ -49,7 +49,12 @@ func NewOrderService(db repository.OrderDB, sf repository.IDGenerator, rpc repos
 
 // IsOrderExist 检查订单是否存在
 func (svc *OrderService) IsOrderExist(ctx context.Context, orderID int64) (bool, int64, error) {
-	return svc.db.IsOrderExist(ctx, orderID)
+	exist, createAt, err := svc.db.IsOrderExist(ctx, orderID)
+	if err != nil {
+		return false, 0, err
+	}
+
+	return exist, svc.calcOrderExpireTime(createAt), nil
 }
 
 // OrderExist 检查订单是否存在
@@ -99,12 +104,13 @@ func (svc *OrderService) calcOrderExpireTime(createAt int64) int64 {
 }
 
 func (svc *OrderService) UpdateOrderAsSuccess(ctx context.Context, expired int64, payRel *model.PaymentResult) error {
-	if time.Now().UnixMilli() > expired {
-		return errno.NewErrNo(errno.ServiceOrderExpired, "order expired")
+	// 对状态的一层校验
+	if payRel.PaymentStatus != constants.PaymentStatusSuccessCode {
+		return errno.NewErrNo(errno.ServiceOrderStatusInvalid, "success orders cannot be updated again")
 	}
 
-	if payRel.PaymentStatus == constants.PaymentStatusSuccessCode {
-		return nil
+	if time.Now().UnixMilli() > expired {
+		return errno.NewErrNo(errno.ServiceOrderExpired, "order expired")
 	}
 	// 尝试开始更新
 	if err := svc.locker.LockOrder(payRel.OrderID); err != nil {
@@ -127,12 +133,16 @@ func (svc *OrderService) UpdateOrderAsSuccess(ctx context.Context, expired int64
 		return err
 	}
 
+	if _, err = svc.cache.UpdatePaymentStatus(ctx, &model.CachePaymentStatus{}); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (svc *OrderService) CancelOrder(ctx context.Context, payRel *model.PaymentResult) error {
 	// 如果订单是失败，那说明回滚过了
-	if payRel.PaymentStatus != constants.PaymentStatusFailedCode {
+	if payRel.PaymentStatus == constants.PaymentStatusFailedCode {
 		return errno.NewErrNo(errno.ServiceOrderStatusInvalid, "failed orders cannot be canceled")
 	}
 
@@ -147,13 +157,20 @@ func (svc *OrderService) CancelOrder(ctx context.Context, payRel *model.PaymentR
 		return err
 	}
 
-	// 释放锁定库存
-	orderStock := model.ConvertOrderGoodsToOrderStock(payRel.OrderID, goods)
-	if err = svc.rpc.DescSkuLockStock(ctx, orderStock); err != nil {
+	// 如果是订单还未支付，那么直接取消订单
+	if payRel.PaymentStatus != constants.PaymentStatusSuccessCode {
+		orderStock := model.ConvertOrderGoodsToOrderStock(payRel.OrderID, goods)
+		if err = svc.rpc.RollbackSkuStock(ctx, orderStock); err != nil {
+			return err
+		}
+	}
+	// TODO 需要一个增加库存的 rpc 接口
+
+	if err = svc.db.UpdatePaymentStatus(ctx, payRel); err != nil {
 		return err
 	}
 
-	if err = svc.db.UpdatePaymentStatus(ctx, payRel); err != nil {
+	if _, err = svc.cache.UpdatePaymentStatus(ctx, &model.CachePaymentStatus{}); err != nil {
 		return err
 	}
 
@@ -162,6 +179,16 @@ func (svc *OrderService) CancelOrder(ctx context.Context, payRel *model.PaymentR
 
 func (svc *OrderService) IsEqualStatus(s1, s2 int8) bool {
 	return s1 == s2
+}
+
+func (svc *OrderService) DeleteOrder(ctx context.Context, orderID int64) error {
+	if err := svc.cache.DeletePaymentStatus(ctx, orderID); err != nil {
+		return err
+	}
+	if err := svc.db.DeleteOrder(ctx, orderID); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (svc *OrderService) nextVal() int64 {

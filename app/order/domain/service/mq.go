@@ -39,7 +39,7 @@ func (svc *OrderService) SkuLockStockRollback(ctx context.Context, body []byte) 
 	}
 
 	if payRel.PaymentStatus == constants.PaymentStatusPendingCode {
-		if err = svc.rpc.IncrSkuLockStock(ctx, orderStock); err != nil {
+		if err = svc.rpc.RollbackSkuStock(ctx, orderStock); err != nil {
 			logger.Error(err.Error())
 			return false
 		}

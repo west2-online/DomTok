@@ -28,10 +28,13 @@ const (
 	CouponRangeTypeSPU      = 1
 	CouponRangeTypeCategory = 2
 	CouponPageSize          = 15
+	CouponTypeSubAmount     = 1
+	CouponTypeDiscount      = 2
 )
 
 const (
 	UserTableName       = "users"
+	AddressTableName    = "address"
 	CategoryTableName   = "category"
 	OrderTableName      = "orders"
 	OrderGoodsTableName = "order_goods"

@@ -99,7 +99,6 @@ func BuildBaseOrderGoods(g *model.OrderGoods) *idlmodel.BaseOrderGoods {
 		GoodsID:          g.GoodsID,
 		StyleID:          g.StyleID,
 		PurchaseQuantity: g.PurchaseQuantity,
-		CouponID:         g.CouponId,
 		GoodsVersion:     g.GoodsVersion,
 	}
 }

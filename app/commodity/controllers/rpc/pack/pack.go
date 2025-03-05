@@ -57,27 +57,6 @@ func BuildSpus(spus []*model.Spu) []*modelKitex.Spu {
 	return base.BuildTypeList(spus, BuildSpu)
 }
 
-func BuildCoupon(coupon *model.Coupon) *modelKitex.Coupon {
-	return &modelKitex.Coupon{
-		CouponID:       coupon.Id,
-		CreatorID:      coupon.Uid,
-		DeadlineForGet: coupon.DeadlineForGet.Unix(),
-		Name:           coupon.Name,
-		TypeInfo:       int32(coupon.TypeInfo),
-		ConditionCost:  coupon.ConditionCost,
-		DiscountAmount: &coupon.DiscountAmount,
-		Discount:       &coupon.Discount,
-		RangeType:      int32(coupon.RangeType),
-		RangeId:        coupon.RangeId,
-		ExpireTime:     coupon.ExpireTime.Unix(),
-		Description:    coupon.Description,
-	}
-}
-
-func BuildCoupons(coupons []*model.Coupon) []*modelKitex.Coupon {
-	return base.BuildTypeList(coupons, BuildCoupon)
-}
-
 func BuildSkuImages(i []*model.SkuImage) []*modelKitex.SkuImage {
 	result := make([]*modelKitex.SkuImage, 0, len(i))
 	for _, v := range i {
@@ -128,13 +107,16 @@ func BuildSkuInfo(s *model.Sku) *modelKitex.SkuInfo {
 	var sku model.Sku
 	if s == nil {
 		sku.SkuID = -1
+		sku.CreatorID = -1
 		sku.HistoryID = -1
 	} else {
 		sku.SkuID = s.SkuID
+		sku.CreatorID = s.CreatorID
 		sku.HistoryID = s.HistoryID
 	}
 	result := &modelKitex.SkuInfo{
 		SkuID:     sku.SkuID,
+		CreatorID: sku.CreatorID,
 		HistoryID: sku.HistoryID,
 	}
 	return result

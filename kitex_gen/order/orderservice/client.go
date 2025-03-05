@@ -36,6 +36,7 @@ type Client interface {
 	ChangeDeliverAddress(ctx context.Context, req *order.ChangeDeliverAddressReq, callOptions ...callopt.Option) (r *order.ChangeDeliverAddressResp, err error)
 	DeleteOrder(ctx context.Context, req *order.DeleteOrderReq, callOptions ...callopt.Option) (r *order.DeleteOrderResp, err error)
 	IsOrderExist(ctx context.Context, req *order.IsOrderExistReq, callOptions ...callopt.Option) (r *order.IsOrderExistResp, err error)
+	GetOrderPaymentAmount(ctx context.Context, req *order.GetOrderPaymentAmount, callOptions ...callopt.Option) (r *order.GetOrderPaymentAmountResp, err error)
 	OrderPaymentSuccess(ctx context.Context, req *order.UpdateOrderStatusReq, callOptions ...callopt.Option) (r *order.UpdateOrderStatusResp, err error)
 	OrderPaymentCancel(ctx context.Context, req *order.UpdateOrderStatusReq, callOptions ...callopt.Option) (r *order.UpdateOrderStatusResp, err error)
 }
@@ -102,6 +103,11 @@ func (p *kOrderServiceClient) DeleteOrder(ctx context.Context, req *order.Delete
 func (p *kOrderServiceClient) IsOrderExist(ctx context.Context, req *order.IsOrderExistReq, callOptions ...callopt.Option) (r *order.IsOrderExistResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.IsOrderExist(ctx, req)
+}
+
+func (p *kOrderServiceClient) GetOrderPaymentAmount(ctx context.Context, req *order.GetOrderPaymentAmount, callOptions ...callopt.Option) (r *order.GetOrderPaymentAmountResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetOrderPaymentAmount(ctx, req)
 }
 
 func (p *kOrderServiceClient) OrderPaymentSuccess(ctx context.Context, req *order.UpdateOrderStatusReq, callOptions ...callopt.Option) (r *order.UpdateOrderStatusResp, err error) {

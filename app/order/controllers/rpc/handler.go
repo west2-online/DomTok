@@ -45,7 +45,6 @@ func (h *OrderHandler) CreateOrder(ctx context.Context, req *order.CreateOrderRe
 			StyleID:          item.StyleID,
 			GoodsVersion:     item.GoodsVersion,
 			PurchaseQuantity: item.PurchaseQuantity,
-			CouponID:         item.CouponID,
 		}
 	})
 
@@ -126,4 +125,10 @@ func (h *OrderHandler) OrderPaymentCancel(ctx context.Context, req *order.Update
 		PaymentStyle:  req.GetPaymentStyle(),
 	}
 	return r, h.useCase.OrderPaymentCancel(ctx, rel)
+}
+
+func (h *OrderHandler) GetOrderPaymentAmount(ctx context.Context, req *order.GetOrderPaymentAmount) (r *order.GetOrderPaymentAmountResp, err error) {
+	r = new(order.GetOrderPaymentAmountResp)
+	r.Amount, err = h.useCase.GetOrderPaymentAmount(ctx, req.GetOrderID())
+	return r, err
 }

@@ -29,6 +29,7 @@ import (
 	"github.com/west2-online/DomTok/app/user"
 	"github.com/west2-online/DomTok/config"
 	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
+	"github.com/west2-online/DomTok/pkg/base"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/logger"
 	"github.com/west2-online/DomTok/pkg/middleware"
@@ -39,7 +40,7 @@ var serviceName = constants.UserServiceName
 
 func init() {
 	config.Init(serviceName)
-	logger.Init(serviceName, config.GetLoggerLevel())
+	// logger.Init(serviceName, config.GetLoggerLevel())
 }
 
 func main() {
@@ -55,7 +56,7 @@ func main() {
 	if err != nil {
 		logger.Fatalf("User: resolve tcp addr failed, err: %v", err)
 	}
-	p := middleware.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
+	p := base.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
 	defer func() { logger.LogError(p.Shutdown(context.Background())) }()
 
 	svr := userservice.NewServer(

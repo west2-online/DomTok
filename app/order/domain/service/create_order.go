@@ -71,42 +71,36 @@ func (svc *OrderService) MakeOrderByGoods(ctx context.Context, addressID int64, 
 		DeliveryAt:            0, // 等后续发货更新
 		AddressID:             addressID,
 		AddressInfo:           addressInfo,
-		CouponId:              0,  // TODO 订单级别的优惠券应该为全局活动, 考虑在优惠券接口进行实现
-		CouponName:            "", // TODO 同上
 	}
 	lo.ForEach(goods, func(item *model.OrderGoods, index int) {
 		item.OrderID = order.Id
 	})
 
-	if err = svc.CalculateTheAmount(goods, order); err != nil {
+	if err = svc.CalculateTheAmount(ctx, goods, order); err != nil {
 		return nil, err
 	}
 
 	return order, nil
 }
 
-// TODO 优惠券接口完善后可以考虑接入优惠券的接口来实现这个方法的功能
-func (svc *OrderService) CalculateTheAmount(goods []*model.OrderGoods, order *model.Order) error {
+func (svc *OrderService) CalculateTheAmount(ctx context.Context, goods []*model.OrderGoods, order *model.Order) (err error) {
+	if goods, err = svc.rpc.CalcOrderGoodsPrice(ctx, goods); err != nil {
+		return err
+	}
+
 	// orderGoods 的  DiscountAmount PaymentAmount SinglePrice, couponName 还未赋值
 	lo.ForEach(goods, func(item *model.OrderGoods, index int) {
-		item.DiscountAmount = decimal.NewFromInt(0)
-		item.PaymentAmount = item.TotalAmount.Add(item.DiscountAmount)
-		item.SinglePrice = item.PaymentAmount.Div(decimal.NewFromInt(item.PurchaseQuantity))
-
 		order.TotalAmountOfGoods = order.TotalAmountOfGoods.Add(item.TotalAmount)
 		order.TotalAmountOfDiscount = order.TotalAmountOfDiscount.Add(item.DiscountAmount)
 		order.TotalAmountOfFreight = order.TotalAmountOfFreight.Add(item.FreightAmount)
 		order.PaymentAmount = order.PaymentAmount.Add(item.PaymentAmount)
 	})
 
-	// 全局活动, 应该调用 coupon 接口实现
-	order.CouponId = 0
-	order.CouponName = ""
 	return nil
 }
 
-// DescSkuLockStock 预扣商品
-func (svc *OrderService) DescSkuLockStock(ctx context.Context, orderID int64, goods []*model.OrderGoods) error {
+// WithholdSkuStock 预扣商品
+func (svc *OrderService) WithholdSkuStock(ctx context.Context, orderID int64, goods []*model.OrderGoods) error {
 	stocks := lo.Map(goods, func(item *model.OrderGoods, index int) *model.Stock {
 		return &model.Stock{SkuID: item.StyleID, Count: item.PurchaseQuantity}
 	})
@@ -116,14 +110,14 @@ func (svc *OrderService) DescSkuLockStock(ctx context.Context, orderID int64, go
 	}
 
 	// 尝试预扣库存
-	if err := svc.rpc.DescSkuLockStock(ctx, orderStock); err != nil {
+	if err := svc.rpc.WithholdSkuStock(ctx, orderStock); err != nil {
 		return err
 	}
 
 	var err error
 	defer func() { // 如果操作出错了尝试进行回滚, 由于刚刚调用 DescSkuLockStock成功, 所以这里回滚大概率是成功的
 		if err != nil {
-			if e := svc.rpc.IncrSkuLockStock(ctx, orderStock); e != nil {
+			if e := svc.rpc.RollbackSkuStock(ctx, orderStock); e != nil {
 				logger.Errorf("failed to rollback for incr sku lock stock,rollbackErr: %v, caused_err: %v", e, err)
 			}
 		}
