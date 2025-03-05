@@ -110,7 +110,7 @@ Jaeger，Rocketmq，Otel-Collector，several-exporter，Prometheus，VictoriaMet
 ![system.png](docs/img/metrics/system.png)
 
 ### Jaeger
-
+![system.png](docs/img/metrics/jaeger.png)
 
 
 ## Quick start and deploy
