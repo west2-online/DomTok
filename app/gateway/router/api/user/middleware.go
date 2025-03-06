@@ -52,22 +52,6 @@ func _loginMw() []app.HandlerFunc {
 	return nil
 }
 
-func _cartMw() []app.HandlerFunc {
-	// : add authorization
-	// your code...
-	return nil
-}
-
-func _skuMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _addgoodsintocartMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
 func _getaddressMw() []app.HandlerFunc {
 	// your code...
 	return nil
