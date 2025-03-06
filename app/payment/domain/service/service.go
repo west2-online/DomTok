@@ -134,7 +134,6 @@ func (svc *PaymentService) CheckRedisRateLimiting(ctx context.Context, uid int64
 	}
 
 	// 检查 24 小时内是否已申请过退款
-	// TODO 这下面的返回值的全用false吗？
 	exists, err := svc.redis.CheckRedisDayKey(ctx, dayKey)
 	if err != nil {
 		return false, false, fmt.Errorf("check refund request history failed: %w", err)

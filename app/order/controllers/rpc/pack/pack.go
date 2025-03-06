@@ -34,7 +34,7 @@ func BuildOrder(o *model.Order) *idlmodel.Order {
 		TotalAmountOfFreight:  utils.DecimalFloat64(&o.TotalAmountOfFreight),
 		TotalAmountOfDiscount: utils.DecimalFloat64(&o.TotalAmountOfDiscount),
 		PaymentAmount:         utils.DecimalFloat64(&o.PaymentAmount),
-		PaymentStatus:         "待支付", // TODO
+		PaymentStatus:         "待支付",
 		PaymentAt:             o.PaymentAt,
 		PaymentStyle:          o.PaymentStyle,
 		OrderedAt:             o.OrderedAt,
@@ -89,7 +89,7 @@ func BuildBaseOrder(o *model.Order) *idlmodel.BaseOrder {
 		Status:             constants.GetOrderStatusMsg(o.Status),
 		TotalAmountOfGoods: utils.DecimalFloat64(&o.TotalAmountOfGoods),
 		PaymentAmount:      utils.DecimalFloat64(&o.PaymentAmount),
-		PaymentStatus:      "", // TODO 根据 o.paymentStatus 转化
+		PaymentStatus:      constants.GetPaymentStatus(o.PaymentStatus),
 	}
 }
 

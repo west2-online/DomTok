@@ -196,8 +196,6 @@ ai.SetServerStrategy(func(functionName string) adapter.ServerCaller {
 ``` go
 type ServerCaller interface {
 	Ping(ctx context.Context) ([]byte, error)
-
-	// TODO: add more methods here
 }
 ```
 

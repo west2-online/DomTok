@@ -164,7 +164,6 @@ func (svc *OrderService) CancelOrder(ctx context.Context, payRel *model.PaymentR
 			return err
 		}
 	}
-	// TODO 需要一个增加库存的 rpc 接口
 
 	if err = svc.db.UpdatePaymentStatus(ctx, payRel); err != nil {
 		return err

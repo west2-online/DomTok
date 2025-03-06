@@ -31,7 +31,7 @@ func buildTestSpu(t *testing.T, creatorId int64) *model.Spu {
 	return &model.Spu{
 		SpuId:               rand.Int64(),
 		Name:                "OPPO",
-		CreatorId:           creatorId, // TODO,
+		CreatorId:           creatorId,
 		Description:         "desc",
 		CategoryId:          rand.Int64(),
 		Price:               rand.Float64(),

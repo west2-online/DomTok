@@ -14,8 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// TODO: 清掉fzu-server的依赖
-
 package base
 
 import (
@@ -28,8 +26,6 @@ import (
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
 )
-
-var SuccessBase = model.BaseResp{Code: errno.SuccessCode, Msg: errno.SuccessMsg}
 
 func BuildBaseResp(err error) *model.BaseResp {
 	if err == nil {
@@ -60,26 +56,6 @@ func LogError(err error) {
 		return
 	}
 	logger.Error(err.Error())
-}
-
-func BuildRespAndLog(err error) *model.BaseResp {
-	if err == nil {
-		return &model.BaseResp{
-			Code: errno.SuccessCode,
-			Msg:  errno.Success.ErrorMsg,
-		}
-	}
-
-	Errno := errno.ConvertErr(err)
-	if Errno.StackTrace() != nil {
-		logger.Error(err.Error(), zap.String(constants.StackTraceKey, fmt.Sprintf("%+v", Errno.StackTrace())))
-	} else {
-		logger.Error(err.Error())
-	}
-	return &model.BaseResp{
-		Code: Errno.ErrorCode,
-		Msg:  Errno.ErrorMsg,
-	}
 }
 
 func BuildTypeList[T any, U any](items []U, buildFunc func(U) T) []T {

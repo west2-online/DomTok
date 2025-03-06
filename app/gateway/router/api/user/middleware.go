@@ -53,7 +53,7 @@ func _loginMw() []app.HandlerFunc {
 }
 
 func _cartMw() []app.HandlerFunc {
-	// todo: add authorization
+	// : add authorization
 	// your code...
 	return nil
 }

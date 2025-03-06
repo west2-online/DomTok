@@ -27,8 +27,7 @@ const (
 	RefundSecretKey          = "west2online"
 	ExpirationDuration       = 15 * time.Minute
 	RefundExpirationDuration = 15 * time.Minute
-	// TODO 这一个常量要改
-	PingTime = 2
+	PingTime                 = 2
 )
 
 const (
