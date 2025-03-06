@@ -84,15 +84,11 @@ DomTok 是一个基于 HTTP 和 RPC 协议的简单抖音电商后端项目，�
 基于字节跳动的 Eino 框架和大语言模型（LLM），本项目实现了一个简单的 AI 功能。
 
 ### 节点拓扑
-最开始我们打算用 Eino 官方提供的 Goland 插件 **Eino Dev** 来完成 LLM 的节点编排操作：
 ![使用 Eino Dev 插件完成节点编排](./img/llm/llm-node-compile-1.png)
 
-后来，在官方文档中，我们发现一个很相似的功能——[React Agent](https://www.cloudwego.io/zh/docs/eino/core_modules/flow_integration_components/react_agent_manual/)
-
-**React Agent** 的节点拓扑和数据流图与我们最初的设计非常相似：
 ![React Agent 节点拓扑](./img/llm/llm-node-compile-2.png)
 
-同时，**React Agent** 的使用方式更加简单，所以我们最终选择了 **React Agent** 来完成 LLM 应用的实现（图片来自[React Agent使用手册](https://www.cloudwego.io/zh/docs/eino/core_modules/flow_integration_components/react_agent_manual/)）：
+我们选择了 **React Agent** 来完成 LLM 应用的实现，模型使用 doubao
 ![React Agent 流程](./img/llm/llm-node-compile-3.png)
 
 ## 测试
@@ -103,7 +99,6 @@ DomTok 是一个基于 HTTP 和 RPC 协议的简单抖音电商后端项目，�
 
 ## 快速启动和部署
 本项目通过脚本极大地简化了流程。你可以参考[部署文档](deploy.zh.md)来快速启动和部署项目。
-
 
 ## 可视化示例
 
@@ -119,7 +114,7 @@ DomTok 是一个基于 HTTP 和 RPC 协议的简单抖音电商后端项目，�
 我们使用 **"efk"** 而不是 **"elk"** 体系，原因与分析在[这里](./efk-log.zh.md)。
 
 #### 可视化日志查询
-我们使用 `kibana` 的创建了简洁有效的数据视图，并且可以使用 
+我们使用 `kibana` 创建了简洁有效的数据视图，并且可以使用 
 [KQL](https://learn.microsoft.com/en-us/kusto/query/?view=microsoft-fabric) 进行可视化查询
 样例如下：
 ![kibana-data-graph.png](img/kibana-data-graph.png)
