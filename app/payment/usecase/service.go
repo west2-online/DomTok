@@ -32,7 +32,6 @@ func (uc *paymentUseCase) CreatePayment(ctx context.Context, orderID int64) (*mo
 
 func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (token string, expTime int64, err error) {
 	// 1. 检查订单是否存在
-	// TODO 记得删除注释
 	orderInfo, err := uc.svc.CheckOrderExist(ctx, orderID)
 	if err != nil {
 		return "", 0, fmt.Errorf("check order existed failed:%w", err)
@@ -89,7 +88,6 @@ func (uc *paymentUseCase) GetPaymentToken(ctx context.Context, orderID int64) (t
 // CreateRefund 发起退款请求
 func (uc *paymentUseCase) CreateRefund(ctx context.Context, orderID int64) (refundStatus int64, refundID int64, err error) {
 	// 1. 检查订单是否存在
-	// TODO记得删除注释
 	orderExists, err := uc.svc.CheckOrderExist(ctx, orderID)
 	if err != nil {
 		return 0, 0, fmt.Errorf("check order existence failed: %w", err)

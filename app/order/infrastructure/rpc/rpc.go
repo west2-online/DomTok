@@ -41,7 +41,6 @@ func NewOrderRpcImpl(u userservice.Client, c commodityservice.Client) repository
 	return &orderRpcImpl{u, c}
 }
 
-// TODO 等address 接口
 func (rpc *orderRpcImpl) GetAddressInfo(ctx context.Context, addressId int64) (string, error) {
 	return "", nil
 }

@@ -81,7 +81,6 @@ func (db *paymentDB) GetPaymentInfo(ctx context.Context, orderID int64) (*model.
 // ConvertToDBModel 转换函数
 func ConvertToDBModel(p *model.PaymentOrder) (*PaymentOrder, error) {
 	if p == nil {
-		// TODO 这里应该是用errno.ParamVerifyErrorCode这个错误码？
 		return nil, errno.Errorf(errno.ParamVerifyErrorCode, "ConvertToDBModel: input payment order is nil")
 	}
 	return &PaymentOrder{
@@ -161,7 +160,6 @@ func (db *paymentDB) UpdatePaymentStatusToSuccessAndCreateLedgerAsTransaction(ct
 // ConvertRefundToDBModel 转换函数
 func ConvertRefundToDBModel(p *model.PaymentRefund) (*PaymentRefund, error) {
 	if p == nil {
-		// TODO 这里应该是用errno.ParamVerifyErrorCode这个错误码？
 		return nil, errno.Errorf(errno.ParamVerifyErrorCode, "ConvertToDBModel: input payment order is nil")
 	}
 	return &PaymentRefund{

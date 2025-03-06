@@ -38,7 +38,6 @@ func NewUserDB(client *gorm.DB) repository.UserDB {
 
 func (db *userDB) CreateUser(ctx context.Context, u *model.User) (int64, error) {
 	// 将 entity 转换成 mysql 这边的 model
-	// TODO 可以考虑整一个函数统一转化, 放在这里占了太多行, 而且这不是这个方法该做的. 这个方法应该做的是创建用户
 	user := User{
 		Username: u.UserName,
 		Password: u.Password,

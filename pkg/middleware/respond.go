@@ -46,7 +46,7 @@ type baser interface {
 // Respond 流程如下:
 //  1. 尝试从 resp 中获取到真正的在 idl 中定义的 response (Ref: https://www.cloudwego.io/zh/docs/kitex/tutorials/framework-exten/middleware/)
 //  2. 获取到 response 后尝试从 response 中提取出来 model.BaseResp, 然后对其进行赋值
-//  3. 尝试判断 err 是否为 errno, 如果是的话说明这是一个可控的 error, 我们对外部返回 nil 即可 (// TODO explain)
+//  3. 尝试判断 err 是否为 errno, 如果是的话说明这是一个可控的 error, 我们对外部返回 nil 即可
 func Respond() endpoint.Middleware {
 	return func(next endpoint.Endpoint) endpoint.Endpoint {
 		return func(ctx context.Context, req, resp interface{}) error {
