@@ -68,6 +68,7 @@ services:
     restart: always
     networks:
       - domtok
+    mem_limit: 750m
 
   kibana:
     image: kibana:8.4.2
@@ -83,6 +84,7 @@ services:
       - ./data/kibana:/usr/share/kibana/data
     networks:
       - domtok
+    mem_limit: 350m
 
   filebeat:
     image: elastic/filebeat:8.4.2
@@ -93,8 +95,7 @@ services:
       - ./data/filebeat:/usr/share/filebeat/data  # 持久化注册表文件
       - ../output/log:/usr/share/filebeat/logs  # 挂载日志目录
     depends_on:
-      elasticsearch:
-        condition: service_healthy
+      - elasticsearch
     restart: on-failure
     networks:
       - domtok
@@ -141,6 +142,7 @@ services:
       domtok:
         aliases:
           - rmqnamesrv
+    mem_limit: 250m
 
   # RocketMQ Broker 服务，负责消息的存储、转发等核心功能
   rmqbroker:
@@ -163,6 +165,7 @@ services:
       domtok:
         aliases:
           - rmqbroker
+    mem_limit: 750m
 
   # OpenTelemetry 收集器，收集、处理和导出可观测性数据（指标、追踪等）
   domtok-otel-collector:
