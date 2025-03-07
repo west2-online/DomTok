@@ -32,6 +32,7 @@ type UserDB interface {
 	GetAddressInfo(ctx context.Context, addressID int64) (*model.Address, error)
 	CreateAddress(ctx context.Context, address *model.Address) (int64, error)
 	GetUserById(ctx context.Context, id int64) (*model.User, error)
+	UpdateUser(ctx context.Context, user *model.User) error
 }
 
 type UserCache interface {

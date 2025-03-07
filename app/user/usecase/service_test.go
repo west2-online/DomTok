@@ -21,14 +21,12 @@ import (
 	"testing"
 
 	"github.com/redis/go-redis/v9"
-
-	"github.com/west2-online/DomTok/app/user/infrastructure/cache"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/west2-online/DomTok/app/user/domain/model"
 	"github.com/west2-online/DomTok/app/user/domain/service"
+	"github.com/west2-online/DomTok/app/user/infrastructure/cache"
 	"github.com/west2-online/DomTok/app/user/usecase"
 	"github.com/west2-online/DomTok/app/user/usecase/mocks"
 	"github.com/west2-online/DomTok/config"

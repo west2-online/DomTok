@@ -30,16 +30,16 @@ import (
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
-var GateWayService *service.GateWayService
-
-func init() {
-	sync.OnceFunc(func() {
-		GateWayService = service.NewGateWayService()
-	})
-}
+var (
+	GateWayService *service.GateWayService
+	once           sync.Once
+)
 
 func UserLoginStatus() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
+		once.Do(func() {
+			GateWayService = service.NewGateWayService()
+		})
 		token := string(c.GetHeader(constants.AuthHeader))
 		_, uid, err := utils.CheckToken(token)
 		if err != nil {
@@ -49,31 +49,19 @@ func UserLoginStatus() app.HandlerFunc {
 		}
 
 		if GateWayService.Bf.Test([]byte(fmt.Sprintf("%d", uid))) {
-			pack.RespError(c, errno.Errorf(errno.UserBaned, "user:%d baned, but get request", uid))
+			pack.RespError(c, errno.Errorf(errno.UserBaned, "bf:user:%d baned, but get request", uid))
 			c.Abort()
 			return
 		}
-
-		ban, err := GateWayService.Re.IsUserBanned(ctx, uid)
-		if err != nil {
-			pack.RespError(c, err)
-			c.Abort()
-			return
-		}
+		ban := GateWayService.Re.IsUserBanned(ctx, uid)
 		if ban {
 			GateWayService.Bf.Add([]byte(fmt.Sprintf("%d", uid)))
-			pack.RespError(c, errno.Errorf(errno.UserBaned, "user:%d baned, but get request", uid))
+			pack.RespError(c, errno.Errorf(errno.UserBaned, "redis: user:%d baned, but get request", uid))
 			c.Abort()
 			return
 		}
-
-		logout, err := GateWayService.Re.IsUserLogout(ctx, uid)
-		if err != nil {
-			pack.RespError(c, err)
-			c.Abort()
-			return
-		}
-		if logout {
+		logout := GateWayService.Re.IsUserLogout(ctx, uid)
+		if !logout {
 			pack.RespError(c, errno.Errorf(errno.UserLogOut, "user:%d logout, but get request", uid))
 			c.Abort()
 			return

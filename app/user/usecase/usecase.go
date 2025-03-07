@@ -33,6 +33,7 @@ type UserUseCase interface {
 	BanUser(ctx context.Context, uid int64) error
 	LiftUser(ctx context.Context, uid int64) error
 	LogoutUser(ctx context.Context) error
+	SetAdministrator(ctx context.Context, uid int64, password []byte, action int) error
 }
 
 // useCase 实现了 domain.UserUseCase

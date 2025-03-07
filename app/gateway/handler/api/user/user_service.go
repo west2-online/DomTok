@@ -20,6 +20,7 @@ package api
 
 import (
 	"context"
+
 	"github.com/cloudwego/hertz/pkg/app"
 
 	api "github.com/west2-online/DomTok/app/gateway/model/api/user"
@@ -183,6 +184,29 @@ func Logout(ctx context.Context, c *app.RequestContext) {
 	}
 
 	err = rpc.LogoutUserRPC(ctx, &user.LogoutReq{})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespSuccess(c)
+}
+
+// SetAdministrator .
+// @router api/v1/user/administrator [POST]
+func SetAdministrator(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req user.SetAdministratorReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	err = rpc.SetAdministrator(ctx, &user.SetAdministratorReq{
+		Uid:      req.Uid,
+		Password: req.Password,
+		Action:   req.Action,
+	})
 	if err != nil {
 		pack.RespError(c, err)
 		return

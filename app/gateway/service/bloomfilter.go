@@ -28,9 +28,10 @@ type BF struct {
 }
 
 func NewBloomFilter() *BF {
+	bf := bloom.NewWithEstimates(constants.BloomFilterSize, constants.FalsePositiveRate)
 	return &BF{
 		BloomFilter: []*bloom.BloomFilter{
-			bloom.NewWithEstimates(constants.BloomFilterSize, constants.FalsePositiveRate),
+			bf,
 		},
 		maxSize: constants.BFMaxSize,
 	}

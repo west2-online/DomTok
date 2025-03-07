@@ -61,6 +61,16 @@ struct LogoutResp {
 
 }
 
+struct SetAdministratorReq {
+    1: required i64 uid
+    2: required string password
+    3: required i16 action
+}
+
+struct SetAdministratorResp {
+    1: required model.BaseResp base,
+}
+
 service UserService {
     RegisterResponse Register(1: RegisterRequest req)(api.post = "api/v1/user/register"),
     LoginResponse Login(1: LoginRequest req)(api.post = "api/v1/user/login")
@@ -69,4 +79,6 @@ service UserService {
     BanUserResp BanUser(1: BanUserReq req) (api.post="api/v1/user/ban"),
     LiftBanUserResp LiftBandUser(1: LiftBanUserReq req) (api.post="api/v1/user/lift"),
     LogoutResp Logout(1: LogoutReq req) (api.post="api/v1/user/logout")
+    SetAdministratorResp SetAdministrator(1:SetAdministratorReq req) (api.post="api/v1/user/administrator")
 }
+

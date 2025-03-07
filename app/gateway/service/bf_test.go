@@ -17,18 +17,19 @@ limitations under the License.
 package service
 
 import (
+	"testing"
+
 	"github.com/smarty/assertions"
 	"github.com/smarty/assertions/assert"
-	"testing"
 )
 
 func TestAddAndTest(t *testing.T) {
-	arr := []string{"sova", "cypher", "jett", "sage", "KO"}
+	////arr := []string{"sova", "cypher", "jett", "sage", "KO"}
 	bf := NewBloomFilter()
-
-	for _, v := range arr {
-		bf.Add([]byte(v))
-	}
+	////
+	////for _, v := range arr {
+	////	bf.Add([]byte(v))
+	////}
 	testItem := "KO"
 	success := bf.Test([]byte(testItem))
 	assert.So(success, assertions.ShouldEqual, true)

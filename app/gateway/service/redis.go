@@ -18,14 +18,12 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/redis/go-redis/v9"
 
 	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/constants"
-	"github.com/west2-online/DomTok/pkg/errno"
 )
 
 type RedisService struct {
@@ -41,26 +39,12 @@ func NewRedisService() *RedisService {
 	return &RedisService{*cli}
 }
 
-func (svc *RedisService) IsUserBanned(ctx context.Context, userId int64) (bool, error) {
-	err := svc.client.Exists(ctx, svc.GetUserBanedKey(userId)).Err()
-	if err != nil {
-		if errors.Is(err, redis.Nil) {
-			return false, nil
-		}
-		return false, errno.Errorf(errno.InternalRedisErrorCode, "RedisService.IsUserBanned failed: %v", err)
-	}
-	return true, nil
+func (svc *RedisService) IsUserBanned(ctx context.Context, userId int64) bool {
+	return svc.client.Exists(ctx, svc.GetUserBanedKey(userId)).Val() == 1
 }
 
-func (svc *RedisService) IsUserLogout(ctx context.Context, userId int64) (bool, error) {
-	err := svc.client.Exists(ctx, svc.GetUserLogoutKey(userId)).Err()
-	if err != nil {
-		if errors.Is(err, redis.Nil) {
-			return false, nil
-		}
-		return false, errno.Errorf(errno.InternalRedisErrorCode, "RedisService.IsUserLogout failed: %v", err)
-	}
-	return true, nil
+func (svc *RedisService) IsUserLogout(ctx context.Context, userId int64) bool {
+	return svc.client.Exists(ctx, svc.GetUserLogoutKey(userId)).Val() == 1
 }
 
 func (svc *RedisService) GetUserBanedKey(userId int64) string {

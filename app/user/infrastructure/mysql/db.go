@@ -99,7 +99,6 @@ func (db *userDB) GetUserInfo(ctx context.Context, username string) (*model.User
 		Phone:    user.Phone,
 		Role:     user.Role,
 	}
-
 	return resp, nil
 }
 
@@ -135,4 +134,20 @@ func (db *userDB) CreateAddress(ctx context.Context, address *model.Address) (in
 	}
 
 	return addr.ID, nil
+}
+
+func (db *userDB) UpdateUser(ctx context.Context, user *model.User) error {
+	u := User{
+		Username: user.UserName,
+		Password: user.Password,
+		Email:    user.Email,
+		Phone:    user.Phone,
+		Role:     user.Role,
+	}
+	err := db.client.WithContext(ctx).Table(u.TableName()).
+		Where("id = ?", user.Uid).Updates(&u).Error
+	if err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update user: %v", err)
+	}
+	return nil
 }

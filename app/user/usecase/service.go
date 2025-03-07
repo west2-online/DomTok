@@ -19,6 +19,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+
 	"github.com/west2-online/DomTok/app/user/domain/model"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
@@ -29,7 +30,13 @@ func (uc *useCase) Login(ctx context.Context, user *model.User) (*model.User, er
 	if err != nil {
 		return nil, fmt.Errorf("get user info failed: %w", err)
 	}
-
+	exist, err := uc.svc.IsBaned(ctx, u.Uid)
+	if err != nil {
+		return nil, fmt.Errorf("check ban failed: %w", err)
+	}
+	if exist {
+		return nil, errno.NewErrNo(errno.AuthNoOperatePermissionCode, "user was baned")
+	}
 	if err = uc.svc.CheckPassword(u.Password, user.Password); err != nil {
 		return nil, err
 	}
@@ -88,4 +95,8 @@ func (us *useCase) LiftUser(ctx context.Context, uid int64) error {
 
 func (us *useCase) LogoutUser(ctx context.Context) error {
 	return us.svc.Logout(ctx)
+}
+
+func (us *useCase) SetAdministrator(ctx context.Context, uid int64, password []byte, action int) error {
+	return us.svc.SetAdministrator(ctx, uid, password, action)
 }

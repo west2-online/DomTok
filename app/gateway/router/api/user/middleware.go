@@ -64,7 +64,9 @@ func _addaddressMw() []app.HandlerFunc {
 
 func _banuserMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
 }
 
 func _liftbanduserMw() []app.HandlerFunc {
@@ -77,4 +79,9 @@ func _logoutMw() []app.HandlerFunc {
 	return []app.HandlerFunc{
 		mw.Auth(),
 	}
+}
+
+func _setadministratorMw() []app.HandlerFunc {
+	// your code...
+	return nil
 }

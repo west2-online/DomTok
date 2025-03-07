@@ -130,3 +130,14 @@ func (h *UserHandler) LiftBandUser(ctx context.Context, req *user.LiftBanUserReq
 	r.Base = base.BuildBaseResp(nil)
 	return
 }
+
+func (h *UserHandler) SetAdministrator(ctx context.Context, req *user.SetAdministratorReq) (r *user.SetAdministratorResp, err error) {
+	r = new(user.SetAdministratorResp)
+	err = h.useCase.SetAdministrator(ctx, req.Uid, []byte(req.Password), int(req.Action))
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return
+}

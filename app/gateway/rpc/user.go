@@ -142,3 +142,15 @@ func LiftUserRPC(ctx context.Context, req *user.LiftBanUserReq) error {
 	}
 	return nil
 }
+
+func SetAdministrator(ctx context.Context, req *user.SetAdministratorReq) error {
+	resp, err := userClient.SetAdministrator(ctx, req)
+	if err != nil {
+		logger.Errorf("SetAdministrator: RPC called failed: %v", err.Error())
+		return errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return nil
+}

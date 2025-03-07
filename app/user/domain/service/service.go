@@ -19,14 +19,15 @@ package service
 import (
 	"context"
 	"fmt"
-	metadata "github.com/west2-online/DomTok/pkg/base/context"
-	"github.com/west2-online/DomTok/pkg/utils"
 
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/west2-online/DomTok/app/user/domain/model"
+	"github.com/west2-online/DomTok/config"
+	metadata "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
+	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 func (svc *UserService) EncryptPassword(pwd string) (string, error) {
@@ -108,6 +109,10 @@ func (svc *UserService) UserBaned(ctx context.Context, uid int64) error {
 		return fmt.Errorf("domain.svc.UserBaned failed: %w", err)
 	}
 
+	if me == uid {
+		return errno.NewErrNo(errno.ParamVerifyErrorCode, "can not do this at self")
+	}
+
 	myInfo, err := svc.db.GetUserById(ctx, me)
 	if err != nil {
 		return fmt.Errorf("domain.svc.UserBaned failed: %w", err)
@@ -126,13 +131,12 @@ func (svc *UserService) UserBaned(ctx context.Context, uid int64) error {
 	if !exist {
 		err = svc.cache.SetUserBaned(ctx, key)
 		if err != nil {
-			return fmt.Errorf("domain.svc.UserBaned failed: %v", err)
+			return fmt.Errorf("domain.svc.UserBaned failed: %w", err)
 		}
 		return nil
 	} else {
 		return errno.NewErrNo(errno.RepeatedOperation, "domain.svc.UserBaned failed, already banned user")
 	}
-
 }
 
 func (svc *UserService) LiftUserBaned(ctx context.Context, uid int64) error {
@@ -160,29 +164,59 @@ func (svc *UserService) LiftUserBaned(ctx context.Context, uid int64) error {
 	if exist {
 		err = svc.cache.DeleteUserBaned(ctx, key)
 		if err != nil {
-			return fmt.Errorf("domain.svc.LiftUserBaned failed: %v", err)
+			return fmt.Errorf("domain.svc.LiftUserBaned failed: %w", err)
 		}
 		return nil
 	} else {
 		return errno.NewErrNo(errno.RepeatedOperation, "domain.svc.LiftUserBaned failed, already normal user")
 	}
-
 }
 
 func (svc *UserService) Logout(ctx context.Context) error {
 	uid, err := metadata.GetLoginData(ctx)
 	if err != nil {
-		return fmt.Errorf("domain.svc.Logout failed: %v", err)
+		return fmt.Errorf("domain.svc.Logout failed: %w", err)
 	}
 	key := svc.cache.UserLogOutKey(uid)
 	exist := svc.cache.IsExist(ctx, key)
 	if exist {
 		err = svc.cache.DeleteUserLogOut(ctx, key)
 		if err != nil {
-			return fmt.Errorf("domain.svc.Logout failed: %v", err)
+			return fmt.Errorf("domain.svc.Logout failed: %w", err)
 		}
 		return nil
 	} else {
 		return errno.NewErrNo(errno.RepeatedOperation, "domain.svc.Logout failed, already logout")
 	}
+}
+
+func (svc *UserService) SetAdministrator(ctx context.Context, uid int64, password []byte, action int) error {
+	err := bcrypt.CompareHashAndPassword([]byte(config.Administrator.Password), password)
+	if err != nil {
+		return errno.NewErrNo(errno.AuthNoOperatePermissionCode, "permission denied")
+	}
+
+	_, err = svc.db.GetUserById(ctx, uid)
+	if err != nil {
+		return errno.Errorf(errno.InternalServiceErrorCode, "domain.svc.SetAdministrator failed: %v", err)
+	}
+
+	if err = svc.Verify(svc.VerifyAction(action)); err != nil {
+		return errno.NewErrNo(errno.ParamVerifyErrorCode, "action type error")
+	}
+
+	err = svc.db.UpdateUser(ctx, &model.User{
+		Uid:  uid,
+		Role: action,
+	})
+	if err != nil {
+		return errno.NewErrNo(errno.InternalServiceErrorCode, "domain.svc.SetAdministrator failed")
+	}
+	return nil
+}
+
+func (svc *UserService) IsBaned(ctx context.Context, uid int64) (bool, error) {
+	key := svc.cache.UserBanedKey(uid)
+	exist := svc.cache.IsExist(ctx, key)
+	return exist, nil
 }

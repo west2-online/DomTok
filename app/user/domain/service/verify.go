@@ -53,3 +53,16 @@ func (svc *UserService) VerifyPassword(pw string) UserVerifyOps {
 		return nil
 	}
 }
+
+func (svc *UserService) VerifyAction(action int) UserVerifyOps {
+	return func() error {
+		switch action {
+		case constants.UserAdministrator:
+			return nil
+		case constants.NormalUser:
+			return nil
+		default:
+			return errno.NewErrNo(errno.ParamVerifyErrorCode, "invalid action")
+		}
+	}
+}

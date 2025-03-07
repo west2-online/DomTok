@@ -31,6 +31,10 @@ type UserDB struct {
 	mock.Mock
 }
 
+func (_m *UserDB) UpdateUser(ctx context.Context, user *model.User) error {
+	return nil
+}
+
 // CreateAddress provides a mock function with given fields: ctx, address
 func (_m *UserDB) CreateAddress(ctx context.Context, address *model.Address) (int64, error) {
 	ret := _m.Called(ctx, address)
