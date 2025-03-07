@@ -26,6 +26,7 @@ type User struct {
 	Password string
 	Email    string
 	Phone    string
+	Role     int
 }
 
 func (User) TableName() string {

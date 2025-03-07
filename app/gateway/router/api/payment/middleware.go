@@ -28,6 +28,7 @@ func rootMw() []app.HandlerFunc {
 	// your code...
 	return []app.HandlerFunc{
 		mw.Auth(),
+		mw.UserLoginStatus(),
 	}
 }
 

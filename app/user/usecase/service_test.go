@@ -20,6 +20,10 @@ import (
 	"context"
 	"testing"
 
+	"github.com/redis/go-redis/v9"
+
+	"github.com/west2-online/DomTok/app/user/infrastructure/cache"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -34,9 +38,11 @@ import (
 
 func TestUseCase_RegisterUser(t *testing.T) {
 	mockDB := new(mocks.UserDB)
+	mockCache := new(redis.Client)
+	c := cache.NewUserCache(mockCache)
 	mockSf, _ := utils.NewSnowflake(config.GetDataCenterID(), constants.WorkerOfUserService)
-	mockService := service.NewUserService(mockDB, mockSf)
-	uc := usecase.NewUserCase(mockDB, mockService)
+	mockService := service.NewUserService(mockDB, mockSf, c)
+	uc := usecase.NewUserCase(mockDB, mockService, c)
 
 	user := &model.User{
 		UserName: "testuser",

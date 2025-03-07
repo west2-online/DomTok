@@ -97,3 +97,36 @@ func (h *UserHandler) AddAddress(ctx context.Context, req *user.AddAddressReques
 	r.AddressID = addressID
 	return
 }
+
+func (h *UserHandler) BanUser(ctx context.Context, req *user.BanUserReq) (r *user.BanUserResp, err error) {
+	r = new(user.BanUserResp)
+	err = h.useCase.BanUser(ctx, req.Uid)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return
+}
+
+func (h *UserHandler) Logout(ctx context.Context, req *user.LogoutReq) (r *user.LogoutResp, err error) {
+	r = new(user.LogoutResp)
+	err = h.useCase.LogoutUser(ctx)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return
+}
+
+func (h *UserHandler) LiftBandUser(ctx context.Context, req *user.LiftBanUserReq) (r *user.LiftBanUserResp, err error) {
+	r = new(user.LiftBanUserResp)
+	err = h.useCase.LiftUser(ctx, req.Uid)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return
+}

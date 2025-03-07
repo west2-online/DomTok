@@ -39,10 +39,34 @@ struct AddAddressResponse {
     1: required i64 address_id
 }
 
+struct BanUserReq {
+    1: required i64 uid
+}
+
+struct BanUserResp {
+}
+
+struct LiftBanUserReq {
+    1: required i64 uid
+}
+
+struct LiftBanUserResp {
+
+}
+
+struct LogoutReq {
+}
+
+struct LogoutResp {
+
+}
 
 service UserService {
     RegisterResponse Register(1: RegisterRequest req)(api.post = "api/v1/user/register"),
     LoginResponse Login(1: LoginRequest req)(api.post = "api/v1/user/login")
     GetAddressResponse GetAddress(1: GetAddressRequest req)(api.get = "api/v1/user/location"),
-    AddAddressResponse AddAddress(1: AddAddressRequest req)(api.post = "api/v1/user/address")
+    AddAddressResponse AddAddress(1: AddAddressRequest req)(api.post = "api/v1/user/address"),
+    BanUserResp BanUser(1: BanUserReq req) (api.post="api/v1/user/ban"),
+    LiftBanUserResp LiftBandUser(1: LiftBanUserReq req) (api.post="api/v1/user/lift"),
+    LogoutResp Logout(1: LogoutReq req) (api.post="api/v1/user/logout")
 }

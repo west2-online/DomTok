@@ -19,7 +19,6 @@ package usecase
 import (
 	"context"
 	"fmt"
-
 	"github.com/west2-online/DomTok/app/user/domain/model"
 	"github.com/west2-online/DomTok/pkg/errno"
 )
@@ -35,6 +34,9 @@ func (uc *useCase) Login(ctx context.Context, user *model.User) (*model.User, er
 		return nil, err
 	}
 
+	if err = uc.svc.UserLogin(ctx, u.Uid); err != nil {
+		return nil, err
+	}
 	return u, nil
 }
 
@@ -74,4 +76,16 @@ func (uc *useCase) GetAddress(ctx context.Context, addressID int64) (*model.Addr
 
 func (uc *useCase) AddAddress(ctx context.Context, address *model.Address) (addressID int64, err error) {
 	return uc.svc.AddAddress(ctx, address)
+}
+
+func (uc *useCase) BanUser(ctx context.Context, uid int64) error {
+	return uc.svc.UserBaned(ctx, uid)
+}
+
+func (us *useCase) LiftUser(ctx context.Context, uid int64) error {
+	return us.svc.LiftUserBaned(ctx, uid)
+}
+
+func (us *useCase) LogoutUser(ctx context.Context) error {
+	return us.svc.Logout(ctx)
 }

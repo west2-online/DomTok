@@ -19,6 +19,7 @@ package user
 import (
 	"github.com/west2-online/DomTok/app/user/controllers/rpc"
 	"github.com/west2-online/DomTok/app/user/domain/service"
+	"github.com/west2-online/DomTok/app/user/infrastructure/cache"
 	"github.com/west2-online/DomTok/app/user/infrastructure/mysql"
 	"github.com/west2-online/DomTok/app/user/usecase"
 	"github.com/west2-online/DomTok/config"
@@ -40,9 +41,15 @@ func InjectUserHandler() user.UserService {
 		panic(err)
 	}
 
+	re, err := client.NewRedisClient(constants.RedisDBGateWay) // 使用和网关同一个数据库，目前仅用作登录登出
+	if err != nil {
+		panic(err)
+	}
+
 	db := mysql.NewUserDB(gormDB)
-	svc := service.NewUserService(db, sf)
-	uc := usecase.NewUserCase(db, svc)
+	redisCache := cache.NewUserCache(re)
+	svc := service.NewUserService(db, sf, redisCache)
+	uc := usecase.NewUserCase(db, svc, redisCache)
 
 	return rpc.NewUserHandler(uc)
 }

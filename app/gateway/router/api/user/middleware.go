@@ -20,6 +20,8 @@ package user
 
 import (
 	"github.com/cloudwego/hertz/pkg/app"
+
+	"github.com/west2-online/DomTok/app/gateway/mw"
 )
 
 func rootMw() []app.HandlerFunc {
@@ -53,11 +55,26 @@ func _loginMw() []app.HandlerFunc {
 }
 
 func _getaddressMw() []app.HandlerFunc {
-	// your code...
 	return nil
 }
 
 func _addaddressMw() []app.HandlerFunc {
+	return nil
+}
+
+func _banuserMw() []app.HandlerFunc {
 	// your code...
 	return nil
+}
+
+func _liftbanduserMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _logoutMw() []app.HandlerFunc {
+	// your code...
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
 }

@@ -8,6 +8,7 @@ struct BaseResp {
 struct UserInfo {
     1: i64 userId,
     2: string name,
+    3: i64 role,
 }
 
 struct AddressInfo {

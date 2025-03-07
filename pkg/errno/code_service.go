@@ -25,6 +25,9 @@ const (
 	AddressNotExist
 
 	ErrRecordNotFound
+	UserLogOut
+	UserBaned
+	UserAlreadyLogin
 )
 
 // order

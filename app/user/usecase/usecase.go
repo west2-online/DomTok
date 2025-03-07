@@ -30,18 +30,23 @@ type UserUseCase interface {
 	Login(ctx context.Context, user *model.User) (*model.User, error)
 	GetAddress(ctx context.Context, addressID int64) (*model.Address, error)
 	AddAddress(ctx context.Context, address *model.Address) (addressID int64, err error)
+	BanUser(ctx context.Context, uid int64) error
+	LiftUser(ctx context.Context, uid int64) error
+	LogoutUser(ctx context.Context) error
 }
 
 // useCase 实现了 domain.UserUseCase
 // 只会以接口的形式被调用, 所以首字母小写改为私有类型
 type useCase struct {
-	db  repository.UserDB
-	svc *service.UserService
+	db    repository.UserDB
+	svc   *service.UserService
+	cache repository.UserCache
 }
 
-func NewUserCase(db repository.UserDB, svc *service.UserService) *useCase {
+func NewUserCase(db repository.UserDB, svc *service.UserService, re repository.UserCache) *useCase {
 	return &useCase{
-		db:  db,
-		svc: svc,
+		db:    db,
+		svc:   svc,
+		cache: re,
 	}
 }

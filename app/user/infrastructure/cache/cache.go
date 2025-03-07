@@ -14,15 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package model
+package cache
 
-// User 用于在 handler --- use case --- infrastructure 之间传递数据的实体类
-// 目的是方便 use case 操作对应的业务
-type User struct {
-	Uid      int64
-	UserName string
-	Password string
-	Email    string
-	Phone    string
-	Role     int
+import (
+	"context"
+
+	"github.com/redis/go-redis/v9"
+
+	"github.com/west2-online/DomTok/app/user/domain/repository"
+)
+
+type userCache struct {
+	client *redis.Client
+}
+
+func NewUserCache(client *redis.Client) repository.UserCache {
+	return &userCache{client: client}
+}
+
+func (c *userCache) IsExist(ctx context.Context, key string) bool {
+	return c.client.Exists(ctx, key).Val() == 1
 }

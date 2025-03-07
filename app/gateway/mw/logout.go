@@ -18,18 +18,27 @@ package mw
 
 import (
 	"context"
-	"log"
+	"fmt"
+	"sync"
 
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"github.com/west2-online/DomTok/app/gateway/pack"
-	metainfoContext "github.com/west2-online/DomTok/pkg/base/context"
+	"github.com/west2-online/DomTok/app/gateway/service"
 	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
-// Auth 负责校验用户身份，会提取 token 并做处理，Next 时会携带 token 类型
-func Auth() app.HandlerFunc {
+var GateWayService *service.GateWayService
+
+func init() {
+	sync.OnceFunc(func() {
+		GateWayService = service.NewGateWayService()
+	})
+}
+
+func UserLoginStatus() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
 		token := string(c.GetHeader(constants.AuthHeader))
 		_, uid, err := utils.CheckToken(token)
@@ -39,19 +48,36 @@ func Auth() app.HandlerFunc {
 			return
 		}
 
-		access, refresh, err := utils.CreateAllToken(uid)
+		if GateWayService.Bf.Test([]byte(fmt.Sprintf("%d", uid))) {
+			pack.RespError(c, errno.Errorf(errno.UserBaned, "user:%d baned, but get request", uid))
+			c.Abort()
+			return
+		}
+
+		ban, err := GateWayService.Re.IsUserBanned(ctx, uid)
 		if err != nil {
 			pack.RespError(c, err)
 			c.Abort()
 			return
 		}
+		if ban {
+			GateWayService.Bf.Add([]byte(fmt.Sprintf("%d", uid)))
+			pack.RespError(c, errno.Errorf(errno.UserBaned, "user:%d baned, but get request", uid))
+			c.Abort()
+			return
+		}
 
-		// 实现规范化服务透传，不需要中间进行编解码
-		ctx = metainfoContext.WithLoginData(ctx, uid)
-		ctx = metainfoContext.SetStreamLoginData(ctx, uid)
-		log.Println(metainfoContext.GetLoginData(ctx))
-		c.Header(constants.AccessTokenHeader, access)
-		c.Header(constants.RefreshTokenHeader, refresh)
+		logout, err := GateWayService.Re.IsUserLogout(ctx, uid)
+		if err != nil {
+			pack.RespError(c, err)
+			c.Abort()
+			return
+		}
+		if logout {
+			pack.RespError(c, errno.Errorf(errno.UserLogOut, "user:%d logout, but get request", uid))
+			c.Abort()
+			return
+		}
 		c.Next(ctx)
 	}
 }

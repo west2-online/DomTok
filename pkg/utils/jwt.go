@@ -165,6 +165,8 @@ func handleTokenError(err error, tokenType int64) (int64, error) {
 		if ve.Errors&jwt.ValidationErrorExpired != 0 {
 			if tokenType == constants.TypeAccessToken {
 				return -1, errno.AuthAccessExpired
+			} else if tokenType == constants.TypeUserLoginToken {
+				return -1, errno.AuthAccessExpired
 			}
 			return -1, errno.NewErrNo(errno.AuthRefreshExpiredCode, "refresh token expired")
 		}
@@ -179,6 +181,8 @@ func getTokenTTL(tokenType int64) time.Duration {
 		return constants.AccessTokenTTL
 	case constants.TypeRefreshToken:
 		return constants.RefreshTokenTTL
+	case constants.TypeUserLoginToken:
+		return constants.AccessTokenTTL
 	default:
 		return 0
 	}

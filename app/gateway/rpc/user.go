@@ -66,6 +66,7 @@ func LoginRPC(ctx context.Context, req *user.LoginRequest) (response *api.LoginR
 		User: &model.UserInfo{
 			UserId: resp.User.UserId,
 			Name:   resp.User.Name,
+			Role:   resp.User.Role,
 		},
 	}
 
@@ -104,4 +105,40 @@ func AddAddressRPC(ctx context.Context, req *user.AddAddressRequest) (addressID 
 		return 0, errno.InternalServiceError.WithMessage(resp.Base.Msg)
 	}
 	return resp.AddressID, nil
+}
+
+func LogoutUserRPC(ctx context.Context, req *user.LogoutReq) error {
+	resp, err := userClient.Logout(ctx, req)
+	if err != nil {
+		logger.Errorf("LogoutRPC: RPC called failed: %v", err.Error())
+		return errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return nil
+}
+
+func BanUserRPC(ctx context.Context, req *user.BanUserReq) error {
+	resp, err := userClient.BanUser(ctx, req)
+	if err != nil {
+		logger.Errorf("BanUserRPC: RPC called failed: %v", err.Error())
+		return errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return nil
+}
+
+func LiftUserRPC(ctx context.Context, req *user.LiftBanUserReq) error {
+	resp, err := userClient.LiftBandUser(ctx, req)
+	if err != nil {
+		logger.Errorf("LiftUserRPC: RPC called failed: %v", err.Error())
+		return errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsSuccess(resp.Base) {
+		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+	}
+	return nil
 }

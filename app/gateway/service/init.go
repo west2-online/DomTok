@@ -14,15 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package model
+package service
 
-// User 用于在 handler --- use case --- infrastructure 之间传递数据的实体类
-// 目的是方便 use case 操作对应的业务
-type User struct {
-	Uid      int64
-	UserName string
-	Password string
-	Email    string
-	Phone    string
-	Role     int
+type GateWayService struct {
+	Re *RedisService
+	Bf *BF
+}
+
+func NewGateWayService() *GateWayService {
+	return &GateWayService{
+		Re: NewRedisService(),
+		Bf: NewBloomFilter(),
+	}
 }

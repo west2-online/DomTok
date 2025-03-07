@@ -32,6 +32,21 @@ type userDB struct {
 	client *gorm.DB
 }
 
+func (db *userDB) GetUserById(ctx context.Context, id int64) (*model.User, error) {
+	var ret User
+	if err := db.client.WithContext(ctx).Where("id = ?", id).First(&ret).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errno.Errorf(errno.ErrRecordNotFound, "mysql: failed to query user: %v", err)
+		}
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to query user: %v", err)
+	}
+	return &model.User{
+		Uid:      id,
+		UserName: ret.Username,
+		Role:     ret.Role,
+	}, nil
+}
+
 func NewUserDB(client *gorm.DB) repository.UserDB {
 	return &userDB{client: client}
 }
@@ -82,6 +97,7 @@ func (db *userDB) GetUserInfo(ctx context.Context, username string) (*model.User
 		Password: user.Password,
 		Email:    user.Email,
 		Phone:    user.Phone,
+		Role:     user.Role,
 	}
 
 	return resp, nil

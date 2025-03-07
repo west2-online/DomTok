@@ -175,6 +175,10 @@ func (_m *UserDB) IsUserExist(ctx context.Context, username string) (bool, error
 	return r0, r1
 }
 
+func (_m *UserDB) GetUserById(ctx context.Context, id int64) (*model.User, error) {
+	return nil, nil
+}
+
 // NewUserDB creates a new instance of UserDB. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewUserDB(t interface {
