@@ -1,0 +1,39 @@
+name: Build and Push Docker Image to Alibaba Cloud
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: "Select the service to build"
+        required: true
+        type: choice
+        options:
+          - gateway
+          - user
+          - assistant
+          - commodity
+          - cart
+          - order
+          - payment
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Log in to Alibaba Cloud Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.ALIYUN_DOCKER_REGISTRY }}
+          username: ${{ secrets.ALIYUN_DOCKER_USER }}
+          password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
+
+      - name: Ensure build script is executable
+        run: chmod +x ./hack/image-build-and-push.sh
+
+      - name: Build and Push Docker Image
+        run: |
+          cd $GITHUB_WORKSPACE && bash ./hack/image-build-and-push.sh ${{ github.event.inputs.service }}
