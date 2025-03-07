@@ -18,7 +18,7 @@ package mw
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"sync"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -26,7 +26,6 @@ import (
 	"github.com/west2-online/DomTok/app/gateway/pack"
 	"github.com/west2-online/DomTok/app/gateway/service"
 	"github.com/west2-online/DomTok/pkg/constants"
-	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
@@ -48,24 +47,31 @@ func UserLoginStatus() app.HandlerFunc {
 			return
 		}
 
-		if GateWayService.Bf.Test([]byte(fmt.Sprintf("%d", uid))) {
-			pack.RespError(c, errno.Errorf(errno.UserBaned, "bf:user:%d baned, but get request", uid))
+		// 判断是否是白名单
+		if !GateWayService.Bf.Test(uid) {
+			// 是的话检查是否退出登录
+			if GateWayService.Re.IsUserLogout(ctx, uid) {
+				pack.RespError(c, errors.New("please login again"))
+				c.Abort()
+			}
+			c.Next(ctx)
+			return
+		}
+
+		// 检查是否是是否真的是黑名单中的人
+		if GateWayService.Re.IsUserBanned(ctx, uid) {
+			pack.RespError(c, errors.New("you are banned"))
 			c.Abort()
 			return
 		}
-		ban := GateWayService.Re.IsUserBanned(ctx, uid)
-		if ban {
-			GateWayService.Bf.Add([]byte(fmt.Sprintf("%d", uid)))
-			pack.RespError(c, errno.Errorf(errno.UserBaned, "redis: user:%d baned, but get request", uid))
+
+		// 如果不是的话就尝试继续判断是否登录
+		if GateWayService.Re.IsUserLogout(ctx, uid) {
+			pack.RespError(c, errors.New("please login again"))
 			c.Abort()
 			return
 		}
-		logout := GateWayService.Re.IsUserLogout(ctx, uid)
-		if !logout {
-			pack.RespError(c, errno.Errorf(errno.UserLogOut, "user:%d logout, but get request", uid))
-			c.Abort()
-			return
-		}
+
 		c.Next(ctx)
 	}
 }

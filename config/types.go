@@ -98,7 +98,7 @@ type volcengine struct {
 * struct upyun 又拍云配置
 * @Bucket: 存储桶
 * @Opearator: 操作员
-* @Password: 密码
+* @Secret: 密码
 * @TokenSecret: 对应又拍云里的SecretAccessKey
 * @TokenTimeout: Token过期时间
 * @UssDomain: 域名
@@ -146,6 +146,5 @@ type config struct {
 }
 
 type administrator struct {
-	Secret   string
-	Password string
+	Secret string
 }

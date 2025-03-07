@@ -24,6 +24,7 @@ import (
 
 	"github.com/west2-online/DomTok/pkg/base/client"
 	"github.com/west2-online/DomTok/pkg/constants"
+	"github.com/west2-online/DomTok/pkg/logger"
 )
 
 type RedisService struct {
@@ -44,7 +45,21 @@ func (svc *RedisService) IsUserBanned(ctx context.Context, userId int64) bool {
 }
 
 func (svc *RedisService) IsUserLogout(ctx context.Context, userId int64) bool {
-	return svc.client.Exists(ctx, svc.GetUserLogoutKey(userId)).Val() == 1
+	return svc.client.Exists(ctx, svc.GetUserLogoutKey(userId)).Val() != 1
+}
+
+func (svc *RedisService) GetAllBanedUser(ctx context.Context) []int64 {
+	keys, err := svc.client.Keys(ctx, constants.RedisUserBanedKey+"*").Result()
+	if err != nil {
+		logger.Fatalf("get all baned user failed: %v", err)
+	}
+	var res []int64
+	for _, key := range keys {
+		var userId int64
+		_, _ = fmt.Sscanf(key, constants.RedisUserBanedKey+"%d", &userId)
+		res = append(res, userId)
+	}
+	return res
 }
 
 func (svc *RedisService) GetUserBanedKey(userId int64) string {
