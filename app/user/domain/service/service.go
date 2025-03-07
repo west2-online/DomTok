@@ -191,9 +191,9 @@ func (svc *UserService) Logout(ctx context.Context) error {
 }
 
 func (svc *UserService) SetAdministrator(ctx context.Context, uid int64, password []byte, action int) error {
-	err := bcrypt.CompareHashAndPassword([]byte(config.Administrator.Password), password)
+	err := bcrypt.CompareHashAndPassword([]byte(config.Administrator.Secret), password)
 	if err != nil {
-		return errno.NewErrNo(errno.AuthNoOperatePermissionCode, "permission denied")
+		return errno.NewErrNo(errno.AuthNoOperatePermissionCode, "wrong secret")
 	}
 
 	_, err = svc.db.GetUserById(ctx, uid)

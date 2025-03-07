@@ -20,8 +20,6 @@ package cart
 
 import (
 	"context"
-	"fmt"
-
 	"github.com/samber/lo"
 
 	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
@@ -130,7 +128,6 @@ func PurChaseCartGoods(ctx context.Context, c *app.RequestContext) {
 	}
 
 	rpcCartGoods := lo.Map(req.CartGoods, func(item *kmodel.CartGoods, index int) *kmodel.CartGoods {
-		fmt.Println(*item)
 		return &kmodel.CartGoods{
 			MerchantId:       item.MerchantId,
 			GoodsId:          item.GoodsId,

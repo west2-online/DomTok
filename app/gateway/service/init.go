@@ -16,14 +16,25 @@ limitations under the License.
 
 package service
 
+import "context"
+
 type GateWayService struct {
 	Re *RedisService
 	Bf *BF
 }
 
 func NewGateWayService() *GateWayService {
-	return &GateWayService{
+	svc := &GateWayService{
 		Re: NewRedisService(),
 		Bf: NewBloomFilter(),
+	}
+	svc.initBloomFilter()
+	return svc
+}
+
+func (svc *GateWayService) initBloomFilter() {
+	keys := svc.Re.GetAllBanedUser(context.Background())
+	for _, key := range keys {
+		svc.Bf.Add(key)
 	}
 }
