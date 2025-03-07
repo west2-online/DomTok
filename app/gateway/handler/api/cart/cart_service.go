@@ -130,7 +130,6 @@ func PurChaseCartGoods(ctx context.Context, c *app.RequestContext) {
 	}
 
 	rpcCartGoods := lo.Map(req.CartGoods, func(item *kmodel.CartGoods, index int) *kmodel.CartGoods {
-		fmt.Println(*item)
 		return &kmodel.CartGoods{
 			MerchantId:       item.MerchantId,
 			GoodsId:          item.GoodsId,
