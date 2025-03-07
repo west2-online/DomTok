@@ -20,8 +20,6 @@ package cart
 
 import (
 	"context"
-	"fmt"
-
 	"github.com/samber/lo"
 
 	kmodel "github.com/west2-online/DomTok/kitex_gen/model"
