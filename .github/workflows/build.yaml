@@ -1,4 +1,4 @@
-name: Build and Push Docker Image to Alibaba Cloud
+name: Build and Push Docker Image
 
 on:
   workflow_dispatch:
@@ -34,6 +34,9 @@ jobs:
       - name: Ensure build script is executable
         run: chmod +x ./hack/image-build-and-push.sh
 
+      - name: Convert service name to lowercase
+        run: echo "SERVICE=$(echo '${{ github.event.inputs.service }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Build and Push Docker Image
         run: |
-          cd $GITHUB_WORKSPACE && bash ./hack/image-build-and-push.sh ${{ github.event.inputs.service }}
+          cd $GITHUB_WORKSPACE && bash ./hack/image-build-and-push.sh $SERVICE
