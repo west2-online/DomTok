@@ -142,4 +142,10 @@ type config struct {
 	Upyun         upyun
 	Rocketmq      rocketmq
 	Otel          otel
+	Administrator administrator
+}
+
+type administrator struct {
+	Secret   string
+	Password string
 }

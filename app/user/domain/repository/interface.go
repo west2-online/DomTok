@@ -31,4 +31,17 @@ type UserDB interface {
 	GetUserInfo(ctx context.Context, username string) (*model.User, error)
 	GetAddressInfo(ctx context.Context, addressID int64) (*model.Address, error)
 	CreateAddress(ctx context.Context, address *model.Address) (int64, error)
+	GetUserById(ctx context.Context, id int64) (*model.User, error)
+	UpdateUser(ctx context.Context, user *model.User) error
+}
+
+type UserCache interface {
+	IsExist(ctx context.Context, key string) bool
+	SetUserLogOut(ctx context.Context, key string, token string) error
+	DeleteUserLogOut(ctx context.Context, key string) error
+	SetUserBaned(ctx context.Context, key string) error
+	DeleteUserBaned(ctx context.Context, key string) error
+	UserLogOutKey(uid int64) string
+	UserBanedKey(uid int64) string
+	GetToken(ctx context.Context, key string) (string, error)
 }

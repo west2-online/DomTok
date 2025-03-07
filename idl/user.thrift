@@ -45,9 +45,56 @@ struct AddAddressResponse {
     2: required i64 addressID,
 }
 
+struct BanUserReq {
+    1: required i64 uid
+}
+
+struct BanUserResp {
+    1: required model.BaseResp base,
+}
+
+struct LiftBanUserReq {
+    1: required i64 uid
+}
+
+struct LiftBanUserResp {
+    1: required model.BaseResp base,
+}
+
+struct LogoutReq {
+}
+
+struct LogoutResp {
+    1: required model.BaseResp base,
+}
+
+struct SetAdministratorReq {
+    1: required i64 uid
+    2: required string password
+    3: required i16 action
+}
+
+struct SetAdministratorResp {
+    1: required model.BaseResp base,
+}
+
+struct GetUserInfoReq {
+    1: required i64 uid
+}
+
+struct GetUserInfoResp {
+        1: required model.BaseResp base,
+        2: required model.UserInfo info
+}
+
 service UserService {
     RegisterResponse Register(1: RegisterRequest req),
     LoginResponse Login(1: LoginRequest req),
     GetAddressResponse GetAddress(1: GetAddressRequest req),
     AddAddressResponse AddAddress(1: AddAddressRequest req),
+    BanUserResp BanUser(1: BanUserReq req),
+    LiftBanUserResp LiftBandUser(1: LiftBanUserReq req) ,
+    LogoutResp Logout(1: LogoutReq req),
+    SetAdministratorResp SetAdministrator(1:SetAdministratorReq req)
+    GetUserInfoResp GetUserInfo(1: GetUserInfoReq req)
 }

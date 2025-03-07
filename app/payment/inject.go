@@ -58,7 +58,11 @@ func InjectPaymentHandler() payment.PaymentService {
 	if err != nil {
 		logger.Fatalf("api.rpc.order InitOrderRPC failed, err is %v", err)
 	}
-	orderRpc := orderRpcPkg.NewPaymentRPC(*c)
+	u, err := client.InitUserRPC()
+	if err != nil {
+		logger.Fatalf("api.rpc.user InitUserRPC failed, err is %v", err)
+	}
+	orderRpc := orderRpcPkg.NewPaymentRPC(*c, *u)
 	// 初始化 Service，并传入 Redis
 	svc := service.NewPaymentService(db, sf, redisRepo, orderRpc)
 

@@ -12,6 +12,10 @@ server:
   log-level: "INFO" # OPTIONS: TRACE, DEBUG, INFO(default), NOTICE, WARN, ERROR, FATAL
   intranet-url: "" # 网关地址
 
+administrator:
+  secret: "domtok-secret"
+  password: "$2a$14$6sUXbvlFBBdkm75aeQXXae0k8yKhSFVVQzqRZJU.qDH4r1/LzB8v."
+
 defaultUser:
   account: ""
   password: ""

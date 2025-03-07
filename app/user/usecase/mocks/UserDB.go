@@ -31,6 +31,10 @@ type UserDB struct {
 	mock.Mock
 }
 
+func (_m *UserDB) UpdateUser(ctx context.Context, user *model.User) error {
+	return nil
+}
+
 // CreateAddress provides a mock function with given fields: ctx, address
 func (_m *UserDB) CreateAddress(ctx context.Context, address *model.Address) (int64, error) {
 	ret := _m.Called(ctx, address)
@@ -173,6 +177,10 @@ func (_m *UserDB) IsUserExist(ctx context.Context, username string) (bool, error
 	}
 
 	return r0, r1
+}
+
+func (_m *UserDB) GetUserById(ctx context.Context, id int64) (*model.User, error) {
+	return nil, nil
 }
 
 // NewUserDB creates a new instance of UserDB. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

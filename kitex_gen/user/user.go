@@ -681,6 +681,586 @@ var fieldIDToName_AddAddressResponse = map[int16]string{
 	2: "addressID",
 }
 
+type BanUserReq struct {
+	Uid int64 `thrift:"uid,1,required" frugal:"1,required,i64" json:"uid"`
+}
+
+func NewBanUserReq() *BanUserReq {
+	return &BanUserReq{}
+}
+
+func (p *BanUserReq) InitDefault() {
+}
+
+func (p *BanUserReq) GetUid() (v int64) {
+	return p.Uid
+}
+func (p *BanUserReq) SetUid(val int64) {
+	p.Uid = val
+}
+
+func (p *BanUserReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("BanUserReq(%+v)", *p)
+}
+
+func (p *BanUserReq) DeepEqual(ano *BanUserReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Uid) {
+		return false
+	}
+	return true
+}
+
+func (p *BanUserReq) Field1DeepEqual(src int64) bool {
+
+	if p.Uid != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_BanUserReq = map[int16]string{
+	1: "uid",
+}
+
+type BanUserResp struct {
+	Base *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+}
+
+func NewBanUserResp() *BanUserResp {
+	return &BanUserResp{}
+}
+
+func (p *BanUserResp) InitDefault() {
+}
+
+var BanUserResp_Base_DEFAULT *model.BaseResp
+
+func (p *BanUserResp) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return BanUserResp_Base_DEFAULT
+	}
+	return p.Base
+}
+func (p *BanUserResp) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+
+func (p *BanUserResp) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *BanUserResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("BanUserResp(%+v)", *p)
+}
+
+func (p *BanUserResp) DeepEqual(ano *BanUserResp) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	return true
+}
+
+func (p *BanUserResp) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_BanUserResp = map[int16]string{
+	1: "base",
+}
+
+type LiftBanUserReq struct {
+	Uid int64 `thrift:"uid,1,required" frugal:"1,required,i64" json:"uid"`
+}
+
+func NewLiftBanUserReq() *LiftBanUserReq {
+	return &LiftBanUserReq{}
+}
+
+func (p *LiftBanUserReq) InitDefault() {
+}
+
+func (p *LiftBanUserReq) GetUid() (v int64) {
+	return p.Uid
+}
+func (p *LiftBanUserReq) SetUid(val int64) {
+	p.Uid = val
+}
+
+func (p *LiftBanUserReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("LiftBanUserReq(%+v)", *p)
+}
+
+func (p *LiftBanUserReq) DeepEqual(ano *LiftBanUserReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Uid) {
+		return false
+	}
+	return true
+}
+
+func (p *LiftBanUserReq) Field1DeepEqual(src int64) bool {
+
+	if p.Uid != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_LiftBanUserReq = map[int16]string{
+	1: "uid",
+}
+
+type LiftBanUserResp struct {
+	Base *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+}
+
+func NewLiftBanUserResp() *LiftBanUserResp {
+	return &LiftBanUserResp{}
+}
+
+func (p *LiftBanUserResp) InitDefault() {
+}
+
+var LiftBanUserResp_Base_DEFAULT *model.BaseResp
+
+func (p *LiftBanUserResp) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return LiftBanUserResp_Base_DEFAULT
+	}
+	return p.Base
+}
+func (p *LiftBanUserResp) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+
+func (p *LiftBanUserResp) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *LiftBanUserResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("LiftBanUserResp(%+v)", *p)
+}
+
+func (p *LiftBanUserResp) DeepEqual(ano *LiftBanUserResp) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	return true
+}
+
+func (p *LiftBanUserResp) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_LiftBanUserResp = map[int16]string{
+	1: "base",
+}
+
+type LogoutReq struct {
+}
+
+func NewLogoutReq() *LogoutReq {
+	return &LogoutReq{}
+}
+
+func (p *LogoutReq) InitDefault() {
+}
+
+func (p *LogoutReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("LogoutReq(%+v)", *p)
+}
+
+func (p *LogoutReq) DeepEqual(ano *LogoutReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_LogoutReq = map[int16]string{}
+
+type LogoutResp struct {
+	Base *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+}
+
+func NewLogoutResp() *LogoutResp {
+	return &LogoutResp{}
+}
+
+func (p *LogoutResp) InitDefault() {
+}
+
+var LogoutResp_Base_DEFAULT *model.BaseResp
+
+func (p *LogoutResp) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return LogoutResp_Base_DEFAULT
+	}
+	return p.Base
+}
+func (p *LogoutResp) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+
+func (p *LogoutResp) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *LogoutResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("LogoutResp(%+v)", *p)
+}
+
+func (p *LogoutResp) DeepEqual(ano *LogoutResp) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	return true
+}
+
+func (p *LogoutResp) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_LogoutResp = map[int16]string{
+	1: "base",
+}
+
+type SetAdministratorReq struct {
+	Uid      int64  `thrift:"uid,1,required" frugal:"1,required,i64" json:"uid"`
+	Password string `thrift:"password,2,required" frugal:"2,required,string" json:"password"`
+	Action   int16  `thrift:"action,3,required" frugal:"3,required,i16" json:"action"`
+}
+
+func NewSetAdministratorReq() *SetAdministratorReq {
+	return &SetAdministratorReq{}
+}
+
+func (p *SetAdministratorReq) InitDefault() {
+}
+
+func (p *SetAdministratorReq) GetUid() (v int64) {
+	return p.Uid
+}
+
+func (p *SetAdministratorReq) GetPassword() (v string) {
+	return p.Password
+}
+
+func (p *SetAdministratorReq) GetAction() (v int16) {
+	return p.Action
+}
+func (p *SetAdministratorReq) SetUid(val int64) {
+	p.Uid = val
+}
+func (p *SetAdministratorReq) SetPassword(val string) {
+	p.Password = val
+}
+func (p *SetAdministratorReq) SetAction(val int16) {
+	p.Action = val
+}
+
+func (p *SetAdministratorReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("SetAdministratorReq(%+v)", *p)
+}
+
+func (p *SetAdministratorReq) DeepEqual(ano *SetAdministratorReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Uid) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Password) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Action) {
+		return false
+	}
+	return true
+}
+
+func (p *SetAdministratorReq) Field1DeepEqual(src int64) bool {
+
+	if p.Uid != src {
+		return false
+	}
+	return true
+}
+func (p *SetAdministratorReq) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Password, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *SetAdministratorReq) Field3DeepEqual(src int16) bool {
+
+	if p.Action != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_SetAdministratorReq = map[int16]string{
+	1: "uid",
+	2: "password",
+	3: "action",
+}
+
+type SetAdministratorResp struct {
+	Base *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+}
+
+func NewSetAdministratorResp() *SetAdministratorResp {
+	return &SetAdministratorResp{}
+}
+
+func (p *SetAdministratorResp) InitDefault() {
+}
+
+var SetAdministratorResp_Base_DEFAULT *model.BaseResp
+
+func (p *SetAdministratorResp) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return SetAdministratorResp_Base_DEFAULT
+	}
+	return p.Base
+}
+func (p *SetAdministratorResp) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+
+func (p *SetAdministratorResp) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *SetAdministratorResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("SetAdministratorResp(%+v)", *p)
+}
+
+func (p *SetAdministratorResp) DeepEqual(ano *SetAdministratorResp) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	return true
+}
+
+func (p *SetAdministratorResp) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_SetAdministratorResp = map[int16]string{
+	1: "base",
+}
+
+type GetUserInfoReq struct {
+	Uid int64 `thrift:"uid,1,required" frugal:"1,required,i64" json:"uid"`
+}
+
+func NewGetUserInfoReq() *GetUserInfoReq {
+	return &GetUserInfoReq{}
+}
+
+func (p *GetUserInfoReq) InitDefault() {
+}
+
+func (p *GetUserInfoReq) GetUid() (v int64) {
+	return p.Uid
+}
+func (p *GetUserInfoReq) SetUid(val int64) {
+	p.Uid = val
+}
+
+func (p *GetUserInfoReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetUserInfoReq(%+v)", *p)
+}
+
+func (p *GetUserInfoReq) DeepEqual(ano *GetUserInfoReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Uid) {
+		return false
+	}
+	return true
+}
+
+func (p *GetUserInfoReq) Field1DeepEqual(src int64) bool {
+
+	if p.Uid != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_GetUserInfoReq = map[int16]string{
+	1: "uid",
+}
+
+type GetUserInfoResp struct {
+	Base *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+	Info *model.UserInfo `thrift:"info,2,required" frugal:"2,required,model.UserInfo" json:"info"`
+}
+
+func NewGetUserInfoResp() *GetUserInfoResp {
+	return &GetUserInfoResp{}
+}
+
+func (p *GetUserInfoResp) InitDefault() {
+}
+
+var GetUserInfoResp_Base_DEFAULT *model.BaseResp
+
+func (p *GetUserInfoResp) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return GetUserInfoResp_Base_DEFAULT
+	}
+	return p.Base
+}
+
+var GetUserInfoResp_Info_DEFAULT *model.UserInfo
+
+func (p *GetUserInfoResp) GetInfo() (v *model.UserInfo) {
+	if !p.IsSetInfo() {
+		return GetUserInfoResp_Info_DEFAULT
+	}
+	return p.Info
+}
+func (p *GetUserInfoResp) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+func (p *GetUserInfoResp) SetInfo(val *model.UserInfo) {
+	p.Info = val
+}
+
+func (p *GetUserInfoResp) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *GetUserInfoResp) IsSetInfo() bool {
+	return p.Info != nil
+}
+
+func (p *GetUserInfoResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetUserInfoResp(%+v)", *p)
+}
+
+func (p *GetUserInfoResp) DeepEqual(ano *GetUserInfoResp) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Info) {
+		return false
+	}
+	return true
+}
+
+func (p *GetUserInfoResp) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+func (p *GetUserInfoResp) Field2DeepEqual(src *model.UserInfo) bool {
+
+	if !p.Info.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_GetUserInfoResp = map[int16]string{
+	1: "base",
+	2: "info",
+}
+
 type UserService interface {
 	Register(ctx context.Context, req *RegisterRequest) (r *RegisterResponse, err error)
 
@@ -689,6 +1269,16 @@ type UserService interface {
 	GetAddress(ctx context.Context, req *GetAddressRequest) (r *GetAddressResponse, err error)
 
 	AddAddress(ctx context.Context, req *AddAddressRequest) (r *AddAddressResponse, err error)
+
+	BanUser(ctx context.Context, req *BanUserReq) (r *BanUserResp, err error)
+
+	LiftBandUser(ctx context.Context, req *LiftBanUserReq) (r *LiftBanUserResp, err error)
+
+	Logout(ctx context.Context, req *LogoutReq) (r *LogoutResp, err error)
+
+	SetAdministrator(ctx context.Context, req *SetAdministratorReq) (r *SetAdministratorResp, err error)
+
+	GetUserInfo(ctx context.Context, req *GetUserInfoReq) (r *GetUserInfoResp, err error)
 }
 
 type UserServiceRegisterArgs struct {
@@ -1152,5 +1742,585 @@ func (p *UserServiceAddAddressResult) Field0DeepEqual(src *AddAddressResponse) b
 }
 
 var fieldIDToName_UserServiceAddAddressResult = map[int16]string{
+	0: "success",
+}
+
+type UserServiceBanUserArgs struct {
+	Req *BanUserReq `thrift:"req,1" frugal:"1,default,BanUserReq" json:"req"`
+}
+
+func NewUserServiceBanUserArgs() *UserServiceBanUserArgs {
+	return &UserServiceBanUserArgs{}
+}
+
+func (p *UserServiceBanUserArgs) InitDefault() {
+}
+
+var UserServiceBanUserArgs_Req_DEFAULT *BanUserReq
+
+func (p *UserServiceBanUserArgs) GetReq() (v *BanUserReq) {
+	if !p.IsSetReq() {
+		return UserServiceBanUserArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *UserServiceBanUserArgs) SetReq(val *BanUserReq) {
+	p.Req = val
+}
+
+func (p *UserServiceBanUserArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *UserServiceBanUserArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceBanUserArgs(%+v)", *p)
+}
+
+func (p *UserServiceBanUserArgs) DeepEqual(ano *UserServiceBanUserArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceBanUserArgs) Field1DeepEqual(src *BanUserReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceBanUserArgs = map[int16]string{
+	1: "req",
+}
+
+type UserServiceBanUserResult struct {
+	Success *BanUserResp `thrift:"success,0,optional" frugal:"0,optional,BanUserResp" json:"success,omitempty"`
+}
+
+func NewUserServiceBanUserResult() *UserServiceBanUserResult {
+	return &UserServiceBanUserResult{}
+}
+
+func (p *UserServiceBanUserResult) InitDefault() {
+}
+
+var UserServiceBanUserResult_Success_DEFAULT *BanUserResp
+
+func (p *UserServiceBanUserResult) GetSuccess() (v *BanUserResp) {
+	if !p.IsSetSuccess() {
+		return UserServiceBanUserResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *UserServiceBanUserResult) SetSuccess(x interface{}) {
+	p.Success = x.(*BanUserResp)
+}
+
+func (p *UserServiceBanUserResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *UserServiceBanUserResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceBanUserResult(%+v)", *p)
+}
+
+func (p *UserServiceBanUserResult) DeepEqual(ano *UserServiceBanUserResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceBanUserResult) Field0DeepEqual(src *BanUserResp) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceBanUserResult = map[int16]string{
+	0: "success",
+}
+
+type UserServiceLiftBandUserArgs struct {
+	Req *LiftBanUserReq `thrift:"req,1" frugal:"1,default,LiftBanUserReq" json:"req"`
+}
+
+func NewUserServiceLiftBandUserArgs() *UserServiceLiftBandUserArgs {
+	return &UserServiceLiftBandUserArgs{}
+}
+
+func (p *UserServiceLiftBandUserArgs) InitDefault() {
+}
+
+var UserServiceLiftBandUserArgs_Req_DEFAULT *LiftBanUserReq
+
+func (p *UserServiceLiftBandUserArgs) GetReq() (v *LiftBanUserReq) {
+	if !p.IsSetReq() {
+		return UserServiceLiftBandUserArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *UserServiceLiftBandUserArgs) SetReq(val *LiftBanUserReq) {
+	p.Req = val
+}
+
+func (p *UserServiceLiftBandUserArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *UserServiceLiftBandUserArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceLiftBandUserArgs(%+v)", *p)
+}
+
+func (p *UserServiceLiftBandUserArgs) DeepEqual(ano *UserServiceLiftBandUserArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceLiftBandUserArgs) Field1DeepEqual(src *LiftBanUserReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceLiftBandUserArgs = map[int16]string{
+	1: "req",
+}
+
+type UserServiceLiftBandUserResult struct {
+	Success *LiftBanUserResp `thrift:"success,0,optional" frugal:"0,optional,LiftBanUserResp" json:"success,omitempty"`
+}
+
+func NewUserServiceLiftBandUserResult() *UserServiceLiftBandUserResult {
+	return &UserServiceLiftBandUserResult{}
+}
+
+func (p *UserServiceLiftBandUserResult) InitDefault() {
+}
+
+var UserServiceLiftBandUserResult_Success_DEFAULT *LiftBanUserResp
+
+func (p *UserServiceLiftBandUserResult) GetSuccess() (v *LiftBanUserResp) {
+	if !p.IsSetSuccess() {
+		return UserServiceLiftBandUserResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *UserServiceLiftBandUserResult) SetSuccess(x interface{}) {
+	p.Success = x.(*LiftBanUserResp)
+}
+
+func (p *UserServiceLiftBandUserResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *UserServiceLiftBandUserResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceLiftBandUserResult(%+v)", *p)
+}
+
+func (p *UserServiceLiftBandUserResult) DeepEqual(ano *UserServiceLiftBandUserResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceLiftBandUserResult) Field0DeepEqual(src *LiftBanUserResp) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceLiftBandUserResult = map[int16]string{
+	0: "success",
+}
+
+type UserServiceLogoutArgs struct {
+	Req *LogoutReq `thrift:"req,1" frugal:"1,default,LogoutReq" json:"req"`
+}
+
+func NewUserServiceLogoutArgs() *UserServiceLogoutArgs {
+	return &UserServiceLogoutArgs{}
+}
+
+func (p *UserServiceLogoutArgs) InitDefault() {
+}
+
+var UserServiceLogoutArgs_Req_DEFAULT *LogoutReq
+
+func (p *UserServiceLogoutArgs) GetReq() (v *LogoutReq) {
+	if !p.IsSetReq() {
+		return UserServiceLogoutArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *UserServiceLogoutArgs) SetReq(val *LogoutReq) {
+	p.Req = val
+}
+
+func (p *UserServiceLogoutArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *UserServiceLogoutArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceLogoutArgs(%+v)", *p)
+}
+
+func (p *UserServiceLogoutArgs) DeepEqual(ano *UserServiceLogoutArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceLogoutArgs) Field1DeepEqual(src *LogoutReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceLogoutArgs = map[int16]string{
+	1: "req",
+}
+
+type UserServiceLogoutResult struct {
+	Success *LogoutResp `thrift:"success,0,optional" frugal:"0,optional,LogoutResp" json:"success,omitempty"`
+}
+
+func NewUserServiceLogoutResult() *UserServiceLogoutResult {
+	return &UserServiceLogoutResult{}
+}
+
+func (p *UserServiceLogoutResult) InitDefault() {
+}
+
+var UserServiceLogoutResult_Success_DEFAULT *LogoutResp
+
+func (p *UserServiceLogoutResult) GetSuccess() (v *LogoutResp) {
+	if !p.IsSetSuccess() {
+		return UserServiceLogoutResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *UserServiceLogoutResult) SetSuccess(x interface{}) {
+	p.Success = x.(*LogoutResp)
+}
+
+func (p *UserServiceLogoutResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *UserServiceLogoutResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceLogoutResult(%+v)", *p)
+}
+
+func (p *UserServiceLogoutResult) DeepEqual(ano *UserServiceLogoutResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceLogoutResult) Field0DeepEqual(src *LogoutResp) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceLogoutResult = map[int16]string{
+	0: "success",
+}
+
+type UserServiceSetAdministratorArgs struct {
+	Req *SetAdministratorReq `thrift:"req,1" frugal:"1,default,SetAdministratorReq" json:"req"`
+}
+
+func NewUserServiceSetAdministratorArgs() *UserServiceSetAdministratorArgs {
+	return &UserServiceSetAdministratorArgs{}
+}
+
+func (p *UserServiceSetAdministratorArgs) InitDefault() {
+}
+
+var UserServiceSetAdministratorArgs_Req_DEFAULT *SetAdministratorReq
+
+func (p *UserServiceSetAdministratorArgs) GetReq() (v *SetAdministratorReq) {
+	if !p.IsSetReq() {
+		return UserServiceSetAdministratorArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *UserServiceSetAdministratorArgs) SetReq(val *SetAdministratorReq) {
+	p.Req = val
+}
+
+func (p *UserServiceSetAdministratorArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *UserServiceSetAdministratorArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceSetAdministratorArgs(%+v)", *p)
+}
+
+func (p *UserServiceSetAdministratorArgs) DeepEqual(ano *UserServiceSetAdministratorArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceSetAdministratorArgs) Field1DeepEqual(src *SetAdministratorReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceSetAdministratorArgs = map[int16]string{
+	1: "req",
+}
+
+type UserServiceSetAdministratorResult struct {
+	Success *SetAdministratorResp `thrift:"success,0,optional" frugal:"0,optional,SetAdministratorResp" json:"success,omitempty"`
+}
+
+func NewUserServiceSetAdministratorResult() *UserServiceSetAdministratorResult {
+	return &UserServiceSetAdministratorResult{}
+}
+
+func (p *UserServiceSetAdministratorResult) InitDefault() {
+}
+
+var UserServiceSetAdministratorResult_Success_DEFAULT *SetAdministratorResp
+
+func (p *UserServiceSetAdministratorResult) GetSuccess() (v *SetAdministratorResp) {
+	if !p.IsSetSuccess() {
+		return UserServiceSetAdministratorResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *UserServiceSetAdministratorResult) SetSuccess(x interface{}) {
+	p.Success = x.(*SetAdministratorResp)
+}
+
+func (p *UserServiceSetAdministratorResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *UserServiceSetAdministratorResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceSetAdministratorResult(%+v)", *p)
+}
+
+func (p *UserServiceSetAdministratorResult) DeepEqual(ano *UserServiceSetAdministratorResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceSetAdministratorResult) Field0DeepEqual(src *SetAdministratorResp) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceSetAdministratorResult = map[int16]string{
+	0: "success",
+}
+
+type UserServiceGetUserInfoArgs struct {
+	Req *GetUserInfoReq `thrift:"req,1" frugal:"1,default,GetUserInfoReq" json:"req"`
+}
+
+func NewUserServiceGetUserInfoArgs() *UserServiceGetUserInfoArgs {
+	return &UserServiceGetUserInfoArgs{}
+}
+
+func (p *UserServiceGetUserInfoArgs) InitDefault() {
+}
+
+var UserServiceGetUserInfoArgs_Req_DEFAULT *GetUserInfoReq
+
+func (p *UserServiceGetUserInfoArgs) GetReq() (v *GetUserInfoReq) {
+	if !p.IsSetReq() {
+		return UserServiceGetUserInfoArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *UserServiceGetUserInfoArgs) SetReq(val *GetUserInfoReq) {
+	p.Req = val
+}
+
+func (p *UserServiceGetUserInfoArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *UserServiceGetUserInfoArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceGetUserInfoArgs(%+v)", *p)
+}
+
+func (p *UserServiceGetUserInfoArgs) DeepEqual(ano *UserServiceGetUserInfoArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceGetUserInfoArgs) Field1DeepEqual(src *GetUserInfoReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceGetUserInfoArgs = map[int16]string{
+	1: "req",
+}
+
+type UserServiceGetUserInfoResult struct {
+	Success *GetUserInfoResp `thrift:"success,0,optional" frugal:"0,optional,GetUserInfoResp" json:"success,omitempty"`
+}
+
+func NewUserServiceGetUserInfoResult() *UserServiceGetUserInfoResult {
+	return &UserServiceGetUserInfoResult{}
+}
+
+func (p *UserServiceGetUserInfoResult) InitDefault() {
+}
+
+var UserServiceGetUserInfoResult_Success_DEFAULT *GetUserInfoResp
+
+func (p *UserServiceGetUserInfoResult) GetSuccess() (v *GetUserInfoResp) {
+	if !p.IsSetSuccess() {
+		return UserServiceGetUserInfoResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *UserServiceGetUserInfoResult) SetSuccess(x interface{}) {
+	p.Success = x.(*GetUserInfoResp)
+}
+
+func (p *UserServiceGetUserInfoResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *UserServiceGetUserInfoResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceGetUserInfoResult(%+v)", *p)
+}
+
+func (p *UserServiceGetUserInfoResult) DeepEqual(ano *UserServiceGetUserInfoResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceGetUserInfoResult) Field0DeepEqual(src *GetUserInfoResp) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceGetUserInfoResult = map[int16]string{
 	0: "success",
 }

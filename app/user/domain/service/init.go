@@ -27,10 +27,11 @@ type UserService struct {
 	db      repository.UserDB
 	sf      *utils.Snowflake
 	emailRe *regexp.Regexp
+	cache   repository.UserCache
 }
 
 // NewUserService 返回一个 NewUserService 实例
-func NewUserService(db repository.UserDB, sf *utils.Snowflake) *UserService {
+func NewUserService(db repository.UserDB, sf *utils.Snowflake, redis repository.UserCache) *UserService {
 	if db == nil {
 		panic("userService`s db should not be nil")
 	}
@@ -39,8 +40,9 @@ func NewUserService(db repository.UserDB, sf *utils.Snowflake) *UserService {
 	}
 
 	svc := &UserService{
-		db: db,
-		sf: sf,
+		db:    db,
+		sf:    sf,
+		cache: redis,
 	}
 	svc.init()
 

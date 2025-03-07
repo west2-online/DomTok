@@ -181,8 +181,12 @@ func (svc *PaymentService) GetRefundStatusMsg(code int8) string {
 	return paymentStatus.GetRefundStatus(code)
 }
 
-func (svc *PaymentService) CheckAdminPermission(_ context.Context, uid int64) (bool, error) {
-	return uid == 1, nil
+func (svc *PaymentService) CheckAdminPermission(ctx context.Context, uid int64) (bool, error) {
+	res, err := svc.rpc.GetUserInfo(ctx, uid)
+	if err != nil {
+		return false, fmt.Errorf("failed to get user info: %w", err)
+	}
+	return res, nil
 }
 
 func (svc *PaymentService) CheckAndDelPaymentToken(ctx context.Context, token string, userID int64, orderID int64) (bool, error) {

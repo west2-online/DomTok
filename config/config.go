@@ -43,6 +43,7 @@ var (
 	Upyun         *upyun
 	Rocketmq      *rocketmq
 	Otel          *otel
+	Administrator *administrator
 	runtimeViper  = viper.New()
 )
 
@@ -108,6 +109,7 @@ func configMapping(srv string) {
 	Rocketmq = &c.Rocketmq
 	Service = getService(srv)
 	Otel = &c.Otel
+	Administrator = &c.Administrator
 }
 
 func getService(name string) *service {

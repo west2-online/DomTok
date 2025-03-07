@@ -41,8 +41,12 @@ func Register(r *server.Hertz) {
 			{
 				_user := _v1.Group("/user", _userMw()...)
 				_user.POST("/address", append(_addaddressMw(), user.AddAddress)...)
+				_user.POST("/administrator", append(_setadministratorMw(), user.SetAdministrator)...)
+				_user.POST("/ban", append(_banuserMw(), user.BanUser)...)
+				_user.POST("/lift", append(_liftbanduserMw(), user.LiftBandUser)...)
 				_user.GET("/location", append(_getaddressMw(), user.GetAddress)...)
 				_user.POST("/login", append(_loginMw(), user.Login)...)
+				_user.POST("/logout", append(_logoutMw(), user.Logout)...)
 				_user.POST("/register", append(_registerMw(), user.Register)...)
 			}
 		}

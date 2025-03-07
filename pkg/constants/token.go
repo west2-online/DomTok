@@ -21,8 +21,9 @@ import (
 )
 
 const (
-	TypeAccessToken  = 0
-	TypeRefreshToken = 1
+	TypeAccessToken    = 0
+	TypeRefreshToken   = 1
+	TypeUserLoginToken = 2
 
 	AccessTokenTTL  = time.Hour * 24 * 7  // Access Token 有效期7天
 	RefreshTokenTTL = time.Hour * 24 * 30 // Refresh Token 有效期30天

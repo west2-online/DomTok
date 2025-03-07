@@ -30,11 +30,20 @@ func (uc *useCase) Login(ctx context.Context, user *model.User) (*model.User, er
 	if err != nil {
 		return nil, fmt.Errorf("get user info failed: %w", err)
 	}
-
+	exist, err := uc.svc.IsBaned(ctx, u.Uid)
+	if err != nil {
+		return nil, fmt.Errorf("check ban failed: %w", err)
+	}
+	if exist {
+		return nil, errno.NewErrNo(errno.AuthNoOperatePermissionCode, "user was baned")
+	}
 	if err = uc.svc.CheckPassword(u.Password, user.Password); err != nil {
 		return nil, err
 	}
 
+	if err = uc.svc.UserLogin(ctx, u.Uid); err != nil {
+		return nil, err
+	}
 	return u, nil
 }
 
@@ -74,4 +83,24 @@ func (uc *useCase) GetAddress(ctx context.Context, addressID int64) (*model.Addr
 
 func (uc *useCase) AddAddress(ctx context.Context, address *model.Address) (addressID int64, err error) {
 	return uc.svc.AddAddress(ctx, address)
+}
+
+func (uc *useCase) BanUser(ctx context.Context, uid int64) error {
+	return uc.svc.UserBaned(ctx, uid)
+}
+
+func (us *useCase) LiftUser(ctx context.Context, uid int64) error {
+	return us.svc.LiftUserBaned(ctx, uid)
+}
+
+func (us *useCase) LogoutUser(ctx context.Context) error {
+	return us.svc.Logout(ctx)
+}
+
+func (us *useCase) SetAdministrator(ctx context.Context, uid int64, password []byte, action int) error {
+	return us.svc.SetAdministrator(ctx, uid, password, action)
+}
+
+func (us *useCase) GetUserInfo(ctx context.Context, uid int64) (*model.User, error) {
+	return us.db.GetUserById(ctx, uid)
 }

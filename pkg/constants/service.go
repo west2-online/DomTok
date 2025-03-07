@@ -36,6 +36,8 @@ const (
 	UserDefaultEncryptPasswordCost = 10
 	UserTestId                     = 1
 	UserTestAddr                   = 1
+	UserAdministrator              = 1
+	NormalUser                     = 0
 )
 
 // OrderService

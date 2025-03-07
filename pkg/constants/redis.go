@@ -34,6 +34,10 @@ const (
 	RedisNXExpireTime        = 3 * time.Second
 	RedisMaxLockRetryTime    = 400 * time.Millisecond
 	RedisRetryStopTime       = 100 * time.Millisecond
+	RedisUserLogoutKey       = "logout:user:"
+	RedisUserBanedKey        = "ban:user:"
+	NeverExpire              = 0
+	RedisUserLoginExpireTime = 2 * 60 * 60 * time.Second
 )
 
 // Redis DB Name
@@ -41,7 +45,7 @@ const (
 	RedisDBOrder     = 0
 	RedisDBCommodity = 1
 	RedisDBCart      = 2
-
+	RedisDBGateWay
 	RedSyncDBId = 0
 )
 

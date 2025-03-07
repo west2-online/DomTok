@@ -33,6 +33,11 @@ type Client interface {
 	Login(ctx context.Context, req *user.LoginRequest, callOptions ...callopt.Option) (r *user.LoginResponse, err error)
 	GetAddress(ctx context.Context, req *user.GetAddressRequest, callOptions ...callopt.Option) (r *user.GetAddressResponse, err error)
 	AddAddress(ctx context.Context, req *user.AddAddressRequest, callOptions ...callopt.Option) (r *user.AddAddressResponse, err error)
+	BanUser(ctx context.Context, req *user.BanUserReq, callOptions ...callopt.Option) (r *user.BanUserResp, err error)
+	LiftBandUser(ctx context.Context, req *user.LiftBanUserReq, callOptions ...callopt.Option) (r *user.LiftBanUserResp, err error)
+	Logout(ctx context.Context, req *user.LogoutReq, callOptions ...callopt.Option) (r *user.LogoutResp, err error)
+	SetAdministrator(ctx context.Context, req *user.SetAdministratorReq, callOptions ...callopt.Option) (r *user.SetAdministratorResp, err error)
+	GetUserInfo(ctx context.Context, req *user.GetUserInfoReq, callOptions ...callopt.Option) (r *user.GetUserInfoResp, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -82,4 +87,29 @@ func (p *kUserServiceClient) GetAddress(ctx context.Context, req *user.GetAddres
 func (p *kUserServiceClient) AddAddress(ctx context.Context, req *user.AddAddressRequest, callOptions ...callopt.Option) (r *user.AddAddressResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.AddAddress(ctx, req)
+}
+
+func (p *kUserServiceClient) BanUser(ctx context.Context, req *user.BanUserReq, callOptions ...callopt.Option) (r *user.BanUserResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.BanUser(ctx, req)
+}
+
+func (p *kUserServiceClient) LiftBandUser(ctx context.Context, req *user.LiftBanUserReq, callOptions ...callopt.Option) (r *user.LiftBanUserResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.LiftBandUser(ctx, req)
+}
+
+func (p *kUserServiceClient) Logout(ctx context.Context, req *user.LogoutReq, callOptions ...callopt.Option) (r *user.LogoutResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.Logout(ctx, req)
+}
+
+func (p *kUserServiceClient) SetAdministrator(ctx context.Context, req *user.SetAdministratorReq, callOptions ...callopt.Option) (r *user.SetAdministratorResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.SetAdministrator(ctx, req)
+}
+
+func (p *kUserServiceClient) GetUserInfo(ctx context.Context, req *user.GetUserInfoReq, callOptions ...callopt.Option) (r *user.GetUserInfoResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetUserInfo(ctx, req)
 }

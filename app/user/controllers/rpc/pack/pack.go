@@ -26,6 +26,7 @@ func BuildUser(u *domainModel.User) *model.UserInfo {
 	return &model.UserInfo{
 		UserId: u.Uid,
 		Name:   u.UserName,
+		Role:   int64(u.Role),
 	}
 }
 

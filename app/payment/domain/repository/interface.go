@@ -52,4 +52,5 @@ type PaymentRPC interface {
 	OrderPaymentCancel(ctx context.Context, orderID int64, paymentAt int64, paymentStyle string) error
 	OrderPaymentSuccess(ctx context.Context, orderID int64, paymentAt int64, paymentStyle string) error
 	GetOrderPaymentAmount(ctx context.Context, orderID int64) (float64, error)
+	GetUserInfo(ctx context.Context, uid int64) (bool, error)
 }

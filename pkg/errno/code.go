@@ -67,4 +67,5 @@ const (
 const (
 	UpYunFileErrorCode = 60000 + iota
 	RedisKeyNotExist
+	RepeatedOperation
 )

@@ -94,6 +94,7 @@ var fieldIDToName_BaseResp = map[int16]string{
 type UserInfo struct {
 	UserId int64  `thrift:"userId,1" frugal:"1,default,i64" json:"userId"`
 	Name   string `thrift:"name,2" frugal:"2,default,string" json:"name"`
+	Role   int64  `thrift:"role,3" frugal:"3,default,i64" json:"role"`
 }
 
 func NewUserInfo() *UserInfo {
@@ -110,11 +111,18 @@ func (p *UserInfo) GetUserId() (v int64) {
 func (p *UserInfo) GetName() (v string) {
 	return p.Name
 }
+
+func (p *UserInfo) GetRole() (v int64) {
+	return p.Role
+}
 func (p *UserInfo) SetUserId(val int64) {
 	p.UserId = val
 }
 func (p *UserInfo) SetName(val string) {
 	p.Name = val
+}
+func (p *UserInfo) SetRole(val int64) {
+	p.Role = val
 }
 
 func (p *UserInfo) String() string {
@@ -136,6 +144,9 @@ func (p *UserInfo) DeepEqual(ano *UserInfo) bool {
 	if !p.Field2DeepEqual(ano.Name) {
 		return false
 	}
+	if !p.Field3DeepEqual(ano.Role) {
+		return false
+	}
 	return true
 }
 
@@ -153,10 +164,18 @@ func (p *UserInfo) Field2DeepEqual(src string) bool {
 	}
 	return true
 }
+func (p *UserInfo) Field3DeepEqual(src int64) bool {
+
+	if p.Role != src {
+		return false
+	}
+	return true
+}
 
 var fieldIDToName_UserInfo = map[int16]string{
 	1: "userId",
 	2: "name",
+	3: "role",
 }
 
 type AddressInfo struct {

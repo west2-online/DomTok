@@ -27,4 +27,13 @@ const (
 	SentinelThreshold        = 100
 	SentinelStatIntervalInMs = 1000
 	LoginDataKey             = "loginData"
+
+	BloomFilterSize   = 10000
+	FalsePositiveRate = 0.05
+	BFMaxSize         = 20
+)
+
+const (
+	UserLogout = iota
+	UserBanned
 )

@@ -59,6 +59,41 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"BanUser": kitex.NewMethodInfo(
+		banUserHandler,
+		newUserServiceBanUserArgs,
+		newUserServiceBanUserResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"LiftBandUser": kitex.NewMethodInfo(
+		liftBandUserHandler,
+		newUserServiceLiftBandUserArgs,
+		newUserServiceLiftBandUserResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"Logout": kitex.NewMethodInfo(
+		logoutHandler,
+		newUserServiceLogoutArgs,
+		newUserServiceLogoutResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"SetAdministrator": kitex.NewMethodInfo(
+		setAdministratorHandler,
+		newUserServiceSetAdministratorArgs,
+		newUserServiceSetAdministratorResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetUserInfo": kitex.NewMethodInfo(
+		getUserInfoHandler,
+		newUserServiceGetUserInfoArgs,
+		newUserServiceGetUserInfoResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -197,6 +232,96 @@ func newUserServiceAddAddressResult() interface{} {
 	return user.NewUserServiceAddAddressResult()
 }
 
+func banUserHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceBanUserArgs)
+	realResult := result.(*user.UserServiceBanUserResult)
+	success, err := handler.(user.UserService).BanUser(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceBanUserArgs() interface{} {
+	return user.NewUserServiceBanUserArgs()
+}
+
+func newUserServiceBanUserResult() interface{} {
+	return user.NewUserServiceBanUserResult()
+}
+
+func liftBandUserHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceLiftBandUserArgs)
+	realResult := result.(*user.UserServiceLiftBandUserResult)
+	success, err := handler.(user.UserService).LiftBandUser(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceLiftBandUserArgs() interface{} {
+	return user.NewUserServiceLiftBandUserArgs()
+}
+
+func newUserServiceLiftBandUserResult() interface{} {
+	return user.NewUserServiceLiftBandUserResult()
+}
+
+func logoutHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceLogoutArgs)
+	realResult := result.(*user.UserServiceLogoutResult)
+	success, err := handler.(user.UserService).Logout(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceLogoutArgs() interface{} {
+	return user.NewUserServiceLogoutArgs()
+}
+
+func newUserServiceLogoutResult() interface{} {
+	return user.NewUserServiceLogoutResult()
+}
+
+func setAdministratorHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceSetAdministratorArgs)
+	realResult := result.(*user.UserServiceSetAdministratorResult)
+	success, err := handler.(user.UserService).SetAdministrator(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceSetAdministratorArgs() interface{} {
+	return user.NewUserServiceSetAdministratorArgs()
+}
+
+func newUserServiceSetAdministratorResult() interface{} {
+	return user.NewUserServiceSetAdministratorResult()
+}
+
+func getUserInfoHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceGetUserInfoArgs)
+	realResult := result.(*user.UserServiceGetUserInfoResult)
+	success, err := handler.(user.UserService).GetUserInfo(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceGetUserInfoArgs() interface{} {
+	return user.NewUserServiceGetUserInfoArgs()
+}
+
+func newUserServiceGetUserInfoResult() interface{} {
+	return user.NewUserServiceGetUserInfoResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -242,6 +367,56 @@ func (p *kClient) AddAddress(ctx context.Context, req *user.AddAddressRequest) (
 	_args.Req = req
 	var _result user.UserServiceAddAddressResult
 	if err = p.c.Call(ctx, "AddAddress", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) BanUser(ctx context.Context, req *user.BanUserReq) (r *user.BanUserResp, err error) {
+	var _args user.UserServiceBanUserArgs
+	_args.Req = req
+	var _result user.UserServiceBanUserResult
+	if err = p.c.Call(ctx, "BanUser", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) LiftBandUser(ctx context.Context, req *user.LiftBanUserReq) (r *user.LiftBanUserResp, err error) {
+	var _args user.UserServiceLiftBandUserArgs
+	_args.Req = req
+	var _result user.UserServiceLiftBandUserResult
+	if err = p.c.Call(ctx, "LiftBandUser", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) Logout(ctx context.Context, req *user.LogoutReq) (r *user.LogoutResp, err error) {
+	var _args user.UserServiceLogoutArgs
+	_args.Req = req
+	var _result user.UserServiceLogoutResult
+	if err = p.c.Call(ctx, "Logout", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) SetAdministrator(ctx context.Context, req *user.SetAdministratorReq) (r *user.SetAdministratorResp, err error) {
+	var _args user.UserServiceSetAdministratorArgs
+	_args.Req = req
+	var _result user.UserServiceSetAdministratorResult
+	if err = p.c.Call(ctx, "SetAdministrator", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetUserInfo(ctx context.Context, req *user.GetUserInfoReq) (r *user.GetUserInfoResp, err error) {
+	var _args user.UserServiceGetUserInfoArgs
+	_args.Req = req
+	var _result user.UserServiceGetUserInfoResult
+	if err = p.c.Call(ctx, "GetUserInfo", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

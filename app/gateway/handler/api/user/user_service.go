@@ -129,3 +129,87 @@ func AddAddress(ctx context.Context, c *app.RequestContext) {
 	}
 	pack.RespData(c, resp.AddressID)
 }
+
+// BanUser .
+// @router api/v1/user/ban [POST]
+func BanUser(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req user.BanUserReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	err = rpc.BanUserRPC(ctx, &user.BanUserReq{
+		Uid: req.Uid,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespSuccess(c)
+}
+
+// LiftBandUser .
+// @router api/v1/user/lift [POST]
+func LiftBandUser(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req user.LiftBanUserReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	err = rpc.LiftUserRPC(ctx, &user.LiftBanUserReq{
+		Uid: req.Uid,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespSuccess(c)
+}
+
+// Logout .
+// @router api/v1/user/logout [POST]
+func Logout(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req user.LogoutReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	err = rpc.LogoutUserRPC(ctx, &user.LogoutReq{})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespSuccess(c)
+}
+
+// SetAdministrator .
+// @router api/v1/user/administrator [POST]
+func SetAdministrator(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req user.SetAdministratorReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
+	err = rpc.SetAdministrator(ctx, &user.SetAdministratorReq{
+		Uid:      req.Uid,
+		Password: req.Password,
+		Action:   req.Action,
+	})
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespSuccess(c)
+}

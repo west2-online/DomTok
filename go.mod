@@ -8,6 +8,7 @@ require (
 	github.com/alibaba/sentinel-golang v1.0.4
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/apache/thrift v0.16.0
+	github.com/bits-and-blooms/bloom/v3 v3.7.0
 	github.com/bytedance/gopkg v0.1.1
 	github.com/bytedance/mockey v1.2.14
 	github.com/bytedance/sonic v1.12.8
@@ -33,6 +34,7 @@ require (
 	github.com/samber/lo v1.49.1
 	github.com/segmentio/kafka-go v0.4.47
 	github.com/shopspring/decimal v1.2.0
+	github.com/smarty/assertions v1.15.0
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
@@ -55,6 +57,7 @@ require (
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/bits-and-blooms/bitset v1.21.0 // indirect
 	github.com/bufbuild/protocompile v0.14.1 // indirect
 	github.com/bytedance/sonic/loader v0.2.3 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
@@ -148,7 +151,6 @@ require (
 	github.com/shirou/gopsutil/v3 v3.21.6 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/slongfield/pyfmt v0.0.0-20220222012616-ea85ff4c361f // indirect
-	github.com/smarty/assertions v1.15.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.12.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
