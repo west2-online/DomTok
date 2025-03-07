@@ -34,6 +34,7 @@ type UserUseCase interface {
 	LiftUser(ctx context.Context, uid int64) error
 	LogoutUser(ctx context.Context) error
 	SetAdministrator(ctx context.Context, uid int64, password []byte, action int) error
+	GetUserInfo(ctx context.Context, uid int64) (*model.User, error)
 }
 
 // useCase 实现了 domain.UserUseCase

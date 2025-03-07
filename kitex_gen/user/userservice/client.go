@@ -37,6 +37,7 @@ type Client interface {
 	LiftBandUser(ctx context.Context, req *user.LiftBanUserReq, callOptions ...callopt.Option) (r *user.LiftBanUserResp, err error)
 	Logout(ctx context.Context, req *user.LogoutReq, callOptions ...callopt.Option) (r *user.LogoutResp, err error)
 	SetAdministrator(ctx context.Context, req *user.SetAdministratorReq, callOptions ...callopt.Option) (r *user.SetAdministratorResp, err error)
+	GetUserInfo(ctx context.Context, req *user.GetUserInfoReq, callOptions ...callopt.Option) (r *user.GetUserInfoResp, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -106,4 +107,9 @@ func (p *kUserServiceClient) Logout(ctx context.Context, req *user.LogoutReq, ca
 func (p *kUserServiceClient) SetAdministrator(ctx context.Context, req *user.SetAdministratorReq, callOptions ...callopt.Option) (r *user.SetAdministratorResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.SetAdministrator(ctx, req)
+}
+
+func (p *kUserServiceClient) GetUserInfo(ctx context.Context, req *user.GetUserInfoReq, callOptions ...callopt.Option) (r *user.GetUserInfoResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetUserInfo(ctx, req)
 }

@@ -100,3 +100,7 @@ func (us *useCase) LogoutUser(ctx context.Context) error {
 func (us *useCase) SetAdministrator(ctx context.Context, uid int64, password []byte, action int) error {
 	return us.svc.SetAdministrator(ctx, uid, password, action)
 }
+
+func (us *useCase) GetUserInfo(ctx context.Context, uid int64) (*model.User, error) {
+	return us.db.GetUserById(ctx, uid)
+}

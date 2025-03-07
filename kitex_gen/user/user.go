@@ -1126,6 +1126,141 @@ var fieldIDToName_SetAdministratorResp = map[int16]string{
 	1: "base",
 }
 
+type GetUserInfoReq struct {
+	Uid int64 `thrift:"uid,1,required" frugal:"1,required,i64" json:"uid"`
+}
+
+func NewGetUserInfoReq() *GetUserInfoReq {
+	return &GetUserInfoReq{}
+}
+
+func (p *GetUserInfoReq) InitDefault() {
+}
+
+func (p *GetUserInfoReq) GetUid() (v int64) {
+	return p.Uid
+}
+func (p *GetUserInfoReq) SetUid(val int64) {
+	p.Uid = val
+}
+
+func (p *GetUserInfoReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetUserInfoReq(%+v)", *p)
+}
+
+func (p *GetUserInfoReq) DeepEqual(ano *GetUserInfoReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Uid) {
+		return false
+	}
+	return true
+}
+
+func (p *GetUserInfoReq) Field1DeepEqual(src int64) bool {
+
+	if p.Uid != src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_GetUserInfoReq = map[int16]string{
+	1: "uid",
+}
+
+type GetUserInfoResp struct {
+	Base *model.BaseResp `thrift:"base,1,required" frugal:"1,required,model.BaseResp" json:"base"`
+	Info *model.UserInfo `thrift:"info,2,required" frugal:"2,required,model.UserInfo" json:"info"`
+}
+
+func NewGetUserInfoResp() *GetUserInfoResp {
+	return &GetUserInfoResp{}
+}
+
+func (p *GetUserInfoResp) InitDefault() {
+}
+
+var GetUserInfoResp_Base_DEFAULT *model.BaseResp
+
+func (p *GetUserInfoResp) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return GetUserInfoResp_Base_DEFAULT
+	}
+	return p.Base
+}
+
+var GetUserInfoResp_Info_DEFAULT *model.UserInfo
+
+func (p *GetUserInfoResp) GetInfo() (v *model.UserInfo) {
+	if !p.IsSetInfo() {
+		return GetUserInfoResp_Info_DEFAULT
+	}
+	return p.Info
+}
+func (p *GetUserInfoResp) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+func (p *GetUserInfoResp) SetInfo(val *model.UserInfo) {
+	p.Info = val
+}
+
+func (p *GetUserInfoResp) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *GetUserInfoResp) IsSetInfo() bool {
+	return p.Info != nil
+}
+
+func (p *GetUserInfoResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetUserInfoResp(%+v)", *p)
+}
+
+func (p *GetUserInfoResp) DeepEqual(ano *GetUserInfoResp) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Info) {
+		return false
+	}
+	return true
+}
+
+func (p *GetUserInfoResp) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+func (p *GetUserInfoResp) Field2DeepEqual(src *model.UserInfo) bool {
+
+	if !p.Info.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_GetUserInfoResp = map[int16]string{
+	1: "base",
+	2: "info",
+}
+
 type UserService interface {
 	Register(ctx context.Context, req *RegisterRequest) (r *RegisterResponse, err error)
 
@@ -1142,6 +1277,8 @@ type UserService interface {
 	Logout(ctx context.Context, req *LogoutReq) (r *LogoutResp, err error)
 
 	SetAdministrator(ctx context.Context, req *SetAdministratorReq) (r *SetAdministratorResp, err error)
+
+	GetUserInfo(ctx context.Context, req *GetUserInfoReq) (r *GetUserInfoResp, err error)
 }
 
 type UserServiceRegisterArgs struct {
@@ -2069,5 +2206,121 @@ func (p *UserServiceSetAdministratorResult) Field0DeepEqual(src *SetAdministrato
 }
 
 var fieldIDToName_UserServiceSetAdministratorResult = map[int16]string{
+	0: "success",
+}
+
+type UserServiceGetUserInfoArgs struct {
+	Req *GetUserInfoReq `thrift:"req,1" frugal:"1,default,GetUserInfoReq" json:"req"`
+}
+
+func NewUserServiceGetUserInfoArgs() *UserServiceGetUserInfoArgs {
+	return &UserServiceGetUserInfoArgs{}
+}
+
+func (p *UserServiceGetUserInfoArgs) InitDefault() {
+}
+
+var UserServiceGetUserInfoArgs_Req_DEFAULT *GetUserInfoReq
+
+func (p *UserServiceGetUserInfoArgs) GetReq() (v *GetUserInfoReq) {
+	if !p.IsSetReq() {
+		return UserServiceGetUserInfoArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *UserServiceGetUserInfoArgs) SetReq(val *GetUserInfoReq) {
+	p.Req = val
+}
+
+func (p *UserServiceGetUserInfoArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *UserServiceGetUserInfoArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceGetUserInfoArgs(%+v)", *p)
+}
+
+func (p *UserServiceGetUserInfoArgs) DeepEqual(ano *UserServiceGetUserInfoArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceGetUserInfoArgs) Field1DeepEqual(src *GetUserInfoReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceGetUserInfoArgs = map[int16]string{
+	1: "req",
+}
+
+type UserServiceGetUserInfoResult struct {
+	Success *GetUserInfoResp `thrift:"success,0,optional" frugal:"0,optional,GetUserInfoResp" json:"success,omitempty"`
+}
+
+func NewUserServiceGetUserInfoResult() *UserServiceGetUserInfoResult {
+	return &UserServiceGetUserInfoResult{}
+}
+
+func (p *UserServiceGetUserInfoResult) InitDefault() {
+}
+
+var UserServiceGetUserInfoResult_Success_DEFAULT *GetUserInfoResp
+
+func (p *UserServiceGetUserInfoResult) GetSuccess() (v *GetUserInfoResp) {
+	if !p.IsSetSuccess() {
+		return UserServiceGetUserInfoResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *UserServiceGetUserInfoResult) SetSuccess(x interface{}) {
+	p.Success = x.(*GetUserInfoResp)
+}
+
+func (p *UserServiceGetUserInfoResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *UserServiceGetUserInfoResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceGetUserInfoResult(%+v)", *p)
+}
+
+func (p *UserServiceGetUserInfoResult) DeepEqual(ano *UserServiceGetUserInfoResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceGetUserInfoResult) Field0DeepEqual(src *GetUserInfoResp) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceGetUserInfoResult = map[int16]string{
 	0: "success",
 }

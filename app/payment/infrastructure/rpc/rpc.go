@@ -22,16 +22,28 @@ import (
 	"github.com/west2-online/DomTok/app/payment/domain/repository"
 	orderrpc "github.com/west2-online/DomTok/kitex_gen/order"
 	"github.com/west2-online/DomTok/kitex_gen/order/orderservice"
+	userrpc "github.com/west2-online/DomTok/kitex_gen/user"
+	"github.com/west2-online/DomTok/kitex_gen/user/userservice"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
 type paymentRPC struct {
 	order orderservice.Client
+	user  userservice.Client
 }
 
-func NewPaymentRPC(order orderservice.Client) repository.PaymentRPC {
-	return &paymentRPC{order: order}
+func (rpc *paymentRPC) GetUserInfo(ctx context.Context, uid int64) (bool, error) {
+	infoReq := &userrpc.GetUserInfoReq{Uid: uid}
+	resp, err := rpc.user.GetUserInfo(ctx, infoReq)
+	if err = utils.ProcessRpcError("rpc.user.GetUserInfo", resp, err); err != nil {
+		return false, err
+	}
+	return resp.Info.Role == constants.UserAdministrator, nil
+}
+
+func NewPaymentRPC(order orderservice.Client, user userservice.Client) repository.PaymentRPC {
+	return &paymentRPC{order: order, user: user}
 }
 
 func (rpc *paymentRPC) PaymentIsOrderExist(ctx context.Context, orderID int64) (orderExistInfo bool, err error) {

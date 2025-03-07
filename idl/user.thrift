@@ -78,6 +78,15 @@ struct SetAdministratorResp {
     1: required model.BaseResp base,
 }
 
+struct GetUserInfoReq {
+    1: required i64 uid
+}
+
+struct GetUserInfoResp {
+        1: required model.BaseResp base,
+        2: required model.UserInfo info
+}
+
 service UserService {
     RegisterResponse Register(1: RegisterRequest req),
     LoginResponse Login(1: LoginRequest req),
@@ -87,4 +96,5 @@ service UserService {
     LiftBanUserResp LiftBandUser(1: LiftBanUserReq req) ,
     LogoutResp Logout(1: LogoutReq req),
     SetAdministratorResp SetAdministrator(1:SetAdministratorReq req)
+    GetUserInfoResp GetUserInfo(1: GetUserInfoReq req)
 }

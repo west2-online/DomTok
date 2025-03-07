@@ -141,3 +141,15 @@ func (h *UserHandler) SetAdministrator(ctx context.Context, req *user.SetAdminis
 	r.Base = base.BuildBaseResp(nil)
 	return
 }
+
+func (h *UserHandler) GetUserInfo(ctx context.Context, req *user.GetUserInfoReq) (r *user.GetUserInfoResp, err error) {
+	r = new(user.GetUserInfoResp)
+	res, err := h.useCase.GetUserInfo(ctx, req.GetUid())
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(err)
+	r.Info = pack.BuildUser(res)
+	return
+}
