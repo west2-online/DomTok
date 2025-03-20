@@ -30,7 +30,7 @@ require (
 	github.com/kitex-contrib/obs-opentelemetry v0.2.9
 	github.com/kitex-contrib/registry-etcd v0.2.5
 	github.com/olivere/elastic/v7 v7.0.32
-	github.com/redis/go-redis/v9 v9.7.0
+	github.com/redis/go-redis/v9 v9.7.3
 	github.com/samber/lo v1.49.1
 	github.com/segmentio/kafka-go v0.4.47
 	github.com/shopspring/decimal v1.2.0
