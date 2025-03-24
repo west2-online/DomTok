@@ -34,6 +34,7 @@ import (
 	redisCommodity "github.com/west2-online/DomTok/app/commodity/infrastructure/redis"
 	"github.com/west2-online/DomTok/kitex_gen/commodity"
 	"github.com/west2-online/DomTok/pkg/base/context"
+	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
@@ -851,6 +852,257 @@ func TestUseCase_IncrLockStock(t *testing.T) {
 				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
 			} else {
 				convey.So(err, convey.ShouldEqual, tc.ExpectedError)
+			}
+		})
+	}
+}
+
+func TestUseCase_CreateCategory(t *testing.T) {
+	type TestCase struct {
+		Name                string
+		CategoryExistStatus bool
+		MockError           error
+		ExpectedError       error
+		Id                  int64
+	}
+
+	testcases := []TestCase{
+		{
+			Name:          "CheckCategoryError",
+			MockError:     errors.New("check category exist failed"),
+			ExpectedError: errors.New("check category exist failed,check category exist failed"),
+		},
+		{
+			Name:                "CategoryAlreadyExists",
+			CategoryExistStatus: true,
+			ExpectedError:       errors.New("category exist"),
+		},
+		{
+			Name:          "GetCreatoridFailed",
+			ExpectedError: errors.New("get category creatorid failed,[20001] Failed to get header in context"),
+		},
+		{
+			Name:          "CreateCategorySuccessfully",
+			ExpectedError: nil,
+			MockError:     nil,
+			Id:            1,
+		},
+	}
+
+	input := model.Category{
+		Name: "test",
+	}
+
+	defer mockey.UnPatchAll()
+
+	for _, tc := range testcases {
+		mockey.PatchConvey(tc.Name, t, func() {
+			// 初始化 gorm.DB
+			gormDB := new(gorm.DB)
+
+			// 初始化 Mock 对象
+			svc := new(service.CommodityService)
+			db := mysql.NewCommodityDB(gormDB)
+			us := &useCase{
+				svc: svc,
+				db:  db,
+			}
+			// Mock 方法
+			mockey.Mock(mockey.GetMethod(us.db, "IsCategoryExistByName")).Return(tc.CategoryExistStatus, tc.MockError).Build()
+			mockey.Mock(mockey.GetMethod(us.db, "CreateCategory")).Return(tc.Id, tc.MockError).Build()
+			mockey.Mock((*service.CommodityService).CreateCategory).Return(tc.Id, tc.MockError).Build()
+			mockey.Mock(mockey.GetMethod(us, "CreateCategory")).Return(tc.Id, tc.ExpectedError).Build()
+			// 调用测试方法
+			id, err := us.CreateCategory(ctx.Background(), &input)
+
+			// 验证结果
+			if tc.ExpectedError != nil {
+				convey.So(err, convey.ShouldNotBeNil)
+				if err != nil {
+					convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+				}
+			} else {
+				convey.So(err, convey.ShouldBeNil)
+				convey.So(id, convey.ShouldEqual, tc.Id)
+			}
+		})
+	}
+}
+
+func TestUseCase_DeleteCategory(t *testing.T) {
+	type TestCase struct {
+		Name          string
+		MockError     error
+		ExpectedError error
+	}
+	testcase := []TestCase{
+		{
+			Name:          "DeleteCategoryError",
+			MockError:     errors.New("DeleteCategoryError"),
+			ExpectedError: errors.New("DeleteCategoryError"),
+		},
+		{
+			Name:          "GetHeaderfail",
+			MockError:     errors.New("service.IdentifyUser failed: [20001] Failed to get header in context"),
+			ExpectedError: errors.New("service.IdentifyUser failed: [20001] Failed to get header in context"),
+		},
+		{
+			Name:          "DeleteCategorySuccessfully",
+			MockError:     nil,
+			ExpectedError: nil,
+		},
+	}
+	defer mockey.UnPatchAll()
+
+	category := model.Category{
+		Id: 1,
+	}
+
+	for _, tc := range testcase {
+		mockey.PatchConvey(tc.Name, t, func() {
+			// 初始化 gorm.DB
+			gormDB := new(gorm.DB) // 确保 gormDB 不为 nil
+
+			// 初始化 Mock 对象
+			svc := new(service.CommodityService)
+			db := mysql.NewCommodityDB(gormDB)
+			us := &useCase{
+				svc: svc,
+				db:  db,
+			}
+
+			// Mock 方法
+			mockey.Mock(mockey.GetMethod(us.db, "GetCategoryById")).Return(&category, nil).Build()
+			mockey.Mock(mockey.GetMethod(us.db, "DeleteCategory")).Return(tc.MockError).Build()
+			mockey.Mock((*service.CommodityService).DeleteCategory).Return(tc.MockError).Build()
+			mockey.Mock(mockey.GetMethod(us, "DeleteCategory")).Return(tc.MockError).Build()
+			// 调用测试方法
+			err := us.DeleteCategory(ctx.Background(), &category)
+
+			// 验证结果
+			if tc.ExpectedError != nil {
+				convey.So(err, convey.ShouldNotBeNil)
+				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			} else {
+				convey.So(err, convey.ShouldBeNil)
+			}
+		})
+	}
+}
+
+func TestUseCase_UpdateCategory(t *testing.T) {
+	type TestCase struct {
+		Name          string
+		MockCategory  *model.Category
+		MockError     error
+		ExpectedError error
+	}
+	testcase := []TestCase{
+		{
+			Name:          "UpdateCategoryError",
+			MockError:     errors.New("UpdateCategoryError"),
+			ExpectedError: errors.New("UpdateCategoryError"),
+		},
+		{
+			Name:          "FailtoGetHeader",
+			MockError:     errors.New("service.IdentifyUser failed: [20001] Failed to get header in context"),
+			ExpectedError: errors.New("service.IdentifyUser failed: [20001] Failed to get header in context"),
+		},
+		{
+			Name:          "UpdataCategorySuccessfully",
+			MockError:     nil,
+			ExpectedError: nil,
+		},
+	}
+	category := model.Category{
+		Name: "test",
+		Id:   1,
+	}
+	defer mockey.UnPatchAll()
+	for _, tc := range testcase {
+		mockey.PatchConvey(tc.Name, t, func() {
+			// 初始化 gorm.DB
+			gormDB := new(gorm.DB) // 确保 gormDB 不为 nil
+
+			// 初始化 Mock 对象
+			svc := new(service.CommodityService)
+			db := mysql.NewCommodityDB(gormDB)
+			us := &useCase{
+				svc: svc,
+				db:  db,
+			}
+
+			// Mock 方法
+			mockey.Mock(mockey.GetMethod(us.db, "GetCategoryById")).Return(&category, tc.MockError).Build()
+			mockey.Mock(mockey.GetMethod(us.db, "UpdateCategory")).Return(tc.MockError).Build()
+			mockey.Mock((*service.CommodityService).UpdateCategory).Return(tc.MockError).Build()
+			mockey.Mock(mockey.GetMethod(us, "UpdateCategory")).Return(tc.MockError).Build()
+			// 调用测试方法
+			err := us.UpdateCategory(ctx.Background(), &category)
+
+			// 验证结果
+			if tc.ExpectedError != nil {
+				convey.So(err, convey.ShouldNotBeNil)
+				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			} else {
+				convey.So(err, convey.ShouldBeNil)
+			}
+		})
+	}
+}
+
+func TestUseCase_ViewCategory(t *testing.T) {
+	type TestCase struct {
+		Name          string
+		MockCategory  []*model.CategoryInfo
+		MockError     error
+		ExpectedError error
+	}
+	testcase := []TestCase{
+		{
+			Name:          "ViewCategoryError",
+			MockError:     errors.New("ViewCategoryError"),
+			ExpectedError: errno.Errorf(errno.ServiceListCategoryFailed, "failed to view categories: %v", errors.New("ViewCategoryError")),
+		},
+		{
+			Name: "ViewCategorySuccessfully",
+			MockCategory: []*model.CategoryInfo{
+				{
+					CategoryID: 1,
+					Name:       "test",
+				},
+			},
+			MockError:     nil,
+			ExpectedError: nil,
+		},
+	}
+	defer mockey.UnPatchAll()
+	for _, tc := range testcase {
+		mockey.PatchConvey(tc.Name, t, func() {
+			// 初始化 gorm.DB
+			gormDB := new(gorm.DB) // 确保 gormDB 不为 nil
+
+			// 初始化 Mock 对象
+			svc := new(service.CommodityService)
+			db := mysql.NewCommodityDB(gormDB)
+			us := &useCase{
+				svc: svc,
+				db:  db,
+			}
+
+			// Mock 方法
+			mockey.Mock(mockey.GetMethod(us.db, "ViewCategory")).Return(tc.MockCategory, tc.MockError).Build()
+
+			// 调用测试方法
+			resp, err := us.ViewCategory(ctx.Background(), 1, 10)
+
+			// 验证结果
+			if tc.ExpectedError != nil {
+				convey.So(err, convey.ShouldNotBeNil)
+				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())
+			} else {
+				convey.So(err, convey.ShouldBeNil)
+				convey.So(resp, convey.ShouldEqual, tc.MockCategory)
 			}
 		})
 	}
