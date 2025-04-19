@@ -54,7 +54,7 @@ func Test_ResponseFactory_Error(t *testing.T) {
 		resp := ResponseFactory.Error(err)
 		v := model.Response{}
 		_ = json.Unmarshal(resp, &v)
-		d := map[string]interface{}{}
+		d := map[string]any{}
 		data, _ := json.Marshal(e)
 		_ = json.Unmarshal(data, &d)
 		So(v.Meta[MetaType], ShouldEqual, MetaTypeError)

@@ -106,7 +106,7 @@ func (f Frame) MarshalText() ([]byte, error) {
 	if name == "unknown" {
 		return []byte(name), nil
 	}
-	return []byte(fmt.Sprintf("%s %s:%d", name, f.file(), f.line())), nil
+	return fmt.Appendf(nil, "%s %s:%d", name, f.file(), f.line()), nil
 }
 
 // StackTrace is stack of Frames from innermost (newest) to outermost (oldest).

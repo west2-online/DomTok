@@ -387,7 +387,7 @@ func (db *commodityDB) DecrStock(ctx context.Context, infos []*model.SkuBuyInfo)
 				return errno.Errorf(errno.InsufficientStockErrorCode, "mysql: not enough  stock to decrease, lockStock = %d, stock = %d", lockStock, stock)
 			}
 
-			updates := map[string]interface{}{
+			updates := map[string]any{
 				"stock":      gorm.Expr("stock - ?", info.Count),
 				"lock_stock": gorm.Expr("lock_stock - ?", info.Count),
 			}
@@ -436,7 +436,7 @@ func (c *commodityDB) DecrStockInNX(ctx context.Context, infos []*model.SkuBuyIn
 				return errno.Errorf(errno.InsufficientStockErrorCode, "mysql: not enough  stock to decrease, lockStock = %d, stock = %d", lockStock, stock)
 			}
 
-			updates := map[string]interface{}{
+			updates := map[string]any{
 				"stock":      gorm.Expr("stock - ?", info.Count),
 				"lock_stock": gorm.Expr("lock_stock - ?", info.Count),
 			}

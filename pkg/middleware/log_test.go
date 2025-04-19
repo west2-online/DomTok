@@ -27,7 +27,7 @@ import (
 	"github.com/west2-online/DomTok/pkg/errno"
 )
 
-func errorLogNext(ctx context.Context, req, resp interface{}) (err error) {
+func errorLogNext(ctx context.Context, req, resp any) (err error) {
 	return nil
 }
 

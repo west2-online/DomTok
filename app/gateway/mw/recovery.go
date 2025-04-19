@@ -31,9 +31,9 @@ func RecoveryMW() app.HandlerFunc {
 	return recovery.Recovery(recovery.WithRecoveryHandler(recoveryHandler))
 }
 
-func recoveryHandler(ctx context.Context, c *app.RequestContext, err interface{}, stack []byte) {
+func recoveryHandler(ctx context.Context, c *app.RequestContext, err any, stack []byte) {
 	logger.Errorf("[Recovery] InternalServiceError err=%v\n stack=%s\n", err, stack)
-	c.JSON(consts.StatusInternalServerError, map[string]interface{}{
+	c.JSON(consts.StatusInternalServerError, map[string]any{
 		"code":    errno.InternalServiceErrorCode,
 		"message": "内部服务错误，请稍后再试",
 	})

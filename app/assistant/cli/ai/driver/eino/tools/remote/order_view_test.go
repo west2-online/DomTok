@@ -42,7 +42,7 @@ func TestToolOrderView_InvokableRun(t *testing.T) {
 		PatchConvey("success", func() {
 			MockValue(&f.getServerCaller).To(func(_ string) adapter.ServerCaller { return fakeServerCaller })
 			Mock((*MockServerCaller).OrderView).To(func(_ context.Context, params *order.ViewOrderReq) ([]byte, error) {
-				return []byte(fmt.Sprintf(`{"order_id":%d}`, params.OrderID)), nil
+				return fmt.Appendf(nil, `{"order_id":%d}`, params.OrderID), nil
 			}).Build()
 
 			resp, err := f.InvokableRun(context.Background(), string(argsBytes))

@@ -36,7 +36,7 @@ type PaymentDB interface {
 	UpdateRefundStatusToSuccessAndCreateLedgerAsTransaction(ctx context.Context, refund *model.PaymentRefund) error
 }
 type PaymentRedis interface {
-	SetPaymentToken(ctx context.Context, key string, value interface{}, expiration time.Duration) error
+	SetPaymentToken(ctx context.Context, key string, value any, expiration time.Duration) error
 	IncrRedisKey(ctx context.Context, key string, expiration int) (int64, error)
 	CheckRedisDayKey(ctx context.Context, key string) (bool, error)
 	SetRedisDayKey(ctx context.Context, key string, value string, expiration int) error

@@ -38,7 +38,7 @@ func SentinelMW() app.HandlerFunc {
 		}),
 		adapter.WithServerBlockFallback(func(ctx context.Context, c *app.RequestContext) {
 			logger.Errorf("frequent requests have been rejected by the gateway. clientIP: %v\n", c.ClientIP())
-			c.AbortWithStatusJSON(consts.StatusOK, map[string]interface{}{
+			c.AbortWithStatusJSON(consts.StatusOK, map[string]any{
 				"code":    errno.InternalServiceErrorCode,
 				"message": "服务器当前处于请求高峰，请稍后再试",
 			})

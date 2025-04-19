@@ -42,7 +42,7 @@ func TestToolCartShow_InvokableRun(t *testing.T) {
 		PatchConvey("success", func() {
 			MockValue(&f.getServerCaller).To(func(_ string) adapter.ServerCaller { return fakeServerCaller })
 			Mock((*MockServerCaller).CartShow).To(func(_ context.Context, params *cart.ShowCartGoodsListRequest) ([]byte, error) {
-				return []byte(fmt.Sprintf("page_num: %d", params.PageNum)), nil
+				return fmt.Appendf(nil, "page_num: %d", params.PageNum), nil
 			}).Build()
 
 			resp, err := f.InvokableRun(context.Background(), string(argsBytes))

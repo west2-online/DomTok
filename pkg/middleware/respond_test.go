@@ -52,11 +52,11 @@ func (rel *respondResult) IsSetSuccess() bool {
 	return rel.resp != nil
 }
 
-func (rel *respondResult) GetResult() interface{} {
+func (rel *respondResult) GetResult() any {
 	return rel.resp
 }
 
-func respondNext(ctx context.Context, req, resp interface{}) (err error) {
+func respondNext(ctx context.Context, req, resp any) (err error) {
 	return nil
 }
 

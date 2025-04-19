@@ -109,7 +109,7 @@ func CheckToken(token string) (int64, int64, error) {
 }
 
 // parsePrivateKey 解析 Ed25519 私钥
-func parsePrivateKey(key string) (interface{}, error) {
+func parsePrivateKey(key string) (any, error) {
 	privateKey, err := jwt.ParseEdPrivateKeyFromPEM([]byte(key))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse private key: %w", err)
@@ -118,7 +118,7 @@ func parsePrivateKey(key string) (interface{}, error) {
 }
 
 // parsePublicKey 解析 Ed25519 公钥
-func parsePublicKey(key string) (interface{}, error) {
+func parsePublicKey(key string) (any, error) {
 	publicKey, err := jwt.ParseEdPublicKeyFromPEM([]byte(key))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse public key: %w", err)
@@ -141,8 +141,8 @@ func parseUnverifiedClaims(token string) (*Claims, error) {
 }
 
 // verifyToken 验证 token 并返回 claims
-func verifyToken(token string, key interface{}) (*Claims, error) {
-	parsedToken, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+func verifyToken(token string, key any) (*Claims, error) {
+	parsedToken, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodEd25519); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}

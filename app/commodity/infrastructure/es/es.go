@@ -76,9 +76,9 @@ func (es *CommodityElastic) RemoveItem(ctx context.Context, indexName string, id
 	return nil
 }
 
-func structToMapUsingJSON(obj interface{}) map[string]interface{} {
+func structToMapUsingJSON(obj any) map[string]any {
 	data, _ := sonic.Marshal(obj)
-	var result map[string]interface{}
+	var result map[string]any
 	_ = sonic.Unmarshal(data, &result)
 	return result
 }

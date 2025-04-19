@@ -31,7 +31,7 @@ import (
 // RedisLogger 不加入自定义的 logger 字段, 以使得 logger 更新后无指针引用
 type RedisLogger struct{}
 
-func (l *RedisLogger) Printf(ctx context.Context, template string, args ...interface{}) {
+func (l *RedisLogger) Printf(ctx context.Context, template string, args ...any) {
 	control.info(fmt.Sprintf(template, args...), zap.String(constants.SourceKey, constants.RedisSource))
 }
 

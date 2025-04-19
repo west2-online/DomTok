@@ -45,7 +45,7 @@ func TestToolOrderList_InvokableRun(t *testing.T) {
 		PatchConvey("success", func() {
 			MockValue(&f.getServerCaller).To(func(_ string) adapter.ServerCaller { return fakeServerCaller })
 			Mock((*MockServerCaller).OrderList).To(func(_ context.Context, params *order.ViewOrderListReq) ([]byte, error) {
-				return []byte(fmt.Sprintf(`{"page":%d,"size":%d}`, params.Page, params.Size)), nil
+				return fmt.Appendf(nil, `{"page":%d,"size":%d}`, params.Page, params.Size), nil
 			}).Build()
 
 			resp, err := f.InvokableRun(context.Background(), string(argsBytes))

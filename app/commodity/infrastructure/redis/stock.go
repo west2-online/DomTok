@@ -71,7 +71,7 @@ func (c *commodityCache) DecrLockStockNum(ctx context.Context, infos []*model.Sk
 		keys = append(keys, c.GetLockStockKey(info.SkuID))
 	}
 	err := c.client.Watch(ctx, func(tx *redis.Tx) error {
-		for i := 0; i < len(infos); i++ {
+		for i := range infos {
 			val, err := tx.Get(ctx, keys[i]).Int64()
 			if err != nil {
 				return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.DecrLockStockNum failed :%v", err)
@@ -111,7 +111,7 @@ func (c *commodityCache) DecrStockNum(ctx context.Context, infos []*model.SkuBuy
 	}
 
 	err := c.client.Watch(ctx, func(tx *redis.Tx) error {
-		for i := 0; i < len(infos); i++ {
+		for i := range infos {
 			val, err := tx.Get(ctx, stockKeys[i]).Int64()
 			if err != nil {
 				return errno.Errorf(errno.InternalRedisErrorCode, "CommodityCache.DecrStockNum failed :%v", err)

@@ -30,6 +30,6 @@ func GetKafkaErrorLogger() *KafkaErrorLogger {
 	return &KafkaErrorLogger{}
 }
 
-func (l *KafkaErrorLogger) Printf(s string, v ...interface{}) {
+func (l *KafkaErrorLogger) Printf(s string, v ...any) {
 	control.error(fmt.Sprintf(s, v...), zap.String(constants.SourceKey, constants.KafkaSource))
 }

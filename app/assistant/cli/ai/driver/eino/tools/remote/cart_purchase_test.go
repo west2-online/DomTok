@@ -45,7 +45,7 @@ func TestToolCartPurchase_InvokableRun(t *testing.T) {
 	argsBytes, _ := sonic.Marshal(args)
 	PatchConvey("Test OrderCreate", t, func() {
 		PatchConvey("success", func() {
-			mp := map[string]interface{}{}
+			mp := map[string]any{}
 			MockValue(&f.getServerCaller).To(func(_ string) adapter.ServerCaller { return fakeServerCaller })
 			Mock((*MockServerCaller).CartPurchase).To(func(_ context.Context, params *cart.PurChaseCartGoodsRequest) ([]byte, error) {
 				mp["base_order_goods"] = params.CartGoods

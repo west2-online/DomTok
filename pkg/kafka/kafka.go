@@ -64,7 +64,7 @@ func (k *Kafka) Consume(ctx context.Context, topic string, consumerNum int, grou
 	ch := make(chan *Message, chCap)
 	k.consumeChans[topic] = ch
 
-	for i := 0; i < consumerNum; i++ {
+	for range consumerNum {
 		readers := client.GetNewReader(topic, groupID)
 		k.readers = append(k.readers, readers)
 		go k.consume(ctx, topic, readers)

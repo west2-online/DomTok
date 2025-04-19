@@ -1,0 +1,223 @@
+# options for analysis running
+run:
+  # default concurrency is the available CPU number
+  concurrency: 16
+  # timeout for analysis, e.g. 30s, 5m, default is 1m
+  timeout: 10m
+  # exit code when at least one issue was found, default is 1
+  issues-exit-code: 1
+  # include test files or not, default is true
+  tests: true
+  # which dirs to skip: they won't be analyzed;
+  # can use regexp here: generated.*, regexp is applied on full path;
+  # default value is empty list, but next dirs are always skipped independently
+  # from this option's value:
+  # third_party$, testdata$, examples$, Godeps$, builtin$
+  # skip-dirs:
+
+# output configuration options
+output:
+  # print lines of code with issue, default is true
+  print-issued-lines: true
+  # print linter name in the end of issue text, default is true
+  print-linter-name: true
+
+
+# all available settings of specific linters
+linters-settings:
+  nakedret:
+    # Make an issue if func has more lines of code than this setting, and it has naked returns.
+    # Default: 30
+    max-func-lines: 31
+  gofmt:
+    # simplify code: gofmt with `-s` option, true by default
+    simplify: true
+  goimports:
+    # put imports beginning with prefix after 3rd-party packages;
+    # it's a comma-separated list of prefixes
+    local-prefixes: github.com/west2-online
+  gci:
+    # Section configuration to compare against.
+    # Section names are case-insensitive and may contain parameters in ().
+    # The default order of sections is `standard > default > custom > blank > dot > alias > localmodule`,
+    # If `custom-order` is `true`, it follows the order of `sections` option.
+    # Default: ["standard", "default"]
+    sections:
+      - standard # Standard section: captures all standard packages.
+      - default # Default section: contains all imports that could not be matched to another section type.
+      - prefix(github.com/west2-online) # Custom section: groups all imports with the specified Prefix.
+      # - blank # Blank section: contains all blank imports. This section is not present unless explicitly enabled.
+      # - dot # Dot section: contains all dot imports. This section is not present unless explicitly enabled.
+      # - alias # Alias section: contains all alias imports. This section is not present unless explicitly enabled.
+      # - localmodule # Local module section: contains all local packages. This section is not present unless explicitly enabled.
+    # Skip generated files.
+    # Default: true
+    skip-generated: true
+    # Enable custom order of sections.
+    # If `true`, make the section order the same as the order of `sections`.
+    # Default: false
+    custom-order: true
+    # Drops lexical ordering for custom sections.
+    # Default: false
+    no-lex-order: true
+  nilnil:
+    # List of return types to check.
+    # Default: ["ptr", "func", "iface", "map", "chan", "uintptr", "unsafeptr"]
+    checked-types:
+      - ptr
+      - func
+      - iface
+      - map
+      - chan
+      - uintptr
+      - unsafeptr
+  errorlint:
+    # Check whether fmt.Errorf uses the %w verb for formatting errors.
+    # See the https://github.com/polyfloyd/go-errorlint for caveats.
+    errorf: true
+    # Permit more than 1 %w verb, valid per Go 1.20 (Requires errorf:true)
+    # Default: true
+    errorf-multi: true
+    # Check for plain type assertions and type switches.
+    # Default: true
+    asserts: true
+    # Check for plain error comparisons.
+    # Default: true
+    comparison: true
+    # Allowed errors.
+    # Default: []
+    allowed-errors:
+      - err: "io.EOF"
+        fun: "example.com/pkg.Read"
+    # Allowed error "wildcards".
+    # Default: []
+    allowed-errors-wildcard:
+      - err: "github.com/west2-online/domtok/pkg/errno"
+        fun: "github.com/west2-online/domtok/pkg/errno"
+  misspell:
+    # Correct spellings using locale preferences for US or UK.
+    # Default is to use a neutral variety of English.
+    # Setting locale to US will correct the British spelling of 'colour' to 'color'.
+    locale: US
+  staticcheck:
+    checks:
+      - all
+      - -SA1019
+  lll:
+    # Max line length, lines longer will be reported.
+    # '\t' is counted as 1 character by default, and can be changed with the tab-width option.
+    # Default: 120.
+    line-length: 160
+    # Tab width in spaces.
+    # Default: 1
+    tab-width: 1
+  mnd:
+    # List of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
+    # Default: ["argument", "case", "condition", "operation", "return", "assign"]
+    checks:
+      - argument
+      - case
+      - condition
+      - operation
+      - return
+      - assign
+    # List of numbers to exclude from analysis.
+    # The numbers should be written as string.
+    # Values always ignored: "1", "1.0", "0" and "0.0"
+    # Default: []
+    ignored-numbers:
+      - '0666'
+      - '0755'
+      - '42'
+    # List of file patterns to exclude from analysis.
+    # Values always ignored: `.+_test.go`
+    # Default: []
+    ignored-files:
+      - 'magic1_.+\.go$'
+    # List of function patterns to exclude from analysis.
+    # Following functions are always ignored: `time.Date`,
+    # `strconv.FormatInt`, `strconv.FormatUint`, `strconv.FormatFloat`,
+    # `strconv.ParseInt`, `strconv.ParseUint`, `strconv.ParseFloat`.
+    # Default: []
+    ignored-functions:
+      - '^math\.'
+      - '^http\.StatusText$'
+  makezero:
+    # Allow only slices initialized with a length of zero.
+    # Default: false
+    always: false
+  nestif:
+    # Minimal complexity of if statements to report.
+    # Default: 5
+    min-complexity: 6
+  tagalign:
+    # Align and sort can be used together or separately.
+    #
+    # Whether enable align. If true, the struct tags will be aligned.
+    # e.g.:
+    # type FooBar struct {
+    #     Bar    string `json:"bar" validate:"required"`
+    #     FooFoo int8   `json:"foo_foo" validate:"required"`
+    # }
+    # will be formatted to:
+    # type FooBar struct {
+    #     Bar    string `json:"bar"     validate:"required"`
+    #     FooFoo int8   `json:"foo_foo" validate:"required"`
+    # }
+    # Default: true.
+    align: true
+    # Whether enable tags sort.
+    # If true, the tags will be sorted by name in ascending order.
+    # e.g.: `xml:"bar" json:"bar" validate:"required"` -> `json:"bar" validate:"required" xml:"bar"`
+    # Default: true
+    sort: true
+    # Specify the order of tags, the other tags will be sorted by name.
+    # This option will be ignored if `sort` is false.
+    # Default: []
+    order:
+      - json
+      - yaml
+      - yml
+      - toml
+      - mapstructure
+      - binding
+      - validate
+    # Whether enable strict style.
+    # In this style, the tags will be sorted and aligned in the dictionary order,
+    # and the tags with the same name will be aligned together.
+    # Note: This option will be ignored if 'align' or 'sort' is false.
+    # Default: false
+    strict: true
+
+linters:
+  fast: false
+  disable-all: true
+  enable:
+    - errcheck # 错误检查
+    - staticcheck # 静态检查
+    - unused # 检查未使用的变量、常量、函数和类型
+    - misspell # 检查常见的拼写错误的英文单词
+    - nolintlint # 报告不正确或不充分的 nolint 指令
+    - goimports # 检查包导入是否按 goimport 命令格式化
+    - nakedret # 检查具有裸返回(func with naked returns)的函数包体是否过大
+    - unconvert # 删除不必要的类型转换
+    - whitespace # 检查不必要的换行符
+    - govet # 与 go vet 大致相同
+    - gosimple # 简化代码
+    - ineffassign # 检测现有变量的赋值何时未被使用
+    - gocritic # 提供诊断功能，检查错误、性能和样式问题
+    - importas # 强制使用一致的包导入别名
+    - gci # 控制包导入顺序
+    - errorlint # 检查错误处理代码合规性
+    - nilerr # 检查当产生错误时仍然返回 nil 的情况
+    - asciicheck # 检查非 ASCII 字符
+    - copyloopvar # 检查循环变量是否在闭包中被复制
+    - decorder # 检查类型、常量、变量和函数的声明顺序和数量
+    - forcetypeassert # 查找强制类型断言
+    - lll # 检查行的长度
+    - mnd # 检查魔数，魔数应该尽量放置在常量中
+    - inamedparam # 检查函数参数的命名
+    - makezero # 检查是否存在非零长初始化的切片
+    - mirror # 报告 bytes/strings 的错误 mirror 用法
+    - nestif # 检查是否存在深度嵌套的 if
+    - tagalign # 检查结构体标签是否对齐，支持自动修正
