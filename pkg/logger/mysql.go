@@ -26,7 +26,7 @@ import (
 
 type MysqlLogger struct{}
 
-func (l *MysqlLogger) Printf(template string, args ...interface{}) {
+func (l *MysqlLogger) Printf(template string, args ...any) {
 	control.info(fmt.Sprintf(template, args...), zap.String(constants.SourceKey, constants.MysqlSource))
 }
 

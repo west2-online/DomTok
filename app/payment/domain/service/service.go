@@ -89,7 +89,7 @@ func (svc *PaymentService) GeneratePaymentToken(ctx context.Context, orderID int
 
 	// 3. 计算 HMAC-SHA256 哈希
 	h := hmac.New(sha256.New, secretKey)
-	_, err = h.Write([]byte(fmt.Sprintf("%d:%d", orderID, expirationTime)))
+	_, err = h.Write(fmt.Appendf(nil, "%d:%d", orderID, expirationTime))
 	if err != nil {
 		return "", 0, fmt.Errorf("failed to generate payment HMAC token: %w", err)
 	}

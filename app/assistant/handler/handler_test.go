@@ -42,7 +42,7 @@ func EntryPointNormalize() {
 func CatchErrInRequestCtx() error {
 	errChan := make(chan error)
 	var err error
-	Mock((*app.RequestContext).JSON).To(func(code int, obj interface{}) {
+	Mock((*app.RequestContext).JSON).To(func(code int, obj any) {
 		if err, ok := obj.(error); ok {
 			errChan <- err
 		}

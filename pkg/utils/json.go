@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 )
 
-func JSONEncode(v interface{}) (string, error) {
+func JSONEncode(v any) (string, error) {
 	data, err := json.Marshal(v)
 	if err != nil {
 		return "", err

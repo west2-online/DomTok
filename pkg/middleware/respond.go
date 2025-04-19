@@ -29,7 +29,7 @@ import (
 )
 
 type response interface {
-	GetResult() interface{}
+	GetResult() any
 	IsSetSuccess() bool
 }
 
@@ -49,7 +49,7 @@ type baser interface {
 //  3. 尝试判断 err 是否为 errno, 如果是的话说明这是一个可控的 error, 我们对外部返回 nil 即可
 func Respond() endpoint.Middleware {
 	return func(next endpoint.Endpoint) endpoint.Endpoint {
-		return func(ctx context.Context, req, resp interface{}) error {
+		return func(ctx context.Context, req, resp any) error {
 			err := next(ctx, req, resp)
 
 			packResp, ok := resp.(response)

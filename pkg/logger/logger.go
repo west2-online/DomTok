@@ -155,7 +155,7 @@ func (l *controlLogger) debug(msg string, fields ...zap.Field) {
 	l.logger.Debug(msg, fields...)
 }
 
-func (l *controlLogger) debugf(template string, args ...interface{}) {
+func (l *controlLogger) debugf(template string, args ...any) {
 	l.mu.RLock()
 	defer l.mu.RUnlock()
 	l.logger.Info(fmt.Sprintf(template, args...))
@@ -167,7 +167,7 @@ func (l *controlLogger) info(msg string, fields ...zap.Field) {
 	l.logger.Info(msg, fields...)
 }
 
-func (l *controlLogger) infof(template string, args ...interface{}) {
+func (l *controlLogger) infof(template string, args ...any) {
 	l.mu.RLock()
 	defer l.mu.RUnlock()
 	l.logger.Info(fmt.Sprintf(template, args...))
@@ -179,7 +179,7 @@ func (l *controlLogger) warn(msg string, fields ...zap.Field) {
 	l.logger.Warn(msg, fields...)
 }
 
-func (l *controlLogger) warnf(template string, args ...interface{}) {
+func (l *controlLogger) warnf(template string, args ...any) {
 	l.mu.RLock()
 	defer l.mu.RUnlock()
 	l.logger.Warn(fmt.Sprintf(template, args...))
@@ -191,7 +191,7 @@ func (l *controlLogger) error(msg string, fields ...zap.Field) {
 	l.logger.Error(msg, fields...)
 }
 
-func (l *controlLogger) errorf(template string, args ...interface{}) {
+func (l *controlLogger) errorf(template string, args ...any) {
 	l.mu.RLock()
 	defer l.mu.RUnlock()
 	l.logger.Error(fmt.Sprintf(template, args...))
@@ -203,7 +203,7 @@ func (l *controlLogger) fatal(msg string, fields ...zap.Field) {
 	l.logger.Fatal(msg, fields...)
 }
 
-func (l *controlLogger) fatalf(template string, args ...interface{}) {
+func (l *controlLogger) fatalf(template string, args ...any) {
 	l.mu.RLock()
 	defer l.mu.RUnlock()
 	l.logger.Fatal(fmt.Sprintf(template, args...))

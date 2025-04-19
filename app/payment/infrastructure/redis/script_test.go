@@ -74,7 +74,7 @@ func TestPaymentRedis_ExecScript(t *testing.T) {
 	mockey.PatchConvey("ExecScript", t, func() {
 		res, err := _cli.execScript(context.Background(), CheckAndDelScript, []string{"key"}, "value")
 		convey.So(err, convey.ShouldBeNil)
-		convey.So(res, convey.ShouldResemble, []interface{}{"key", "value"})
+		convey.So(res, convey.ShouldResemble, []any{"key", "value"})
 	})
 
 	err = _cli.client.ScriptFlush(context.Background()).Err()

@@ -116,7 +116,7 @@ func TestOrder_Locker(t *testing.T) {
 					getLock.Add(1)
 					_ = l.UnlockOrder(id + index)
 				}
-				for i := 0; i < times; i++ {
+				for i := range times {
 					go fn(id, int64(i))
 				}
 				wg.Wait()

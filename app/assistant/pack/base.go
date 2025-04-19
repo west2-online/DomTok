@@ -43,7 +43,7 @@ const (
 	OpContentOpen  = "open"
 )
 
-func (_ResponseFactory) ConnectSuccess(extra interface{}) []byte {
+func (_ResponseFactory) ConnectSuccess(extra any) []byte {
 	resp := model.NewResponse()
 	resp.SetMeta(MetaType, MetaTypePing)
 	resp.SetMeta(MetaExtra, extra)
@@ -60,7 +60,7 @@ func (_ResponseFactory) Error(err error) []byte {
 }
 
 // Command returns a response with a command.
-func (_ResponseFactory) Command(params interface{}) []byte {
+func (_ResponseFactory) Command(params any) []byte {
 	resp := model.NewResponse()
 	resp.SetMeta(MetaType, MetaTypeCommand)
 	resp.SetData(params)
@@ -68,7 +68,7 @@ func (_ResponseFactory) Command(params interface{}) []byte {
 }
 
 // Message returns a response with a message.
-func (_ResponseFactory) Message(params interface{}) []byte {
+func (_ResponseFactory) Message(params any) []byte {
 	resp := model.NewResponse()
 	resp.SetMeta(MetaType, MetaTypeMessage)
 	resp.SetData(params)

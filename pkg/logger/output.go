@@ -29,7 +29,7 @@ func Debug(msg string, fields ...zap.Field) {
 	control.debug(msg, fields...)
 }
 
-func Debugf(template string, args ...interface{}) {
+func Debugf(template string, args ...any) {
 	control.debugf(template, args...)
 }
 
@@ -37,7 +37,7 @@ func Info(msg string, fields ...zap.Field) {
 	control.info(msg, fields...)
 }
 
-func Infof(template string, args ...interface{}) {
+func Infof(template string, args ...any) {
 	control.infof(template, args...)
 }
 
@@ -45,7 +45,7 @@ func Warn(msg string, fields ...zap.Field) {
 	control.warn(msg, fields...)
 }
 
-func Warnf(template string, args ...interface{}) {
+func Warnf(template string, args ...any) {
 	control.warnf(template, args...)
 }
 
@@ -53,7 +53,7 @@ func Error(msg string, fields ...zap.Field) {
 	control.error(msg, fields...)
 }
 
-func Errorf(template string, args ...interface{}) {
+func Errorf(template string, args ...any) {
 	control.errorf(template, args...)
 }
 
@@ -61,7 +61,7 @@ func Fatal(msg string, fields ...zap.Field) {
 	control.fatal(msg, fields...)
 }
 
-func Fatalf(template string, args ...interface{}) {
+func Fatalf(template string, args ...any) {
 	control.fatalf(template, args...)
 }
 

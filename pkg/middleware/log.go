@@ -39,7 +39,7 @@ import (
 //  3. 如果不是 errno, 说明这是一个不可控的 error, 但这里不对他进行处理, 打印返回即可
 func ErrorLog() endpoint.Middleware {
 	return func(next endpoint.Endpoint) endpoint.Endpoint {
-		return func(ctx context.Context, req, resp interface{}) error {
+		return func(ctx context.Context, req, resp any) error {
 			err := next(ctx, req, resp) // next 就是继续往深处去, 一直到处理我们的业务请求
 			if err == nil {
 				return nil

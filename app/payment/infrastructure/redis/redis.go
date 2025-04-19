@@ -39,7 +39,7 @@ func NewPaymentRedis(client *redis.Client) repository.PaymentRedis {
 	return &cli
 }
 
-func (p *paymentRedis) SetPaymentToken(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
+func (p *paymentRedis) SetPaymentToken(ctx context.Context, key string, value any, expiration time.Duration) error {
 	return p.client.Set(ctx, key, value, expiration).Err()
 }
 
@@ -100,7 +100,7 @@ func (p *paymentRedis) GetTTLAndDelPaymentToken(ctx context.Context, key string,
 	if err != nil {
 		return false, -1, errno.Errorf(errno.InternalRedisErrorCode, "failed to get ttl and delete refund token: %v", err)
 	}
-	res, ok := result.([]interface{})
+	res, ok := result.([]any)
 	if !ok || len(res) != 2 {
 		return false, -1, errno.Errorf(errno.InternalRedisErrorCode, "failed to convert result to [2]interface{}")
 	}

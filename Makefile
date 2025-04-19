@@ -197,7 +197,7 @@ vet:
 # 代码格式校验
 .PHONY: lint
 lint:
-	golangci-lint run --config=./.golangci.yml --tests --allow-parallel-runners --sort-results --show-stats --print-resources-usage
+	golangci-lint run --config=./.golangci.yml --tests --allow-parallel-runners --show-stats --print-resources-usage
 
 # 检查依赖漏洞
 .PHONY: vulncheck

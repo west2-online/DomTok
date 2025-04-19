@@ -350,7 +350,7 @@ func TestOrderDB_GetOrdersByUserID(t *testing.T) {
 			So(err, ShouldBeNil)
 		}
 
-		for i := 0; i < 3; i++ {
+		for range 3 {
 			order := buildTestModelOrder(t)
 			order.Uid = 1 // 设置相同的用户ID
 			orderGoods := buildTestModelOrderGoods(t, order.Id)

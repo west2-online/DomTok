@@ -221,7 +221,7 @@ func TestClient_BuildChatModel(t *testing.T) {
 
 func IsDialogExist(cli *Client, dialog *model.Dialog) bool {
 	exist := false
-	cli.recorder.Range(func(key, value interface{}) bool {
+	cli.recorder.Range(func(key, value any) bool {
 		if key == dialog.Unique() {
 			exist = true
 		}

@@ -17,6 +17,7 @@ limitations under the License.
 package model
 
 import (
+	"slices"
 	"sort"
 	"time"
 )
@@ -87,7 +88,7 @@ func (cart *CartJson) InsertSku(info *GoodInfo) {
 		}
 
 		// 删除旧位置
-		cart.Store = append(cart.Store[:index], cart.Store[index+1:]...)
+		cart.Store = slices.Delete(cart.Store, index, index+1)
 		// 插到最前面
 		cart.Store = append([]Store{store}, cart.Store...)
 	} else {
@@ -138,7 +139,7 @@ func (cart *CartJson) DeleteSku(info *GoodInfo) {
 				store.Goods[skuIndex].Count -= info.Count
 			} else {
 				// 删除 sku
-				store.Goods = append(store.Goods[:skuIndex], store.Goods[skuIndex+1:]...)
+				store.Goods = slices.Delete(store.Goods, skuIndex, skuIndex+1)
 			}
 		}
 	}
@@ -147,10 +148,10 @@ func (cart *CartJson) DeleteSku(info *GoodInfo) {
 		store := cart.Store[index]
 		// 如果该商店的商品列表为空，则删除整个商店
 		if len(store.Goods) == 0 {
-			cart.Store = append(cart.Store[:index], cart.Store[index+1:]...)
+			cart.Store = slices.Delete(cart.Store, index, index+1)
 		} else {
 			// 更新商店顺序
-			cart.Store = append(cart.Store[:index], cart.Store[index+1:]...)
+			cart.Store = slices.Delete(cart.Store, index, index+1)
 			cart.Store = append([]Store{store}, cart.Store...)
 		}
 	}

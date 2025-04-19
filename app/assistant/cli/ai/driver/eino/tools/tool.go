@@ -76,7 +76,7 @@ func reflectObject(o reflect.StructField) *schema.ParameterInfo {
 		SubParams: make(map[string]*schema.ParameterInfo),
 		Required:  o.Tag.Get(TagRequired) == TagRequiredTrue,
 	}
-	for i := 0; i < o.Type.NumField(); i++ {
+	for i := range o.Type.NumField() {
 		f := o.Type.Field(i)
 		jsonTag := f.Tag.Get(TagJSON)
 		if jsonTag == "" {
@@ -122,7 +122,7 @@ func reflectAny(f reflect.StructField) *schema.ParameterInfo {
 }
 
 // Reflect obj should be a struct instance or a struct pointer(pointer will be dereferenced automatically)
-func Reflect(obj interface{}) *map[string]*schema.ParameterInfo {
+func Reflect(obj any) *map[string]*schema.ParameterInfo {
 	for reflect.TypeOf(obj).Kind() == reflect.Ptr {
 		obj = reflect.ValueOf(obj).Elem().Interface()
 	}
@@ -130,7 +130,7 @@ func Reflect(obj interface{}) *map[string]*schema.ParameterInfo {
 		panic("obj must be a struct instance")
 	}
 	p := make(map[string]*schema.ParameterInfo)
-	for i := 0; i < reflect.TypeOf(obj).NumField(); i++ {
+	for i := range reflect.TypeOf(obj).NumField() {
 		f := reflect.TypeOf(obj).Field(i)
 		jsonTag := f.Tag.Get(TagJSON)
 		if jsonTag == "" {

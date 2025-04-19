@@ -49,7 +49,7 @@ func NewErrNoWithStack(code int64, msg string) ErrNo {
 	}
 }
 
-func Errorf(code int64, template string, args ...interface{}) ErrNo {
+func Errorf(code int64, template string, args ...any) ErrNo {
 	return ErrNo{
 		ErrorCode: code,
 		ErrorMsg:  fmt.Sprintf(template, args...),

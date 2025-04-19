@@ -22,34 +22,34 @@ import (
 
 // Response is a struct that represents the response of the websocket.
 type Response struct {
-	Meta map[string]interface{} `json:"meta" form:"meta" query:"meta"`
-	Data interface{}            `json:"data" form:"data" query:"data"`
+	Meta map[string]any `json:"meta" form:"meta" query:"meta"`
+	Data any            `json:"data" form:"data" query:"data"`
 }
 
 // NewResponse creates a new Response.
 func NewResponse() *Response {
 	return &Response{
-		Meta: make(map[string]interface{}),
+		Meta: make(map[string]any),
 	}
 }
 
 // SetMeta sets the value of the meta field.
-func (r *Response) SetMeta(key string, value interface{}) {
+func (r *Response) SetMeta(key string, value any) {
 	r.Meta[key] = value
 }
 
 // SetData sets the value of the data field.
-func (r *Response) SetData(value interface{}) {
+func (r *Response) SetData(value any) {
 	r.Data = value
 }
 
 // GetMeta returns the value of the meta field.
-func (r *Response) GetMeta(key string) interface{} {
+func (r *Response) GetMeta(key string) any {
 	return r.Meta[key]
 }
 
 // GetData returns the value of the data field.
-func (r *Response) GetData() interface{} {
+func (r *Response) GetData() any {
 	return r.Data
 }
 
@@ -62,7 +62,7 @@ func (r *Response) Marshal() ([]byte, error) {
 func (r *Response) MustMarshal() []byte {
 	// prevent nil pointer dereference
 	if r.Meta == nil {
-		r.Meta = make(map[string]interface{})
+		r.Meta = make(map[string]any)
 	}
 	// prevent nil pointer dereference
 	if r.Data == nil {

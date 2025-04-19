@@ -160,7 +160,7 @@ func (db *orderDB) UpdateOrderStatus(ctx context.Context, orderID int64, status 
 // UpdateOrderAddress 更新订单地址
 func (db *orderDB) UpdateOrderAddress(ctx context.Context, orderID int64, addressID int64, addressInfo string) error {
 	if err := db.client.WithContext(ctx).Model(&Order{Id: orderID}).
-		Updates(map[string]interface{}{
+		Updates(map[string]any{
 			"address_id":   addressID,
 			"address_info": addressInfo,
 		}).Error; err != nil {
@@ -212,7 +212,7 @@ func (db *orderDB) GetOrderAndGoods(ctx context.Context, orderID int64) (*model.
 
 func (db *orderDB) UpdatePaymentStatus(ctx context.Context, message *model.PaymentResult) error {
 	if err := db.client.WithContext(ctx).Model(&Order{Id: message.OrderID}).
-		Updates(map[string]interface{}{
+		Updates(map[string]any{
 			"status":         message.PaymentStatus,
 			"payment_status": message.PaymentStatus,
 			"payment_at":     message.PaymentAt,

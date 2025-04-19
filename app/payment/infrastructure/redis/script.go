@@ -71,7 +71,7 @@ func (p *paymentRedis) loadScript() (err error) {
 }
 
 // execScript 执行脚本
-func (p *paymentRedis) execScript(ctx context.Context, k ScriptKey, keys []string, args ...interface{}) (interface{}, error) {
+func (p *paymentRedis) execScript(ctx context.Context, k ScriptKey, keys []string, args ...any) (any, error) {
 	script := scripts[k]
 	return p.client.EvalSha(ctx, script.Hash, keys, args...).Result()
 }

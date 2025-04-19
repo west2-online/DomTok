@@ -71,7 +71,7 @@ func (svc *CommodityService) CalculateWithCoupon(ctx context.Context, goods []*m
 
 	// 直接在原切片上通过双指针修改，减少内存开销
 	validPointer := 0
-	for i := 0; i < len(couponList); i++ {
+	for i := range couponList {
 		if time.Now().Before(couponList[i].ExpireTime) {
 			couponList[validPointer] = couponList[i]
 			validPointer++

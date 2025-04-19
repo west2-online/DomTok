@@ -61,7 +61,7 @@ func TestCommodityDB_Spu(t *testing.T) {
 
 	spuInfo := buildTestSpu(t, uid)
 	imgs := make([]*model.SpuImage, 10)
-	for i := 0; i < len(imgs); i++ {
+	for i := range imgs {
 		imgs[i] = buildTestSpuImage(t, spuInfo.SpuId)
 	}
 
@@ -70,7 +70,7 @@ func TestCommodityDB_Spu(t *testing.T) {
 			err := _db.CreateSpu(ctx, spuInfo)
 			So(err, ShouldBeNil)
 
-			for i := 0; i < len(imgs); i++ {
+			for i := range imgs {
 				err = _db.CreateSpuImage(ctx, imgs[i])
 				So(err, ShouldBeNil)
 			}
@@ -85,7 +85,7 @@ func TestCommodityDB_Spu(t *testing.T) {
 			So(err, ShouldBeNil)
 			matchTestSpu(t, ret, spuInfo)
 
-			for i := 0; i < len(imgs); i++ {
+			for i := range imgs {
 				img, err := _db.GetSpuImage(ctx, imgs[i].ImageID)
 				So(err, ShouldBeNil)
 				matchTestSpuImage(t, img, imgs[i])

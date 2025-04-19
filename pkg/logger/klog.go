@@ -33,87 +33,87 @@ func GetKlogLogger() *KlogLogger {
 	return &KlogLogger{}
 }
 
-func (l *KlogLogger) Trace(v ...interface{}) {
+func (l *KlogLogger) Trace(v ...any) {
 	control.debug(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) Debug(v ...interface{}) {
+func (l *KlogLogger) Debug(v ...any) {
 	control.debug(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) Info(v ...interface{}) {
+func (l *KlogLogger) Info(v ...any) {
 	control.info(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) Notice(v ...interface{}) {
+func (l *KlogLogger) Notice(v ...any) {
 	control.info(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) Warn(v ...interface{}) {
+func (l *KlogLogger) Warn(v ...any) {
 	control.warn(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) Error(v ...interface{}) {
+func (l *KlogLogger) Error(v ...any) {
 	control.error(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) Fatal(v ...interface{}) {
+func (l *KlogLogger) Fatal(v ...any) {
 	control.fatal(fmt.Sprint(v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) Tracef(format string, v ...interface{}) {
+func (l *KlogLogger) Tracef(format string, v ...any) {
 	control.debug(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) Debugf(format string, v ...interface{}) {
+func (l *KlogLogger) Debugf(format string, v ...any) {
 	control.debug(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) Infof(format string, v ...interface{}) {
+func (l *KlogLogger) Infof(format string, v ...any) {
 	control.info(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) Noticef(format string, v ...interface{}) {
+func (l *KlogLogger) Noticef(format string, v ...any) {
 	control.info(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) Warnf(format string, v ...interface{}) {
+func (l *KlogLogger) Warnf(format string, v ...any) {
 	control.warn(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) Errorf(format string, v ...interface{}) {
+func (l *KlogLogger) Errorf(format string, v ...any) {
 	control.error(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) Fatalf(format string, v ...interface{}) {
+func (l *KlogLogger) Fatalf(format string, v ...any) {
 	control.fatal(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) CtxTracef(ctx context.Context, format string, v ...interface{}) {
+func (l *KlogLogger) CtxTracef(ctx context.Context, format string, v ...any) {
 	control.debug(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) CtxDebugf(ctx context.Context, format string, v ...interface{}) {
+func (l *KlogLogger) CtxDebugf(ctx context.Context, format string, v ...any) {
 	control.debug(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) CtxInfof(ctx context.Context, format string, v ...interface{}) {
+func (l *KlogLogger) CtxInfof(ctx context.Context, format string, v ...any) {
 	control.info(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) CtxNoticef(ctx context.Context, format string, v ...interface{}) {
+func (l *KlogLogger) CtxNoticef(ctx context.Context, format string, v ...any) {
 	control.info(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) CtxWarnf(ctx context.Context, format string, v ...interface{}) {
+func (l *KlogLogger) CtxWarnf(ctx context.Context, format string, v ...any) {
 	control.warn(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) CtxErrorf(ctx context.Context, format string, v ...interface{}) {
+func (l *KlogLogger) CtxErrorf(ctx context.Context, format string, v ...any) {
 	control.error(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 
-func (l *KlogLogger) CtxFatalf(ctx context.Context, format string, v ...interface{}) {
+func (l *KlogLogger) CtxFatalf(ctx context.Context, format string, v ...any) {
 	control.fatal(fmt.Sprintf(format, v...), zap.String(constants.SourceKey, constants.KlogSource))
 }
 

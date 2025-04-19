@@ -23,7 +23,7 @@ import (
 
 func UriEncode(uri string) string {
 	uris := strings.Split(uri, "/")
-	for i := 0; i < len(uris); i++ {
+	for i := range uris {
 		uris[i] = url.PathEscape(uris[i])
 	}
 	return strings.Join(uris, "/")

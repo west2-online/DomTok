@@ -46,7 +46,7 @@ func TestCore_Accept(t *testing.T) {
 			msgChan <- Message{t, msg}
 			return nil
 		}).Build()
-		Mock((*sync.Map).Delete).To(func(key interface{}) {
+		Mock((*sync.Map).Delete).To(func(key any) {
 			delChan <- key.(string) //nolint:forcetypeassert
 		}).Build()
 		Mock(handleTextMessage).Return(successErr).Build()

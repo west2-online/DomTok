@@ -52,7 +52,7 @@ func (c CommodityHandler) CreateSpuImage(streamServer commodity.CommodityService
 		return streamServer.SendAndClose(resp)
 	}
 
-	for i := 0; i < int(req.BufferCount); i++ {
+	for range int(req.BufferCount) {
 		data, err := streamServer.Recv()
 		if err != nil {
 			resp.Base = base.BuildBaseResp(err)
@@ -83,7 +83,7 @@ func (c CommodityHandler) UpdateSpuImage(streamServer commodity.CommodityService
 		return streamServer.SendAndClose(resp)
 	}
 
-	for i := 0; i < int(req.BufferCount); i++ {
+	for range int(req.BufferCount) {
 		data, err := streamServer.Recv()
 		if err != nil {
 			resp.Base = base.BuildBaseResp(err)
@@ -217,7 +217,7 @@ func (c CommodityHandler) CreateSpu(streamServer commodity.CommodityService_Crea
 		return streamServer.SendAndClose(resp)
 	}
 
-	for i := 0; i < int(req.BufferCount); i++ {
+	for range int(req.BufferCount) {
 		fileData, err := streamServer.Recv()
 		if err != nil {
 			resp.Base = base.BuildBaseResp(err)
@@ -254,7 +254,7 @@ func (c CommodityHandler) UpdateSpu(streamServer commodity.CommodityService_Upda
 		return streamServer.SendAndClose(resp)
 	}
 
-	for i := 0; i < int(*req.BufferCount); i++ {
+	for range int(*req.BufferCount) {
 		fileData, err := streamServer.Recv()
 		if err != nil {
 			resp.Base = base.BuildBaseResp(err)
@@ -330,7 +330,7 @@ func (c CommodityHandler) CreateSku(streamServer commodity.CommodityService_Crea
 		return streamServer.SendAndClose(r)
 	}
 
-	for i := 0; i < int(req.BufferCount); i++ {
+	for range int(req.BufferCount) {
 		fileData, err := streamServer.Recv()
 		if err != nil {
 			r.Base = base.BuildBaseResp(err)
@@ -367,7 +367,7 @@ func (c CommodityHandler) UpdateSku(streamServer commodity.CommodityService_Upda
 		return streamServer.SendAndClose(r)
 	}
 
-	for i := 0; i < int(*req.BufferCount); i++ {
+	for range int(*req.BufferCount) {
 		fileData, err := streamServer.Recv()
 		if err != nil {
 			r.Base = base.BuildBaseResp(err)
@@ -496,7 +496,7 @@ func (c CommodityHandler) CreateSkuImage(streamServer commodity.CommodityService
 		return streamServer.SendAndClose(resp)
 	}
 
-	for i := 0; i < int(req.BufferCount); i++ {
+	for range int(req.BufferCount) {
 		data, err := streamServer.Recv()
 		if err != nil {
 			resp.Base = base.BuildBaseResp(err)
@@ -525,7 +525,7 @@ func (c CommodityHandler) UpdateSkuImage(streamServer commodity.CommodityService
 		return streamServer.SendAndClose(resp)
 	}
 
-	for i := 0; i < int(req.BufferCount); i++ {
+	for range int(req.BufferCount) {
 		data, err := streamServer.Recv()
 		if err != nil {
 			resp.Base = base.BuildBaseResp(err)
