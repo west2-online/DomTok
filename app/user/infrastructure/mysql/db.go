@@ -114,6 +114,7 @@ func (db *userDB) GetAddressInfo(ctx context.Context, addressID int64) (*model.A
 
 	resp := &model.Address{
 		AddressID: address.ID,
+		Uid:       address.UserID,
 		Province:  address.Province,
 		City:      address.City,
 		Detail:    address.Detail,
@@ -124,6 +125,7 @@ func (db *userDB) GetAddressInfo(ctx context.Context, addressID int64) (*model.A
 
 func (db *userDB) CreateAddress(ctx context.Context, address *model.Address) (int64, error) {
 	addr := Address{
+		UserID:   address.Uid,
 		Province: address.Province,
 		City:     address.City,
 		Detail:   address.Detail,
@@ -134,6 +136,34 @@ func (db *userDB) CreateAddress(ctx context.Context, address *model.Address) (in
 	}
 
 	return addr.ID, nil
+}
+
+func (db *userDB) DeleteAddress(ctx context.Context, addressID int64) error {
+	if err := db.client.WithContext(ctx).Table(Address{}.TableName()).Where("id = ?", addressID).Delete(&Address{}).Error; err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to delete address: %v", err)
+	}
+	return nil
+}
+
+func (db *userDB) ListAddress(ctx context.Context, uid int64, pageNum, pageSize int) ([]*model.Address, error) {
+	var addresses []Address
+	offset := (pageNum - 1) * pageSize
+	err := db.client.WithContext(ctx).Table(Address{}.TableName()).Where("user_id = ?", uid).Offset(offset).Limit(pageSize).Find(&addresses).Error
+	if err != nil {
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to list address: %v", err)
+	}
+
+	var result []*model.Address
+	for _, addr := range addresses {
+		result = append(result, &model.Address{
+			AddressID: addr.ID,
+			Uid:       addr.UserID,
+			Province:  addr.Province,
+			City:      addr.City,
+			Detail:    addr.Detail,
+		})
+	}
+	return result, nil
 }
 
 func (db *userDB) UpdateUser(ctx context.Context, user *model.User) error {

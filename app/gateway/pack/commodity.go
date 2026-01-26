@@ -24,7 +24,7 @@ import (
 	modelKitex "github.com/west2-online/DomTok/kitex_gen/model"
 	"github.com/west2-online/DomTok/pkg/base"
 	"github.com/west2-online/DomTok/pkg/errno"
-	"github.com/west2-online/DomTok/pkg/upyun"
+	"github.com/west2-online/DomTok/pkg/tos"
 )
 
 func BuildFileDataBytes(file *multipart.FileHeader) ([]byte, error) {
@@ -45,7 +45,7 @@ func BuildSpuImage(img *modelKitex.SpuImage) *model.SpuImage {
 	return &model.SpuImage{
 		ImageID:   img.ImageID,
 		SpuID:     img.SpuID,
-		URL:       upyun.GetImageUrl(img.Url),
+		URL:       tos.MustSignedURL(img.Url),
 		CreatedAt: img.CreatedAt,
 		UpdatedAt: img.UpdatedAt,
 	}

@@ -25,12 +25,13 @@ import (
 	"github.com/bytedance/sonic"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/west2-online/DomTok/pkg/tos"
+
 	"github.com/west2-online/DomTok/app/commodity/domain/model"
 	contextLogin "github.com/west2-online/DomTok/pkg/base/context"
 	"github.com/west2-online/DomTok/pkg/constants"
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
-	"github.com/west2-online/DomTok/pkg/upyun"
 	"github.com/west2-online/DomTok/pkg/utils"
 )
 
@@ -41,7 +42,7 @@ func (svc *CommodityService) nextID() int64 {
 
 func (svc *CommodityService) CreateSpu(ctx context.Context, spu *model.Spu) (int64, error) {
 	spu.SpuId = svc.nextID()
-	spu.GoodsHeadDrawingUrl = utils.GenerateFileName(constants.SpuDirDest, spu.SpuId)
+	spu.GoodsHeadDrawingUrl = utils.GenerateTosFilePath(constants.SpuDirDest, spu.SpuId)
 	var eg errgroup.Group
 
 	eg.Go(func() error {
@@ -52,7 +53,7 @@ func (svc *CommodityService) CreateSpu(ctx context.Context, spu *model.Spu) (int
 	})
 
 	eg.Go(func() error {
-		if err := upyun.UploadImg(spu.GoodsHeadDrawing, spu.GoodsHeadDrawingUrl); err != nil {
+		if err := tos.UploadImage(ctx, spu.GoodsHeadDrawing, spu.GoodsHeadDrawingUrl); err != nil {
 			return fmt.Errorf("service.CreateSpu: upload image failed: %w", err)
 		}
 		return nil
@@ -74,12 +75,12 @@ func (svc *CommodityService) CreateSpu(ctx context.Context, spu *model.Spu) (int
 
 func (svc *CommodityService) CreateSpuImage(ctx context.Context, spuImage *model.SpuImage) (int64, error) {
 	spuImage.ImageID = svc.nextID()
-	spuImage.Url = utils.GenerateFileName(constants.SpuImageDirDest, spuImage.SpuID)
+	spuImage.Url = utils.GenerateTosFilePath(constants.SpuImageDirDest, spuImage.SpuID)
 
 	var eg errgroup.Group
 
 	eg.Go(func() error {
-		if err := upyun.UploadImg(spuImage.Data, spuImage.Url); err != nil {
+		if err := tos.UploadImage(ctx, spuImage.Data, spuImage.Url); err != nil {
 			return fmt.Errorf("service.CreateSpuImage: upload spuImage failed: %w", err)
 		}
 		return nil
@@ -111,7 +112,7 @@ func (svc *CommodityService) UpdateSpuImage(ctx context.Context, spuImage *model
 	})
 
 	eg.Go(func() error {
-		err = upyun.UploadImg(spuImage.Data, spuImage.Url)
+		err = tos.UploadImage(ctx, spuImage.Data, spuImage.Url)
 		if err != nil {
 			return fmt.Errorf("service.UpdateSpuImage: upload spuImage failed: %w", err)
 		}
@@ -119,7 +120,7 @@ func (svc *CommodityService) UpdateSpuImage(ctx context.Context, spuImage *model
 	})
 
 	eg.Go(func() error {
-		err = upyun.DeleteImg(originSpuImage.Url)
+		err = tos.DeleteImage(ctx, originSpuImage.Url)
 		if err != nil {
 			return fmt.Errorf("service.UpdateSpuImage: delete spuImage failed: %w", err)
 		}
@@ -151,7 +152,7 @@ func (svc *CommodityService) UpdateSpu(ctx context.Context, spu *model.Spu, orig
 
 	if len(spu.GoodsHeadDrawing) > 0 {
 		eg.Go(func() error {
-			err := upyun.UploadImg(spu.GoodsHeadDrawing, spu.GoodsHeadDrawingUrl)
+			err := tos.UploadImage(ctx, spu.GoodsHeadDrawing, spu.GoodsHeadDrawingUrl)
 			if err != nil {
 				return fmt.Errorf("service.UpdateSpu: upload spuImage failed: %w", err)
 			}
@@ -159,7 +160,7 @@ func (svc *CommodityService) UpdateSpu(ctx context.Context, spu *model.Spu, orig
 		})
 
 		eg.Go(func() error {
-			err := upyun.DeleteImg(originSpu.GoodsHeadDrawingUrl)
+			err := tos.DeleteImage(ctx, originSpu.GoodsHeadDrawingUrl)
 			if err != nil {
 				return fmt.Errorf("service.UpdateSpu: delete spuImage failed: %w", err)
 			}
@@ -182,7 +183,7 @@ func (svc *CommodityService) DeleteSpuImage(ctx context.Context, imageId int64, 
 	})
 
 	eg.Go(func() error {
-		if err := upyun.DeleteImg(url); err != nil {
+		if err := tos.DeleteImage(ctx, url); err != nil {
 			return fmt.Errorf("service.DeleteSpuImage: delete spuImage failed: %w", err)
 		}
 		return nil
@@ -203,7 +204,7 @@ func (svc *CommodityService) DeleteSpu(ctx context.Context, spuId int64, url str
 	})
 
 	eg.Go(func() error {
-		if err := upyun.DeleteImg(url); err != nil {
+		if err := tos.DeleteImage(ctx, url); err != nil {
 			return fmt.Errorf("service.DeleteSpu: delete spuImage failed: %w", err)
 		}
 		return nil
@@ -237,7 +238,7 @@ func (svc *CommodityService) DeleteAllSpuImages(ctx context.Context, spuId int64
 
 	for i := 0; i < len(ids); i++ {
 		eg.Go(func() error {
-			if err = upyun.DeleteImg(urls[i]); err != nil {
+			if err = tos.DeleteImage(ctx, urls[i]); err != nil {
 				return fmt.Errorf("service.DeleteAllSpuImages: delete spuImages failed: %w", err)
 			}
 			return nil
@@ -615,7 +616,7 @@ func (svc *CommodityService) DecrStockInNX(ctx context.Context, infos []*model.S
 func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku, ext string) (*model.Sku, error) {
 	sku.SkuID = svc.nextID()
 	sku.HistoryID = svc.nextID()
-	sku.StyleHeadDrawingUrl = utils.GenerateFileName(constants.SkuDirDest, sku.SkuID) + ext
+	sku.StyleHeadDrawingUrl = utils.GenerateTosFilePath(constants.SkuDirDest, sku.SkuID)
 	var eg errgroup.Group
 	eg.Go(func() error {
 		if err := svc.db.CreateSku(ctx, sku); err != nil {
@@ -626,8 +627,8 @@ func (svc *CommodityService) CreateSku(ctx context.Context, sku *model.Sku, ext 
 	})
 
 	eg.Go(func() error {
-		if err := upyun.UploadImg(sku.StyleHeadDrawing, sku.StyleHeadDrawingUrl); err != nil {
-			return fmt.Errorf("service.UploadImg: upload image failed: %w", err)
+		if err := tos.UploadImage(ctx, sku.StyleHeadDrawing, sku.StyleHeadDrawingUrl); err != nil {
+			return fmt.Errorf("service.CreateSku: upload image failed: %w", err)
 		}
 		return nil
 	})
@@ -653,7 +654,7 @@ func (svc *CommodityService) UpdateSku(ctx context.Context, sku *model.Sku, orig
 	if len(sku.StyleHeadDrawing) > 0 {
 		var eg errgroup.Group
 		eg.Go(func() error {
-			err := upyun.DeleteImg(originSpu.StyleHeadDrawingUrl)
+			err := tos.DeleteImage(ctx, originSpu.StyleHeadDrawingUrl)
 			if err != nil {
 				return errno.UpYunFileError.WithMessage(err.Error())
 			}
@@ -661,7 +662,7 @@ func (svc *CommodityService) UpdateSku(ctx context.Context, sku *model.Sku, orig
 		})
 
 		eg.Go(func() error {
-			err := upyun.UploadImg(sku.StyleHeadDrawing, sku.StyleHeadDrawingUrl)
+			err := tos.UploadImage(ctx, sku.StyleHeadDrawing, sku.StyleHeadDrawingUrl)
 			if err != nil {
 				return errno.UpYunFileError.WithMessage(err.Error())
 			}
@@ -686,7 +687,7 @@ func (svc *CommodityService) DeleteSku(ctx context.Context, sku *model.Sku) erro
 		return fmt.Errorf("usecase.DeleteSku failed: %w", err)
 	}
 
-	err = upyun.DeleteImg(sku.StyleHeadDrawingUrl)
+	err = tos.DeleteImage(ctx, sku.StyleHeadDrawingUrl)
 	if err != nil {
 		return errno.UpYunFileError.WithMessage(err.Error())
 	}
@@ -760,11 +761,11 @@ func (svc *CommodityService) ViewSkuPriceHistory(ctx context.Context, s *model.S
 
 func (svc *CommodityService) CreateSkuImage(ctx context.Context, skuImage *model.SkuImage, data []byte) (int64, error) {
 	skuImage.ImageID = svc.nextID()
-	skuImage.Url = utils.GenerateFileName(constants.SkuImageDirDest, skuImage.ImageID)
+	skuImage.Url = utils.GenerateTosFilePath(constants.SkuImageDirDest, skuImage.ImageID)
 	var eg errgroup.Group
 
 	eg.Go(func() error {
-		if err := upyun.UploadImg(data, skuImage.Url); err != nil {
+		if err := tos.UploadImage(ctx, data, skuImage.Url); err != nil {
 			return fmt.Errorf("service.CreateSkuImage: upload skuImage failed: %w", err)
 		}
 		return nil
@@ -788,7 +789,7 @@ func (svc *CommodityService) UpdateSkuImage(ctx context.Context, skuImage *model
 	var eg errgroup.Group
 
 	eg.Go(func() error {
-		err := upyun.DeleteImg(originSkuImages.Url)
+		err := tos.DeleteImage(ctx, originSkuImages.Url)
 		if err != nil {
 			return errno.UpYunFileError.WithMessage(err.Error())
 		}
@@ -796,7 +797,7 @@ func (svc *CommodityService) UpdateSkuImage(ctx context.Context, skuImage *model
 	})
 
 	eg.Go(func() error {
-		err := upyun.UploadImg(data, skuImage.Url)
+		err := tos.UploadImage(ctx, data, skuImage.Url)
 		if err != nil {
 			return errno.UpYunFileError.WithMessage(err.Error())
 		}
@@ -840,7 +841,7 @@ func (svc *CommodityService) DeleteSkuImage(ctx context.Context, imageId int64, 
 		return fmt.Errorf("service.DeleteSkuImage: delete skuImage failed: %w", err)
 	}
 
-	if err := upyun.DeleteImg(url); err != nil {
+	if err := tos.DeleteImage(ctx, url); err != nil {
 		return fmt.Errorf("service.DeleteSkuImage: delete skuImage failed: %w", err)
 	}
 

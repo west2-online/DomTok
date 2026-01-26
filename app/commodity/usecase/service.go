@@ -163,7 +163,7 @@ func (us *useCase) UpdateSpu(ctx context.Context, spu *model.Spu) error {
 	}
 
 	if len(spu.GoodsHeadDrawing) > 0 {
-		spu.GoodsHeadDrawingUrl = utils.GenerateFileName(constants.SpuDirDest, spu.SpuId)
+		spu.GoodsHeadDrawingUrl = utils.GenerateTosFilePath(constants.SpuDirDest, spu.SpuId)
 	}
 
 	if err = us.svc.UpdateSpu(ctx, spu, ret); err != nil {
@@ -183,7 +183,7 @@ func (us *useCase) UpdateSpuImage(ctx context.Context, spuImage *model.SpuImage)
 		return fmt.Errorf("usecase.UpdateSpuImage identify user failed: %w", err)
 	}
 
-	spuImage.Url = utils.GenerateFileName(constants.SpuImageDirDest, img.ImageID)
+	spuImage.Url = utils.GenerateTosFilePath(constants.SpuImageDirDest, img.ImageID)
 	if err = us.svc.UpdateSpuImage(ctx, spuImage, img); err != nil {
 		return fmt.Errorf("usecase.UpdateSpuImage failed: %w", err)
 	}
@@ -296,7 +296,7 @@ func (us *useCase) UpdateSku(ctx context.Context, sku *model.Sku, ext string) (e
 		return fmt.Errorf("service.UpdateSku: %w", err)
 	}
 
-	sku.StyleHeadDrawingUrl = utils.GenerateFileName(constants.SkuDirDest, sku.SkuID) + ext
+	sku.StyleHeadDrawingUrl = utils.GenerateTosFilePath(constants.SkuDirDest, sku.SkuID)
 	if err = us.svc.UpdateSku(ctx, sku, ret); err != nil {
 		return fmt.Errorf("usecase.UpdateSku failed: %w", err)
 	}
@@ -414,7 +414,7 @@ func (us *useCase) UpdateSkuImage(ctx context.Context, skuImage *model.SkuImage,
 		return fmt.Errorf("usecase.UpdateSkuImage failed: %w", err)
 	}
 
-	skuImage.Url = utils.GenerateFileName(constants.SkuImageDirDest, skuImage.ImageID)
+	skuImage.Url = utils.GenerateTosFilePath(constants.SkuImageDirDest, skuImage.ImageID)
 	err = us.svc.UpdateSkuImage(ctx, skuImage, img, data)
 	if err != nil {
 		return fmt.Errorf("usecase.UpdateSkuImage failed: %w", err)

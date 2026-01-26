@@ -35,6 +35,8 @@ type UserUseCase interface {
 	LogoutUser(ctx context.Context) error
 	SetAdministrator(ctx context.Context, uid int64, password []byte, action int) error
 	GetUserInfo(ctx context.Context, uid int64) (*model.User, error)
+	ListAddress(ctx context.Context, pageNum, pageSize int) ([]*model.Address, error)
+	DeleteAddress(ctx context.Context, addressID int64) error
 }
 
 // useCase 实现了 domain.UserUseCase

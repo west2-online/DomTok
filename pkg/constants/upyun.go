@@ -17,9 +17,9 @@ limitations under the License.
 package constants
 
 const (
-	SpuDirDest      = "/spu/"
-	SpuImageDirDest = "/spu_image/"
+	SpuDirDest      = "/spu"
+	SpuImageDirDest = "/spu_image"
 
-	SkuDirDest      = "/sku/"
-	SkuImageDirDest = "/sku_image/"
+	SkuDirDest      = "/sku"
+	SkuImageDirDest = "/sku_image"
 )

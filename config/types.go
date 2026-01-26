@@ -16,7 +16,7 @@ limitations under the License.
 
 package config
 
-type server struct {
+type ServerConfig struct {
 	Secret      string `mapstructure:"private-key"`
 	PublicKey   string `mapstructure:"public-key"`
 	Version     string
@@ -25,17 +25,17 @@ type server struct {
 	IntranetUrl string `mapstructure:"intranet-url"`
 }
 
-type snowflake struct {
+type SnowflakeConfig struct {
 	DatacenterID int64 `mapstructure:"datacenter-id"`
 }
 
-type service struct {
+type ServiceConfig struct {
 	Name     string
 	AddrList []string
 	LB       bool `mapstructure:"load-balance"`
 }
 
-type mySQL struct {
+type MySQLConfig struct {
 	Addr     string
 	Database string
 	Username string
@@ -43,108 +43,80 @@ type mySQL struct {
 	Charset  string
 }
 
-type jaeger struct {
+type JaegerConfig struct {
 	Addr string
 }
 
-type etcd struct {
+type EtcdConfig struct {
 	Addr string
 }
 
-type rabbitMQ struct {
+type RabbitMQConfig struct {
 	Addr     string
 	Username string
 	Password string
 }
 
-type redis struct {
+type RedisConfig struct {
 	Addr     string
 	Password string
 }
 
-type oss struct {
-	Endpoint        string
-	AccessKeyID     string `mapstructure:"accessKey-id"`
-	AccessKeySecret string `mapstructure:"accessKey-secret"`
-	BucketName      string
-	MainDirectory   string `mapstructure:"main-directory"`
-}
-
-type elasticsearch struct {
+type ElasticsearchConfig struct {
 	Addr string
 	Host string
 }
 
-type kafka struct {
+type KafkaConfig struct {
 	Address  string
 	Network  string
 	User     string
 	Password string
 }
 
-type defaultUser struct {
-	Account  string `mapstructure:"account"`
-	Password string `mapstructure:"password"`
-}
-
-type volcengine struct {
+type VolcengineConfig struct {
 	ApiKey  string `mapstructure:"api-key"`
 	BaseUrl string `mapstructure:"base-url"`
 	Region  string `mapstructure:"region"`
 	Model   string `mapstructure:"model"`
 }
 
-/*
-* struct upyun 又拍云配置
-* @Bucket: 存储桶
-* @Opearator: 操作员
-* @Secret: 密码
-* @TokenSecret: 对应又拍云里的SecretAccessKey
-* @TokenTimeout: Token过期时间
-* @UssDomain: 域名
-* @UnCheckedDir: 上传目录
- */
-type upyun struct {
-	Bucket         string
-	Operator       string
-	Password       string
-	TokenSecret    string `mapstructure:"token-secret"`
-	TokenTimeout   int64  `mapstructure:"token-timeout"`
-	UssDomain      string `mapstructure:"uss-domain"`
-	DownloadDomain string `mapstructure:"download-domain"`
-	Path           string
+type TosConfig struct {
+	Bucket    string `mapstructure:"bucket"`
+	Region    string `mapstructure:"region"`
+	Endpoint  string `mapstructure:"endpoint"`
+	AccessKey string `mapstructure:"accessKey"`
+	SecretKey string `mapstructure:"secretKey"`
 }
 
-type rocketmq struct {
+type RocketmqConfig struct {
 	BrokerAddr  string `mapstructure:"brokerAddr"`
 	NameSrvAddr string `mapstructure:"nameSrvAddr"`
 	AccessKey   string `mapstructure:"accessKey"`
 	SecretKey   string `mapstructure:"secretKey"`
 }
 
-type otel struct {
+type OtelConfig struct {
 	CollectorAddr string `mapstructure:"collector-addr"`
 }
 
-type config struct {
-	Server        server
-	Snowflake     snowflake
-	MySQL         mySQL
-	Jaeger        jaeger
-	Etcd          etcd
-	RabbitMQ      rabbitMQ
-	Redis         redis
-	OSS           oss
-	Elasticsearch elasticsearch
-	Kafka         kafka
-	DefaultUser   defaultUser
-	Volcengine    volcengine
-	Upyun         upyun
-	Rocketmq      rocketmq
-	Otel          otel
-	Administrator administrator
+type AdministratorConfig struct {
+	Secret string
 }
 
-type administrator struct {
-	Secret string
+type Config struct {
+	Server        ServerConfig
+	Snowflake     SnowflakeConfig
+	MySQL         MySQLConfig
+	Jaeger        JaegerConfig
+	Etcd          EtcdConfig
+	RabbitMQ      RabbitMQConfig
+	Redis         RedisConfig
+	Elasticsearch ElasticsearchConfig
+	Kafka         KafkaConfig
+	Volcengine    VolcengineConfig
+	Tos           TosConfig
+	Rocketmq      RocketmqConfig
+	Otel          OtelConfig
+	Administrator AdministratorConfig
 }

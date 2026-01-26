@@ -304,7 +304,7 @@ func TestUseCase_UpdateSpu(t *testing.T) {
 			mockey.Mock((*service.CommodityService).IdentifyUserInStreamCtx).Return(tc.MockIdentifyError).Build()
 			mockey.Mock((*service.CommodityService).Verify).Return(tc.MockVerifyError).Build()
 			mockey.Mock((*service.CommodityService).UpdateSpu).Return(tc.MockUpdateError).Build()
-			mockey.Mock(utils.GenerateFileName).Return("").Build()
+			mockey.Mock(utils.GenerateTosFilePath).Return("").Build()
 
 			err := us.UpdateSpu(ctx.Background(), spu)
 			if err != nil {
@@ -368,7 +368,7 @@ func TestUseCase_UpdateSpuImage(t *testing.T) {
 			mockey.Mock((*service.CommodityService).GetSpuFromImageId).Return(tc.MockSpuInfo, tc.MockImageInfo, tc.MockGetSpuError).Build()
 			mockey.Mock((*service.CommodityService).IdentifyUserInStreamCtx).Return(tc.MockIdentifyError).Build()
 			mockey.Mock((*service.CommodityService).UpdateSpuImage).Return(tc.MockUpdateError).Build()
-			mockey.Mock(utils.GenerateFileName).Return("").Build()
+			mockey.Mock(utils.GenerateTosFilePath).Return("").Build()
 			err := us.UpdateSpuImage(ctx.Background(), img)
 			if err != nil {
 				convey.So(err.Error(), convey.ShouldEqual, tc.ExpectedError.Error())

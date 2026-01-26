@@ -50,11 +50,12 @@ func init() {
 		return httpCli
 	})
 	ai.SetBuilder(func(ctx context.Context) (model.ChatModel, error) {
+		c := config.Volcengine
 		return ark.NewChatModel(ctx, &ark.ChatModelConfig{
-			APIKey:  config.Volcengine.ApiKey,
-			BaseURL: config.Volcengine.BaseUrl,
-			Region:  config.Volcengine.Region,
-			Model:   config.Volcengine.Model,
+			APIKey:  c.ApiKey,
+			BaseURL: c.BaseUrl,
+			Region:  c.Region,
+			Model:   c.Model,
 		})
 	})
 

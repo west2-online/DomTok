@@ -85,6 +85,14 @@ func (uc *useCase) AddAddress(ctx context.Context, address *model.Address) (addr
 	return uc.svc.AddAddress(ctx, address)
 }
 
+func (uc *useCase) ListAddress(ctx context.Context, pageNum, pageSize int) ([]*model.Address, error) {
+	return uc.svc.ListAddress(ctx, pageNum, pageSize)
+}
+
+func (uc *useCase) DeleteAddress(ctx context.Context, addressID int64) error {
+	return uc.svc.DeleteAddress(ctx, addressID)
+}
+
 func (uc *useCase) BanUser(ctx context.Context, uid int64) error {
 	return uc.svc.UserBaned(ctx, uid)
 }

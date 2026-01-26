@@ -45,6 +45,24 @@ struct AddAddressResponse {
     2: required i64 addressID,
 }
 
+struct ListAddressRequest {
+    1: required i64 pageNum,
+    2: required i64 pageSize,
+}
+
+struct ListAddressResponse {
+    1: required model.BaseResp base,
+    2: required list<model.AddressInfo> addresses,
+}
+
+struct DeleteAddressRequest {
+    1: required i64 address_id
+}
+
+struct DeleteAddressResponse {
+    1: required model.BaseResp base,
+}
+
 struct BanUserReq {
     1: required i64 uid
 }
@@ -92,6 +110,8 @@ service UserService {
     LoginResponse Login(1: LoginRequest req),
     GetAddressResponse GetAddress(1: GetAddressRequest req),
     AddAddressResponse AddAddress(1: AddAddressRequest req),
+    ListAddressResponse ListAddress(1: ListAddressRequest req),
+    DeleteAddressResponse DeleteAddress(1: DeleteAddressRequest req),
     BanUserResp BanUser(1: BanUserReq req),
     LiftBanUserResp LiftBandUser(1: LiftBanUserReq req) ,
     LogoutResp Logout(1: LogoutReq req),

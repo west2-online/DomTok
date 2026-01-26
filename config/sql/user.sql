@@ -9,3 +9,13 @@ CREATE TABLE `users` (
                         `role` SMALLINT NOT NULL default 0,
                         `phone` VARCHAR(11) NOT NULL COMMENT '手机号'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 地址表
+CREATE TABLE `address` (
+                        `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '地址ID',
+                        `user_id` BIGINT NOT NULL COMMENT '用户ID',
+                        `province` VARCHAR(255) NOT NULL COMMENT '省份',
+                        `city` VARCHAR(255) NOT NULL COMMENT '城市',
+                        `detail` VARCHAR(255) NOT NULL COMMENT '详细地址',
+                        INDEX `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户地址表';

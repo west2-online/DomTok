@@ -98,6 +98,29 @@ func (h *UserHandler) AddAddress(ctx context.Context, req *user.AddAddressReques
 	return
 }
 
+func (h *UserHandler) ListAddress(ctx context.Context, req *user.ListAddressRequest) (r *user.ListAddressResponse, err error) {
+	r = new(user.ListAddressResponse)
+	addresses, err := h.useCase.ListAddress(ctx, int(req.PageNum), int(req.PageSize))
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(nil)
+	r.Addresses = pack.BuildAddresses(addresses)
+	return
+}
+
+func (h *UserHandler) DeleteAddress(ctx context.Context, req *user.DeleteAddressRequest) (r *user.DeleteAddressResponse, err error) {
+	r = new(user.DeleteAddressResponse)
+	err = h.useCase.DeleteAddress(ctx, req.AddressId)
+	if err != nil {
+		r.Base = base.BuildBaseResp(err)
+		return
+	}
+	r.Base = base.BuildBaseResp(nil)
+	return
+}
+
 func (h *UserHandler) BanUser(ctx context.Context, req *user.BanUserReq) (r *user.BanUserResp, err error) {
 	r = new(user.BanUserResp)
 	err = h.useCase.BanUser(ctx, req.Uid)

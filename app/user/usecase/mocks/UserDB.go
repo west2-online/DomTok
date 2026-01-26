@@ -35,6 +35,46 @@ func (_m *UserDB) UpdateUser(ctx context.Context, user *model.User) error {
 	return nil
 }
 
+// DeleteAddress provides a mock function with given fields: ctx, addressID
+func (_m *UserDB) DeleteAddress(ctx context.Context, addressID int64) error {
+	ret := _m.Called(ctx, addressID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64) error); ok {
+		r0 = rf(ctx, addressID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// ListAddress provides a mock function with given fields: ctx, uid, pageNum, pageSize
+func (_m *UserDB) ListAddress(ctx context.Context, uid int64, pageNum int, pageSize int) ([]*model.Address, error) {
+	ret := _m.Called(ctx, uid, pageNum, pageSize)
+
+	var r0 []*model.Address
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64, int, int) ([]*model.Address, error)); ok {
+		return rf(ctx, uid, pageNum, pageSize)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, int64, int, int) []*model.Address); ok {
+		r0 = rf(ctx, uid, pageNum, pageSize)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*model.Address)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, int64, int, int) error); ok {
+		r1 = rf(ctx, uid, pageNum, pageSize)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // CreateAddress provides a mock function with given fields: ctx, address
 func (_m *UserDB) CreateAddress(ctx context.Context, address *model.Address) (int64, error) {
 	ret := _m.Called(ctx, address)

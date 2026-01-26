@@ -41,3 +41,14 @@ func BuildAddress(address *domainModel.Address) *model.AddressInfo {
 		Detail:    address.Detail,
 	}
 }
+
+func BuildAddresses(addresses []*domainModel.Address) []*model.AddressInfo {
+	if addresses == nil {
+		return nil
+	}
+	res := make([]*model.AddressInfo, 0, len(addresses))
+	for _, addr := range addresses {
+		res = append(res, BuildAddress(addr))
+	}
+	return res
+}

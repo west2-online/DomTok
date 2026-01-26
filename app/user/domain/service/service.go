@@ -62,11 +62,49 @@ func (svc *UserService) GetAddress(ctx context.Context, addressID int64) (addres
 }
 
 func (svc *UserService) AddAddress(ctx context.Context, address *model.Address) (addressID int64, err error) {
+	uid, err := metadata.GetLoginData(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("domain.svc.AddAddress failed: %w", err)
+	}
+	address.Uid = uid
 	addressID, err = svc.db.CreateAddress(ctx, address)
 	if err != nil {
 		return 0, fmt.Errorf("domain.svc.AddAddress failed: %w", err)
 	}
 	return addressID, nil
+}
+
+func (svc *UserService) ListAddress(ctx context.Context, pageNum, pageSize int) ([]*model.Address, error) {
+	uid, err := metadata.GetLoginData(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("domain.svc.ListAddress failed: %w", err)
+	}
+	addresses, err := svc.db.ListAddress(ctx, uid, pageNum, pageSize)
+	if err != nil {
+		return nil, fmt.Errorf("domain.svc.ListAddress failed: %w", err)
+	}
+	return addresses, nil
+}
+
+func (svc *UserService) DeleteAddress(ctx context.Context, addressID int64) error {
+	uid, err := metadata.GetLoginData(ctx)
+	if err != nil {
+		return fmt.Errorf("domain.svc.DeleteAddress failed: %w", err)
+	}
+
+	address, err := svc.db.GetAddressInfo(ctx, addressID)
+	if err != nil {
+		return fmt.Errorf("domain.svc.DeleteAddress failed: %w", err)
+	}
+
+	if address.Uid != uid {
+		return errno.NewErrNo(errno.AuthNoOperatePermissionCode, "permission denied")
+	}
+
+	if err := svc.db.DeleteAddress(ctx, addressID); err != nil {
+		return fmt.Errorf("domain.svc.DeleteAddress failed: %w", err)
+	}
+	return nil
 }
 
 func (svc *UserService) UserLogin(ctx context.Context, uid int64) error {

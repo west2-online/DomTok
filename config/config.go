@@ -29,21 +29,20 @@ import (
 )
 
 var (
-	Server        *server
-	Mysql         *mySQL
-	Snowflake     *snowflake
-	Service       *service
-	Jaeger        *jaeger
-	Etcd          *etcd
-	Redis         *redis
-	DefaultUser   *defaultUser
-	Elasticsearch *elasticsearch
-	Kafka         *kafka
-	Volcengine    *volcengine
-	Upyun         *upyun
-	Rocketmq      *rocketmq
-	Otel          *otel
-	Administrator *administrator
+	Server        *ServerConfig
+	Mysql         *MySQLConfig
+	Snowflake     *SnowflakeConfig
+	Service       *ServiceConfig
+	Jaeger        *JaegerConfig
+	Etcd          *EtcdConfig
+	Redis         *RedisConfig
+	Elasticsearch *ElasticsearchConfig
+	Kafka         *KafkaConfig
+	Volcengine    *VolcengineConfig
+	Tos           *TosConfig
+	Rocketmq      *RocketmqConfig
+	Otel          *OtelConfig
+	Administrator *AdministratorConfig
 	runtimeViper  = viper.New()
 )
 
@@ -62,7 +61,7 @@ func Init(service string) {
 		logger.Fatalf("config.Init: etcd addr is empty")
 	}
 	logger.Infof("config.Init: etcd addr: %v", etcdAddr)
-	Etcd = &etcd{Addr: etcdAddr}
+	Etcd = &EtcdConfig{Addr: etcdAddr}
 
 	// 配置存储在 etcd 中
 	err := runtimeViper.AddRemoteProvider(remoteProvider, Etcd.Addr, remotePath)
@@ -91,7 +90,7 @@ func Init(service string) {
 
 // configMapping 用于将配置映射到全局变量
 func configMapping(srv string) {
-	c := new(config)
+	c := new(Config)
 	if err := runtimeViper.Unmarshal(&c); err != nil {
 		// 由于这个函数会在配置重载时被再次触发，所以需要判断日志记录方式
 		logger.Fatalf("config.configMapping: config: unmarshal error: %v", err)
@@ -103,19 +102,17 @@ func configMapping(srv string) {
 	Redis = &c.Redis
 	Elasticsearch = &c.Elasticsearch
 	Kafka = &c.Kafka
-	DefaultUser = &c.DefaultUser
 	Volcengine = &c.Volcengine
-	Upyun = &c.Upyun
+	Tos = &c.Tos
 	Rocketmq = &c.Rocketmq
 	Service = getService(srv)
 	Otel = &c.Otel
 	Administrator = &c.Administrator
 }
 
-func getService(name string) *service {
+func getService(name string) *ServiceConfig {
 	addrList := runtimeViper.GetStringSlice("services." + name + ".addr")
-
-	return &service{
+	return &ServiceConfig{
 		Name:     runtimeViper.GetString("services." + name + ".name"),
 		AddrList: addrList,
 		LB:       runtimeViper.GetBool("services." + name + ".load-balance"),

@@ -24,7 +24,6 @@ import (
 	"net"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/h2non/filetype"
 	"github.com/h2non/filetype/types"
@@ -35,19 +34,6 @@ import (
 	"github.com/west2-online/DomTok/pkg/errno"
 	"github.com/west2-online/DomTok/pkg/logger"
 )
-
-const DefaultFilePermissions = 0o666 // 默认文件权限
-
-// TimeParse 会将文本日期解析为标准时间对象
-func TimeParse(date string) (time.Time, error) {
-	return time.Parse("2006-01-02", date)
-}
-
-// LoadCNLocation 载入cn时间
-func LoadCNLocation() *time.Location {
-	Loc, _ := time.LoadLocation("Asia/Shanghai")
-	return Loc
-}
 
 // GetMysqlDSN 会拼接 mysql 的 DSN
 func GetMysqlDSN() (string, error) {
@@ -179,17 +165,9 @@ func FileToBytes(file *multipart.FileHeader) (ret [][]byte, err error) {
 	return ret, nil
 }
 
-func GenerateFileName(path string, id int64) string {
-	currentTime := time.Now()
-	// 获取年月日和小时分钟
-	year, month, day := currentTime.Date()
-	hour, minute := currentTime.Hour(), currentTime.Minute()
-	second := currentTime.Second()
-	nanoSecond := currentTime.Nanosecond()
-	return strings.Join([]string{
-		config.Upyun.UssDomain, "/", config.Upyun.Bucket, path,
-		fmt.Sprintf("%d_%d%02d%02d_%02d%02d%02d%03d.", id, year, month, day, hour, minute, second, nanoSecond),
-	}, "")
+// GenerateTosFilePath 会生成tos的文件路径, 格式为: path/id
+func GenerateTosFilePath(path string, id int64) string {
+	return fmt.Sprintf("%s/%d", path, id)
 }
 
 func DecimalFloat64(d *decimal.Decimal) float64 {

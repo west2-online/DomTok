@@ -4,6 +4,7 @@
 # 执行 go install golang.org/x/tools/cmd/goimports@latest
 # 执行 go install golang.org/x/vuln/cmd/govulncheck@latest
 # 执行 go install mvdan.cc/gofumpt@latest
+# 执行 go install github.com/vetcher/go-accessor@latest
 # 访问 https://golangci-lint.run/welcome/install/ 以查看安装 golangci-lint 的方法
 
 
@@ -86,6 +87,10 @@ kitex-gen-%:
 .PHONY: hz-%
 hz-%:
 	hz update -idl ${IDL_PATH}/api/$*.thrift
+
+.PHONY: gen
+gen:
+	go generate ./...
 
 # 单元测试
 # -gcflags="all=-l -N": -l 表示禁用内联优化，-N 表示禁用优化
@@ -197,7 +202,7 @@ vet:
 # 代码格式校验
 .PHONY: lint
 lint:
-	golangci-lint run --config=./.golangci.yml --tests --allow-parallel-runners --sort-results --show-stats --print-resources-usage
+	golangci-lint run --config=./.golangci.yml
 
 # 检查依赖漏洞
 .PHONY: vulncheck

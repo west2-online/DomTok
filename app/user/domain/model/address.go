@@ -18,6 +18,7 @@ package model
 
 type Address struct {
 	AddressID int64
+	Uid       int64
 	Province  string
 	City      string
 	Detail    string
